@@ -41,6 +41,14 @@ func main() {
 	http.HandleFunc("/VolumeDriver.Mount", driver.Mount)
 	http.HandleFunc("/VolumeDriver.Unmount", driver.Unmount)
 	http.HandleFunc("/VolumeDriver.Path", driver.Path)
+	http.HandleFunc("/VolumeDriver.Get", driver.Get)
+	http.HandleFunc("/VolumeDriver.List", driver.List)
+
+	// Catch all other paths to return an error
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Received unknown request: %s", r.URL.Path)
+		http.Error(w, "Not Found", http.StatusNotFound)
+	})
 
 	listener, err := net.Listen("unix", socketPath)
 	if err != nil {
