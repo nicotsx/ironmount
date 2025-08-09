@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  ironmount:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ironmount
+    restart: unless-stopped
+    volumes:
+      - /run/docker/plugins:/run/docker/plugins
+      - /tmp/ironmount:/tmp/ironmount
