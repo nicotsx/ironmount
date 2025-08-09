@@ -3,20 +3,20 @@ package driver
 import (
 	"encoding/json"
 	"ironmount/internal/db"
-	"log"
 	"net/http"
 	"os"
+
+	"github.com/rs/zerolog/hlog"
+	"github.com/rs/zerolog/log"
 )
 
 func Remove(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Received remove request: %s", r.URL.Path)
-
 	var req RemoveRequest
 	_ = json.NewDecoder(r.Body).Decode(&req)
 
 	vol, err := db.GetVolumeByName(req.Name)
 	if err != nil {
-		log.Printf("Error retrieving volume: %s", err.Error())
+		hlog.FromRequest(r).Error().Err(err).Msg("Error retrieving volume")
 		_ = json.NewEncoder(w).Encode(map[string]string{
 			"Err": err.Error(),
 		})
@@ -24,6 +24,8 @@ func Remove(w http.ResponseWriter, r *http.Request) {
 	}
 
 	db.RemoveVolume(vol.Name)
+
+	log.Info().Str("path", vol.Path).Msg("Removing volume directory")
 	os.RemoveAll(vol.Path)
 
 	_ = json.NewEncoder(w).Encode(map[string]string{"Err": ""})

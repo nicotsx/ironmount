@@ -3,10 +3,14 @@ package main
 import (
 	"ironmount/internal/db"
 	"ironmount/internal/driver"
-	"log"
 	"net"
 	"net/http"
 	"os"
+	"time"
+
+	"github.com/justinas/alice"
+	"github.com/rs/zerolog/hlog"
+	"github.com/rs/zerolog/log"
 )
 
 const volumeRoot = "/tmp/ironmount"
@@ -22,42 +26,53 @@ func main() {
 	db.Init()
 
 	if err := os.MkdirAll("/run/docker/plugins", 0755); err != nil {
-		log.Fatalf("Failed to create plugin directory: %v", err)
+		log.Fatal().Err(err).Msg("Failed to create plugin directory")
 	}
 
 	if err := os.MkdirAll(volumeRoot, 0755); err != nil {
-		log.Fatalf("Failed to create volume root: %v", err)
+		log.Fatal().Err(err).Msg("Failed to create volume root")
 	}
 
 	if err := os.MkdirAll("/run/docker/plugins", 0755); err != nil {
-		log.Fatalf("Failed to create plugin directory: %v", err)
+		log.Fatal().Err(err).Msg("Failed to create plugin directory")
 	}
 
 	socketPath := "/run/docker/plugins/ironmount.sock"
 	if err := os.RemoveAll(socketPath); err != nil {
-		log.Fatalf("Failed to remove existing socket: %v", err)
+		log.Fatal().Err(err).Msg("Failed to remove existing socket")
 	}
 
-	http.HandleFunc("/Plugin.Activate", driver.Activate)
-	http.HandleFunc("/VolumeDriver.Create", driver.Create)
-	http.HandleFunc("/VolumeDriver.Remove", driver.Remove)
-	http.HandleFunc("/VolumeDriver.Mount", driver.Mount)
-	http.HandleFunc("/VolumeDriver.Unmount", driver.Unmount)
-	http.HandleFunc("/VolumeDriver.Path", driver.Path)
-	http.HandleFunc("/VolumeDriver.Get", driver.Get)
-	http.HandleFunc("/VolumeDriver.List", driver.List)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/Plugin.Activate", driver.Activate)
+	mux.HandleFunc("/VolumeDriver.Create", driver.Create)
+	mux.HandleFunc("/VolumeDriver.Remove", driver.Remove)
+	mux.HandleFunc("/VolumeDriver.Mount", driver.Mount)
+	mux.HandleFunc("/VolumeDriver.Unmount", driver.Unmount)
+	mux.HandleFunc("/VolumeDriver.Path", driver.Path)
+	mux.HandleFunc("/VolumeDriver.Get", driver.Get)
+	mux.HandleFunc("/VolumeDriver.List", driver.List)
 
-	// Catch all other paths to return an error
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("Received unknown request: %s", r.URL.Path)
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Not Found", http.StatusNotFound)
 	})
 
 	listener, err := net.Listen("unix", socketPath)
 	if err != nil {
-		log.Fatalf("Failed to listen on socket: %v", err)
+		log.Fatal().Err(err).Msg("Failed to listen on socket")
 	}
 
-	log.Printf("Irounmount plugin started, listening on %s", socketPath)
-	log.Fatal(http.Serve(listener, nil))
+	chain := alice.New()
+	chain = chain.Append(hlog.NewHandler(log.Logger))
+	chain = chain.Append(hlog.AccessHandler(func(r *http.Request, status, size int, duration time.Duration) {
+		hlog.FromRequest(r).Info().
+			Str("method", r.Method).
+			Str("url", r.URL.Path).
+			Int("status", status).
+			Msg("")
+	}))
+
+	log.Info().Str("socket", socketPath).Msg("Irounmount plugin started, listening on")
+	if err := http.Serve(listener, chain.Then(mux)); err != nil {
+		log.Fatal().Err(err).Msg("Server stopped")
+	}
 }

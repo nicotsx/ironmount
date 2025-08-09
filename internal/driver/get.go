@@ -3,13 +3,12 @@ package driver
 import (
 	"encoding/json"
 	"ironmount/internal/db"
-	"log"
 	"net/http"
+
+	"github.com/rs/zerolog/hlog"
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Received get request: %s", r.URL.Path)
-
 	var req struct {
 		Name string
 	}
@@ -18,7 +17,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
 	vol, err := db.GetVolumeByName(req.Name)
 
 	if err != nil {
-		log.Printf("Error retrieving volume: %s", err.Error())
+		hlog.FromRequest(r).Error().Err(err).Msg("Error retrieving volume")
 
 		response := map[string]string{
 			"Err": err.Error(),

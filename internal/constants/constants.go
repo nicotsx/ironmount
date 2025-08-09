@@ -1,3 +1,3 @@
 package constants
 
-var VolumeRoot = "/home/nicolas/ironmount/tmp"
+var VolumeRoot = "/tmp/ironmount"

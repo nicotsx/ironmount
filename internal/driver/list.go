@@ -3,16 +3,15 @@ package driver
 import (
 	"encoding/json"
 	"ironmount/internal/db"
-	"log"
 	"net/http"
+
+	"github.com/rs/zerolog/hlog"
 )
 
 func List(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Received list request: %s", r.URL.Path)
-
 	volumes, err := db.ListVolumes()
 	if err != nil {
-		log.Printf("Error listing volumes: %s", err.Error())
+		hlog.FromRequest(r).Error().Err(err).Msg("Error listing volumes")
 		json.NewEncoder(w).Encode(map[string]any{
 			"Volumes": nil,
 			"Err":     err.Error(),

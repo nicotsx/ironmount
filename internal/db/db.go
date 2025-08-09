@@ -2,8 +2,8 @@ package db
 
 import (
 	"database/sql"
-	"log"
 
+	"github.com/rs/zerolog/log"
 	_ "modernc.org/sqlite"
 )
 
@@ -59,10 +59,9 @@ func CreateVolume(name, path string) error {
 func RemoveVolume(name string) error {
 	_, err := DB.Exec("DELETE FROM volumes WHERE name = ?", name)
 
-	log.Printf("Removing volume: %s", name)
-	log.Printf("Error removing volume: %v", err)
-
+	log.Info().Str("volume", name).Msg("Removing volume")
 	if err != nil {
+		log.Error().Err(err).Str("volume", name).Msg("Error removing volume")
 		return err
 	}
 	return nil
