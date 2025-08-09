@@ -2,10 +2,13 @@ package driver
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
 func Mount(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Received mount request: %s", r.URL.Path)
+
 	var req MountRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 

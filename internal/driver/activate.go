@@ -7,7 +7,6 @@ import (
 )
 
 func Activate(w http.ResponseWriter, r *http.Request) {
-	// Log the activation request
 	log.Printf("Received activation request: %s", r.URL.Path)
 
 	resp := map[string]any{

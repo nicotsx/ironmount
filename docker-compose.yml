@@ -4,9 +4,13 @@ services:
   ironmount:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: ironmount
     restart: unless-stopped
     volumes:
+      - ./:/ironmount
+
       - /run/docker/plugins:/run/docker/plugins
       - /tmp/ironmount:/tmp/ironmount
+    environment:
+      - GO_ENV=development

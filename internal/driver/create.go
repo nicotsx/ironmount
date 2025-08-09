@@ -3,12 +3,15 @@ package driver
 import (
 	"encoding/json"
 	"ironmount/internal/constants"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 )
 
 func Create(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Received create request: %s", r.URL.Path)
+
 	var req struct {
 		Name string
 	}

@@ -2,10 +2,13 @@ package driver
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
 func Path(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Received path request: %s", r.URL.Path)
+
 	var req PathRequest
 	_ = json.NewDecoder(r.Body).Decode(&req)
 
