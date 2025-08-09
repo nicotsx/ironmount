@@ -3,6 +3,7 @@ package driver
 import (
 	"encoding/json"
 	"ironmount/internal/constants"
+	"ironmount/internal/db"
 	"log"
 	"net/http"
 	"os"
@@ -24,12 +25,13 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	db.CreateVolume(req.Name, volPath)
+
 	response := map[string]string{
 		"Name":       req.Name,
 		"Mountpoint": volPath,
 		"Err":        "",
 	}
 
-	volumes[req.Name] = Volume{Name: req.Name, Path: volPath}
 	_ = json.NewEncoder(w).Encode(response)
 }

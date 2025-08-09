@@ -9,8 +9,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./:/ironmount
-
       - /run/docker/plugins:/run/docker/plugins
-      - /tmp/ironmount:/tmp/ironmount
+      - ./tmp:/tmp/ironmount
     environment:
       - GO_ENV=development

@@ -2,6 +2,7 @@ package driver
 
 import (
 	"encoding/json"
+	"ironmount/internal/db"
 	"log"
 	"net/http"
 )
@@ -9,14 +10,18 @@ import (
 func List(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Received list request: %s", r.URL.Path)
 
-	var vols []map[string]string
-	for _, v := range volumes {
-		vols = append(vols, map[string]string{
-			"Name": v.Name,
+	volumes, err := db.ListVolumes()
+	if err != nil {
+		log.Printf("Error listing volumes: %s", err.Error())
+		json.NewEncoder(w).Encode(map[string]any{
+			"Volumes": nil,
+			"Err":     err.Error(),
 		})
+		return
 	}
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"Volumes": vols,
+
+	json.NewEncoder(w).Encode(map[string]any{
+		"Volumes": volumes,
 		"Err":     "",
 	})
 }

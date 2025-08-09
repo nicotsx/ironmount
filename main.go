@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ironmount/internal/db"
 	"ironmount/internal/driver"
 	"log"
 	"net"
@@ -18,6 +19,8 @@ type Volume struct {
 var volumes = map[string]Volume{}
 
 func main() {
+	db.Init()
+
 	if err := os.MkdirAll("/run/docker/plugins", 0755); err != nil {
 		log.Fatalf("Failed to create plugin directory: %v", err)
 	}

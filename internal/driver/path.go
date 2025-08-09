@@ -2,6 +2,7 @@ package driver
 
 import (
 	"encoding/json"
+	"ironmount/internal/db"
 	"log"
 	"net/http"
 )
@@ -12,9 +13,11 @@ func Path(w http.ResponseWriter, r *http.Request) {
 	var req PathRequest
 	_ = json.NewDecoder(r.Body).Decode(&req)
 
-	vol, ok := volumes[req.Name]
-	if !ok {
-		_ = json.NewEncoder(w).Encode(map[string]string{"Err": "volume not found"})
+	vol, err := db.GetVolumeByName(req.Name)
+	if err != nil {
+		_ = json.NewEncoder(w).Encode(map[string]string{
+			"Err": err.Error(),
+		})
 		return
 	}
 

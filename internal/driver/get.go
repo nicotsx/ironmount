@@ -2,6 +2,7 @@ package driver
 
 import (
 	"encoding/json"
+	"ironmount/internal/db"
 	"log"
 	"net/http"
 )
@@ -14,7 +15,18 @@ func Get(w http.ResponseWriter, r *http.Request) {
 	}
 	_ = json.NewDecoder(r.Body).Decode(&req)
 
-	vol := volumes[req.Name]
+	vol, err := db.GetVolumeByName(req.Name)
+
+	if err != nil {
+		log.Printf("Error retrieving volume: %s", err.Error())
+
+		response := map[string]string{
+			"Err": err.Error(),
+		}
+		_ = json.NewEncoder(w).Encode(response)
+
+		return
+	}
 
 	response := map[string]any{
 		"Volume": map[string]any{

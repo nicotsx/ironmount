@@ -32,3 +32,4 @@ go.work.sum
 # .vscode/
 ironmount
 out/
+*.db
