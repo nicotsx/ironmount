@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ironmount/internal/constants"
 	"ironmount/internal/db"
 	"ironmount/internal/driver"
 	"net"
@@ -12,8 +13,6 @@ import (
 	"github.com/rs/zerolog/hlog"
 	"github.com/rs/zerolog/log"
 )
-
-const volumeRoot = "/tmp/ironmount"
 
 type Volume struct {
 	Name string
@@ -29,7 +28,7 @@ func main() {
 		log.Fatal().Err(err).Msg("Failed to create plugin directory")
 	}
 
-	if err := os.MkdirAll(volumeRoot, 0755); err != nil {
+	if err := os.MkdirAll(constants.VolumeRootLocal, 0755); err != nil {
 		log.Fatal().Err(err).Msg("Failed to create volume root")
 	}
 

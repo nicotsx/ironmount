@@ -7,9 +7,16 @@ services:
       dockerfile: Dockerfile.dev
     container_name: ironmount
     restart: unless-stopped
+    cap_add:
+      - SYS_ADMIN
+      - SYS_MODULE
+    # security_opt:
+    #   - apparmor:unconfined
     volumes:
       - ./:/ironmount
       - /run/docker/plugins:/run/docker/plugins
-      - ./tmp:/tmp/ironmount
+
+      - /home/nicolas/ironmount/tmp:/mounts
     environment:
       - GO_ENV=development
+      - VOLUME_ROOT=/home/nicolas/ironmount/tmp

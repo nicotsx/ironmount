@@ -1,3 +1,3 @@
 package constants
 
-var VolumeRoot = "/tmp/ironmount"
+const VolumeRootLocal = "/mounts"

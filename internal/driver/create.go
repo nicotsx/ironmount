@@ -2,6 +2,7 @@ package driver
 
 import (
 	"encoding/json"
+	"ironmount/internal/constants"
 	"ironmount/internal/core"
 	"ironmount/internal/db"
 	"net/http"
@@ -19,20 +20,21 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&req)
 
 	cfg := core.LoadConfig()
-	volPath := filepath.Join(cfg.VolumeRoot, req.Name)
+	volPathHost := filepath.Join(cfg.VolumeRootHost, req.Name)
+	volPathLocal := filepath.Join(constants.VolumeRootLocal, req.Name)
 
-	log.Info().Str("path", volPath).Msg("Creating volume directory")
-	if err := os.MkdirAll(volPath, 0755); err != nil {
-		log.Error().Err(err).Str("path", volPath).Msg("Failed to create volume directory")
+	log.Info().Str("path", volPathLocal).Msg("Creating volume directory")
+	if err := os.MkdirAll(volPathLocal, 0755); err != nil {
+		log.Error().Err(err).Str("path", volPathLocal).Msg("Failed to create volume directory")
 		_ = json.NewEncoder(w).Encode(map[string]string{"Err": err.Error()})
 		return
 	}
 
-	db.CreateVolume(req.Name, volPath)
+	db.CreateVolume(req.Name, volPathHost)
 
 	response := map[string]string{
 		"Name":       req.Name,
-		"Mountpoint": volPath,
+		"Mountpoint": volPathHost,
 		"Err":        "",
 	}
 

@@ -33,3 +33,4 @@ go.work.sum
 ironmount
 out/
 *.db
+tmp/
