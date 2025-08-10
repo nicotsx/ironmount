@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ironmount/internal/api"
 	"ironmount/internal/constants"
 	"ironmount/internal/core"
 	"ironmount/internal/db"
@@ -18,8 +19,6 @@ type Volume struct {
 	Name string
 	Path string
 }
-
-var volumes = map[string]Volume{}
 
 func main() {
 	db.Init()
@@ -48,6 +47,7 @@ func main() {
 	router.Use(gin.Recovery())
 
 	driver.SetupHandlers(router)
+	api.SetupHandlers(router)
 
 	unixListener, err := net.Listen("unix", socketPath)
 	if err != nil {

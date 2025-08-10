@@ -1,6 +1,7 @@
 package driver
 
 import (
+	"fmt"
 	"ironmount/internal/db"
 	"net/http"
 
@@ -19,6 +20,8 @@ func Get(c *gin.Context) {
 
 	vol, err := db.GetVolumeByName(body.Name)
 
+	fmt.Println("Get volume by name:", vol.Name)
+
 	if err != nil {
 		log.Warn().Err(err).Str("name", body.Name).Msg("Failed to get volume by name")
 		response := map[string]string{
@@ -34,6 +37,7 @@ func Get(c *gin.Context) {
 			"Name":       vol.Name,
 			"Mountpoint": vol.Path,
 			"Status":     map[string]string{},
+			// "CreatedAt":  vol.CreatedAt,
 		},
 		"Err": "",
 	}

@@ -8,8 +8,9 @@ import (
 )
 
 type Volume struct {
-	Name string `json:"name"`
-	Path string `json:"path"`
+	Name      string `json:"name"`
+	Path      string `json:"path"`
+	CreatedAt string `json:"created_at"`
 }
 
 // DB is the global database connection
@@ -24,7 +25,8 @@ func Init() {
 	_, err = DB.Exec(`
 	CREATE TABLE IF NOT EXISTS volumes (
 		name TEXT PRIMARY KEY,
-		path TEXT NOT NULL
+		path TEXT NOT NULL,
+		created_at TEXT DEFAULT (datetime('now'))
 	);
 	`)
 	if err != nil {
@@ -39,6 +41,9 @@ func GetVolumeByName(n string) (*Volume, error) {
 	err := DB.QueryRow("SELECT name, path FROM volumes WHERE name = ?", n).Scan(&name, &path)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 
