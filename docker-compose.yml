@@ -18,7 +18,7 @@ services:
 
       - ./:/app/
         
-      - /home/nicolas/ironmount/tmp:/mounts:rshared
+      - ./tmp:/mounts #:rshared
     environment:
       - GO_ENV=development
-      - VOLUME_ROOT=/home/nicolas/ironmount/tmp
+      - VOLUME_ROOT=/Users/nicolas/Developer/dir/ironmount/tmp

@@ -1,11 +1,11 @@
 package main
 
 import (
-	"ironmount/internal/api"
 	"ironmount/internal/constants"
 	"ironmount/internal/core"
 	"ironmount/internal/db"
-	"ironmount/internal/driver"
+	"ironmount/internal/modules/driver"
+	"ironmount/internal/modules/volumes"
 
 	"net"
 	"net/http"
@@ -15,13 +15,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type Volume struct {
-	Name string
-	Path string
-}
-
 func main() {
-	db.Init()
+	db.InitDB()
 
 	if err := os.MkdirAll("/run/docker/plugins", 0755); err != nil {
 		log.Fatal().Err(err).Msg("Failed to create plugin directory")
@@ -46,8 +41,12 @@ func main() {
 	router.Use(core.GinLogger())
 	router.Use(gin.Recovery())
 
+	router.GET("/api/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
+
 	driver.SetupHandlers(router)
-	api.SetupHandlers(router)
+	volumes.SetupHandlers(router)
 
 	unixListener, err := net.Listen("unix", socketPath)
 	if err != nil {
