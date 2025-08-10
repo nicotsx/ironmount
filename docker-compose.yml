@@ -10,12 +10,15 @@ services:
     cap_add:
       - SYS_ADMIN
       - SYS_MODULE
+    ports:
+      - "8080:8080"
     # security_opt:
     #   - apparmor:unconfined
     volumes:
-      - ./:/ironmount
+      - ./main.go:/ironmount/main.go
+      - ./internal:/irounmount/internal
+        
       - /run/docker/plugins:/run/docker/plugins
-
       - /home/nicolas/ironmount/tmp:/mounts
     environment:
       - GO_ENV=development
