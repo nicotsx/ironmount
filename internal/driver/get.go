@@ -1,28 +1,30 @@
 package driver
 
 import (
-	"encoding/json"
 	"ironmount/internal/db"
 	"net/http"
 
-	"github.com/rs/zerolog/hlog"
+	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 )
 
-func Get(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		Name string
-	}
-	_ = json.NewDecoder(r.Body).Decode(&req)
+func Get(c *gin.Context) {
+	var body GetRequest
 
-	vol, err := db.GetVolumeByName(req.Name)
+	if err := c.BindJSON(&body); err != nil {
+		log.Error().Err(err).Msg("Failed to bind JSON for Get request")
+		c.JSON(http.StatusBadRequest, gin.H{"Err": err.Error()})
+		return
+	}
+
+	vol, err := db.GetVolumeByName(body.Name)
 
 	if err != nil {
-		hlog.FromRequest(r).Error().Err(err).Msg("Error retrieving volume")
-
+		log.Warn().Err(err).Str("name", body.Name).Msg("Failed to get volume by name")
 		response := map[string]string{
 			"Err": err.Error(),
 		}
-		_ = json.NewEncoder(w).Encode(response)
+		c.JSON(http.StatusNotFound, response)
 
 		return
 	}
@@ -36,5 +38,5 @@ func Get(w http.ResponseWriter, r *http.Request) {
 		"Err": "",
 	}
 
-	_ = json.NewEncoder(w).Encode(response)
+	c.JSON(http.StatusOK, response)
 }

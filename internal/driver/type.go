@@ -5,6 +5,10 @@ type CreateRequest struct {
 	Name string
 }
 
+type GetRequest struct {
+	Name string
+}
+
 // RemoveRequest is the JSON request for Remove
 type RemoveRequest struct {
 	Name string

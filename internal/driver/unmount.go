@@ -1,10 +1,13 @@
 package driver
 
 import (
-	"encoding/json"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-func Unmount(w http.ResponseWriter, r *http.Request) {
-	_ = json.NewEncoder(w).Encode(map[string]string{"Err": ""})
+func Unmount(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"Err": "",
+	})
 }

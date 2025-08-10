@@ -1,27 +1,31 @@
 package driver
 
 import (
-	"encoding/json"
 	"ironmount/internal/db"
 	"net/http"
 
-	"github.com/rs/zerolog/hlog"
+	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 )
 
-func Path(w http.ResponseWriter, r *http.Request) {
+func Path(c *gin.Context) {
 	var req PathRequest
-	_ = json.NewDecoder(r.Body).Decode(&req)
 
-	vol, err := db.GetVolumeByName(req.Name)
-	if err != nil {
-		hlog.FromRequest(r).Error().Err(err).Msg("Error retrieving volume")
-		_ = json.NewEncoder(w).Encode(map[string]string{
-			"Err": err.Error(),
-		})
+	if err := c.BindJSON(&req); err != nil {
+		log.Error().Err(err).Msg("Invalid request body for Path")
+		c.JSON(http.StatusBadRequest, gin.H{"Err": "Invalid request body"})
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(map[string]string{
+	vol, err := db.GetVolumeByName(req.Name)
+	if err != nil {
+		log.Error().Err(err).Str("volume", req.Name).Msg("Failed to get volume by name")
+
+		c.JSON(http.StatusNotFound, gin.H{"Err": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
 		"Mountpoint": vol.Path,
 		"Err":        "",
 	})

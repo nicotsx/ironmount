@@ -2,15 +2,15 @@ package main
 
 import (
 	"ironmount/internal/constants"
+	"ironmount/internal/core"
 	"ironmount/internal/db"
 	"ironmount/internal/driver"
+
 	"net"
 	"net/http"
 	"os"
-	"time"
 
-	"github.com/justinas/alice"
-	"github.com/rs/zerolog/hlog"
+	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 )
 
@@ -41,30 +41,36 @@ func main() {
 		log.Fatal().Err(err).Msg("Failed to remove existing socket")
 	}
 
-	mux := http.NewServeMux()
-	driver.SetupHandlers(mux)
+	gin.SetMode(gin.ReleaseMode)
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "Not Found", http.StatusNotFound)
-	})
+	router := gin.New()
+	router.Use(core.GinLogger())
+	router.Use(gin.Recovery())
 
-	listener, err := net.Listen("unix", socketPath)
+	driver.SetupHandlers(router)
+
+	unixListener, err := net.Listen("unix", socketPath)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to listen on socket")
 	}
 
-	chain := alice.New()
-	chain = chain.Append(hlog.NewHandler(log.Logger))
-	chain = chain.Append(hlog.AccessHandler(func(r *http.Request, status, size int, duration time.Duration) {
-		hlog.FromRequest(r).Info().
-			Str("method", r.Method).
-			Str("url", r.URL.Path).
-			Int("status", status).
-			Msg("")
-	}))
+	tcpListener, err := net.Listen("tcp", ":8080")
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to listen on TCP port 8080")
+	}
 
-	log.Info().Str("socket", socketPath).Msg("Irounmount plugin started, listening on")
-	if err := http.Serve(listener, chain.Then(mux)); err != nil {
-		log.Fatal().Err(err).Msg("Server stopped")
+	unixServer := &http.Server{Handler: router}
+	tcpServer := &http.Server{Handler: router}
+
+	go func() {
+		log.Info().Msg("Listening on TCP :8080")
+		if err := tcpServer.Serve(tcpListener); err != nil && err != http.ErrServerClosed {
+			log.Fatal().Err(err).Msg("TCP server error")
+		}
+	}()
+
+	log.Info().Msg("Listening on UNIX " + socketPath)
+	if err := unixServer.Serve(unixListener); err != nil && err != http.ErrServerClosed {
+		log.Fatal().Err(err).Msg("Unix server error")
 	}
 }

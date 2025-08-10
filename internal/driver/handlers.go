@@ -1,17 +1,17 @@
 package driver
 
 import (
-	"net/http"
+	"github.com/gin-gonic/gin"
 )
 
-func SetupHandlers(mux *http.ServeMux) {
-	mux.HandleFunc("/Plugin.Activate", Activate)
-	mux.HandleFunc("/VolumeDriver.Create", Create)
-	mux.HandleFunc("/VolumeDriver.Remove", Remove)
-	mux.HandleFunc("/VolumeDriver.Mount", Mount)
-	mux.HandleFunc("/VolumeDriver.Unmount", Unmount)
-	mux.HandleFunc("/VolumeDriver.Path", Path)
-	mux.HandleFunc("/VolumeDriver.Get", Get)
-	mux.HandleFunc("/VolumeDriver.List", List)
-
+func SetupHandlers(router *gin.Engine) {
+	router.POST("/Plugin.Activate", Activate)
+	router.POST("/VolumeDriver.Create", Create)
+	router.POST("/VolumeDriver.Remove", Remove)
+	router.POST("/VolumeDriver.Mount", Mount)
+	router.POST("/VolumeDriver.Unmount", Unmount)
+	router.POST("/VolumeDriver.Path", Path)
+	router.POST("/VolumeDriver.Get", Get)
+	router.POST("/VolumeDriver.List", List)
+	router.POST("/VolumeDriver.Capabilities", Capabilities)
 }

@@ -1,25 +1,27 @@
 package driver
 
 import (
-	"encoding/json"
 	"ironmount/internal/db"
 	"net/http"
 
-	"github.com/rs/zerolog/hlog"
+	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 )
 
-func List(w http.ResponseWriter, r *http.Request) {
+func List(c *gin.Context) {
 	volumes, err := db.ListVolumes()
+
 	if err != nil {
-		hlog.FromRequest(r).Error().Err(err).Msg("Error listing volumes")
-		json.NewEncoder(w).Encode(map[string]any{
+		log.Error().Err(err).Msg("Failed to list volumes")
+
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"Volumes": nil,
 			"Err":     err.Error(),
 		})
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]any{
+	c.JSON(http.StatusOK, gin.H{
 		"Volumes": volumes,
 		"Err":     "",
 	})
