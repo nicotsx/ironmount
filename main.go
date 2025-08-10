@@ -42,14 +42,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/Plugin.Activate", driver.Activate)
-	mux.HandleFunc("/VolumeDriver.Create", driver.Create)
-	mux.HandleFunc("/VolumeDriver.Remove", driver.Remove)
-	mux.HandleFunc("/VolumeDriver.Mount", driver.Mount)
-	mux.HandleFunc("/VolumeDriver.Unmount", driver.Unmount)
-	mux.HandleFunc("/VolumeDriver.Path", driver.Path)
-	mux.HandleFunc("/VolumeDriver.Get", driver.Get)
-	mux.HandleFunc("/VolumeDriver.List", driver.List)
+	driver.SetupHandlers(mux)
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Not Found", http.StatusNotFound)
