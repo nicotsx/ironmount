@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 )
@@ -38,6 +39,7 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 
 	router := gin.New()
+	router.Use(cors.Default())
 	router.Use(core.GinLogger())
 	router.Use(gin.Recovery())
 

@@ -1,3 +1,4 @@
+// Package db provides database access for the Ironmount application
 package db
 
 import (

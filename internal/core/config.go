@@ -1,3 +1,4 @@
+// Package core provides the configuration loading functionality for the application.
 package core
 
 import (
