@@ -1,4 +1,6 @@
-import { Copy, Folder, Plus } from "lucide-react";
+import { Copy, Folder } from "lucide-react";
+import { useState } from "react";
+import { CreateVolumeDialog } from "~/components/create-volume-dialog";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import {
@@ -24,6 +26,7 @@ import { cn } from "~/lib/utils";
 export function Welcome() {
 	const { data } = useVolumes();
 	const deleteVolume = useDeleteVolume();
+	const [open, setOpen] = useState(false);
 
 	return (
 		<div
@@ -42,15 +45,15 @@ export function Welcome() {
 				</h2>
 				<div className="flex items-center gap-2 mt-4 justify-between">
 					<span className="flex items-center gap-2">
-						<Input className="w-[180px]" placeholder="Search volumes..." />
+						<Input className="w-[180px]" placeholder="Search volumes…" />
 						<Select>
 							<SelectTrigger className="w-[180px]">
 								<SelectValue placeholder="All status" />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value="light">Mounted</SelectItem>
-								<SelectItem value="dark">Unmounted</SelectItem>
-								<SelectItem value="system">Error</SelectItem>
+								<SelectItem value="mounted">Mounted</SelectItem>
+								<SelectItem value="unmounted">Unmounted</SelectItem>
+								<SelectItem value="error">Error</SelectItem>
 							</SelectContent>
 						</Select>
 						<Select>
@@ -58,16 +61,13 @@ export function Welcome() {
 								<SelectValue placeholder="All backends" />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value="light">Directory</SelectItem>
-								<SelectItem value="dark">NFS</SelectItem>
-								<SelectItem value="system">SMB</SelectItem>
+								<SelectItem value="directory">Directory</SelectItem>
+								<SelectItem value="nfs">NFS</SelectItem>
+								<SelectItem value="smb">SMB</SelectItem>
 							</SelectContent>
 						</Select>
 					</span>
-					<Button className="bg-blue-900 hover:bg-blue-800">
-						<Plus size={16} />
-						Create volume
-					</Button>
+					<CreateVolumeDialog open={open} setOpen={setOpen} />
 				</div>
 				<Table className="mt-4 border bg-white dark:bg-secondary">
 					<TableCaption>A list of your managed Docker volumes.</TableCaption>
@@ -84,7 +84,7 @@ export function Welcome() {
 						{data?.volumes.map((volume) => (
 							<TableRow key={volume.name}>
 								<TableCell className="font-medium">{volume.name}</TableCell>
-								<TableCell className="">
+								<TableCell>
 									<span className="mx-auto flex items-center gap-2 text-purple-800 dark:text-purple-300 rounded-md px-2 py-1">
 										<Folder size={10} />
 										Dir
@@ -98,10 +98,10 @@ export function Welcome() {
 										<Copy size={10} />
 									</span>
 								</TableCell>
-								<TableCell className="">
+								<TableCell className="text-center">
 									<span className="relative flex size-3 mx-auto">
-										<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-										<span className="relative inline-flex size-3 rounded-full bg-green-500"></span>
+										<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+										<span className="relative inline-flex size-3 rounded-full bg-green-500" />
 									</span>
 								</TableCell>
 								<TableCell className="text-right">
