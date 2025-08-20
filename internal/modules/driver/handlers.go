@@ -37,7 +37,10 @@ func SetupHandlers(router *gin.Engine) {
 			return
 		}
 
-		volume, status, err := volumeService.CreateVolume(req.Name)
+		volume, status, err := volumeService.CreateVolume(volumes.VolumeCreateRequest{
+			Name: req.Name,
+			Type: volumes.VolumeBackendTypeLocal,
+		})
 
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to create volume")

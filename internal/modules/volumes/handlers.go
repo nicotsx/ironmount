@@ -2,8 +2,6 @@
 package volumes
 
 import (
-	"ironmount/internal/core"
-
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 )
@@ -19,22 +17,15 @@ func SetupHandlers(router *gin.Engine) {
 	})
 
 	router.POST("/api/volumes", func(c *gin.Context) {
-		var req struct {
-			Name string `json:"name" binding:"required"`
-		}
+		var body VolumeCreateRequest
 
-		if err := c.ShouldBindJSON(&req); err != nil {
+		if err := c.ShouldBindJSON(&body); err != nil {
+			log.Error().Err(err).Msg("Failed to bind JSON for volume creation")
 			c.JSON(400, gin.H{"error": "Invalid request body"})
 			return
 		}
 
-		clean := core.Slugify(req.Name)
-		if clean == "" || clean != req.Name {
-			c.JSON(400, gin.H{"error": "invalid volume name"})
-			return
-		}
-
-		volume, status, err := volumeService.CreateVolume(clean)
+		volume, status, err := volumeService.CreateVolume(body)
 		if err != nil {
 			c.JSON(status, gin.H{"error": err.Error()})
 			return

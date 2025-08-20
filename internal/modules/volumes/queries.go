@@ -2,6 +2,7 @@ package volumes
 
 import (
 	"context"
+	"github.com/go-playground/validator/v10"
 	"ironmount/internal/db"
 
 	"github.com/rs/zerolog/log"
@@ -27,9 +28,18 @@ func (q *VolumeQueries) QueryVolumeByName(n string) (*db.Volume, error) {
 	return volume, nil
 }
 
-func (q *VolumeQueries) InsertVolume(name, path string) error {
+func (q *VolumeQueries) InsertVolume(name string, path string, volType VolumeBackendType, config string) error {
 	ctx := context.Background()
-	err := gorm.G[db.Volume](db.DB).Create(ctx, &db.Volume{Name: name, Path: path})
+
+	validate := validator.New(validator.WithRequiredStructEnabled())
+
+	data := &db.Volume{}
+	if err := validate.Struct(data); err != nil {
+		log.Error().Err(err).Str("name", name).Msg("Validation error while inserting volume")
+		return err
+	}
+
+	err := gorm.G[db.Volume](db.DB).Create(ctx, &db.Volume{})
 
 	if err != nil {
 		return err

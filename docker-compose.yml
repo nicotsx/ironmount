@@ -10,6 +10,7 @@ services:
       - SYS_MODULE
     ports:
       - "8080:8080"
+    privileged: true
     # security_opt:
     #   - apparmor:unconfined
     volumes:
@@ -18,7 +19,7 @@ services:
 
       - ./:/app/
         
-      - ./tmp:/mounts #:rshared
+      - /home/nicolas/ironmount/tmp:/mounts:rshared
     environment:
       - GO_ENV=development
-      - VOLUME_ROOT=/Users/nicolas/Developer/dir/ironmount/tmp
+      - VOLUME_ROOT=/home/nicolas/ironmount/tmp
