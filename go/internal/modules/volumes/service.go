@@ -74,7 +74,7 @@ func (v *VolumeService) CreateVolume(body VolumeCreateRequest) (*db.Volume, int,
 	}
 	stringConfig := string(bytesConfig)
 
-	if err := volumeQueries.InsertVolume(name, volPathHost, stringConfig); err != nil {
+	if err := volumeQueries.InsertVolume(name, volPathHost, VolumeBackendTypeLocal, stringConfig); err != nil {
 		if strings.Contains(err.Error(), "UNIQUE") {
 			return nil, http.StatusConflict, fmt.Errorf("volume %s already exists", name)
 		}

@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1755765658194,
+      "tag": "0000_known_madelyne_pryor",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1755775437391,
+      "tag": "0001_far_frank_castle",
+      "breakpoints": true
+    }
+  ]
+}

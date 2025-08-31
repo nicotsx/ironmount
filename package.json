@@ -1,0 +1,16 @@
+{
+	"name": "ironmount",
+	"private": true,
+	"packageManager": "bun@1.2.15",
+	"scripts": {
+		"dev": "turbo dev",
+		"gen:api-client": "openapi-ts"
+	},
+	"workspaces": [
+		"apps/*"
+	],
+	"devDependencies": {
+		"@hey-api/openapi-ts": "^0.80.17",
+		"turbo": "^2.5.6"
+	}
+}

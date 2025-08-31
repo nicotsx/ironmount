@@ -34,3 +34,8 @@ ironmount
 out/
 *.db
 tmp/
+
+node_modules/
+.env*
+
+.turbo

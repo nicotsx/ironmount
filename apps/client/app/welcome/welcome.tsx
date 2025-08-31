@@ -1,5 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
 import { Copy, Folder } from "lucide-react";
 import { useState } from "react";
+import { getApiV1VolumesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { CreateVolumeDialog } from "~/components/create-volume-dialog";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -20,11 +22,13 @@ import {
 	TableRow,
 } from "~/components/ui/table";
 import { useDeleteVolume } from "~/hooks/useDeleteVolume";
-import { useVolumes } from "~/hooks/useVolumes";
 import { cn } from "~/lib/utils";
 
 export function Welcome() {
-	const { data } = useVolumes();
+	const { data } = useQuery({
+		...getApiV1VolumesOptions(),
+	});
+
 	const deleteVolume = useDeleteVolume();
 	const [open, setOpen] = useState(false);
 

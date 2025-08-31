@@ -9,17 +9,22 @@ services:
       - SYS_ADMIN
       - SYS_MODULE
     ports:
-      - "8080:8080"
+      - "3000:3000"
     privileged: true
+    env_file:
+      - path: .env.local
+        required: false
     # security_opt:
     #   - apparmor:unconfined
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /run/docker/plugins:/run/docker/plugins
 
-      - ./:/app/
+      - ./apps/client/app:/apps/client/app
+      - ./apps/server/src:/apps/server/src
+
+      - ./data:/data
         
-      # - /home/nicolas/ironmount/tmp:/mounts:rshared
+      # - /home/nicolas/ironmount/tmp:/mounts #//:rshared
     environment:
-      - GO_ENV=development
       - VOLUME_ROOT=/home/nicolas/ironmount/tmp
