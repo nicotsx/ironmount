@@ -1,0 +1,14 @@
+*
+
+!turbo.json
+
+!**/package.json
+!**/bun.lock
+!**/tsconfig.json
+!**/vite.config.ts
+!**/react-router.config.ts
+
+!apps/**/src/**
+!apps/**/drizzle/**
+!apps/**/app/**
+!apps/**/public/**

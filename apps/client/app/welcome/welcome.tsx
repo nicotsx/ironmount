@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Copy, Folder } from "lucide-react";
 import { useState } from "react";
 import { getApiV1VolumesOptions } from "~/api-client/@tanstack/react-query.gen";
@@ -21,7 +21,6 @@ import {
 	TableHeader,
 	TableRow,
 } from "~/components/ui/table";
-import { useDeleteVolume } from "~/hooks/useDeleteVolume";
 import { cn } from "~/lib/utils";
 
 export function Welcome() {
@@ -29,7 +28,7 @@ export function Welcome() {
 		...getApiV1VolumesOptions(),
 	});
 
-	const deleteVolume = useDeleteVolume();
+	const deleteVolume = useMutation({});
 	const [open, setOpen] = useState(false);
 
 	return (

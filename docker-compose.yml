@@ -20,11 +20,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /run/docker/plugins:/run/docker/plugins
 
-      - ./apps/client/app:/apps/client/app
-      - ./apps/server/src:/apps/server/src
+      - ./apps/client/app:/app/apps/client/app
+      - ./apps/server/src:/app/apps/server/src
 
       - ./data:/data
         
       # - /home/nicolas/ironmount/tmp:/mounts #//:rshared
-    environment:
-      - VOLUME_ROOT=/home/nicolas/ironmount/tmp

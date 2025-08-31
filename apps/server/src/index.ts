@@ -1,13 +1,31 @@
 import * as fs from "node:fs/promises";
+import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
-import { driverController } from "./controllers/driver.controller";
-import { volumeController } from "./controllers/volume.controller";
+import { openAPISpecs } from "hono-openapi";
 import { runDbMigrations } from "./db/db";
-import {
-	generalDescriptor,
-	scalarDescriptor,
-} from "./descriptors/general.descriptors";
+import { driverController } from "./modules/driver/driver.controller";
+import { volumeController } from "./modules/volumes/volume.controller";
+
+export const generalDescriptor = (app: Hono) =>
+	openAPISpecs(app, {
+		documentation: {
+			info: {
+				title: "Ironmount API",
+				version: "1.0.0",
+				description: "API for managing Docker volumes",
+			},
+			servers: [
+				{ url: "http://localhost:3000", description: "Development Server" },
+			],
+		},
+	});
+
+export const scalarDescriptor = Scalar({
+	title: "Ironmount API Docs",
+	pageTitle: "Ironmount API Docs",
+	url: "/api/v1/openapi.json",
+});
 
 const driver = new Hono().use(logger()).route("/", driverController);
 const app = new Hono()

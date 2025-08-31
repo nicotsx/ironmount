@@ -5,11 +5,13 @@ const envSchema = type({
 	NODE_ENV: type
 		.enumerated("development", "production", "test")
 		.default("development"),
-	DB_FILE_NAME: "string",
+	VOLUME_ROOT: "string",
 }).pipe((s) => ({
 	__prod__: s.NODE_ENV === "production",
 	environment: s.NODE_ENV,
-	dbFileName: s.DB_FILE_NAME,
+	dbFileName: "/data/ironmount.db",
+	volumeRootHost: s.VOLUME_ROOT,
+	volumeRootContainer: "/mnt/volumes",
 }));
 
 const parseConfig = (env: unknown) => {

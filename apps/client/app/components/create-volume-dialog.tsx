@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useCreateVolume } from "~/hooks/useCreateVolume";
 import { slugify } from "~/lib/utils";
 import { Button } from "./ui/button";
 import {
@@ -50,7 +50,7 @@ export const CreateVolumeDialog = ({ open, setOpen }: Props) => {
 	});
 
 	const nameValue = form.watch("name");
-	const createVolume = useCreateVolume();
+	const createVolume = useMutation({});
 
 	const onSubmit = (values: { name: string }) => {
 		createVolume.mutate(values, {

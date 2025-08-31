@@ -2,9 +2,13 @@ FROM oven/bun:1.2.20-alpine AS base
 
 WORKDIR /app
 
-COPY . .
+COPY ./package.json ./bun.lock ./
+COPY ./apps/client/package.json ./apps/client/package.json
+COPY ./apps/server/package.json ./apps/server/package.json
 
 RUN bun install
+
+COPY . .
 
 EXPOSE 3000
 
