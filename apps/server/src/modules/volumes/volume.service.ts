@@ -39,6 +39,29 @@ const createVolume = async (name: string, backendConfig: BackendConfig) => {
 	return { volume: val[0], status: 201 };
 };
 
+const deleteVolume = async (name: string) => {
+	try {
+		const volume = await db.query.volumesTable.findFirst({
+			where: eq(volumesTable.name, name),
+		});
+
+		if (!volume) {
+			return { error: new NotFoundError("Volume not found") };
+		}
+
+		const backend = createVolumeBackend(volume);
+		await backend.unmount();
+		await db.delete(volumesTable).where(eq(volumesTable.name, name));
+		return { status: 200 };
+	} catch (error) {
+		return {
+			error: new InternalServerError("Failed to delete volume", {
+				cause: error,
+			}),
+		};
+	}
+};
+
 const mountVolume = async (name: string) => {
 	try {
 		const volume = await db.query.volumesTable.findFirst({
@@ -64,4 +87,5 @@ export const volumeService = {
 	listVolumes,
 	createVolume,
 	mountVolume,
+	deleteVolume,
 };

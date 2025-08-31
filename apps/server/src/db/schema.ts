@@ -25,9 +25,7 @@ const directoryConfigSchema = type({
 	backend: "'directory'",
 });
 
-export const volumeConfigSchema = nfsConfigSchema
-	.or(smbConfigSchema)
-	.or(directoryConfigSchema);
+export const volumeConfigSchema = nfsConfigSchema.or(smbConfigSchema).or(directoryConfigSchema);
 
 export type BackendConfig = typeof volumeConfigSchema.infer;
 
@@ -36,11 +34,9 @@ export const volumesTable = sqliteTable("volumes_table", {
 	name: text().notNull().unique(),
 	path: text().notNull(),
 	type: text().notNull(),
-	createdAt: int("created_at").notNull().default(sql`(current_timestamp)`),
-	updatedAt: int("updated_at").notNull().default(sql`(current_timestamp)`),
-	config: text("config", { mode: "json" })
-		.$type<typeof volumeConfigSchema.inferOut>()
-		.notNull(),
+	createdAt: int("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+	updatedAt: int("updated_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+	config: text("config", { mode: "json" }).$type<typeof volumeConfigSchema.inferOut>().notNull(),
 });
 
 export type Volume = typeof volumesTable.$inferSelect;

@@ -14,14 +14,13 @@ export type ListVolumesResponses = {
 	200: {
 		volumes: Array<{
 			createdAt: number;
-			mountpoint: string;
 			name: string;
+			path: string;
 		}>;
 	};
 };
 
-export type ListVolumesResponse =
-	ListVolumesResponses[keyof ListVolumesResponses];
+export type ListVolumesResponse = ListVolumesResponses[keyof ListVolumesResponses];
 
 export type CreateVolumeData = {
 	body?: {
@@ -51,14 +50,36 @@ export type CreateVolumeResponses = {
 	 * Volume created successfully
 	 */
 	201: {
-		createdAt: number;
-		mountpoint: string;
-		name: string;
+		message: string;
+		volume: {
+			createdAt: number;
+			name: string;
+			path: string;
+		};
 	};
 };
 
-export type CreateVolumeResponse =
-	CreateVolumeResponses[keyof CreateVolumeResponses];
+export type CreateVolumeResponse = CreateVolumeResponses[keyof CreateVolumeResponses];
+
+export type DeleteVolumeData = {
+	body?: never;
+	path: {
+		name: string;
+	};
+	query?: never;
+	url: "/api/v1/volumes/{name}";
+};
+
+export type DeleteVolumeResponses = {
+	/**
+	 * Volume deleted successfully
+	 */
+	200: {
+		message: string;
+	};
+};
+
+export type DeleteVolumeResponse = DeleteVolumeResponses[keyof DeleteVolumeResponses];
 
 export type ClientOptions = {
 	baseUrl: "http://localhost:3000" | (string & {});

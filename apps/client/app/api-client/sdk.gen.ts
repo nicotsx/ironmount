@@ -6,13 +6,15 @@ import type {
 	ListVolumesResponses,
 	CreateVolumeData,
 	CreateVolumeResponses,
+	DeleteVolumeData,
+	DeleteVolumeResponses,
 } from "./types.gen";
 import { client as _heyApiClient } from "./client.gen";
 
-export type Options<
-	TData extends TDataShape = TDataShape,
-	ThrowOnError extends boolean = boolean,
-> = ClientOptions<TData, ThrowOnError> & {
+export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = ClientOptions<
+	TData,
+	ThrowOnError
+> & {
 	/**
 	 * You can provide a client instance returned by `createClient()` instead of
 	 * individual options. This might be also useful if you want to implement a
@@ -29,14 +31,8 @@ export type Options<
 /**
  * List all volumes
  */
-export const listVolumes = <ThrowOnError extends boolean = false>(
-	options?: Options<ListVolumesData, ThrowOnError>,
-) => {
-	return (options?.client ?? _heyApiClient).get<
-		ListVolumesResponses,
-		unknown,
-		ThrowOnError
-	>({
+export const listVolumes = <ThrowOnError extends boolean = false>(options?: Options<ListVolumesData, ThrowOnError>) => {
+	return (options?.client ?? _heyApiClient).get<ListVolumesResponses, unknown, ThrowOnError>({
 		url: "/api/v1/volumes",
 		...options,
 	});
@@ -48,16 +44,24 @@ export const listVolumes = <ThrowOnError extends boolean = false>(
 export const createVolume = <ThrowOnError extends boolean = false>(
 	options?: Options<CreateVolumeData, ThrowOnError>,
 ) => {
-	return (options?.client ?? _heyApiClient).post<
-		CreateVolumeResponses,
-		unknown,
-		ThrowOnError
-	>({
+	return (options?.client ?? _heyApiClient).post<CreateVolumeResponses, unknown, ThrowOnError>({
 		url: "/api/v1/volumes",
 		...options,
 		headers: {
 			"Content-Type": "application/json",
 			...options?.headers,
 		},
+	});
+};
+
+/**
+ * Delete a volume
+ */
+export const deleteVolume = <ThrowOnError extends boolean = false>(
+	options: Options<DeleteVolumeData, ThrowOnError>,
+) => {
+	return (options.client ?? _heyApiClient).delete<DeleteVolumeResponses, unknown, ThrowOnError>({
+		url: "/api/v1/volumes/{name}",
+		...options,
 	});
 };

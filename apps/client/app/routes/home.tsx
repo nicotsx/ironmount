@@ -1,6 +1,7 @@
 import { Copy, Folder } from "lucide-react";
 import { useState } from "react";
-import { listVolumes } from "~/api-client";
+import { useFetcher } from "react-router";
+import { createVolume, deleteVolume, listVolumes } from "~/api-client";
 import { CreateVolumeDialog } from "~/components/create-volume-dialog";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -8,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
 import { cn } from "~/lib/utils";
 import type { Route } from "./+types/home";
-import { useFetcher } from "react-router";
+import { parseError } from "~/lib/errors";
+import { toast } from "sonner";
 
 export function meta(_: Route.MetaArgs) {
 	return [
@@ -25,17 +27,29 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 	const { _action, ...rest } = Object.fromEntries(formData.entries());
 
 	if (_action === "delete") {
-		return { yolo: "swag", _action: "delete" as const };
-		console.log("Delete action triggered", rest);
-		// Delete volume logic
+		const { error } = await deleteVolume({ path: { name: rest.name as string } });
+
+		if (error) {
+			toast.error("Failed to delete volume", {
+				description: parseError(error)?.message,
+			});
+		} else {
+			toast.success("Volume deleted successfully");
+		}
+
+		return { error: parseError(error), _action: "delete" as const };
 	}
 
 	if (_action === "create") {
-		console.log("Create action triggered", rest);
-		return {
-			error: "Volume with this name already exists.",
-			_action: "create" as const,
-		};
+		const { error } = await createVolume({ body: { name: rest.name as string, config: { backend: "directory" } } });
+		if (error) {
+			toast.error("Failed to create volume", {
+				description: parseError(error)?.message,
+			});
+		} else {
+			toast.success("Volume created successfully");
+		}
+		return { error: parseError(error), _action: "create" as const };
 	}
 }
 
@@ -131,7 +145,7 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
 								<TableCell>
 									<span className="flex items-center gap-2">
 										<span className="text-muted-foreground text-xs truncate bg-primary/10 rounded-md px-2 py-1">
-											{volume.mountpoint}
+											{volume.path}
 										</span>
 										<Copy size={10} />
 									</span>

@@ -9,7 +9,7 @@ import { volumeConfigSchema } from "../../db/schema";
 export const listVolumesResponse = type({
 	volumes: type({
 		name: "string",
-		mountpoint: "string",
+		path: "string",
 		createdAt: "number",
 	}).array(),
 });
@@ -41,9 +41,12 @@ export const createVolumeBody = type({
 });
 
 export const createVolumeResponse = type({
-	name: "string",
-	mountpoint: "string",
-	createdAt: "number",
+	message: "string",
+	volume: type({
+		name: "string",
+		path: "string",
+		createdAt: "number",
+	}),
 });
 
 export const createVolumeDto = describeRoute({
@@ -57,6 +60,30 @@ export const createVolumeDto = describeRoute({
 			content: {
 				"application/json": {
 					schema: resolver(createVolumeResponse),
+				},
+			},
+		},
+	},
+});
+
+/**
+ * Delete a volume
+ */
+export const deleteVolumeResponse = type({
+	message: "string",
+});
+
+export const deleteVolumeDto = describeRoute({
+	description: "Delete a volume",
+	operationId: "deleteVolume",
+	validateResponse: true,
+	tags: ["Volumes"],
+	responses: {
+		200: {
+			description: "Volume deleted successfully",
+			content: {
+				"application/json": {
+					schema: resolver(deleteVolumeResponse),
 				},
 			},
 		},

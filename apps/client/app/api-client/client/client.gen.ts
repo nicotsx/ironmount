@@ -26,12 +26,7 @@ export const createClient = (config: Config = {}): Client => {
 		return getConfig();
 	};
 
-	const interceptors = createInterceptors<
-		Request,
-		Response,
-		unknown,
-		ResolvedRequestOptions
-	>();
+	const interceptors = createInterceptors<Request, Response, unknown, ResolvedRequestOptions>();
 
 	const request: Client["request"] = async (options) => {
 		const opts = {
@@ -94,10 +89,7 @@ export const createClient = (config: Config = {}): Client => {
 		};
 
 		if (response.ok) {
-			if (
-				response.status === 204 ||
-				response.headers.get("Content-Length") === "0"
-			) {
+			if (response.status === 204 || response.headers.get("Content-Length") === "0") {
 				return opts.responseStyle === "data"
 					? {}
 					: {
@@ -107,9 +99,7 @@ export const createClient = (config: Config = {}): Client => {
 			}
 
 			const parseAs =
-				(opts.parseAs === "auto"
-					? getParseAs(response.headers.get("Content-Type"))
-					: opts.parseAs) ?? "json";
+				(opts.parseAs === "auto" ? getParseAs(response.headers.get("Content-Type")) : opts.parseAs) ?? "json";
 
 			let data: any;
 			switch (parseAs) {
