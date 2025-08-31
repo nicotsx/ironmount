@@ -1,0 +1,18 @@
+sync:
+  defaults:
+    ignore:
+      vcs: true
+      paths:
+        - "node_modules"
+        - ".git"
+        - ".DS_Store"
+        - "tmp"
+        - "logs"
+  ironmount:
+    alpha: "."
+    beta: "nicolas@192.168.2.42:/home/nicolas/ironmount"
+    mode: "one-way-safe"
+    flushOnCreate: true
+    ignore:
+      paths:
+        - "node_modules"

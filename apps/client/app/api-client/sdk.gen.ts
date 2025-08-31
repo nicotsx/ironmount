@@ -2,8 +2,10 @@
 
 import type { Options as ClientOptions, TDataShape, Client } from "./client";
 import type {
-	GetApiV1VolumesData,
-	GetApiV1VolumesResponses,
+	ListVolumesData,
+	ListVolumesResponses,
+	CreateVolumeData,
+	CreateVolumeResponses,
 } from "./types.gen";
 import { client as _heyApiClient } from "./client.gen";
 
@@ -27,15 +29,35 @@ export type Options<
 /**
  * List all volumes
  */
-export const getApiV1Volumes = <ThrowOnError extends boolean = false>(
-	options?: Options<GetApiV1VolumesData, ThrowOnError>,
+export const listVolumes = <ThrowOnError extends boolean = false>(
+	options?: Options<ListVolumesData, ThrowOnError>,
 ) => {
 	return (options?.client ?? _heyApiClient).get<
-		GetApiV1VolumesResponses,
+		ListVolumesResponses,
 		unknown,
 		ThrowOnError
 	>({
 		url: "/api/v1/volumes",
 		...options,
+	});
+};
+
+/**
+ * Create a new volume
+ */
+export const createVolume = <ThrowOnError extends boolean = false>(
+	options?: Options<CreateVolumeData, ThrowOnError>,
+) => {
+	return (options?.client ?? _heyApiClient).post<
+		CreateVolumeResponses,
+		unknown,
+		ThrowOnError
+	>({
+		url: "/api/v1/volumes",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options?.headers,
+		},
 	});
 };

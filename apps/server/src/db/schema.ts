@@ -42,3 +42,5 @@ export const volumesTable = sqliteTable("volumes_table", {
 		.$type<typeof volumeConfigSchema.inferOut>()
 		.notNull(),
 });
+
+export type Volume = typeof volumesTable.$inferSelect;

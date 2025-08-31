@@ -1,12 +1,7 @@
 import { Hono } from "hono";
 import { validator } from "hono-openapi/arktype";
 import { handleServiceError } from "../../utils/errors";
-import {
-	createVolumeBody,
-	createVolumeDto,
-	type ListVolumesResponseDto,
-	listVolumesDto,
-} from "./volume.dto";
+import { createVolumeBody, createVolumeDto, type ListVolumesResponseDto, listVolumesDto } from "./volume.dto";
 import { volumeService } from "./volume.service";
 
 export const volumeController = new Hono()
@@ -23,22 +18,17 @@ export const volumeController = new Hono()
 
 		return c.json(response, 200);
 	})
-	.post(
-		"/",
-		createVolumeDto,
-		validator("json", createVolumeBody),
-		async (c) => {
-			const body = c.req.valid("json");
-			const res = await volumeService.createVolume(body.name, body.config);
+	.post("/", createVolumeDto, validator("json", createVolumeBody), async (c) => {
+		const body = c.req.valid("json");
+		const res = await volumeService.createVolume(body.name, body.config);
 
-			if (res.error) {
-				const { message, status } = handleServiceError(res.error);
-				return c.json(message, status);
-			}
+		if (res.error) {
+			const { message, status } = handleServiceError(res.error);
+			return c.json(message, status);
+		}
 
-			return c.json({ message: "Volume created", volume: res.volume });
-		},
-	)
+		return c.json({ message: "Volume created", volume: res.volume });
+	})
 	.get("/:name", (c) => {
 		return c.json({ message: `Details of volume ${c.req.param("name")}` });
 	})

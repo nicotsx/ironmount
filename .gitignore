@@ -39,3 +39,5 @@ node_modules/
 .env*
 
 .turbo
+
+mutagen.yml.lock

@@ -18,6 +18,8 @@ export type ListVolumesResponseDto = typeof listVolumesResponse.infer;
 export const listVolumesDto = describeRoute({
 	description: "List all volumes",
 	tags: ["Volumes"],
+	operationId: "listVolumes",
+	validateResponse: true,
 	responses: {
 		200: {
 			description: "A list of volumes",
@@ -46,6 +48,8 @@ export const createVolumeResponse = type({
 
 export const createVolumeDto = describeRoute({
 	description: "Create a new volume",
+	operationId: "createVolume",
+	validateResponse: true,
 	tags: ["Volumes"],
 	responses: {
 		201: {

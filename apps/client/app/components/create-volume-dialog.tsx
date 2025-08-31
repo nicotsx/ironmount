@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,21 +13,8 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "./ui/dialog";
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from "./ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
-
-type Props = {
-	open: boolean;
-	setOpen: (open: boolean) => void;
-};
 
 const formSchema = z.object({
 	name: z
@@ -41,25 +27,20 @@ const formSchema = z.object({
 		}),
 });
 
-export const CreateVolumeDialog = ({ open, setOpen }: Props) => {
+type FormValues = z.infer<typeof formSchema>;
+type Props = {
+	open: boolean;
+	setOpen: (open: boolean) => void;
+	onSubmit: (values: FormValues) => void;
+};
+
+export const CreateVolumeDialog = ({ open, setOpen, onSubmit }: Props) => {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			name: "",
 		},
 	});
-
-	const nameValue = form.watch("name");
-	const createVolume = useMutation({});
-
-	const onSubmit = (values: { name: string }) => {
-		createVolume.mutate(values, {
-			onSuccess: () => {
-				form.reset();
-				setOpen(false);
-			},
-		});
-	};
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
@@ -72,9 +53,7 @@ export const CreateVolumeDialog = ({ open, setOpen }: Props) => {
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Create volume</DialogTitle>
-					<DialogDescription>
-						Enter a name for the new volume.
-					</DialogDescription>
+					<DialogDescription>Enter a name for the new volume.</DialogDescription>
 				</DialogHeader>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -92,25 +71,23 @@ export const CreateVolumeDialog = ({ open, setOpen }: Props) => {
 											min={1}
 										/>
 									</FormControl>
-									<FormDescription>
-										Unique identifier for the volume.
-									</FormDescription>
+									<FormDescription>Unique identifier for the volume.</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}
 						/>
-						{createVolume.error && (
-							<div className="text-red-500 text-sm">
-								{createVolume.error.message}
-							</div>
-						)}
+						{/* {createVolume.error && ( */}
+						{/* 	<div className="text-red-500 text-sm"> */}
+						{/* 		{createVolume.error.message} */}
+						{/* 	</div> */}
+						{/* )} */}
 						<DialogFooter>
 							<Button variant="secondary" onClick={() => setOpen(false)}>
 								Cancel
 							</Button>
 							<Button
 								type="submit"
-								disabled={createVolume.status === "pending" || !nameValue}
+								// disabled={createVolume.status === "pending" || !nameValue}
 							>
 								Create
 							</Button>

@@ -10,6 +10,11 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { client } from "./api-client/client.gen";
+
+client.setConfig({
+	baseUrl: "http://192.168.2.42:3000/",
+});
 
 export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },

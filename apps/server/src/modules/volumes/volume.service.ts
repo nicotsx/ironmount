@@ -1,10 +1,11 @@
 import * as path from "node:path";
 import { eq } from "drizzle-orm";
-import { ConflictError } from "http-errors-enhanced";
+import { ConflictError, InternalServerError, NotFoundError } from "http-errors-enhanced";
 import slugify from "slugify";
 import { config } from "../../core/config";
 import { db } from "../../db/db";
 import { type BackendConfig, volumesTable } from "../../db/schema";
+import { createVolumeBackend } from "../backends/backend";
 
 const listVolumes = async () => {
 	const volumes = await db.query.volumesTable.findMany({});
@@ -38,7 +39,29 @@ const createVolume = async (name: string, backendConfig: BackendConfig) => {
 	return { volume: val[0], status: 201 };
 };
 
+const mountVolume = async (name: string) => {
+	try {
+		const volume = await db.query.volumesTable.findFirst({
+			where: eq(volumesTable.name, name),
+		});
+
+		if (!volume) {
+			return { error: new NotFoundError("Volume not found") };
+		}
+
+		const backend = createVolumeBackend(volume);
+		await backend.mount();
+	} catch (error) {
+		return {
+			error: new InternalServerError("Failed to mount volume", {
+				cause: error,
+			}),
+		};
+	}
+};
+
 export const volumeService = {
 	listVolumes,
 	createVolume,
+	mountVolume,
 };
