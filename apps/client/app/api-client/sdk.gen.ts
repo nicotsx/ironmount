@@ -6,6 +6,8 @@ import type {
 	ListVolumesResponses,
 	CreateVolumeData,
 	CreateVolumeResponses,
+	TestConnectionData,
+	TestConnectionResponses,
 	DeleteVolumeData,
 	DeleteVolumeResponses,
 } from "./types.gen";
@@ -46,6 +48,22 @@ export const createVolume = <ThrowOnError extends boolean = false>(
 ) => {
 	return (options?.client ?? _heyApiClient).post<CreateVolumeResponses, unknown, ThrowOnError>({
 		url: "/api/v1/volumes",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options?.headers,
+		},
+	});
+};
+
+/**
+ * Test connection to backend
+ */
+export const testConnection = <ThrowOnError extends boolean = false>(
+	options?: Options<TestConnectionData, ThrowOnError>,
+) => {
+	return (options?.client ?? _heyApiClient).post<TestConnectionResponses, unknown, ThrowOnError>({
+		url: "/api/v1/volumes/test-connection",
 		...options,
 		headers: {
 			"Content-Type": "application/json",

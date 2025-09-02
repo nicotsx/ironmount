@@ -7,6 +7,8 @@ import {
 	deleteVolumeDto,
 	type ListVolumesResponseDto,
 	listVolumesDto,
+	testConnectionBody,
+	testConnectionDto,
 } from "./volume.dto";
 import { volumeService } from "./volume.service";
 
@@ -34,6 +36,12 @@ export const volumeController = new Hono()
 		}
 
 		return c.json({ message: "Volume created", volume: res.volume });
+	})
+	.post("/test-connection", testConnectionDto, validator("json", testConnectionBody), async (c) => {
+		const body = c.req.valid("json");
+		const result = await volumeService.testConnection(body.config);
+
+		return c.json(result, 200);
 	})
 	.delete("/:name", deleteVolumeDto, async (c) => {
 		const { name } = c.req.param();

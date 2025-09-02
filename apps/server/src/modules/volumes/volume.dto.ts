@@ -89,3 +89,32 @@ export const deleteVolumeDto = describeRoute({
 		},
 	},
 });
+
+/**
+ * Test connection
+ */
+export const testConnectionBody = type({
+	config: volumeConfigSchema,
+});
+
+export const testConnectionResponse = type({
+	success: "boolean",
+	message: "string",
+});
+
+export const testConnectionDto = describeRoute({
+	description: "Test connection to backend",
+	operationId: "testConnection",
+	validateResponse: true,
+	tags: ["Volumes"],
+	responses: {
+		200: {
+			description: "Connection test result",
+			content: {
+				"application/json": {
+					schema: resolver(testConnectionResponse),
+				},
+			},
+		},
+	},
+});

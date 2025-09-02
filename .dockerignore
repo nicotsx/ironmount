@@ -12,3 +12,5 @@
 !apps/**/drizzle/**
 !apps/**/app/**
 !apps/**/public/**
+
+!packages/**/src/**

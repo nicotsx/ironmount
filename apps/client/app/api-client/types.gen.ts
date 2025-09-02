@@ -33,7 +33,7 @@ export type CreateVolumeData = {
 					exportPath: string;
 					port: number;
 					server: string;
-					version: string;
+					version: "3" | "4" | "4.1";
 			  }
 			| {
 					backend: "smb";
@@ -60,6 +60,40 @@ export type CreateVolumeResponses = {
 };
 
 export type CreateVolumeResponse = CreateVolumeResponses[keyof CreateVolumeResponses];
+
+export type TestConnectionData = {
+	body?: {
+		config:
+			| {
+					backend: "directory";
+			  }
+			| {
+					backend: "nfs";
+					exportPath: string;
+					port: number;
+					server: string;
+					version: "3" | "4" | "4.1";
+			  }
+			| {
+					backend: "smb";
+			  };
+	};
+	path?: never;
+	query?: never;
+	url: "/api/v1/volumes/test-connection";
+};
+
+export type TestConnectionResponses = {
+	/**
+	 * Connection test result
+	 */
+	200: {
+		message: string;
+		success: boolean;
+	};
+};
+
+export type TestConnectionResponse = TestConnectionResponses[keyof TestConnectionResponses];
 
 export type DeleteVolumeData = {
 	body?: never;

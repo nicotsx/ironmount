@@ -1,3 +1,5 @@
+import * as fs from "node:fs/promises";
+import * as os from "node:os";
 import * as path from "node:path";
 import type { BackendConfig } from "@ironmount/schemas";
 import { eq } from "drizzle-orm";
@@ -33,7 +35,7 @@ const createVolume = async (name: string, backendConfig: BackendConfig) => {
 			name: slug,
 			config: backendConfig,
 			path: path.join(volumePathHost, slug),
-			type: "nfs",
+			type: backendConfig.backend,
 		})
 		.returning();
 
@@ -84,9 +86,53 @@ const mountVolume = async (name: string) => {
 	}
 };
 
+const testConnection = async (backendConfig: BackendConfig) => {
+	let tempDir: string | null = null;
+
+	try {
+		tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "ironmount-test-"));
+
+		const mockVolume = {
+			id: 0,
+			name: "test-connection",
+			path: tempDir,
+			config: backendConfig,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			type: backendConfig.backend,
+		};
+
+		const backend = createVolumeBackend(mockVolume);
+
+		await backend.mount();
+		await backend.unmount();
+
+		return {
+			success: true,
+			message: "Connection successful",
+		};
+	} catch (error) {
+		return {
+			success: false,
+			message: error instanceof Error ? error.message : "Connection failed",
+		};
+	} finally {
+		if (tempDir) {
+			try {
+				await fs.access(tempDir);
+				await fs.rm(tempDir, { recursive: true, force: true });
+			} catch (cleanupError) {
+				// Ignore cleanup errors if directory doesn't exist or can't be removed
+				console.warn("Failed to cleanup temp directory:", cleanupError);
+			}
+		}
+	}
+};
+
 export const volumeService = {
 	listVolumes,
 	createVolume,
 	mountVolume,
 	deleteVolume,
+	testConnection,
 };

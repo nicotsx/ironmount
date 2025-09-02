@@ -9,7 +9,7 @@ sync:
         - "tmp"
         - "logs"
         - "mutagen.yml.lock"
-        - "data/ironmount.db"
+        - "data"
   ironmount:
     alpha: "."
     beta: "nicolas@192.168.2.42:/home/nicolas/ironmount"
