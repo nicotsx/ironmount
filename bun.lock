@@ -12,7 +12,7 @@
       "name": "@ironmount/client",
       "dependencies": {
         "@hookform/resolvers": "^5.2.1",
-        "@ironmount/server": "workspace:*",
+        "@ironmount/schemas": "workspace:*",
         "@radix-ui/react-alert-dialog": "^1.1.15",
         "@radix-ui/react-dialog": "^1.1.15",
         "@radix-ui/react-label": "^2.1.7",
@@ -52,6 +52,7 @@
       "name": "@ironmount/server",
       "dependencies": {
         "@hono/arktype-validator": "^2.0.1",
+        "@ironmount/schemas": "workspace:*",
         "@scalar/hono-api-reference": "^0.9.13",
         "arktype": "^2.1.20",
         "dotenv": "^17.2.1",
@@ -64,6 +65,13 @@
       "devDependencies": {
         "@types/bun": "^1.2.20",
         "drizzle-kit": "^0.31.4",
+      },
+    },
+    "packages/schemas": {
+      "name": "@ironmount/schemas",
+      "version": "0.0.0",
+      "peerDependencies": {
+        "arktype": ">=2",
       },
     },
   },
@@ -207,6 +215,8 @@
     "@hookform/resolvers": ["@hookform/resolvers@5.2.1", "", { "dependencies": { "@standard-schema/utils": "^0.3.0" }, "peerDependencies": { "react-hook-form": "^7.55.0" } }, "sha512-u0+6X58gkjMcxur1wRWokA7XsiiBJ6aK17aPZxhkoYiK5J+HcTx0Vhu9ovXe6H+dVpO6cjrn2FkJTryXEMlryQ=="],
 
     "@ironmount/client": ["@ironmount/client@workspace:apps/client"],
+
+    "@ironmount/schemas": ["@ironmount/schemas@workspace:packages/schemas"],
 
     "@ironmount/server": ["@ironmount/server@workspace:apps/server"],
 

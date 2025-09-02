@@ -1,6 +1,6 @@
 import { exec } from "node:child_process";
 import * as os from "node:os";
-import type { BackendConfig } from "../../../db/schema";
+import type { BackendConfig } from "@ironmount/schemas";
 import type { VolumeBackend } from "../backend";
 
 const mount = async (config: BackendConfig, path: string) => {

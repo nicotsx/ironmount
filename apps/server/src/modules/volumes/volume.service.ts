@@ -1,10 +1,11 @@
 import * as path from "node:path";
+import type { BackendConfig } from "@ironmount/schemas";
 import { eq } from "drizzle-orm";
 import { ConflictError, InternalServerError, NotFoundError } from "http-errors-enhanced";
 import slugify from "slugify";
 import { config } from "../../core/config";
 import { db } from "../../db/db";
-import { type BackendConfig, volumesTable } from "../../db/schema";
+import { volumesTable } from "../../db/schema";
 import { createVolumeBackend } from "../backends/backend";
 
 const listVolumes = async () => {

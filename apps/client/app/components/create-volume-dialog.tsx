@@ -1,4 +1,5 @@
 import { arktypeResolver } from "@hookform/resolvers/arktype";
+import { volumeConfigSchema } from "@ironmount/schemas";
 import { type } from "arktype";
 import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -19,15 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 
 export const formSchema = type({
 	name: "2<=string<=32",
-	backend: "'directory'",
-}).or({
-	name: "2<=string<=32",
-	backend: "'nfs'",
-	server: "string",
-	exportPath: "string",
-	port: "number >= 1",
-	version: "'3' | '4' | '4.1'",
-});
+}).and(volumeConfigSchema);
 
 type FormValues = typeof formSchema.infer;
 type Props = {

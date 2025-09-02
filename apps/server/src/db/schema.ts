@@ -1,33 +1,6 @@
-import { type } from "arktype";
+import type { volumeConfigSchema } from "@ironmount/schemas";
 import { sql } from "drizzle-orm";
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
-
-const BACKEND_TYPES = {
-	nfs: "nfs",
-	smb: "smb",
-	directory: "directory",
-};
-export type BackendType = keyof typeof BACKEND_TYPES;
-
-const nfsConfigSchema = type({
-	backend: "'nfs'",
-	server: "string",
-	exportPath: "string",
-	port: "number >= 1",
-	version: "'3' | '4' | '4.1'",
-});
-
-const smbConfigSchema = type({
-	backend: "'smb'",
-});
-
-const directoryConfigSchema = type({
-	backend: "'directory'",
-});
-
-export const volumeConfigSchema = nfsConfigSchema.or(smbConfigSchema).or(directoryConfigSchema);
-
-export type BackendConfig = typeof volumeConfigSchema.infer;
 
 export const volumesTable = sqliteTable("volumes_table", {
 	id: int().primaryKey({ autoIncrement: true }),

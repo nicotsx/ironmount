@@ -1,7 +1,7 @@
+import { volumeConfigSchema } from "@ironmount/schemas";
 import { type } from "arktype";
 import { describeRoute } from "hono-openapi";
 import { resolver } from "hono-openapi/arktype";
-import { volumeConfigSchema } from "../../db/schema";
 
 /**
  * List all volumes
