@@ -8,10 +8,12 @@ sync:
         - ".DS_Store"
         - "tmp"
         - "logs"
+        - "mutagen.yml.lock"
+        - "data/ironmount.db"
   ironmount:
     alpha: "."
     beta: "nicolas@192.168.2.42:/home/nicolas/ironmount"
-    mode: "one-way-safe"
+    mode: "one-way-replica"
     flushOnCreate: true
     ignore:
       paths:

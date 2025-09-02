@@ -1,16 +1,17 @@
+import { type } from "arktype";
 import { Copy, Folder } from "lucide-react";
 import { useState } from "react";
 import { useFetcher } from "react-router";
+import { toast } from "sonner";
 import { createVolume, deleteVolume, listVolumes } from "~/api-client";
-import { CreateVolumeDialog } from "~/components/create-volume-dialog";
+import { CreateVolumeDialog, formSchema } from "~/components/create-volume-dialog";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
+import { parseError } from "~/lib/errors";
 import { cn } from "~/lib/utils";
 import type { Route } from "./+types/home";
-import { parseError } from "~/lib/errors";
-import { toast } from "sonner";
 
 export function meta(_: Route.MetaArgs) {
 	return [
@@ -27,7 +28,8 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 	const { _action, ...rest } = Object.fromEntries(formData.entries());
 
 	if (_action === "delete") {
-		const { error } = await deleteVolume({ path: { name: rest.name as string } });
+		const name = rest.name as string;
+		const { error } = await deleteVolume({ path: { name: name } });
 
 		if (error) {
 			toast.error("Failed to delete volume", {
@@ -41,7 +43,17 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 	}
 
 	if (_action === "create") {
-		const { error } = await createVolume({ body: { name: rest.name as string, config: { backend: "directory" } } });
+		const validationResult = formSchema(rest);
+
+		if (validationResult instanceof type.errors) {
+			toast.error("Invalid form data", {
+				description: "Please check your input and try again.",
+			});
+			return { error: validationResult, _action: "create" as const };
+		}
+
+		const validatedData = validationResult as typeof formSchema.infer;
+		const { error } = await createVolume({ body: { name: validatedData.name, config: validatedData } });
 		if (error) {
 			toast.error("Failed to create volume", {
 				description: parseError(error)?.message,
@@ -139,7 +151,7 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
 								<TableCell>
 									<span className="mx-auto flex items-center gap-2 text-purple-800 dark:text-purple-300 rounded-md px-2 py-1">
 										<Folder size={10} />
-										Dir
+										Volume
 									</span>
 								</TableCell>
 								<TableCell>

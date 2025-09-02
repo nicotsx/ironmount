@@ -13,8 +13,8 @@ const nfsConfigSchema = type({
 	backend: "'nfs'",
 	server: "string",
 	exportPath: "string",
-	port: "number",
-	version: "string", // Shold be an enum: "3" | "4" | "4.1"
+	port: "number >= 1",
+	version: "'3' | '4' | '4.1'",
 });
 
 const smbConfigSchema = type({
