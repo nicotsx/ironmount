@@ -1,8 +1,10 @@
 import { arktypeResolver } from "@hookform/resolvers/arktype";
 import { volumeConfigSchema } from "@ironmount/schemas";
 import { type } from "arktype";
-import { Plus } from "lucide-react";
+import { CheckCircle, Loader2, Plus, XCircle } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { testConnection } from "~/api-client";
 import { slugify } from "~/lib/utils";
 import { Button } from "./ui/button";
 import {
@@ -17,6 +19,9 @@ import {
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { useMutation } from "@tanstack/react-query";
+import { testConnectionMutation } from "~/api-client/@tanstack/react-query.gen";
+import { toast } from "sonner";
 
 export const formSchema = type({
 	name: "2<=string<=32",
@@ -30,6 +35,9 @@ type Props = {
 };
 
 export const CreateVolumeDialog = ({ open, setOpen, onSubmit }: Props) => {
+	const [testStatus, setTestStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+	const [testMessage, setTestMessage] = useState<string>("");
+
 	const form = useForm<typeof formSchema.infer>({
 		resolver: arktypeResolver(formSchema),
 		defaultValues: {
@@ -38,7 +46,35 @@ export const CreateVolumeDialog = ({ open, setOpen, onSubmit }: Props) => {
 		},
 	});
 
+	const testBackendConnection = useMutation({
+		...testConnectionMutation(),
+		onMutate: () => {
+			setTestStatus("loading");
+		},
+		onError: () => {
+			setTestStatus("error");
+			setTestMessage("Failed to test connection. Please try again.");
+		},
+		onSuccess: (data) => {
+			if (data?.success) {
+				setTestStatus("success");
+				setTestMessage(data.message);
+			} else {
+				setTestStatus("error");
+				setTestMessage(data?.message || "Connection test failed");
+			}
+		},
+	});
+
 	const watchedBackend = form.watch("backend");
+
+	const handleTestConnection = async () => {
+		const formValues = form.getValues();
+
+		testBackendConnection.mutate({
+			body: { config: formValues },
+		});
+	};
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
@@ -165,11 +201,40 @@ export const CreateVolumeDialog = ({ open, setOpen, onSubmit }: Props) => {
 								/>
 							</>
 						)}
-						{/* {createVolume.error && ( */}
-						{/* 	<div className="text-red-500 text-sm"> */}
-						{/* 		{createVolume.error.message} */}
-						{/* 	</div> */}
-						{/* )} */}
+						{watchedBackend === "nfs" && (
+							<div className="space-y-3">
+								<div className="flex items-center gap-2">
+									<Button
+										type="button"
+										variant="outline"
+										onClick={handleTestConnection}
+										disabled={testStatus === "loading" || !form.watch("server") || !form.watch("exportPath")}
+										className="flex-1"
+									>
+										{testStatus === "loading" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+										{testStatus === "success" && <CheckCircle className="mr-2 h-4 w-4 text-green-500" />}
+										{testStatus === "error" && <XCircle className="mr-2 h-4 w-4 text-red-500" />}
+										{testStatus === "idle" && "Test Connection"}
+										{testStatus === "loading" && "Testing..."}
+										{testStatus === "success" && "Connection Successful"}
+										{testStatus === "error" && "Test Failed"}
+									</Button>
+								</div>
+								{testMessage && (
+									<div
+										className={`text-sm p-2 rounded-md ${
+											testStatus === "success"
+												? "bg-green-50 text-green-700 border border-green-200"
+												: testStatus === "error"
+													? "bg-red-50 text-red-700 border border-red-200"
+													: "bg-gray-50 text-gray-700 border border-gray-200"
+										}`}
+									>
+										{testMessage}
+									</div>
+								)}
+							</div>
+						)}
 						<DialogFooter>
 							<Button variant="secondary" onClick={() => setOpen(false)}>
 								Cancel

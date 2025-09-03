@@ -12,7 +12,7 @@ export const nfsConfigSchema = type({
 	backend: "'nfs'",
 	server: "string",
 	exportPath: "string",
-	port: "number >= 1",
+	port: type("string.integer.parse").or(type("number")).to("1 <= number <= 65536").default("2049"),
 	version: "'3' | '4' | '4.1'",
 });
 

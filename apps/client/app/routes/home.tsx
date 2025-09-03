@@ -101,7 +101,7 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
 			<main className="relative flex flex-col pt-16 p-4 container mx-auto">
 				<h1 className="text-3xl font-bold mb-0 uppercase">Ironmount</h1>
 				<h2 className="text-sm font-semibold mb-2 text-muted-foreground">
-					Create, manage, monitor, and automate your Docker volumes with ease.
+					Create, manage, monitor, and automate your volumes with ease.
 				</h2>
 				<div className="flex items-center gap-2 mt-4 justify-between">
 					<span className="flex items-center gap-2">
@@ -134,7 +134,7 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
 					/>
 				</div>
 				<Table className="mt-4 border bg-white dark:bg-secondary">
-					<TableCaption>A list of your managed Docker volumes.</TableCaption>
+					<TableCaption>A list of your managed volumes.</TableCaption>
 					<TableHeader>
 						<TableRow>
 							<TableHead className="w-[100px] uppercase">Name</TableHead>

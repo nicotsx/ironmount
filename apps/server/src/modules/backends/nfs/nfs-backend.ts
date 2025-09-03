@@ -19,6 +19,7 @@ const mount = async (config: BackendConfig, path: string) => {
 
 	return new Promise<void>((resolve, reject) => {
 		exec(cmd, (error, stdout, stderr) => {
+			console.log("Mount command executed:", { cmd, error, stdout, stderr });
 			if (error) {
 				console.error(`Error mounting NFS volume: ${stderr}`);
 				return reject(new Error(`Failed to mount NFS volume: ${stderr}`));

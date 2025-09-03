@@ -13,11 +13,9 @@ export const generalDescriptor = (app: Hono) =>
 			info: {
 				title: "Ironmount API",
 				version: "1.0.0",
-				description: "API for managing Docker volumes",
+				description: "API for managing volumes",
 			},
-			servers: [
-				{ url: "http://localhost:3000", description: "Development Server" },
-			],
+			servers: [{ url: "http://localhost:3000", description: "Development Server" }],
 		},
 	});
 
@@ -58,9 +56,7 @@ const socketPath = "/run/docker/plugins/ironmount.sock";
 		fetch: app.fetch,
 	});
 
-	console.log(
-		`Server is running at http://localhost:8080 and unix socket at ${socketPath}`,
-	);
+	console.log(`Server is running at http://localhost:8080 and unix socket at ${socketPath}`);
 })();
 
 export type AppType = typeof app;
