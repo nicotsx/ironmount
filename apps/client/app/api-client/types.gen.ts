@@ -13,9 +13,25 @@ export type ListVolumesResponses = {
 	 */
 	200: {
 		volumes: Array<{
+			config:
+				| {
+						backend: "directory";
+				  }
+				| {
+						backend: "nfs";
+						exportPath: string;
+						server: string;
+						version: "3" | "4" | "4.1";
+						port?: number | string;
+				  }
+				| {
+						backend: "smb";
+				  };
 			createdAt: number;
 			name: string;
 			path: string;
+			type: "directory" | "nfs" | "smb";
+			updatedAt: number;
 		}>;
 	};
 };
@@ -153,7 +169,7 @@ export type GetVolumeResponses = {
 		createdAt: number;
 		name: string;
 		path: string;
-		type: string;
+		type: "directory" | "nfs" | "smb";
 		updatedAt: number;
 	};
 };

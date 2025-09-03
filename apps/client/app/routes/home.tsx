@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Copy, Folder } from "lucide-react";
+import { Copy } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { type ListVolumesResponse, listVolumes } from "~/api-client";
@@ -10,6 +10,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
+import { VolumeIcon } from "~/components/volume-icon";
 import { parseError } from "~/lib/errors";
 import { cn } from "~/lib/utils";
 import type { Route } from "./+types/home";
@@ -114,10 +115,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 							<TableRow key={volume.name}>
 								<TableCell className="font-medium">{volume.name}</TableCell>
 								<TableCell>
-									<span className="mx-auto flex items-center gap-2 text-purple-800 dark:text-purple-300 rounded-md px-2 py-1">
-										<Folder size={10} />
-										Volume
-									</span>
+									<VolumeIcon backend={volume.type} />
 								</TableCell>
 								<TableCell>
 									<span className="flex items-center gap-2">

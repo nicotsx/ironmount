@@ -6,7 +6,7 @@ import { resolver } from "hono-openapi/arktype";
 const volumeSchema = type({
 	name: "string",
 	path: "string",
-	type: "string",
+	type: type.enumerated("nfs", "smb", "directory"),
 	createdAt: "number",
 	updatedAt: "number",
 	config: volumeConfigSchema,
