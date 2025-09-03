@@ -28,8 +28,11 @@ export type ListVolumesResponses = {
 						backend: "smb";
 				  };
 			createdAt: number;
+			lastError: string;
+			lastHealthCheck: number;
 			name: string;
 			path: string;
+			status: "error" | "mounted" | "unknown" | "unmounted";
 			type: "directory" | "nfs" | "smb";
 			updatedAt: number;
 		}>;
@@ -167,8 +170,11 @@ export type GetVolumeResponses = {
 					backend: "smb";
 			  };
 		createdAt: number;
+		lastError: string;
+		lastHealthCheck: number;
 		name: string;
 		path: string;
+		status: "error" | "mounted" | "unknown" | "unmounted";
 		type: "directory" | "nfs" | "smb";
 		updatedAt: number;
 	};

@@ -7,8 +7,11 @@ const volumeSchema = type({
 	name: "string",
 	path: "string",
 	type: type.enumerated("nfs", "smb", "directory"),
+	status: type.enumerated("mounted", "unmounted", "error", "unknown"),
+	lastError: "string|null",
 	createdAt: "number",
 	updatedAt: "number",
+	lastHealthCheck: "number",
 	config: volumeConfigSchema,
 });
 

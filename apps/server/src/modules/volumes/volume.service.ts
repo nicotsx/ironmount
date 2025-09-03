@@ -109,7 +109,9 @@ const updateVolume = async (name: string, backendConfig: BackendConfig) => {
 		}
 
 		const oldBackend = createVolumeBackend(existing);
-		await oldBackend.unmount();
+		await oldBackend.unmount().catch((err) => {
+			console.warn("Failed to unmount backend:", err);
+		});
 
 		const updated = await db
 			.update(volumesTable)
@@ -135,6 +137,39 @@ const updateVolume = async (name: string, backendConfig: BackendConfig) => {
 	}
 };
 
+const updateVolumeStatus = async (name: string, status: "mounted" | "unmounted" | "error", error?: string) => {
+	await db
+		.update(volumesTable)
+		.set({
+			status,
+			lastHealthCheck: new Date(),
+			lastError: error ?? null,
+			updatedAt: new Date(),
+		})
+		.where(eq(volumesTable.name, name));
+};
+
+const getVolumeStatus = async (name: string) => {
+	const volume = await db.query.volumesTable.findFirst({
+		where: eq(volumesTable.name, name),
+	});
+
+	if (!volume) {
+		return { error: new NotFoundError("Volume not found") };
+	}
+
+	const backend = createVolumeBackend(volume);
+	const healthResult = await backend.checkHealth();
+	await updateVolumeStatus(name, healthResult.status, healthResult.error);
+
+	return {
+		name: volume.name,
+		status: healthResult.status,
+		lastHealthCheck: new Date(),
+		error: healthResult.error,
+	};
+};
+
 const testConnection = async (backendConfig: BackendConfig) => {
 	let tempDir: string | null = null;
 
@@ -148,7 +183,10 @@ const testConnection = async (backendConfig: BackendConfig) => {
 			config: backendConfig,
 			createdAt: new Date(),
 			updatedAt: new Date(),
+			lastHealthCheck: new Date(),
 			type: backendConfig.backend,
+			status: "unmounted" as const,
+			lastError: null,
 		};
 
 		const backend = createVolumeBackend(mockVolume);
@@ -186,4 +224,6 @@ export const volumeService = {
 	getVolume,
 	updateVolume,
 	testConnection,
+	updateVolumeStatus,
+	getVolumeStatus,
 };

@@ -27,3 +27,11 @@ export const directoryConfigSchema = type({
 export const volumeConfigSchema = nfsConfigSchema.or(smbConfigSchema).or(directoryConfigSchema);
 
 export type BackendConfig = typeof volumeConfigSchema.infer;
+
+export const BACKEND_STATUS = {
+	mounted: "mounted",
+	unmounted: "unmounted",
+	error: "error",
+} as const;
+
+export type BackendStatus = keyof typeof BACKEND_STATUS;

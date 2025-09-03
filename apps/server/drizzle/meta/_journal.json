@@ -15,6 +15,13 @@
       "when": 1755775437391,
       "tag": "0001_far_frank_castle",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1756930554198,
+      "tag": "0002_cheerful_randall",
+      "breakpoints": true
     }
   ]
 }

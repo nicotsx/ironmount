@@ -1,7 +1,8 @@
 import { exec } from "node:child_process";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
-import type { BackendConfig } from "@ironmount/schemas";
+import * as npath from "node:path";
+import { BACKEND_STATUS, type BackendConfig } from "@ironmount/schemas";
 import type { VolumeBackend } from "../backend";
 
 const mount = async (config: BackendConfig, path: string) => {
@@ -54,7 +55,24 @@ const unmount = async (path: string) => {
 	});
 };
 
+const checkHealth = async (path: string) => {
+	try {
+		await fs.access(path);
+
+		// Try to create a temporary file to ensure the mount is writable
+		const testFilePath = npath.join(path, `.healthcheck-${Date.now()}`);
+		await fs.writeFile(testFilePath, "healthcheck");
+		await fs.unlink(testFilePath);
+
+		return { status: BACKEND_STATUS.mounted };
+	} catch (error) {
+		console.error("NFS volume health check failed:", error);
+		return { status: BACKEND_STATUS.error, error: error instanceof Error ? error.message : String(error) };
+	}
+};
+
 export const makeNfsBackend = (config: BackendConfig, path: string): VolumeBackend => ({
 	mount: () => mount(config, path),
 	unmount: () => unmount(path),
+	checkHealth: () => checkHealth(path),
 });

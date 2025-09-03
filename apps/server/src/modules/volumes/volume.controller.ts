@@ -24,6 +24,7 @@ export const volumeController = new Hono()
 				...volume,
 				updatedAt: volume.updatedAt.getTime(),
 				createdAt: volume.createdAt.getTime(),
+				lastHealthCheck: volume.lastHealthCheck.getTime(),
 			})),
 		} satisfies ListVolumesResponseDto;
 
