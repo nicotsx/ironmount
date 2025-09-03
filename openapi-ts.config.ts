@@ -6,9 +6,5 @@ export default defineConfig({
 		path: "./apps/client/app/api-client",
 		format: "biome",
 	},
-	plugins: [
-		...defaultPlugins,
-		"@tanstack/react-query",
-		"@hey-api/client-fetch",
-	],
+	plugins: [...defaultPlugins, "@tanstack/react-query", "@hey-api/client-fetch"],
 });

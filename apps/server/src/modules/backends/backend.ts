@@ -15,7 +15,7 @@ export const createVolumeBackend = (volume: Volume): VolumeBackend => {
 			return makeNfsBackend(config, path);
 		}
 		case "directory": {
-			return makeDirectoryBackend();
+			return makeDirectoryBackend(config, path);
 		}
 		default: {
 			throw new Error(`Backend ${config.backend} not implemented`);

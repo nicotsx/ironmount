@@ -1,37 +1,30 @@
 import { useMutation } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
 import { useId } from "react";
 import { toast } from "sonner";
-import { createVolumeMutation } from "~/api-client/@tanstack/react-query.gen";
+import type { GetVolumeResponse } from "~/api-client";
+import { updateVolumeMutation } from "~/api-client/@tanstack/react-query.gen";
 import { parseError } from "~/lib/errors";
 import { CreateVolumeForm } from "./create-volume-form";
 import { Button } from "./ui/button";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from "./ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
 
 type Props = {
 	open: boolean;
 	setOpen: (open: boolean) => void;
+	initialValues?: Partial<GetVolumeResponse>;
 };
 
-export const CreateVolumeDialog = ({ open, setOpen }: Props) => {
+export const EditVolumeDialog = ({ open, setOpen, initialValues }: Props) => {
 	const formId = useId();
 
-	const create = useMutation({
-		...createVolumeMutation(),
+	const update = useMutation({
+		...updateVolumeMutation(),
 		onSuccess: () => {
-			toast.success("Volume created successfully");
+			toast.success("Volume updated successfully");
 			setOpen(false);
 		},
 		onError: (error) => {
-			toast.error("Failed to create volume", {
+			toast.error("Failed to update volume", {
 				description: parseError(error)?.message,
 			});
 		},
@@ -39,30 +32,25 @@ export const CreateVolumeDialog = ({ open, setOpen }: Props) => {
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger asChild>
-				<Button className="bg-blue-900 hover:bg-blue-800">
-					<Plus size={16} />
-					Create volume
-				</Button>
-			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Create volume</DialogTitle>
 					<DialogDescription>Enter a name for the new volume</DialogDescription>
 				</DialogHeader>
 				<CreateVolumeForm
-					mode="create"
+					mode="update"
 					formId={formId}
+					initialValues={{ ...initialValues, ...initialValues?.config }}
 					onSubmit={(values) => {
-						create.mutate({ body: { config: values, name: values.name } });
+						update.mutate({ body: { config: values }, path: { name: values.name } });
 					}}
 				/>
 				<DialogFooter>
 					<Button type="button" variant="secondary" onClick={() => setOpen(false)}>
 						Cancel
 					</Button>
-					<Button type="submit" form={formId} disabled={create.isPending}>
-						Create
+					<Button type="submit" form={formId} disabled={update.isPending}>
+						Update
 					</Button>
 				</DialogFooter>
 			</DialogContent>

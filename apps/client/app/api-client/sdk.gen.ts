@@ -10,6 +10,12 @@ import type {
 	TestConnectionResponses,
 	DeleteVolumeData,
 	DeleteVolumeResponses,
+	GetVolumeData,
+	GetVolumeResponses,
+	GetVolumeErrors,
+	UpdateVolumeData,
+	UpdateVolumeResponses,
+	UpdateVolumeErrors,
 } from "./types.gen";
 import { client as _heyApiClient } from "./client.gen";
 
@@ -81,5 +87,31 @@ export const deleteVolume = <ThrowOnError extends boolean = false>(
 	return (options.client ?? _heyApiClient).delete<DeleteVolumeResponses, unknown, ThrowOnError>({
 		url: "/api/v1/volumes/{name}",
 		...options,
+	});
+};
+
+/**
+ * Get a volume by name
+ */
+export const getVolume = <ThrowOnError extends boolean = false>(options: Options<GetVolumeData, ThrowOnError>) => {
+	return (options.client ?? _heyApiClient).get<GetVolumeResponses, GetVolumeErrors, ThrowOnError>({
+		url: "/api/v1/volumes/{name}",
+		...options,
+	});
+};
+
+/**
+ * Update a volume's configuration
+ */
+export const updateVolume = <ThrowOnError extends boolean = false>(
+	options: Options<UpdateVolumeData, ThrowOnError>,
+) => {
+	return (options.client ?? _heyApiClient).put<UpdateVolumeResponses, UpdateVolumeErrors, ThrowOnError>({
+		url: "/api/v1/volumes/{name}",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options.headers,
+		},
 	});
 };

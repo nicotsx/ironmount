@@ -86,6 +86,55 @@ const mountVolume = async (name: string) => {
 	}
 };
 
+const getVolume = async (name: string) => {
+	const volume = await db.query.volumesTable.findFirst({
+		where: eq(volumesTable.name, name),
+	});
+
+	if (!volume) {
+		return { error: new NotFoundError("Volume not found") };
+	}
+
+	return { volume };
+};
+
+const updateVolume = async (name: string, backendConfig: BackendConfig) => {
+	try {
+		const existing = await db.query.volumesTable.findFirst({
+			where: eq(volumesTable.name, name),
+		});
+
+		if (!existing) {
+			return { error: new NotFoundError("Volume not found") };
+		}
+
+		const oldBackend = createVolumeBackend(existing);
+		await oldBackend.unmount();
+
+		const updated = await db
+			.update(volumesTable)
+			.set({
+				config: backendConfig,
+				type: backendConfig.backend,
+				updatedAt: new Date(),
+			})
+			.where(eq(volumesTable.name, name))
+			.returning();
+
+		// Mount with new configuration
+		const newBackend = createVolumeBackend(updated[0]);
+		await newBackend.mount();
+
+		return { volume: updated[0] };
+	} catch (error) {
+		return {
+			error: new InternalServerError("Failed to update volume", {
+				cause: error,
+			}),
+		};
+	}
+};
+
 const testConnection = async (backendConfig: BackendConfig) => {
 	let tempDir: string | null = null;
 
@@ -134,5 +183,7 @@ export const volumeService = {
 	createVolume,
 	mountVolume,
 	deleteVolume,
+	getVolume,
+	updateVolume,
 	testConnection,
 };

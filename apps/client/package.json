@@ -19,6 +19,7 @@
 		"@react-router/node": "^7.7.1",
 		"@react-router/serve": "^7.7.1",
 		"@tanstack/react-query": "^5.84.2",
+		"@tanstack/react-query-devtools": "^5.85.9",
 		"@tanstack/react-table": "^8.21.3",
 		"arktype": "^2.1.20",
 		"class-variance-authority": "^0.7.1",

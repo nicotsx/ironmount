@@ -31,9 +31,9 @@ export type CreateVolumeData = {
 			| {
 					backend: "nfs";
 					exportPath: string;
-					port: number;
 					server: string;
 					version: "3" | "4" | "4.1";
+					port?: number | string;
 			  }
 			| {
 					backend: "smb";
@@ -70,9 +70,9 @@ export type TestConnectionData = {
 			| {
 					backend: "nfs";
 					exportPath: string;
-					port: number;
 					server: string;
 					version: "3" | "4" | "4.1";
+					port?: number | string;
 			  }
 			| {
 					backend: "smb";
@@ -114,6 +114,114 @@ export type DeleteVolumeResponses = {
 };
 
 export type DeleteVolumeResponse = DeleteVolumeResponses[keyof DeleteVolumeResponses];
+
+export type GetVolumeData = {
+	body?: never;
+	path: {
+		name: string;
+	};
+	query?: never;
+	url: "/api/v1/volumes/{name}";
+};
+
+export type GetVolumeErrors = {
+	/**
+	 * Volume not found
+	 */
+	404: unknown;
+};
+
+export type GetVolumeResponses = {
+	/**
+	 * Volume details
+	 */
+	200: {
+		config:
+			| {
+					backend: "directory";
+			  }
+			| {
+					backend: "nfs";
+					exportPath: string;
+					server: string;
+					version: "3" | "4" | "4.1";
+					port?: number | string;
+			  }
+			| {
+					backend: "smb";
+			  };
+		createdAt: number;
+		name: string;
+		path: string;
+		type: string;
+		updatedAt: number;
+	};
+};
+
+export type GetVolumeResponse = GetVolumeResponses[keyof GetVolumeResponses];
+
+export type UpdateVolumeData = {
+	body?: {
+		config:
+			| {
+					backend: "directory";
+			  }
+			| {
+					backend: "nfs";
+					exportPath: string;
+					server: string;
+					version: "3" | "4" | "4.1";
+					port?: number | string;
+			  }
+			| {
+					backend: "smb";
+			  };
+	};
+	path: {
+		name: string;
+	};
+	query?: never;
+	url: "/api/v1/volumes/{name}";
+};
+
+export type UpdateVolumeErrors = {
+	/**
+	 * Volume not found
+	 */
+	404: unknown;
+};
+
+export type UpdateVolumeResponses = {
+	/**
+	 * Volume updated successfully
+	 */
+	200: {
+		message: string;
+		volume: {
+			config:
+				| {
+						backend: "directory";
+				  }
+				| {
+						backend: "nfs";
+						exportPath: string;
+						server: string;
+						version: "3" | "4" | "4.1";
+						port?: number | string;
+				  }
+				| {
+						backend: "smb";
+				  };
+			createdAt: number;
+			name: string;
+			path: string;
+			type: string;
+			updatedAt: number;
+		};
+	};
+};
+
+export type UpdateVolumeResponse = UpdateVolumeResponses[keyof UpdateVolumeResponses];
 
 export type ClientOptions = {
 	baseUrl: "http://localhost:3000" | (string & {});

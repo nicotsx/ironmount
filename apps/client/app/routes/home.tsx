@@ -1,10 +1,11 @@
-import { type } from "arktype";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Copy, Folder } from "lucide-react";
 import { useState } from "react";
-import { useFetcher } from "react-router";
 import { toast } from "sonner";
-import { createVolume, deleteVolume, listVolumes } from "~/api-client";
-import { CreateVolumeDialog, formSchema } from "~/components/create-volume-dialog";
+import { type ListVolumesResponse, listVolumes } from "~/api-client";
+import { deleteVolumeMutation, listVolumesOptions } from "~/api-client/@tanstack/react-query.gen";
+import { CreateVolumeDialog } from "~/components/create-volume-dialog";
+import { EditVolumeDialog } from "~/components/edit-volume-dialog";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
@@ -23,70 +24,38 @@ export function meta(_: Route.MetaArgs) {
 	];
 }
 
-export async function clientAction({ request }: Route.ClientActionArgs) {
-	const formData = await request.formData();
-	const { _action, ...rest } = Object.fromEntries(formData.entries());
+export const clientLoader = async () => {
+	const volumes = await listVolumes();
+	if (volumes.data) return { volumes: volumes.data.volumes };
+	return { volumes: [] };
+};
 
-	if (_action === "delete") {
-		const name = rest.name as string;
-		const { error } = await deleteVolume({ path: { name: name } });
+export default function Home({ loaderData }: Route.ComponentProps) {
+	const [volumeToEdit, setVolumeToEdit] = useState<ListVolumesResponse["volumes"][number]>();
+	const [createVolumeOpen, setCreateVolumeOpen] = useState(false);
 
-		if (error) {
+	const deleteVol = useMutation({
+		...deleteVolumeMutation(),
+		onSuccess: () => {
+			toast.success("Volume deleted successfully");
+		},
+		onError: (error) => {
 			toast.error("Failed to delete volume", {
 				description: parseError(error)?.message,
 			});
-		} else {
-			toast.success("Volume deleted successfully");
-		}
-
-		return { error: parseError(error), _action: "delete" as const };
-	}
-
-	if (_action === "create") {
-		const validationResult = formSchema(rest);
-
-		if (validationResult instanceof type.errors) {
-			toast.error("Invalid form data", {
-				description: "Please check your input and try again.",
-			});
-			return { error: validationResult, _action: "create" as const };
-		}
-
-		const validatedData = validationResult as typeof formSchema.infer;
-		const { error } = await createVolume({ body: { name: validatedData.name, config: validatedData } });
-		if (error) {
-			toast.error("Failed to create volume", {
-				description: parseError(error)?.message,
-			});
-		} else {
-			toast.success("Volume created successfully");
-		}
-		return { error: parseError(error), _action: "create" as const };
-	}
-}
-
-export async function clientLoader(_: Route.ClientLoaderArgs) {
-	const volumes = await listVolumes();
-	return volumes.data;
-}
-
-export default function Home({ loaderData, actionData }: Route.ComponentProps) {
-	const [open, setOpen] = useState(false);
-
-	const createFetcher = useFetcher<Extract<typeof actionData, { _action: "create" }>>();
-	const deleteFetcher = useFetcher<Extract<typeof actionData, { _action: "delete" }>>();
-
-	createFetcher.data;
-	deleteFetcher.data;
-
-	const isDeleting = deleteFetcher.state === "submitting";
-	const isCreating = createFetcher.state === "submitting";
-
-	console.log(createFetcher);
+		},
+	});
 
 	const handleDeleteConfirm = (name: string) => {
-		deleteFetcher.submit({ _action: "delete", name }, { method: "DELETE" });
+		if (confirm(`Are you sure you want to delete the volume "${name}"? This action cannot be undone.`)) {
+			deleteVol.mutate({ path: { name } });
+		}
 	};
+
+	const { data } = useQuery({
+		...listVolumesOptions(),
+		initialData: loaderData,
+	});
 
 	return (
 		<div
@@ -127,11 +96,7 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
 							</SelectContent>
 						</Select>
 					</span>
-					<CreateVolumeDialog
-						open={open}
-						setOpen={setOpen}
-						onSubmit={(values) => createFetcher.submit({ _action: "create", ...values }, { method: "POST" })}
-					/>
+					<CreateVolumeDialog open={createVolumeOpen} setOpen={setCreateVolumeOpen} />
 				</div>
 				<Table className="mt-4 border bg-white dark:bg-secondary">
 					<TableCaption>A list of your managed volumes.</TableCaption>
@@ -145,7 +110,7 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{loaderData?.volumes.map((volume) => (
+						{data?.volumes.map((volume) => (
 							<TableRow key={volume.name}>
 								<TableCell className="font-medium">{volume.name}</TableCell>
 								<TableCell>
@@ -169,14 +134,29 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
 									</span>
 								</TableCell>
 								<TableCell className="text-right">
-									<Button variant="destructive" onClick={() => handleDeleteConfirm(volume.name)}>
-										Delete
-									</Button>
+									<div className="flex justify-end gap-2">
+										<Button
+											type="button"
+											onClick={() => {
+												setVolumeToEdit(volume);
+											}}
+										>
+											Edit
+										</Button>
+										<Button type="button" variant="destructive" onClick={() => handleDeleteConfirm(volume.name)}>
+											Delete
+										</Button>
+									</div>
 								</TableCell>
 							</TableRow>
 						))}
 					</TableBody>
 				</Table>
+				<EditVolumeDialog
+					open={Boolean(volumeToEdit)}
+					setOpen={() => setVolumeToEdit(undefined)}
+					initialValues={volumeToEdit}
+				/>
 			</main>
 		</div>
 	);

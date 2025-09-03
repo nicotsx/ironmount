@@ -3,15 +3,20 @@ import { type } from "arktype";
 import { describeRoute } from "hono-openapi";
 import { resolver } from "hono-openapi/arktype";
 
+const volumeSchema = type({
+	name: "string",
+	path: "string",
+	type: "string",
+	createdAt: "number",
+	updatedAt: "number",
+	config: volumeConfigSchema,
+});
+
 /**
  * List all volumes
  */
 export const listVolumesResponse = type({
-	volumes: type({
-		name: "string",
-		path: "string",
-		createdAt: "number",
-	}).array(),
+	volumes: volumeSchema.array(),
 });
 export type ListVolumesResponseDto = typeof listVolumesResponse.infer;
 
@@ -86,6 +91,68 @@ export const deleteVolumeDto = describeRoute({
 					schema: resolver(deleteVolumeResponse),
 				},
 			},
+		},
+	},
+});
+
+/**
+ * Get a volume
+ */
+export const getVolumeDto = describeRoute({
+	description: "Get a volume by name",
+	operationId: "getVolume",
+	validateResponse: true,
+	tags: ["Volumes"],
+	responses: {
+		200: {
+			description: "Volume details",
+			content: {
+				"application/json": {
+					schema: resolver(volumeSchema),
+				},
+			},
+		},
+		404: {
+			description: "Volume not found",
+		},
+	},
+});
+
+/**
+ * Update a volume
+ */
+export const updateVolumeBody = type({
+	config: volumeConfigSchema,
+});
+
+export const updateVolumeResponse = type({
+	message: "string",
+	volume: type({
+		name: "string",
+		path: "string",
+		type: "string",
+		createdAt: "number",
+		updatedAt: "number",
+		config: volumeConfigSchema,
+	}),
+});
+
+export const updateVolumeDto = describeRoute({
+	description: "Update a volume's configuration",
+	operationId: "updateVolume",
+	validateResponse: true,
+	tags: ["Volumes"],
+	responses: {
+		200: {
+			description: "Volume updated successfully",
+			content: {
+				"application/json": {
+					schema: resolver(updateVolumeResponse),
+				},
+			},
+		},
+		404: {
+			description: "Volume not found",
 		},
 	},
 });

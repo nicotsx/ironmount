@@ -5,10 +5,13 @@ import {
 	createVolumeBody,
 	createVolumeDto,
 	deleteVolumeDto,
+	getVolumeDto,
 	type ListVolumesResponseDto,
 	listVolumesDto,
 	testConnectionBody,
 	testConnectionDto,
+	updateVolumeBody,
+	updateVolumeDto,
 } from "./volume.dto";
 import { volumeService } from "./volume.service";
 
@@ -18,8 +21,8 @@ export const volumeController = new Hono()
 
 		const response = {
 			volumes: volumes.map((volume) => ({
-				name: volume.name,
-				path: volume.path,
+				...volume,
+				updatedAt: volume.updatedAt.getTime(),
 				createdAt: volume.createdAt.getTime(),
 			})),
 		} satisfies ListVolumesResponseDto;
@@ -54,12 +57,47 @@ export const volumeController = new Hono()
 
 		return c.json({ message: "Volume deleted" });
 	})
-	.get("/:name", (c) => {
-		return c.json({ message: `Details of volume ${c.req.param("name")}` });
+	.get("/:name", getVolumeDto, async (c) => {
+		const { name } = c.req.param();
+		const res = await volumeService.getVolume(name);
+
+		if (res.error) {
+			const { message, status } = handleServiceError(res.error);
+			return c.json(message, status);
+		}
+
+		const response = {
+			name: res.volume.name,
+			path: res.volume.path,
+			type: res.volume.type,
+			createdAt: res.volume.createdAt.getTime(),
+			updatedAt: res.volume.updatedAt.getTime(),
+			config: res.volume.config,
+		};
+
+		return c.json(response, 200);
 	})
-	.put("/:name", (c) => {
-		return c.json({ message: `Update volume ${c.req.param("name")}` });
-	})
-	.delete("/:name", (c) => {
-		return c.json({ message: `Delete volume ${c.req.param("name")}` });
+	.put("/:name", updateVolumeDto, validator("json", updateVolumeBody), async (c) => {
+		const { name } = c.req.param();
+		const body = c.req.valid("json");
+		const res = await volumeService.updateVolume(name, body.config);
+
+		if (res.error) {
+			const { message, status } = handleServiceError(res.error);
+			return c.json(message, status);
+		}
+
+		const response = {
+			message: "Volume updated",
+			volume: {
+				name: res.volume.name,
+				path: res.volume.path,
+				type: res.volume.type,
+				createdAt: res.volume.createdAt.getTime(),
+				updatedAt: res.volume.updatedAt.getTime(),
+				config: res.volume.config,
+			},
+		};
+
+		return c.json(response, 200);
 	});
