@@ -15,6 +15,8 @@ const volumeSchema = type({
 	config: volumeConfigSchema,
 });
 
+export type VolumeDto = typeof volumeSchema.infer;
+
 /**
  * List all volumes
  */

@@ -22,10 +22,16 @@ const mount = async (config: BackendConfig, path: string) => {
 	const cmd = `mount -t nfs -o ${options.join(",")} ${source} ${path}`;
 
 	return new Promise<void>((resolve, reject) => {
+		const timeout = setTimeout(() => {
+			reject(new Error("Mount command timed out"));
+		}, 5000);
+
 		exec(cmd, (error, stdout, stderr) => {
 			console.log("Mount command executed:", { cmd, error, stdout, stderr });
+			clearTimeout(timeout);
+
 			if (error) {
-				// console.error(`Error mounting NFS volume: ${stderr}`);
+				console.error(`Error mounting NFS volume: ${stderr}`);
 				return reject(new Error(`Failed to mount NFS volume: ${stderr}`));
 			}
 			console.log(`NFS volume mounted successfully: ${stdout}`);
@@ -43,8 +49,14 @@ const unmount = async (path: string) => {
 	const cmd = `umount -f ${path}`;
 
 	return new Promise<void>((resolve, reject) => {
+		const timeout = setTimeout(() => {
+			reject(new Error("Mount command timed out"));
+		}, 5000);
+
 		exec(cmd, (error, stdout, stderr) => {
 			console.log("Unmount command executed:", { cmd, error, stdout, stderr });
+			clearTimeout(timeout);
+
 			if (error) {
 				console.error(`Error unmounting NFS volume: ${stderr}`);
 				return reject(new Error(`Failed to unmount NFS volume: ${stderr}`));

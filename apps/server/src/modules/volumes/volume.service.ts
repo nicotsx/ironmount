@@ -108,24 +108,16 @@ const updateVolume = async (name: string, backendConfig: BackendConfig) => {
 			return { error: new NotFoundError("Volume not found") };
 		}
 
-		const oldBackend = createVolumeBackend(existing);
-		await oldBackend.unmount().catch((err) => {
-			console.warn("Failed to unmount backend:", err);
-		});
-
 		const updated = await db
 			.update(volumesTable)
 			.set({
 				config: backendConfig,
 				type: backendConfig.backend,
 				updatedAt: new Date(),
+				status: "unmounted",
 			})
 			.where(eq(volumesTable.name, name))
 			.returning();
-
-		// Mount with new configuration
-		const newBackend = createVolumeBackend(updated[0]);
-		await newBackend.mount();
 
 		return { volume: updated[0] };
 	} catch (error) {

@@ -12,6 +12,7 @@ import {
 	testConnectionDto,
 	updateVolumeBody,
 	updateVolumeDto,
+	type VolumeDto,
 } from "./volume.dto";
 import { volumeService } from "./volume.service";
 
@@ -68,13 +69,11 @@ export const volumeController = new Hono()
 		}
 
 		const response = {
-			name: res.volume.name,
-			path: res.volume.path,
-			type: res.volume.type,
+			...res.volume,
 			createdAt: res.volume.createdAt.getTime(),
 			updatedAt: res.volume.updatedAt.getTime(),
-			config: res.volume.config,
-		};
+			lastHealthCheck: res.volume.lastHealthCheck.getTime(),
+		} satisfies VolumeDto;
 
 		return c.json(response, 200);
 	})

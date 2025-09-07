@@ -3,7 +3,7 @@ import { volumeConfigSchema } from "@ironmount/schemas";
 import { useMutation } from "@tanstack/react-query";
 import { type } from "arktype";
 import { CheckCircle, Loader2, XCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { testConnectionMutation } from "~/api-client/@tanstack/react-query.gen";
 import { slugify } from "~/lib/utils";
@@ -28,21 +28,9 @@ type Props = {
 export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, formId }: Props) => {
 	const form = useForm<FormValues>({
 		resolver: arktypeResolver(formSchema),
-		defaultValues: {
-			name: "",
-			backend: "directory",
-		},
+		defaultValues: initialValues,
 	});
-	const { setValue, formState, watch, getValues } = form;
-	const { isDirty } = formState;
-
-	useEffect(() => {
-		if (initialValues && !isDirty) {
-			for (const [key, value] of Object.entries(initialValues)) {
-				setValue(key as keyof FormValues, value as string);
-			}
-		}
-	}, [initialValues, isDirty, setValue]);
+	const { watch, getValues } = form;
 
 	const watchedBackend = watch("backend");
 
@@ -108,7 +96,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Backend</FormLabel>
-							<Select onValueChange={field.onChange} defaultValue={field.value}>
+							<Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
 								<FormControl>
 									<SelectTrigger>
 										<SelectValue placeholder="Select a backend" />
