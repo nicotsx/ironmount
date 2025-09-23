@@ -17,7 +17,6 @@ import {
 	unmountVolumeDto,
 } from "./volume.dto";
 import { volumeService } from "./volume.service";
-import { logger } from "../../utils/logger";
 
 export const volumeController = new Hono()
 	.get("/", listVolumesDto, async (c) => {

@@ -23,5 +23,5 @@ services:
       - ./apps/server/src:/app/apps/server/src
 
       - ./data:/data
-        
+
       - /home/nicolas/ironmount/tmp:/mounts:rshared

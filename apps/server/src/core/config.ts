@@ -2,16 +2,14 @@ import { type } from "arktype";
 import "dotenv/config";
 
 const envSchema = type({
-	NODE_ENV: type
-		.enumerated("development", "production", "test")
-		.default("development"),
+	NODE_ENV: type.enumerated("development", "production", "test").default("development"),
 	VOLUME_ROOT: "string",
 }).pipe((s) => ({
 	__prod__: s.NODE_ENV === "production",
 	environment: s.NODE_ENV,
 	dbFileName: "/data/ironmount.db",
 	volumeRootHost: s.VOLUME_ROOT,
-	volumeRootContainer: "/mnt/volumes",
+	volumeRootContainer: "/mounts",
 }));
 
 const parseConfig = (env: unknown) => {

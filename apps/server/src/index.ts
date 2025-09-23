@@ -7,6 +7,7 @@ import { runDbMigrations } from "./db/db";
 import { driverController } from "./modules/driver/driver.controller";
 import { volumeController } from "./modules/volumes/volume.controller";
 import { logger } from "./utils/logger";
+import { startup } from "./modules/lifecycle/startup";
 
 export const generalDescriptor = (app: Hono) =>
 	openAPISpecs(app, {
@@ -56,6 +57,8 @@ const socketPath = "/run/docker/plugins/ironmount.sock";
 		port: 8080,
 		fetch: app.fetch,
 	});
+
+	await startup();
 
 	logger.info(`Server is running at http://localhost:8080 and unix socket at ${socketPath}`);
 })();

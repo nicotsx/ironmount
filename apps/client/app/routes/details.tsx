@@ -17,6 +17,7 @@ import { parseError } from "~/lib/errors";
 import { HealthchecksCard } from "~/modules/details/components/healthchecks-card";
 import type { Route } from "./+types/details";
 import { cn } from "~/lib/utils";
+import { StatusDot } from "~/components/status-dot";
 
 export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
 	const volume = await getVolume({ path: { name: params.name ?? "" } });
@@ -89,9 +90,8 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 				<div>
 					<h1 className="text-3xl font-bold mb-0 uppercase">Volume: {name}</h1>
 					<div className="text-sm font-semibold mb-2 text-muted-foreground flex items-center gap-2">
-						<span className="text-green-500 flex items-center gap-2">
-							<WifiIcon size={16} />
-							{data.status}
+						<span className="flex items-center gap-2">
+							<StatusDot status={data.status} /> {data.status[0].toUpperCase() + data.status.slice(1)}
 						</span>
 						<VolumeIcon size={14} backend={data?.config.backend} />
 					</div>

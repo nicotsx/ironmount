@@ -69,6 +69,11 @@ const unmount = async (path: string) => {
 				logger.error(`Error unmounting NFS volume: ${stderr}`);
 				return reject(new Error(`Failed to unmount NFS volume: ${stderr}`));
 			}
+
+			fs.rmdir(path).catch((rmdirError) => {
+				logger.error(`Failed to remove directory ${path}:`, rmdirError);
+			});
+
 			logger.info(`NFS volume unmounted successfully: ${stdout}`);
 			resolve();
 		});

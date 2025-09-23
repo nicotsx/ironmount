@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
 import { VolumeIcon } from "~/components/volume-icon";
 import type { Route } from "./+types/home";
+import { StatusDot } from "~/components/status-dot";
 
 export function meta(_: Route.MetaArgs) {
 	return [
@@ -101,10 +102,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 								</span>
 							</TableCell>
 							<TableCell className="text-center">
-								<span className="relative flex size-3 mx-auto">
-									<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-									<span className="relative inline-flex size-3 rounded-full bg-green-500" />
-								</span>
+								<StatusDot status={volume.status} />
 							</TableCell>
 						</TableRow>
 					))}
