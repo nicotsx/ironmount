@@ -2,16 +2,21 @@ import type { BackendStatus } from "@ironmount/schemas";
 import type { Volume } from "../../db/schema";
 import { makeDirectoryBackend } from "./directory/directory-backend";
 import { makeNfsBackend } from "./nfs/nfs-backend";
-import { config } from "../../core/config";
+import { VOLUME_MOUNT_BASE } from "../../core/constants";
+
+type OperationResult = {
+	error?: string;
+	status: BackendStatus;
+};
 
 export type VolumeBackend = {
-	mount: () => Promise<void>;
-	unmount: () => Promise<void>;
-	checkHealth: () => Promise<{ error?: string; status: BackendStatus }>;
+	mount: () => Promise<OperationResult>;
+	unmount: () => Promise<OperationResult>;
+	checkHealth: () => Promise<OperationResult>;
 };
 
 export const createVolumeBackend = (volume: Volume): VolumeBackend => {
-	const path = `${config.volumeRootContainer}/${volume.name}/_data`;
+	const path = `${VOLUME_MOUNT_BASE}/${volume.name}/_data`;
 
 	switch (volume.config.backend) {
 		case "nfs": {

@@ -2,8 +2,8 @@
 	"name": "@ironmount/server",
 	"type": "module",
 	"scripts": {
-		"dev": "bun run --hot src/index.ts",
-		"typecheck": "tsc --noEmit",
+		"dev": "bun run --watch src/index.ts",
+		"tsc": "tsc --noEmit",
 		"gen:migrations": "drizzle-kit generate"
 	},
 	"dependencies": {
@@ -16,6 +16,7 @@
 		"hono": "^4.9.2",
 		"hono-openapi": "^0.4.8",
 		"http-errors-enhanced": "^3.0.2",
+		"node-cron": "^4.2.1",
 		"slugify": "^1.6.6",
 		"winston": "^3.17.0"
 	},

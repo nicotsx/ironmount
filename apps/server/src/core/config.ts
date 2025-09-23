@@ -7,9 +7,7 @@ const envSchema = type({
 }).pipe((s) => ({
 	__prod__: s.NODE_ENV === "production",
 	environment: s.NODE_ENV,
-	dbFileName: "/data/ironmount.db",
 	volumeRootHost: s.VOLUME_ROOT,
-	volumeRootContainer: "/mounts",
 }));
 
 const parseConfig = (env: unknown) => {

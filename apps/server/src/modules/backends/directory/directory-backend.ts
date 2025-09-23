@@ -7,10 +7,12 @@ import { logger } from "../../../utils/logger";
 const mount = async (_config: BackendConfig, path: string) => {
 	logger.info("Mounting directory volume...");
 	await fs.mkdir(path, { recursive: true });
+	return { status: BACKEND_STATUS.mounted };
 };
 
 const unmount = async () => {
 	logger.info("Cannot unmount directory volume.");
+	return { status: BACKEND_STATUS.unmounted };
 };
 
 const checkHealth = async (path: string) => {

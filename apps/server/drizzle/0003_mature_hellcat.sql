@@ -1,0 +1,1 @@
+ALTER TABLE `volumes_table` ADD `auto_remount` integer DEFAULT 1 NOT NULL;

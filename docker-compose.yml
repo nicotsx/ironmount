@@ -24,4 +24,4 @@ services:
 
       - ./data:/data
 
-      - /home/nicolas/ironmount/tmp:/mounts:rshared
+      - /home/nicolas/mounts:/mounts:rshared

@@ -148,7 +148,7 @@ const updateVolume = async (name: string, backendConfig: BackendConfig) => {
 			return { error: new NotFoundError("Volume not found") };
 		}
 
-		const updated = await db
+		const [updated] = await db
 			.update(volumesTable)
 			.set({
 				config: backendConfig,
@@ -159,7 +159,11 @@ const updateVolume = async (name: string, backendConfig: BackendConfig) => {
 			.where(eq(volumesTable.name, name))
 			.returning();
 
-		return { volume: updated[0] };
+		if (!updated) {
+			return { error: new InternalServerError("Failed to update volume") };
+		}
+
+		return { volume: updated };
 	} catch (error) {
 		return {
 			error: new InternalServerError("Failed to update volume", {
@@ -219,6 +223,7 @@ const testConnection = async (backendConfig: BackendConfig) => {
 			type: backendConfig.backend,
 			status: "unmounted" as const,
 			lastError: null,
+			autoRemount: 0,
 		};
 
 		const backend = createVolumeBackend(mockVolume);

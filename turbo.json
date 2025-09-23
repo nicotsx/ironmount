@@ -6,6 +6,10 @@
 			"cache": false,
 			"persistent": true,
 			"env": ["*"]
+		},
+		"tsc": {
+			"cache": false,
+			"persistent": true
 		}
 	}
 }
