@@ -3,6 +3,7 @@ import * as npath from "node:path";
 import { BACKEND_STATUS, type BackendConfig } from "@ironmount/schemas";
 import type { VolumeBackend } from "../backend";
 import { logger } from "../../../utils/logger";
+import { toMessage } from "../../../utils/errors";
 
 const mount = async (_config: BackendConfig, path: string) => {
 	logger.info("Mounting directory volume...");
@@ -27,7 +28,7 @@ const checkHealth = async (path: string) => {
 		return { status: BACKEND_STATUS.mounted };
 	} catch (error) {
 		logger.error("Directory health check failed:", error);
-		return { status: BACKEND_STATUS.error, error: error instanceof Error ? error.message : String(error) };
+		return { status: BACKEND_STATUS.error, error: toMessage(error) };
 	}
 };
 

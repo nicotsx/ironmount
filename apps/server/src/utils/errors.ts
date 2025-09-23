@@ -13,3 +13,7 @@ export const handleServiceError = (error: unknown) => {
 	logger.error("Unhandled service error:", error);
 	return { message: "Internal Server Error", status: 500 as const };
 };
+
+export const toMessage = (err: unknown): string => {
+	return err instanceof Error ? err.message : String(err);
+};

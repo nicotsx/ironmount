@@ -8,6 +8,7 @@ import { logger } from "../../../utils/logger";
 import { promisify } from "node:util";
 import { withTimeout } from "../../../utils/timeout";
 import { OPERATION_TIMEOUT } from "../../../core/constants";
+import { toMessage } from "../../../utils/errors";
 
 const execFile = promisify(execFileCb);
 
@@ -121,8 +122,8 @@ const checkHealth = async (path: string) => {
 	try {
 		return await withTimeout(run(), OPERATION_TIMEOUT, "NFS health check");
 	} catch (error) {
-		logger.error("NFS volume health check failed:", error);
-		return { status: BACKEND_STATUS.error, error: error instanceof Error ? error.message : String(error) };
+		logger.error("NFS volume health check failed:", toMessage(error));
+		return { status: BACKEND_STATUS.error, error: toMessage(error) };
 	}
 };
 

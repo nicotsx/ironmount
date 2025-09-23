@@ -10,6 +10,7 @@ import { db } from "../../db/db";
 import { volumesTable } from "../../db/schema";
 import { createVolumeBackend } from "../backends/backend";
 import { logger } from "../../utils/logger";
+import { toMessage } from "../../utils/errors";
 
 const listVolumes = async () => {
 	const volumes = await db.query.volumesTable.findMany({});
@@ -77,15 +78,11 @@ const mountVolume = async (name: string) => {
 		}
 
 		const backend = createVolumeBackend(volume);
-		await backend.unmount().catch((_) => {
-			// Ignore unmount errors
-		});
-
 		await backend.mount();
 
 		await db
 			.update(volumesTable)
-			.set({ status: "mounted", lastHealthCheck: new Date() })
+			.set({ status: "mounted", lastHealthCheck: new Date(), lastError: null })
 			.where(eq(volumesTable.name, name));
 
 		return { status: 200 };
@@ -173,39 +170,6 @@ const updateVolume = async (name: string, backendConfig: BackendConfig) => {
 	}
 };
 
-const updateVolumeStatus = async (name: string, status: "mounted" | "unmounted" | "error", error?: string) => {
-	await db
-		.update(volumesTable)
-		.set({
-			status,
-			lastHealthCheck: new Date(),
-			lastError: error ?? null,
-			updatedAt: new Date(),
-		})
-		.where(eq(volumesTable.name, name));
-};
-
-const getVolumeStatus = async (name: string) => {
-	const volume = await db.query.volumesTable.findFirst({
-		where: eq(volumesTable.name, name),
-	});
-
-	if (!volume) {
-		return { error: new NotFoundError("Volume not found") };
-	}
-
-	const backend = createVolumeBackend(volume);
-	const healthResult = await backend.checkHealth();
-	await updateVolumeStatus(name, healthResult.status, healthResult.error);
-
-	return {
-		name: volume.name,
-		status: healthResult.status,
-		lastHealthCheck: new Date(),
-		error: healthResult.error,
-	};
-};
-
 const testConnection = async (backendConfig: BackendConfig) => {
 	let tempDir: string | null = null;
 
@@ -238,7 +202,7 @@ const testConnection = async (backendConfig: BackendConfig) => {
 	} catch (error) {
 		return {
 			success: false,
-			message: error instanceof Error ? error.message : "Connection failed",
+			message: toMessage(error),
 		};
 	} finally {
 		if (tempDir) {
@@ -246,10 +210,39 @@ const testConnection = async (backendConfig: BackendConfig) => {
 				await fs.access(tempDir);
 				await fs.rm(tempDir, { recursive: true, force: true });
 			} catch (cleanupError) {
-				// Ignore cleanup errors if directory doesn't exist or can't be removed
 				logger.warn("Failed to cleanup temp directory:", cleanupError);
 			}
 		}
+	}
+};
+
+const checkHealth = async (name: string) => {
+	try {
+		const volume = await db.query.volumesTable.findFirst({
+			where: eq(volumesTable.name, name),
+		});
+
+		if (!volume) {
+			return { error: new NotFoundError("Volume not found") };
+		}
+
+		const backend = createVolumeBackend(volume);
+		const { error } = await backend.checkHealth();
+
+		if (error) {
+			await db
+				.update(volumesTable)
+				.set({ status: "error", lastError: error, lastHealthCheck: new Date() })
+				.where(eq(volumesTable.name, volume.name));
+
+			return { error };
+		}
+
+		await db.update(volumesTable).set({ lastHealthCheck: new Date() }).where(eq(volumesTable.name, volume.name));
+
+		return { status: 200 };
+	} catch (err) {
+		return { error: new InternalServerError("Health check failed", { cause: err }) };
 	}
 };
 
@@ -261,7 +254,6 @@ export const volumeService = {
 	getVolume,
 	updateVolume,
 	testConnection,
-	updateVolumeStatus,
-	getVolumeStatus,
 	unmountVolume,
+	checkHealth,
 };
