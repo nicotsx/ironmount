@@ -245,6 +245,60 @@ export type UpdateVolumeResponses = {
 
 export type UpdateVolumeResponse = UpdateVolumeResponses[keyof UpdateVolumeResponses];
 
+export type MountVolumeData = {
+	body?: never;
+	path: {
+		name: string;
+	};
+	query?: never;
+	url: "/api/v1/volumes/{name}/mount";
+};
+
+export type MountVolumeErrors = {
+	/**
+	 * Volume not found
+	 */
+	404: unknown;
+};
+
+export type MountVolumeResponses = {
+	/**
+	 * Volume mounted successfully
+	 */
+	200: {
+		message: string;
+	};
+};
+
+export type MountVolumeResponse = MountVolumeResponses[keyof MountVolumeResponses];
+
+export type UnmountVolumeData = {
+	body?: never;
+	path: {
+		name: string;
+	};
+	query?: never;
+	url: "/api/v1/volumes/{name}/unmount";
+};
+
+export type UnmountVolumeErrors = {
+	/**
+	 * Volume not found
+	 */
+	404: unknown;
+};
+
+export type UnmountVolumeResponses = {
+	/**
+	 * Volume unmounted successfully
+	 */
+	200: {
+		message: string;
+	};
+};
+
+export type UnmountVolumeResponse = UnmountVolumeResponses[keyof UnmountVolumeResponses];
+
 export type ClientOptions = {
 	baseUrl: "http://localhost:3000" | (string & {});
 };

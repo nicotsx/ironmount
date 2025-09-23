@@ -9,6 +9,7 @@ import { config } from "../../core/config";
 import { db } from "../../db/db";
 import { volumesTable } from "../../db/schema";
 import { createVolumeBackend } from "../backends/backend";
+import { logger } from "../../utils/logger";
 
 const listVolumes = async () => {
 	const volumes = await db.query.volumesTable.findMany({});
@@ -76,10 +77,49 @@ const mountVolume = async (name: string) => {
 		}
 
 		const backend = createVolumeBackend(volume);
+		await backend.unmount().catch((_) => {
+			// Ignore unmount errors
+		});
+
 		await backend.mount();
+
+		await db
+			.update(volumesTable)
+			.set({ status: "mounted", lastHealthCheck: new Date() })
+			.where(eq(volumesTable.name, name));
+
+		return { status: 200 };
 	} catch (error) {
 		return {
 			error: new InternalServerError("Failed to mount volume", {
+				cause: error,
+			}),
+		};
+	}
+};
+
+const unmountVolume = async (name: string) => {
+	try {
+		const volume = await db.query.volumesTable.findFirst({
+			where: eq(volumesTable.name, name),
+		});
+
+		if (!volume) {
+			return { error: new NotFoundError("Volume not found") };
+		}
+
+		const backend = createVolumeBackend(volume);
+		await backend.unmount();
+
+		await db
+			.update(volumesTable)
+			.set({ status: "unmounted", lastHealthCheck: new Date() })
+			.where(eq(volumesTable.name, name));
+
+		return { status: 200 };
+	} catch (error) {
+		return {
+			error: new InternalServerError("Failed to unmount volume", {
 				cause: error,
 			}),
 		};
@@ -202,7 +242,7 @@ const testConnection = async (backendConfig: BackendConfig) => {
 				await fs.rm(tempDir, { recursive: true, force: true });
 			} catch (cleanupError) {
 				// Ignore cleanup errors if directory doesn't exist or can't be removed
-				console.warn("Failed to cleanup temp directory:", cleanupError);
+				logger.warn("Failed to cleanup temp directory:", cleanupError);
 			}
 		}
 	}
@@ -218,4 +258,5 @@ export const volumeService = {
 	testConnection,
 	updateVolumeStatus,
 	getVolumeStatus,
+	unmountVolume,
 };

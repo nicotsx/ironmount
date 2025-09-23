@@ -13,8 +13,11 @@ import {
 	updateVolumeBody,
 	updateVolumeDto,
 	type VolumeDto,
+	mountVolumeDto,
+	unmountVolumeDto,
 } from "./volume.dto";
 import { volumeService } from "./volume.service";
+import { logger } from "../../utils/logger";
 
 export const volumeController = new Hono()
 	.get("/", listVolumesDto, async (c) => {
@@ -100,4 +103,26 @@ export const volumeController = new Hono()
 		};
 
 		return c.json(response, 200);
+	})
+	.post("/:name/mount", mountVolumeDto, async (c) => {
+		const { name } = c.req.param();
+		const res = await volumeService.mountVolume(name);
+
+		if (res.error) {
+			const { message, status } = handleServiceError(res.error);
+			return c.json(message, status);
+		}
+
+		return c.json({ message: "Volume mounted successfully" }, 200);
+	})
+	.post("/:name/unmount", unmountVolumeDto, async (c) => {
+		const { name } = c.req.param();
+		const res = await volumeService.unmountVolume(name);
+
+		if (res.error) {
+			const { message, status } = handleServiceError(res.error);
+			return c.json(message, status);
+		}
+
+		return c.json({ message: "Volume unmounted successfully" }, 200);
 	});

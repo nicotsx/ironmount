@@ -2,14 +2,15 @@ import * as fs from "node:fs/promises";
 import * as npath from "node:path";
 import { BACKEND_STATUS, type BackendConfig } from "@ironmount/schemas";
 import type { VolumeBackend } from "../backend";
+import { logger } from "../../../utils/logger";
 
 const mount = async (_config: BackendConfig, path: string) => {
-	console.log("Mounting directory volume...");
+	logger.info("Mounting directory volume...");
 	await fs.mkdir(path, { recursive: true });
 };
 
 const unmount = async () => {
-	console.log("Cannot unmount directory volume.");
+	logger.info("Cannot unmount directory volume.");
 };
 
 const checkHealth = async (path: string) => {
@@ -23,7 +24,7 @@ const checkHealth = async (path: string) => {
 
 		return { status: BACKEND_STATUS.mounted };
 	} catch (error) {
-		console.error("Directory health check failed:", error);
+		logger.error("Directory health check failed:", error);
 		return { status: BACKEND_STATUS.error, error: error instanceof Error ? error.message : String(error) };
 	}
 };

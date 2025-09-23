@@ -16,7 +16,8 @@
 		"hono": "^4.9.2",
 		"hono-openapi": "^0.4.8",
 		"http-errors-enhanced": "^3.0.2",
-		"slugify": "^1.6.6"
+		"slugify": "^1.6.6",
+		"winston": "^3.17.0"
 	},
 	"devDependencies": {
 		"@types/bun": "^1.2.20",

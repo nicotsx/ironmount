@@ -1,4 +1,5 @@
 import { ConflictError, NotFoundError } from "http-errors-enhanced";
+import { logger } from "./logger";
 
 export const handleServiceError = (error: unknown) => {
 	if (error instanceof ConflictError) {
@@ -9,6 +10,6 @@ export const handleServiceError = (error: unknown) => {
 		return { message: error.message, status: 404 as const };
 	}
 
-	console.error("Unhandled service error:", error);
+	logger.error("Unhandled service error:", error);
 	return { message: "Internal Server Error", status: 500 as const };
 };

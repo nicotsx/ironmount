@@ -4,6 +4,7 @@ import * as os from "node:os";
 import * as npath from "node:path";
 import { BACKEND_STATUS, type BackendConfig } from "@ironmount/schemas";
 import type { VolumeBackend } from "../backend";
+import { logger } from "../../../utils/logger";
 
 const mount = async (config: BackendConfig, path: string) => {
 	if (config.backend !== "nfs") {
@@ -11,7 +12,7 @@ const mount = async (config: BackendConfig, path: string) => {
 	}
 
 	if (os.platform() !== "linux") {
-		console.error("NFS mounting is only supported on Linux hosts.");
+		logger.error("NFS mounting is only supported on Linux hosts.");
 		return;
 	}
 
@@ -27,14 +28,14 @@ const mount = async (config: BackendConfig, path: string) => {
 		}, 5000);
 
 		exec(cmd, (error, stdout, stderr) => {
-			console.log("Mount command executed:", { cmd, error, stdout, stderr });
+			logger.info("Mount command executed:", { cmd, error, stdout, stderr });
 			clearTimeout(timeout);
 
 			if (error) {
-				console.error(`Error mounting NFS volume: ${stderr}`);
+				logger.error(`Error mounting NFS volume: ${stderr}`);
 				return reject(new Error(`Failed to mount NFS volume: ${stderr}`));
 			}
-			console.log(`NFS volume mounted successfully: ${stdout}`);
+			logger.info(`NFS volume mounted successfully: ${stdout}`);
 			resolve();
 		});
 	});
@@ -42,7 +43,14 @@ const mount = async (config: BackendConfig, path: string) => {
 
 const unmount = async (path: string) => {
 	if (os.platform() !== "linux") {
-		console.error("NFS unmounting is only supported on Linux hosts.");
+		logger.error("NFS unmounting is only supported on Linux hosts.");
+		return;
+	}
+
+	try {
+		await fs.access(path);
+	} catch {
+		logger.warn(`Path ${path} does not exist. Skipping unmount.`);
 		return;
 	}
 
@@ -54,14 +62,14 @@ const unmount = async (path: string) => {
 		}, 5000);
 
 		exec(cmd, (error, stdout, stderr) => {
-			console.log("Unmount command executed:", { cmd, error, stdout, stderr });
+			logger.info("Unmount command executed:", { cmd, error, stdout, stderr });
 			clearTimeout(timeout);
 
 			if (error) {
-				console.error(`Error unmounting NFS volume: ${stderr}`);
+				logger.error(`Error unmounting NFS volume: ${stderr}`);
 				return reject(new Error(`Failed to unmount NFS volume: ${stderr}`));
 			}
-			console.log(`NFS volume unmounted successfully: ${stdout}`);
+			logger.info(`NFS volume unmounted successfully: ${stdout}`);
 			resolve();
 		});
 	});
@@ -78,7 +86,7 @@ const checkHealth = async (path: string) => {
 
 		return { status: BACKEND_STATUS.mounted };
 	} catch (error) {
-		console.error("NFS volume health check failed:", error);
+		logger.error("NFS volume health check failed:", error);
 		return { status: BACKEND_STATUS.error, error: error instanceof Error ? error.message : String(error) };
 	}
 };

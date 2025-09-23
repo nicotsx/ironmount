@@ -16,6 +16,12 @@ import type {
 	UpdateVolumeData,
 	UpdateVolumeResponses,
 	UpdateVolumeErrors,
+	MountVolumeData,
+	MountVolumeResponses,
+	MountVolumeErrors,
+	UnmountVolumeData,
+	UnmountVolumeResponses,
+	UnmountVolumeErrors,
 } from "./types.gen";
 import { client as _heyApiClient } from "./client.gen";
 
@@ -113,5 +119,27 @@ export const updateVolume = <ThrowOnError extends boolean = false>(
 			"Content-Type": "application/json",
 			...options.headers,
 		},
+	});
+};
+
+/**
+ * Mount a volume
+ */
+export const mountVolume = <ThrowOnError extends boolean = false>(options: Options<MountVolumeData, ThrowOnError>) => {
+	return (options.client ?? _heyApiClient).post<MountVolumeResponses, MountVolumeErrors, ThrowOnError>({
+		url: "/api/v1/volumes/{name}/mount",
+		...options,
+	});
+};
+
+/**
+ * Unmount a volume
+ */
+export const unmountVolume = <ThrowOnError extends boolean = false>(
+	options: Options<UnmountVolumeData, ThrowOnError>,
+) => {
+	return (options.client ?? _heyApiClient).post<UnmountVolumeResponses, UnmountVolumeErrors, ThrowOnError>({
+		url: "/api/v1/volumes/{name}/unmount",
+		...options,
 	});
 };

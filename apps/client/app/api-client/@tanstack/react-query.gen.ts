@@ -8,6 +8,8 @@ import {
 	deleteVolume,
 	getVolume,
 	updateVolume,
+	mountVolume,
+	unmountVolume,
 } from "../sdk.gen";
 import { queryOptions, type UseMutationOptions, type DefaultError } from "@tanstack/react-query";
 import type {
@@ -21,6 +23,10 @@ import type {
 	GetVolumeData,
 	UpdateVolumeData,
 	UpdateVolumeResponse,
+	MountVolumeData,
+	MountVolumeResponse,
+	UnmountVolumeData,
+	UnmountVolumeResponse,
 } from "../types.gen";
 import { client as _heyApiClient } from "../client.gen";
 
@@ -210,6 +216,84 @@ export const updateVolumeMutation = (
 	const mutationOptions: UseMutationOptions<UpdateVolumeResponse, DefaultError, Options<UpdateVolumeData>> = {
 		mutationFn: async (localOptions) => {
 			const { data } = await updateVolume({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
+};
+
+export const mountVolumeQueryKey = (options: Options<MountVolumeData>) => createQueryKey("mountVolume", options);
+
+/**
+ * Mount a volume
+ */
+export const mountVolumeOptions = (options: Options<MountVolumeData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await mountVolume({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: mountVolumeQueryKey(options),
+	});
+};
+
+/**
+ * Mount a volume
+ */
+export const mountVolumeMutation = (
+	options?: Partial<Options<MountVolumeData>>,
+): UseMutationOptions<MountVolumeResponse, DefaultError, Options<MountVolumeData>> => {
+	const mutationOptions: UseMutationOptions<MountVolumeResponse, DefaultError, Options<MountVolumeData>> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await mountVolume({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
+};
+
+export const unmountVolumeQueryKey = (options: Options<UnmountVolumeData>) => createQueryKey("unmountVolume", options);
+
+/**
+ * Unmount a volume
+ */
+export const unmountVolumeOptions = (options: Options<UnmountVolumeData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await unmountVolume({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: unmountVolumeQueryKey(options),
+	});
+};
+
+/**
+ * Unmount a volume
+ */
+export const unmountVolumeMutation = (
+	options?: Partial<Options<UnmountVolumeData>>,
+): UseMutationOptions<UnmountVolumeResponse, DefaultError, Options<UnmountVolumeData>> => {
+	const mutationOptions: UseMutationOptions<UnmountVolumeResponse, DefaultError, Options<UnmountVolumeData>> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await unmountVolume({
 				...options,
 				...localOptions,
 				throwOnError: true,

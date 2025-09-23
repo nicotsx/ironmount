@@ -3,7 +3,12 @@ import { WifiIcon } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { getVolume } from "~/api-client";
-import { deleteVolumeMutation, getVolumeOptions } from "~/api-client/@tanstack/react-query.gen";
+import {
+	deleteVolumeMutation,
+	getVolumeOptions,
+	mountVolumeMutation,
+	unmountVolumeMutation,
+} from "~/api-client/@tanstack/react-query.gen";
 import { CreateVolumeForm } from "~/components/create-volume-form";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
@@ -11,6 +16,7 @@ import { VolumeIcon } from "~/components/volume-icon";
 import { parseError } from "~/lib/errors";
 import { HealthchecksCard } from "~/modules/details/components/healthchecks-card";
 import type { Route } from "./+types/details";
+import { cn } from "~/lib/utils";
 
 export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
 	const volume = await getVolume({ path: { name: params.name ?? "" } });
@@ -34,6 +40,30 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 		},
 		onError: (error) => {
 			toast.error("Failed to delete volume", {
+				description: parseError(error)?.message,
+			});
+		},
+	});
+
+	const mountVol = useMutation({
+		...mountVolumeMutation(),
+		onSuccess: () => {
+			toast.success("Volume mounted successfully");
+		},
+		onError: (error) => {
+			toast.error("Failed to mount volume", {
+				description: parseError(error)?.message,
+			});
+		},
+	});
+
+	const unmountVol = useMutation({
+		...unmountVolumeMutation(),
+		onSuccess: () => {
+			toast.success("Volume unmounted successfully");
+		},
+		onError: (error) => {
+			toast.error("Failed to unmount volume", {
 				description: parseError(error)?.message,
 			});
 		},
@@ -67,7 +97,22 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 					</div>
 				</div>
 				<div className="flex gap-4">
-					<Button>Mount</Button>
+					<Button
+						variant="secondary"
+						onClick={() => mountVol.mutate({ path: { name } })}
+						disabled={mountVol.isPending}
+						className={cn({ hidden: data.status === "mounted" })}
+					>
+						Mount
+					</Button>
+					<Button
+						variant="secondary"
+						onClick={() => unmountVol.mutate({ path: { name } })}
+						disabled={unmountVol.isPending}
+						className={cn({ hidden: data.status !== "mounted" })}
+					>
+						Unmount
+					</Button>
 					<Button variant="destructive" onClick={() => handleDeleteConfirm(name)} disabled={deleteVol.isPending}>
 						Delete
 					</Button>

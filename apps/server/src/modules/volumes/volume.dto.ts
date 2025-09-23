@@ -190,3 +190,57 @@ export const testConnectionDto = describeRoute({
 		},
 	},
 });
+
+/**
+ * Mount volume
+ */
+export const mountVolumeResponse = type({
+	message: "string",
+});
+
+export const mountVolumeDto = describeRoute({
+	description: "Mount a volume",
+	operationId: "mountVolume",
+	validateResponse: true,
+	tags: ["Volumes"],
+	responses: {
+		200: {
+			description: "Volume mounted successfully",
+			content: {
+				"application/json": {
+					schema: resolver(mountVolumeResponse),
+				},
+			},
+		},
+		404: {
+			description: "Volume not found",
+		},
+	},
+});
+
+/**
+ * Unmount volume
+ */
+export const unmountVolumeResponse = type({
+	message: "string",
+});
+
+export const unmountVolumeDto = describeRoute({
+	description: "Unmount a volume",
+	operationId: "unmountVolume",
+	validateResponse: true,
+	tags: ["Volumes"],
+	responses: {
+		200: {
+			description: "Volume unmounted successfully",
+			content: {
+				"application/json": {
+					schema: resolver(unmountVolumeResponse),
+				},
+			},
+		},
+		404: {
+			description: "Volume not found",
+		},
+	},
+});
