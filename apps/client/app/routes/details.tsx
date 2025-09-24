@@ -17,6 +17,8 @@ import { HealthchecksCard } from "~/modules/details/components/healthchecks-card
 import type { Route } from "./+types/details";
 import { cn } from "~/lib/utils";
 import { StatusDot } from "~/components/status-dot";
+import { VolumeInfoTabContent } from "~/modules/details/tabs/info";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
 export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
 	const volume = await getVolume({ path: { name: params.name ?? "" } });
@@ -116,15 +118,17 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 					</Button>
 				</div>
 			</div>
-			<div className="grid gap-4 grid-cols-1 lg:grid-cols-3 lg:grid-rows-[auto_1fr]">
-				<Card className="p-6 lg:col-span-2 lg:row-span-2">
-					<CreateVolumeForm initialValues={{ ...data, ...data?.config }} onSubmit={console.log} />
-				</Card>
-				<HealthchecksCard volume={data} />
-				<Card className="p-6 h-full">
-					<h2 className="text-lg font-medium">Volume Information</h2>
-				</Card>
-			</div>
+			<Tabs defaultValue="info" className="mt-0">
+				<TabsList>
+					<TabsTrigger value="info">Configuration</TabsTrigger>
+					<TabsTrigger value="backups">Backups</TabsTrigger>
+					<TabsTrigger value="explorer">Eplorer</TabsTrigger>
+				</TabsList>
+				<TabsContent value="info">
+					<VolumeInfoTabContent volume={data} />
+				</TabsContent>
+				<TabsContent value="password">Change your password here.</TabsContent>
+			</Tabs>
 		</>
 	);
 }

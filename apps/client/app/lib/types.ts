@@ -1,3 +1,4 @@
 import type { GetVolumeResponse } from "~/api-client";
 
-export type VolumeStatus = GetVolumeResponse["status"];
+export type Volume = GetVolumeResponse;
+export type VolumeStatus = Volume["status"];
