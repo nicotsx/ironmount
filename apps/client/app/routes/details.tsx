@@ -87,7 +87,6 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 		<>
 			<div className="flex items-center justify-between">
 				<div>
-					<h1 className="text-3xl font-bold mb-0 uppercase">{name}</h1>
 					<div className="text-sm font-semibold mb-2 text-muted-foreground flex items-center gap-2">
 						<span className="flex items-center gap-2">
 							<StatusDot status={data.status} /> {data.status[0].toUpperCase() + data.status.slice(1)}
