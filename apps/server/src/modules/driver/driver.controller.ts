@@ -1,4 +1,6 @@
 import { Hono } from "hono";
+import { volumeService } from "../volumes/volume.service";
+import { config } from "../../core/config";
 
 export const driverController = new Hono()
 	.post("/VolumeDriver.Capabilities", (c) => {
@@ -13,10 +15,8 @@ export const driverController = new Hono()
 			Implements: ["VolumeDriver"],
 		});
 	})
-	.post("/VolumeDriver.Create", (c) => {
-		return c.json({
-			Err: "",
-		});
+	.post("/VolumeDriver.Create", (_) => {
+		throw new Error("Volume creation is not supported via the driver");
 	})
 	.post("/VolumeDriver.Remove", (c) => {
 		return c.json({
@@ -38,21 +38,36 @@ export const driverController = new Hono()
 			Mountpoint: `/mnt/something`,
 		});
 	})
-	.post("/VolumeDriver.Get", (c) => {
+	.post("/VolumeDriver.Get", async (c) => {
+		const body = await c.req.json();
+
+		if (!body.Name) {
+			return c.json({ Err: "Volume name is required" }, 400);
+		}
+
+		const volumeRoot = config.volumeRootHost;
+		const { volume } = await volumeService.getVolume(body.Name);
+
 		return c.json({
-			Name: "my-volume",
-			Mountpoint: `/mnt/something`,
-			Status: {},
+			Volume: {
+				Name: volume.name,
+				Mountpoint: `${volumeRoot}/${volume.name}/_data`,
+				Status: {},
+			},
+			Err: "",
 		});
 	})
-	.post("/VolumeDriver.List", (c) => {
+	.post("/VolumeDriver.List", async (c) => {
+		const volumes = await volumeService.listVolumes();
+		const volumeRoot = config.volumeRootHost;
+
+		const res = volumes.map((volume) => ({
+			Name: volume.name,
+			Mountpoint: `${volumeRoot}/${volume.name}/_data`,
+			Status: {},
+		}));
+
 		return c.json({
-			Volumes: [
-				{
-					Name: "my-volume",
-					Mountpoint: `/mnt/something`,
-					Status: {},
-				},
-			],
+			Volumes: res,
 		});
 	});
