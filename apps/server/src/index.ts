@@ -8,6 +8,7 @@ import { driverController } from "./modules/driver/driver.controller";
 import { volumeController } from "./modules/volumes/volume.controller";
 import { logger } from "./utils/logger";
 import { startup } from "./modules/lifecycle/startup";
+import { handleServiceError } from "./utils/errors";
 
 export const generalDescriptor = (app: Hono) =>
 	openAPISpecs(app, {
@@ -39,6 +40,18 @@ app.get("/docs", scalarDescriptor);
 
 app.get("/", (c) => {
 	return c.json({ message: "Welcome to the Ironmount API" });
+});
+
+app.onError((err, c) => {
+	logger.error(`${c.req.url}: ${err.message}`);
+
+	if (err.cause instanceof Error) {
+		logger.error(err.cause.message);
+	}
+
+	const { status, message } = handleServiceError(err);
+
+	return c.json({ error: message }, status);
 });
 
 const socketPath = "/run/docker/plugins/ironmount.sock";

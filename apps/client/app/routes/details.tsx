@@ -1,5 +1,4 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { WifiIcon } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { getVolume } from "~/api-client";
@@ -88,7 +87,7 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 		<>
 			<div className="flex items-center justify-between">
 				<div>
-					<h1 className="text-3xl font-bold mb-0 uppercase">Volume: {name}</h1>
+					<h1 className="text-3xl font-bold mb-0 uppercase">{name}</h1>
 					<div className="text-sm font-semibold mb-2 text-muted-foreground flex items-center gap-2">
 						<span className="flex items-center gap-2">
 							<StatusDot status={data.status} /> {data.status[0].toUpperCase() + data.status.slice(1)}
@@ -100,7 +99,7 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 					<Button
 						variant="secondary"
 						onClick={() => mountVol.mutate({ path: { name } })}
-						disabled={mountVol.isPending}
+						loading={mountVol.isPending}
 						className={cn({ hidden: data.status === "mounted" })}
 					>
 						Mount
@@ -108,7 +107,7 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 					<Button
 						variant="secondary"
 						onClick={() => unmountVol.mutate({ path: { name } })}
-						disabled={unmountVol.isPending}
+						loading={unmountVol.isPending}
 						className={cn({ hidden: data.status !== "mounted" })}
 					>
 						Unmount
@@ -118,16 +117,14 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 					</Button>
 				</div>
 			</div>
-			<div className="flex gap-4">
-				<Card className="my-4 p-6 flex-1">
+			<div className="grid gap-4 grid-cols-1 lg:grid-cols-3 lg:grid-rows-[auto_1fr]">
+				<Card className="p-6 lg:col-span-2 lg:row-span-2">
 					<CreateVolumeForm initialValues={{ ...data, ...data?.config }} onSubmit={console.log} />
 				</Card>
-				<div className="flex flex-col my-4 gap-4">
-					<HealthchecksCard volume={data} />
-					<Card className="p-6 flex-1">
-						<h2 className="text-lg font-medium">Volume Information</h2>
-					</Card>
-				</div>
+				<HealthchecksCard volume={data} />
+				<Card className="p-6 h-full">
+					<h2 className="text-lg font-medium">Volume Information</h2>
+				</Card>
 			</div>
 		</>
 	);

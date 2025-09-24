@@ -1,4 +1,4 @@
-import { exec, execFile as execFileCb } from "node:child_process";
+import { execFile as execFileCb } from "node:child_process";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as npath from "node:path";
@@ -9,6 +9,7 @@ import { promisify } from "node:util";
 import { withTimeout } from "../../../utils/timeout";
 import { OPERATION_TIMEOUT } from "../../../core/constants";
 import { toMessage } from "../../../utils/errors";
+import { getMountForPath } from "../../../utils/mountinfo";
 
 const execFile = promisify(execFileCb);
 
@@ -109,6 +110,12 @@ const checkHealth = async (path: string) => {
 	const run = async () => {
 		logger.debug(`Checking health of NFS volume at ${path}...`);
 		await fs.access(path);
+
+		const mount = await getMountForPath(path);
+
+		if (!mount || !mount.fstype.startsWith("nfs")) {
+			throw new Error(`Path ${path} is not mounted as NFS.`);
+		}
 
 		const testFilePath = npath.join(path, `.healthcheck-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
 

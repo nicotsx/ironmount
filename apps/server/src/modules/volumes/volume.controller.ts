@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import { validator } from "hono-openapi/arktype";
-import { handleServiceError } from "../../utils/errors";
 import {
 	createVolumeBody,
 	createVolumeDto,
@@ -37,12 +36,7 @@ export const volumeController = new Hono()
 		const body = c.req.valid("json");
 		const res = await volumeService.createVolume(body.name, body.config);
 
-		if (res.error) {
-			const { message, status } = handleServiceError(res.error);
-			return c.json(message, status);
-		}
-
-		return c.json({ message: "Volume created", volume: res.volume });
+		return c.json({ message: "Volume created", volume: res.volume }, 201);
 	})
 	.post("/test-connection", testConnectionDto, validator("json", testConnectionBody), async (c) => {
 		const body = c.req.valid("json");
@@ -52,23 +46,13 @@ export const volumeController = new Hono()
 	})
 	.delete("/:name", deleteVolumeDto, async (c) => {
 		const { name } = c.req.param();
-		const res = await volumeService.deleteVolume(name);
+		await volumeService.deleteVolume(name);
 
-		if (res.error) {
-			const { message, status } = handleServiceError(res.error);
-			return c.json(message, status);
-		}
-
-		return c.json({ message: "Volume deleted" });
+		return c.json({ message: "Volume deleted" }, 200);
 	})
 	.get("/:name", getVolumeDto, async (c) => {
 		const { name } = c.req.param();
 		const res = await volumeService.getVolume(name);
-
-		if (res.error) {
-			const { message, status } = handleServiceError(res.error);
-			return c.json(message, status);
-		}
 
 		const response = {
 			...res.volume,
@@ -83,11 +67,6 @@ export const volumeController = new Hono()
 		const { name } = c.req.param();
 		const body = c.req.valid("json");
 		const res = await volumeService.updateVolume(name, body.config);
-
-		if (res.error) {
-			const { message, status } = handleServiceError(res.error);
-			return c.json(message, status);
-		}
 
 		const response = {
 			message: "Volume updated",
@@ -105,23 +84,13 @@ export const volumeController = new Hono()
 	})
 	.post("/:name/mount", mountVolumeDto, async (c) => {
 		const { name } = c.req.param();
-		const res = await volumeService.mountVolume(name);
+		const { error, status } = await volumeService.mountVolume(name);
 
-		if (res.error) {
-			const { message, status } = handleServiceError(res.error);
-			return c.json(message, status);
-		}
-
-		return c.json({ message: "Volume mounted successfully" }, 200);
+		return c.json({ error, status }, error ? 500 : 200);
 	})
 	.post("/:name/unmount", unmountVolumeDto, async (c) => {
 		const { name } = c.req.param();
-		const res = await volumeService.unmountVolume(name);
+		const { error, status } = await volumeService.unmountVolume(name);
 
-		if (res.error) {
-			const { message, status } = handleServiceError(res.error);
-			return c.json(message, status);
-		}
-
-		return c.json({ message: "Volume unmounted successfully" }, 200);
+		return c.json({ error, status }, error ? 500 : 200);
 	});

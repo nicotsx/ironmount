@@ -8,11 +8,12 @@ const volumeSchema = type({
 	path: "string",
 	type: type.enumerated("nfs", "smb", "directory"),
 	status: type.enumerated("mounted", "unmounted", "error", "unknown"),
-	lastError: "string|null",
+	lastError: "string | null",
 	createdAt: "number",
 	updatedAt: "number",
 	lastHealthCheck: "number",
 	config: volumeConfigSchema,
+	autoRemount: "0 | 1",
 });
 
 export type VolumeDto = typeof volumeSchema.infer;
@@ -55,7 +56,6 @@ export const createVolumeResponse = type({
 	volume: type({
 		name: "string",
 		path: "string",
-		createdAt: "number",
 	}),
 });
 
@@ -195,7 +195,8 @@ export const testConnectionDto = describeRoute({
  * Mount volume
  */
 export const mountVolumeResponse = type({
-	message: "string",
+	error: "string?",
+	status: type.enumerated("mounted", "unmounted", "error"),
 });
 
 export const mountVolumeDto = describeRoute({
@@ -222,7 +223,8 @@ export const mountVolumeDto = describeRoute({
  * Unmount volume
  */
 export const unmountVolumeResponse = type({
-	message: "string",
+	error: "string?",
+	status: type.enumerated("mounted", "unmounted", "error"),
 });
 
 export const unmountVolumeDto = describeRoute({

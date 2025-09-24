@@ -1,4 +1,4 @@
-import { eq, or } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { db } from "../../db/db";
 import { logger } from "../../utils/logger";
 import { volumesTable } from "../../db/schema";
@@ -7,7 +7,10 @@ import { volumeService } from "../volumes/volume.service";
 
 export const startup = async () => {
 	const volumes = await db.query.volumesTable.findMany({
-		where: or(eq(volumesTable.status, "mounted"), eq(volumesTable.autoRemount, 1)),
+		where: or(
+			eq(volumesTable.status, "mounted"),
+			and(eq(volumesTable.autoRemount, 1), eq(volumesTable.status, "error")),
+		),
 	});
 
 	for (const volume of volumes) {
@@ -21,7 +24,7 @@ export const startup = async () => {
 		logger.info("Running health check for all volumes...");
 
 		const volumes = await db.query.volumesTable.findMany({
-			where: or(eq(volumesTable.status, "mounted")),
+			where: or(eq(volumesTable.status, "mounted"), eq(volumesTable.status, "error")),
 		});
 
 		for (const volume of volumes) {

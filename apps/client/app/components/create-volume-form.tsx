@@ -30,6 +30,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 		resolver: arktypeResolver(formSchema),
 		defaultValues: initialValues,
 	});
+
 	const { watch, getValues } = form;
 
 	const watchedBackend = watch("backend");
@@ -40,6 +41,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 	const testBackendConnection = useMutation({
 		...testConnectionMutation(),
 		onMutate: () => {
+			setTestMessage("");
 			setTestStatus("loading");
 		},
 		onError: () => {

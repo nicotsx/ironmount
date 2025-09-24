@@ -13,6 +13,7 @@ export type ListVolumesResponses = {
 	 */
 	200: {
 		volumes: Array<{
+			autoRemount: boolean;
 			config:
 				| {
 						backend: "directory";
@@ -155,6 +156,7 @@ export type GetVolumeResponses = {
 	 * Volume details
 	 */
 	200: {
+		autoRemount: boolean;
 		config:
 			| {
 					backend: "directory";

@@ -13,7 +13,7 @@ export const volumesTable = sqliteTable("volumes_table", {
 	createdAt: int("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
 	updatedAt: int("updated_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
 	config: text("config", { mode: "json" }).$type<typeof volumeConfigSchema.inferOut>().notNull(),
-	autoRemount: int("auto_remount").notNull().default(1),
+	autoRemount: int("auto_remount").$type<1 | 0>().notNull().default(1),
 });
 
 export type Volume = typeof volumesTable.$inferSelect;

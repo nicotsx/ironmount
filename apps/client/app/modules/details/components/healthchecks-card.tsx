@@ -21,10 +21,13 @@ export const HealthchecksCard = ({ volume }: Props) => {
 					<ScanHeartIcon size={24} />
 					<h2 className="text-lg font-medium">Health Checks</h2>
 				</span>
-				<span className="">Status: {volume.status ?? "Unknown"}</span>
-				<span className="text-sm text-muted-foreground mb-4">Checked {timeAgo || "never"}</span>
-				<span className="flex items-center">
-					Enable auto remount
+				{volume.lastError && <span className="text-md text-red-600 ">{volume.lastError}</span>}
+				{volume.status === "mounted" && <span className="text-md text-green-600">Healthy</span>}
+				{volume.status !== "unmounted" && (
+					<span className="text-xs text-muted-foreground mb-4">Checked {timeAgo || "never"}</span>
+				)}
+				<span className="flex items-center gap-2">
+					Remount on error
 					<Switch className="ml-auto cursor-pointer" checked={volume.autoRemount} />
 				</span>
 			</div>
