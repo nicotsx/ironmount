@@ -9,6 +9,7 @@
 		"typecheck": "react-router typegen && tsc"
 	},
 	"dependencies": {
+		"@codemirror/lang-yaml": "^6.1.2",
 		"@hookform/resolvers": "^5.2.1",
 		"@ironmount/schemas": "workspace:*",
 		"@radix-ui/react-alert-dialog": "^1.1.15",
@@ -24,6 +25,8 @@
 		"@tanstack/react-query": "^5.84.2",
 		"@tanstack/react-query-devtools": "^5.85.9",
 		"@tanstack/react-table": "^8.21.3",
+		"@uiw/codemirror-theme-copilot": "^4.25.2",
+		"@uiw/react-codemirror": "^4.25.2",
 		"arktype": "^2.1.20",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
@@ -36,7 +39,8 @@
 		"react-hook-form": "^7.62.0",
 		"react-router": "^7.7.1",
 		"sonner": "^2.0.7",
-		"tailwind-merge": "^3.3.1"
+		"tailwind-merge": "^3.3.1",
+		"yaml": "^2.8.1"
 	},
 	"devDependencies": {
 		"@react-router/dev": "^7.7.1",

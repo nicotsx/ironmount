@@ -23,9 +23,18 @@ export const driverController = new Hono()
 			Err: "",
 		});
 	})
-	.post("/VolumeDriver.Mount", (c) => {
+	.post("/VolumeDriver.Mount", async (c) => {
+		const body = await c.req.json();
+
+		if (!body.Name) {
+			return c.json({ Err: "Volume name is required" }, 400);
+		}
+
+		const volumeRoot = config.volumeRootHost;
+		const mountpoint = `${volumeRoot}/${body.Name}/_data`;
+
 		return c.json({
-			Mountpoint: `/mnt/something`,
+			Mountpoint: mountpoint,
 		});
 	})
 	.post("/VolumeDriver.Unmount", (c) => {

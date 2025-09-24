@@ -8,17 +8,15 @@ import {
 	mountVolumeMutation,
 	unmountVolumeMutation,
 } from "~/api-client/@tanstack/react-query.gen";
-import { CreateVolumeForm } from "~/components/create-volume-form";
 import { Button } from "~/components/ui/button";
-import { Card } from "~/components/ui/card";
 import { VolumeIcon } from "~/components/volume-icon";
 import { parseError } from "~/lib/errors";
-import { HealthchecksCard } from "~/modules/details/components/healthchecks-card";
 import type { Route } from "./+types/details";
 import { cn } from "~/lib/utils";
 import { StatusDot } from "~/components/status-dot";
 import { VolumeInfoTabContent } from "~/modules/details/tabs/info";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { DockerTabContent } from "~/modules/details/tabs/docker";
 
 export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
 	const volume = await getVolume({ path: { name: params.name ?? "" } });
@@ -121,13 +119,14 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 			<Tabs defaultValue="info" className="mt-0">
 				<TabsList>
 					<TabsTrigger value="info">Configuration</TabsTrigger>
-					<TabsTrigger value="backups">Backups</TabsTrigger>
-					<TabsTrigger value="explorer">Eplorer</TabsTrigger>
+					<TabsTrigger value="docker">Docker usage</TabsTrigger>
 				</TabsList>
 				<TabsContent value="info">
 					<VolumeInfoTabContent volume={data} />
 				</TabsContent>
-				<TabsContent value="password">Change your password here.</TabsContent>
+				<TabsContent value="docker">
+					<DockerTabContent volume={data} />
+				</TabsContent>
 			</Tabs>
 		</>
 	);
