@@ -101,7 +101,7 @@ const getVolume = async (name: string) => {
 		where: eq(volumesTable.name, name),
 	});
 
-	const statfs = await getStatFs(`${VOLUME_MOUNT_BASE}/${name}/_data`);
+	const statfs = await getStatFs(`${VOLUME_MOUNT_BASE}/${name}/_data`).catch(() => {});
 
 	if (!volume) {
 		throw new NotFoundError("Volume not found");
@@ -182,7 +182,7 @@ const checkHealth = async (name: string) => {
 
 	await db
 		.update(volumesTable)
-		.set({ lastHealthCheck: new Date(), status, lastError: error })
+		.set({ lastHealthCheck: new Date(), status, lastError: error ?? null })
 		.where(eq(volumesTable.name, volume.name));
 
 	return { status, error };

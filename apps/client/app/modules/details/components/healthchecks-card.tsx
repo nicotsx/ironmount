@@ -15,10 +15,10 @@ export const HealthchecksCard = ({ volume }: Props) => {
 	});
 
 	return (
-		<Card className="p-6 flex-1 flex flex-col">
+		<Card className="p-6 flex-1 flex flex-col h-full">
 			<div className="flex flex-col flex-1 justify-start">
 				<span className="flex items-center gap-2 mb-4">
-					<ScanHeartIcon size={24} />
+					<ScanHeartIcon className="h-4 w-4" />
 					<h2 className="text-lg font-medium">Health Checks</h2>
 				</span>
 				{volume.lastError && <span className="text-md text-red-600 ">{volume.lastError}</span>}

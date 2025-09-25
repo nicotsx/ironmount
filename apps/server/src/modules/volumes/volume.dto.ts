@@ -103,9 +103,9 @@ export const deleteVolumeDto = describeRoute({
 const getVolumeResponse = type({
 	volume: volumeSchema,
 	statfs: type({
-		total: "number",
-		used: "number",
-		free: "number",
+		total: "number = 0",
+		used: "number = 0",
+		free: "number = 0",
 	}),
 });
 

@@ -1,9 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { useId } from "react";
 import { toast } from "sonner";
-import type { GetVolumeResponse } from "~/api-client";
 import { updateVolumeMutation } from "~/api-client/@tanstack/react-query.gen";
 import { parseError } from "~/lib/errors";
+import type { Volume } from "../lib/types";
 import { CreateVolumeForm } from "./create-volume-form";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 type Props = {
 	open: boolean;
 	setOpen: (open: boolean) => void;
-	initialValues?: Partial<GetVolumeResponse>;
+	initialValues?: Partial<Volume>;
 };
 
 export const EditVolumeDialog = ({ open, setOpen, initialValues }: Props) => {

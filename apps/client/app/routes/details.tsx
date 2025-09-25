@@ -8,19 +8,19 @@ import {
 	mountVolumeMutation,
 	unmountVolumeMutation,
 } from "~/api-client/@tanstack/react-query.gen";
+import { StatusDot } from "~/components/status-dot";
 import { Button } from "~/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { VolumeIcon } from "~/components/volume-icon";
 import { parseError } from "~/lib/errors";
-import type { Route } from "./+types/details";
 import { cn } from "~/lib/utils";
-import { StatusDot } from "~/components/status-dot";
-import { VolumeInfoTabContent } from "~/modules/details/tabs/info";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { DockerTabContent } from "~/modules/details/tabs/docker";
+import { VolumeInfoTabContent } from "~/modules/details/tabs/info";
+import type { Route } from "./+types/details";
 
 export function meta({ params }: Route.MetaArgs) {
 	return [
-		{ title: "Ironmount - " + params.name },
+		{ title: `Ironmount - ${params.name}` },
 		{
 			name: "description",
 			content: "Create, manage, monitor, and automate your Docker volumes with ease.",
@@ -93,7 +93,6 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 		return <div>Loading...</div>;
 	}
 
-	console.log(data);
 	const { volume, statfs } = data;
 
 	return (
