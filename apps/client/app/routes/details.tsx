@@ -18,6 +18,16 @@ import { VolumeInfoTabContent } from "~/modules/details/tabs/info";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { DockerTabContent } from "~/modules/details/tabs/docker";
 
+export function meta({ params }: Route.MetaArgs) {
+	return [
+		{ title: "Ironmount - " + params.name },
+		{
+			name: "description",
+			content: "Create, manage, monitor, and automate your Docker volumes with ease.",
+		},
+	];
+}
+
 export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
 	const volume = await getVolume({ path: { name: params.name ?? "" } });
 	if (volume.data) return volume.data;
@@ -83,15 +93,18 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 		return <div>Loading...</div>;
 	}
 
+	console.log(data);
+	const { volume, statfs } = data;
+
 	return (
 		<>
 			<div className="flex items-center justify-between">
 				<div>
 					<div className="text-sm font-semibold mb-2 text-muted-foreground flex items-center gap-2">
 						<span className="flex items-center gap-2">
-							<StatusDot status={data.status} /> {data.status[0].toUpperCase() + data.status.slice(1)}
+							<StatusDot status={volume.status} /> {volume.status[0].toUpperCase() + volume.status.slice(1)}
 						</span>
-						<VolumeIcon size={14} backend={data?.config.backend} />
+						<VolumeIcon size={14} backend={volume?.config.backend} />
 					</div>
 				</div>
 				<div className="flex gap-4">
@@ -99,7 +112,7 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 						variant="secondary"
 						onClick={() => mountVol.mutate({ path: { name } })}
 						loading={mountVol.isPending}
-						className={cn({ hidden: data.status === "mounted" })}
+						className={cn({ hidden: volume.status === "mounted" })}
 					>
 						Mount
 					</Button>
@@ -107,7 +120,7 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 						variant="secondary"
 						onClick={() => unmountVol.mutate({ path: { name } })}
 						loading={unmountVol.isPending}
-						className={cn({ hidden: data.status !== "mounted" })}
+						className={cn({ hidden: volume.status !== "mounted" })}
 					>
 						Unmount
 					</Button>
@@ -122,10 +135,10 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 					<TabsTrigger value="docker">Docker usage</TabsTrigger>
 				</TabsList>
 				<TabsContent value="info">
-					<VolumeInfoTabContent volume={data} />
+					<VolumeInfoTabContent volume={volume} statfs={statfs} />
 				</TabsContent>
 				<TabsContent value="docker">
-					<DockerTabContent volume={data} />
+					<DockerTabContent volume={volume} />
 				</TabsContent>
 			</Tabs>
 		</>

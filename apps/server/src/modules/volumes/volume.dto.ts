@@ -100,6 +100,16 @@ export const deleteVolumeDto = describeRoute({
 	},
 });
 
+const getVolumeResponse = type({
+	volume: volumeSchema,
+	statfs: type({
+		total: "number",
+		used: "number",
+		free: "number",
+	}),
+});
+
+export type GetVolumeResponseDto = typeof getVolumeResponse.infer;
 /**
  * Get a volume
  */
@@ -113,7 +123,7 @@ export const getVolumeDto = describeRoute({
 			description: "Volume details",
 			content: {
 				"application/json": {
-					schema: resolver(volumeSchema),
+					schema: resolver(getVolumeResponse),
 				},
 			},
 		},

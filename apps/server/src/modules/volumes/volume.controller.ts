@@ -11,9 +11,9 @@ import {
 	testConnectionDto,
 	updateVolumeBody,
 	updateVolumeDto,
-	type VolumeDto,
 	mountVolumeDto,
 	unmountVolumeDto,
+	type GetVolumeResponseDto,
 } from "./volume.dto";
 import { volumeService } from "./volume.service";
 
@@ -55,11 +55,14 @@ export const volumeController = new Hono()
 		const res = await volumeService.getVolume(name);
 
 		const response = {
-			...res.volume,
-			createdAt: res.volume.createdAt.getTime(),
-			updatedAt: res.volume.updatedAt.getTime(),
-			lastHealthCheck: res.volume.lastHealthCheck.getTime(),
-		} satisfies VolumeDto;
+			...res,
+			volume: {
+				...res.volume,
+				createdAt: res.volume.createdAt.getTime(),
+				updatedAt: res.volume.updatedAt.getTime(),
+				lastHealthCheck: res.volume.lastHealthCheck.getTime(),
+			},
+		} satisfies GetVolumeResponseDto;
 
 		return c.json(response, 200);
 	})

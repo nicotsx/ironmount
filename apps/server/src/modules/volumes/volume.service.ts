@@ -10,6 +10,8 @@ import { db } from "../../db/db";
 import { volumesTable } from "../../db/schema";
 import { createVolumeBackend } from "../backends/backend";
 import { toMessage } from "../../utils/errors";
+import { getStatFs } from "../../utils/mountinfo";
+import { VOLUME_MOUNT_BASE } from "../../core/constants";
 
 const listVolumes = async () => {
 	const volumes = await db.query.volumesTable.findMany({});
@@ -99,11 +101,13 @@ const getVolume = async (name: string) => {
 		where: eq(volumesTable.name, name),
 	});
 
+	const statfs = await getStatFs(`${VOLUME_MOUNT_BASE}/${name}/_data`);
+
 	if (!volume) {
 		throw new NotFoundError("Volume not found");
 	}
 
-	return { volume };
+	return { volume, statfs };
 };
 
 const updateVolume = async (name: string, backendConfig: BackendConfig) => {

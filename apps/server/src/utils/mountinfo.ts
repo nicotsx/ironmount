@@ -51,3 +51,13 @@ export async function getMountForPath(p: string): Promise<MountInfo | undefined>
 	}
 	return best;
 }
+
+export async function getStatFs(mountPoint: string) {
+	const stats = await fs.statfs(mountPoint);
+
+	const total = Number(stats.blocks) * Number(stats.bsize);
+	const free = Number(stats.bfree) * Number(stats.bsize);
+	const used = total - free;
+
+	return { total, used, free };
+}

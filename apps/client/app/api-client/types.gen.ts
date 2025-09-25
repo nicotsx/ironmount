@@ -13,7 +13,7 @@ export type ListVolumesResponses = {
 	 */
 	200: {
 		volumes: Array<{
-			autoRemount: boolean;
+			autoRemount: 0 | 1;
 			config:
 				| {
 						backend: "directory";
@@ -72,7 +72,6 @@ export type CreateVolumeResponses = {
 	201: {
 		message: string;
 		volume: {
-			createdAt: number;
 			name: string;
 			path: string;
 		};
@@ -156,29 +155,36 @@ export type GetVolumeResponses = {
 	 * Volume details
 	 */
 	200: {
-		autoRemount: boolean;
-		config:
-			| {
-					backend: "directory";
-			  }
-			| {
-					backend: "nfs";
-					exportPath: string;
-					server: string;
-					version: "3" | "4" | "4.1";
-					port?: number | string;
-			  }
-			| {
-					backend: "smb";
-			  };
-		createdAt: number;
-		lastError: string;
-		lastHealthCheck: number;
-		name: string;
-		path: string;
-		status: "error" | "mounted" | "unknown" | "unmounted";
-		type: "directory" | "nfs" | "smb";
-		updatedAt: number;
+		statfs: {
+			free: number;
+			total: number;
+			used: number;
+		};
+		volume: {
+			autoRemount: 0 | 1;
+			config:
+				| {
+						backend: "directory";
+				  }
+				| {
+						backend: "nfs";
+						exportPath: string;
+						server: string;
+						version: "3" | "4" | "4.1";
+						port?: number | string;
+				  }
+				| {
+						backend: "smb";
+				  };
+			createdAt: number;
+			lastError: string;
+			lastHealthCheck: number;
+			name: string;
+			path: string;
+			status: "error" | "mounted" | "unknown" | "unmounted";
+			type: "directory" | "nfs" | "smb";
+			updatedAt: number;
+		};
 	};
 };
 
@@ -268,7 +274,8 @@ export type MountVolumeResponses = {
 	 * Volume mounted successfully
 	 */
 	200: {
-		message: string;
+		status: "error" | "mounted" | "unmounted";
+		error?: string;
 	};
 };
 
@@ -295,7 +302,8 @@ export type UnmountVolumeResponses = {
 	 * Volume unmounted successfully
 	 */
 	200: {
-		message: string;
+		status: "error" | "mounted" | "unmounted";
+		error?: string;
 	};
 };
 

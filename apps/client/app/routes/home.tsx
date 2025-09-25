@@ -1,17 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { Copy } from "lucide-react";
+import { Copy, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { type ListVolumesResponse, listVolumes } from "~/api-client";
 import { listVolumesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { CreateVolumeDialog } from "~/components/create-volume-dialog";
 import { EditVolumeDialog } from "~/components/edit-volume-dialog";
+import { StatusDot } from "~/components/status-dot";
+import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
 import { VolumeIcon } from "~/components/volume-icon";
 import type { Route } from "./+types/home";
-import { StatusDot } from "~/components/status-dot";
 
 export function meta(_: Route.MetaArgs) {
 	return [
@@ -32,6 +33,15 @@ export const clientLoader = async () => {
 export default function Home({ loaderData }: Route.ComponentProps) {
 	const [volumeToEdit, setVolumeToEdit] = useState<ListVolumesResponse["volumes"][number]>();
 	const [createVolumeOpen, setCreateVolumeOpen] = useState(false);
+	const [searchQuery, setSearchQuery] = useState("");
+	const [statusFilter, setStatusFilter] = useState("");
+	const [backendFilter, setBackendFilter] = useState("");
+
+	const clearFilters = () => {
+		setSearchQuery("");
+		setStatusFilter("");
+		setBackendFilter("");
+	};
 
 	const navigate = useNavigate();
 
@@ -39,6 +49,14 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 		...listVolumesOptions(),
 		initialData: loaderData,
 	});
+
+	const filteredVolumes =
+		data?.volumes.filter((volume) => {
+			const matchesSearch = volume.name.toLowerCase().includes(searchQuery.toLowerCase());
+			const matchesStatus = !statusFilter || volume.status === statusFilter;
+			const matchesBackend = !backendFilter || volume.type === backendFilter;
+			return matchesSearch && matchesStatus && matchesBackend;
+		}) || [];
 
 	return (
 		<>
@@ -48,8 +66,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 			</h2>
 			<div className="flex items-center gap-2 mt-4 justify-between">
 				<span className="flex items-center gap-2">
-					<Input className="w-[180px]" placeholder="Search volumes…" />
-					<Select>
+					<Input
+						className="w-[180px]"
+						placeholder="Search volumes…"
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
+					/>
+					<Select value={statusFilter} onValueChange={setStatusFilter}>
 						<SelectTrigger className="w-[180px]">
 							<SelectValue placeholder="All status" />
 						</SelectTrigger>
@@ -59,7 +82,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 							<SelectItem value="error">Error</SelectItem>
 						</SelectContent>
 					</Select>
-					<Select>
+					<Select value={backendFilter} onValueChange={setBackendFilter}>
 						<SelectTrigger className="w-[180px]">
 							<SelectValue placeholder="All backends" />
 						</SelectTrigger>
@@ -69,6 +92,12 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 							<SelectItem value="smb">SMB</SelectItem>
 						</SelectContent>
 					</Select>
+					{(searchQuery || statusFilter || backendFilter) && (
+						<Button variant="outline" size="sm" onClick={clearFilters}>
+							<RotateCcw className="h-4 w-4 mr-2" />
+							Clear filters
+						</Button>
+					)}
 				</span>
 				<CreateVolumeDialog open={createVolumeOpen} setOpen={setCreateVolumeOpen} />
 			</div>
@@ -83,7 +112,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{data?.volumes.map((volume) => (
+					{filteredVolumes.map((volume) => (
 						<TableRow
 							key={volume.name}
 							className="hover:bg-accent/50 hover:cursor-pointer"

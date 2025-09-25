@@ -1,12 +1,12 @@
 import { formatDistanceToNow } from "date-fns";
 import { ScanHeartIcon } from "lucide-react";
-import type { GetVolumeResponse } from "~/api-client";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Switch } from "~/components/ui/switch";
+import type { Volume } from "~/lib/types";
 
 type Props = {
-	volume: GetVolumeResponse;
+	volume: Volume;
 };
 
 export const HealthchecksCard = ({ volume }: Props) => {
@@ -28,7 +28,7 @@ export const HealthchecksCard = ({ volume }: Props) => {
 				)}
 				<span className="flex items-center gap-2">
 					Remount on error
-					<Switch className="ml-auto cursor-pointer" checked={volume.autoRemount} />
+					<Switch className="ml-auto cursor-pointer" checked={Boolean(volume.autoRemount)} />
 				</span>
 			</div>
 			<Button variant="outline">Run Health Check</Button>
