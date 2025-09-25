@@ -1,17 +1,13 @@
-import { execFile as execFileCb } from "node:child_process";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
-import * as npath from "node:path";
 import { BACKEND_STATUS, type BackendConfig } from "@ironmount/schemas";
 import type { VolumeBackend } from "../backend";
 import { logger } from "../../../utils/logger";
-import { promisify } from "node:util";
 import { withTimeout } from "../../../utils/timeout";
 import { OPERATION_TIMEOUT } from "../../../core/constants";
 import { toMessage } from "../../../utils/errors";
 import { getMountForPath } from "../../../utils/mountinfo";
-
-const execFile = promisify(execFileCb);
+import { createTestFile, executeMount, executeUnmount } from "../utils/backend-utils";
 
 const mount = async (config: BackendConfig, path: string) => {
 	logger.debug(`Mounting volume ${path}...`);
@@ -44,14 +40,7 @@ const mount = async (config: BackendConfig, path: string) => {
 		logger.debug(`Mounting volume ${path}...`);
 		logger.info(`Executing mount: mount ${args.join(" ")}`);
 
-		const { stderr } = await execFile("mount", args, {
-			timeout: OPERATION_TIMEOUT,
-			maxBuffer: 1024 * 1024,
-		});
-
-		if (stderr?.trim()) {
-			logger.warn(stderr.trim());
-		}
+		await executeMount(args);
 
 		logger.info(`NFS volume at ${path} mounted successfully.`);
 		return { status: BACKEND_STATUS.mounted };
@@ -59,11 +48,9 @@ const mount = async (config: BackendConfig, path: string) => {
 
 	try {
 		return await withTimeout(run(), OPERATION_TIMEOUT, "NFS mount");
-	} catch (err: any) {
-		const msg = err.stderr?.toString().trim() || err.message;
-
-		logger.error("Error mounting NFS volume", { error: msg });
-		return { status: BACKEND_STATUS.error, error: msg };
+	} catch (err) {
+		logger.error("Error mounting NFS volume", { error: toMessage(err) });
+		return { status: BACKEND_STATUS.error, error: toMessage(err) };
 	}
 };
 
@@ -81,14 +68,7 @@ const unmount = async (path: string) => {
 			return { status: BACKEND_STATUS.unmounted };
 		}
 
-		const { stderr } = await execFile("umount", ["-l", "-f", path], {
-			timeout: OPERATION_TIMEOUT,
-			maxBuffer: 1024 * 1024,
-		});
-
-		if (stderr?.trim()) {
-			logger.warn(stderr.trim());
-		}
+		await executeUnmount(path);
 
 		await fs.rmdir(path);
 
@@ -101,7 +81,6 @@ const unmount = async (path: string) => {
 	} catch (err: any) {
 		const msg = err.stderr?.toString().trim() || err.message;
 		logger.error("Error unmounting NFS volume", { path, error: msg });
-
 		return { status: BACKEND_STATUS.error, error: msg };
 	}
 };
@@ -117,10 +96,7 @@ const checkHealth = async (path: string) => {
 			throw new Error(`Path ${path} is not mounted as NFS.`);
 		}
 
-		const testFilePath = npath.join(path, `.healthcheck-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
-
-		await fs.writeFile(testFilePath, "healthcheck");
-		await fs.unlink(testFilePath);
+		await createTestFile(path);
 
 		logger.debug(`NFS volume at ${path} is healthy and mounted.`);
 		return { status: BACKEND_STATUS.mounted };

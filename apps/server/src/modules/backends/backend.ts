@@ -1,8 +1,9 @@
 import type { BackendStatus } from "@ironmount/schemas";
+import { VOLUME_MOUNT_BASE } from "../../core/constants";
 import type { Volume } from "../../db/schema";
 import { makeDirectoryBackend } from "./directory/directory-backend";
 import { makeNfsBackend } from "./nfs/nfs-backend";
-import { VOLUME_MOUNT_BASE } from "../../core/constants";
+import { makeSmbBackend } from "./smb/smb-backend";
 
 type OperationResult = {
 	error?: string;
@@ -22,11 +23,11 @@ export const createVolumeBackend = (volume: Volume): VolumeBackend => {
 		case "nfs": {
 			return makeNfsBackend(volume.config, path);
 		}
+		case "smb": {
+			return makeSmbBackend(volume.config, path);
+		}
 		case "directory": {
 			return makeDirectoryBackend(volume.config, path);
-		}
-		default: {
-			throw new Error(`Backend ${volume.config.backend} not implemented`);
 		}
 	}
 };

@@ -71,7 +71,7 @@ const socketPath = "/run/docker/plugins/ironmount.sock";
 		fetch: app.fetch,
 	});
 
-	await startup();
+	startup();
 
 	logger.info(`Server is running at http://localhost:8080 and unix socket at ${socketPath}`);
 })();
