@@ -10,7 +10,7 @@ import { db } from "../../db/db";
 import { volumesTable } from "../../db/schema";
 import { createVolumeBackend } from "../backends/backend";
 import { toMessage } from "../../utils/errors";
-import { getStatFs } from "../../utils/mountinfo";
+import { getStatFs, type StatFs } from "../../utils/mountinfo";
 import { VOLUME_MOUNT_BASE } from "../../core/constants";
 
 const listVolumes = async () => {
@@ -101,10 +101,13 @@ const getVolume = async (name: string) => {
 		where: eq(volumesTable.name, name),
 	});
 
-	const statfs = await getStatFs(`${VOLUME_MOUNT_BASE}/${name}/_data`).catch(() => {});
-
 	if (!volume) {
 		throw new NotFoundError("Volume not found");
+	}
+
+	let statfs: Partial<StatFs> = {};
+	if (volume.status === "mounted") {
+		statfs = (await getStatFs(`${VOLUME_MOUNT_BASE}/${name}/_data`).catch(() => {})) ?? {};
 	}
 
 	return { volume, statfs };

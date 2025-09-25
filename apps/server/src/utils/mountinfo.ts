@@ -6,6 +6,12 @@ type MountInfo = {
 	fstype: string;
 };
 
+export type StatFs = {
+	total: number;
+	used: number;
+	free: number;
+};
+
 function isPathWithin(base: string, target: string): boolean {
 	const rel = path.posix.relative(base, target);
 	return rel === "" || (!rel.startsWith("..") && !path.isAbsolute(rel));

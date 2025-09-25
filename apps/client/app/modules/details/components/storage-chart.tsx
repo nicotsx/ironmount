@@ -1,6 +1,6 @@
 "use client";
 
-import { HardDrive } from "lucide-react";
+import { HardDrive, Unplug } from "lucide-react";
 import * as React from "react";
 import { Label, Pie, PieChart } from "recharts";
 import { ByteSize } from "~/components/bytes-size";
@@ -46,6 +46,25 @@ export function StorageChart({ statfs }: Props) {
 	const usagePercentage = React.useMemo(() => {
 		return Math.round((statfs.used / statfs.total) * 100);
 	}, [statfs]);
+
+	const isEmpty = !statfs.total;
+
+	if (isEmpty) {
+		return (
+			<Card className="flex flex-col h-full text-sm">
+				<CardHeader className="items-center pb-0">
+					<CardTitle className="flex items-center gap-2">
+						<HardDrive className="h-4 w-4" />
+						Storage Usage
+					</CardTitle>
+				</CardHeader>
+				<CardContent className="flex-1 pb-10 flex flex-col items-center justify-center text-center">
+					<Unplug className="mb-4 h-5 w-5 text-muted-foreground" />
+					<p className="text-muted-foreground">No storage data available. Mount the volume to see usage statistics.</p>
+				</CardContent>
+			</Card>
+		);
+	}
 
 	return (
 		<Card className="flex flex-col h-full text-sm">

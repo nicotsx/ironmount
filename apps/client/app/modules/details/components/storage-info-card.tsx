@@ -1,4 +1,4 @@
-import { Database, HardDrive } from "lucide-react";
+import { Database, HardDrive, Unplug } from "lucide-react";
 import { ByteSize } from "~/components/bytes-size";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import type { StatFs } from "~/lib/types";
@@ -8,6 +8,25 @@ type Props = {
 };
 
 export function StorageInfoCard({ statfs }: Props) {
+	const isEmpty = !statfs.total;
+
+	if (isEmpty) {
+		return (
+			<Card className="flex flex-col h-full text-sm">
+				<CardHeader className="items-center pb-0">
+					<CardTitle className="flex items-center gap-2">
+						<Database className="h-4 w-4" />
+						Storage Usage
+					</CardTitle>
+				</CardHeader>
+				<CardContent className="flex-1 pb-10 flex flex-col items-center justify-center text-center">
+					<Unplug className="mb-4 h-5 w-5 text-muted-foreground" />
+					<p className="text-muted-foreground">No storage data available. Mount the volume to see usage statistics.</p>
+				</CardContent>
+			</Card>
+		);
+	}
+
 	return (
 		<Card className="h-full text-sm">
 			<CardHeader>
