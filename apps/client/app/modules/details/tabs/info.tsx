@@ -11,15 +11,17 @@ type Props = {
 
 export const VolumeInfoTabContent = ({ volume, statfs }: Props) => {
 	return (
-		<div className="grid gap-3 grid-cols-1 lg:grid-cols-4 lg:grid-rows-[auto_auto]">
-			<Card className="p-6 lg:col-span-2 lg:row-span-2">
+		<div className="grid gap-4 xl:grid-cols-[minmax(0,_2.3fr)_minmax(320px,_1fr)]">
+			<Card className="p-6">
 				<CreateVolumeForm initialValues={{ ...volume, ...volume.config }} onSubmit={console.log} />
 			</Card>
-			<div className="lg:col-span-2 lg:row-span-1">
-				<HealthchecksCard volume={volume} />
-			</div>
-			<div className="lg:col-span-2">
-				<StorageChart statfs={statfs} />
+			<div className="grid gap-4">
+				<div className="lg:row-span-1">
+					<HealthchecksCard volume={volume} />
+				</div>
+				<div className="">
+					<StorageChart statfs={statfs} />
+				</div>
 			</div>
 		</div>
 	);

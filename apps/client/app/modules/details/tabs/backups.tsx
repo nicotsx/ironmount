@@ -134,14 +134,16 @@ export const VolumeBackupsTabContent = ({ volume }: Props) => {
 	};
 
 	return (
-		<div className="grid gap-4 grid-cols-1 xl:grid-cols-[minmax(0,_2fr)_minmax(260px,_1fr)]">
+		<div className="grid gap-4 xl:grid-cols-[minmax(0,_2.3fr)_minmax(320px,_1fr)]">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(handleSubmit)} className="grid gap-4">
 					<Card>
 						<CardHeader className="flex flex-row items-center justify-between gap-4">
 							<div>
 								<CardTitle>Backup automation</CardTitle>
-								<CardDescription>Enable scheduled snapshots and off-site replication for this volume.</CardDescription>
+								<CardDescription className="mt-1">
+									Enable scheduled snapshots and off-site replication for this volume.
+								</CardDescription>
 							</div>
 							<FormField
 								control={form.control}
