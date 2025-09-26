@@ -18,7 +18,7 @@ export function StorageChart({ statfs }: Props) {
 			{
 				name: "Used",
 				value: statfs.used,
-				fill: "blue",
+				fill: "#2B7EFF",
 			},
 			{
 				name: "Free",
@@ -29,19 +29,7 @@ export function StorageChart({ statfs }: Props) {
 		[statfs],
 	);
 
-	const chartConfig = {
-		value: {
-			label: "Storage",
-		},
-		used: {
-			label: "Used",
-			color: "hsl(var(--destructive))",
-		},
-		free: {
-			label: "Free",
-			color: "hsl(var(--primary))",
-		},
-	} satisfies ChartConfig;
+	const chartConfig = {} satisfies ChartConfig;
 
 	const usagePercentage = React.useMemo(() => {
 		return Math.round((statfs.used / statfs.total) * 100);
@@ -75,37 +63,70 @@ export function StorageChart({ statfs }: Props) {
 				</CardTitle>
 			</CardHeader>
 			<CardContent className="flex-1 pb-0">
-				<ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
-					<PieChart>
-						<ChartTooltip
-							cursor={false}
-							content={
-								<ChartTooltipContent
-									hideLabel
-									formatter={(value, name) => [<ByteSize key={name} bytes={value as number} />, name]}
-								/>
-							}
-						/>
-						<Pie data={chartData} dataKey="value" nameKey="name" innerRadius={60} strokeWidth={5}>
-							<Label
-								content={({ viewBox }) => {
-									if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-										return (
-											<text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
-												<tspan x={viewBox.cx} y={viewBox.cy} className="fill-foreground text-3xl font-bold">
-													{usagePercentage}%
-												</tspan>
-												<tspan x={viewBox.cx} y={(viewBox.cy || 0) + 24} className="fill-muted-foreground">
-													Used
-												</tspan>
-											</text>
-										);
-									}
-								}}
+				<div className="">
+					<ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
+						<PieChart>
+							<ChartTooltip
+								cursor={false}
+								content={
+									<ChartTooltipContent
+										hideLabel
+										formatter={(value, name) => [<ByteSize key={name} bytes={value as number} />, name]}
+									/>
+								}
 							/>
-						</Pie>
-					</PieChart>
-				</ChartContainer>
+							<Pie data={chartData} dataKey="value" nameKey="name" innerRadius={60} strokeWidth={5}>
+								<Label
+									content={({ viewBox }) => {
+										if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+											return (
+												<text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
+													<tspan x={viewBox.cx} y={viewBox.cy} className="fill-foreground text-3xl font-bold">
+														{usagePercentage}%
+													</tspan>
+													<tspan x={viewBox.cx} y={(viewBox.cy || 0) + 24} className="fill-muted-foreground">
+														Used
+													</tspan>
+												</text>
+											);
+										}
+									}}
+								/>
+							</Pie>
+						</PieChart>
+					</ChartContainer>
+					<div className="flex flex-col h-full justify-center">
+						<div className="grid gap-4 w-full">
+							<div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+								<div className="flex items-center gap-3">
+									<HardDrive className="h-4 w-4 text-muted-foreground" />
+									<span className="font-medium">Total Capacity</span>
+								</div>
+								<ByteSize bytes={statfs.total} className="font-mono text-sm" />
+							</div>
+
+							<div className="flex items-center justify-between p-3 rounded-lg bg-blue-500/10">
+								<div className="flex items-center gap-3">
+									<div className="h-4 w-4 rounded-full bg-blue-500" />
+									<span className="font-medium">Used Space</span>
+								</div>
+								<div className="text-right">
+									<ByteSize bytes={statfs.used} className="font-mono text-sm" />
+								</div>
+							</div>
+
+							<div className="flex items-center justify-between p-3 rounded-lg bg-primary/10">
+								<div className="flex items-center gap-3">
+									<div className="h-4 w-4 rounded-full bg-primary" />
+									<span className="font-medium">Free Space</span>
+								</div>
+								<div className="text-right">
+									<ByteSize bytes={statfs.free} className="font-mono text-sm" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</CardContent>
 		</Card>
 	);

@@ -3,7 +3,6 @@ import { Card } from "~/components/ui/card";
 import type { StatFs, Volume } from "~/lib/types";
 import { HealthchecksCard } from "../components/healthchecks-card";
 import { StorageChart } from "../components/storage-chart";
-import { StorageInfoCard } from "../components/storage-info-card";
 
 type Props = {
 	volume: Volume;
@@ -19,11 +18,8 @@ export const VolumeInfoTabContent = ({ volume, statfs }: Props) => {
 			<div className="lg:col-span-2 lg:row-span-1">
 				<HealthchecksCard volume={volume} />
 			</div>
-			<div className="lg:col-span-1">
+			<div className="lg:col-span-2">
 				<StorageChart statfs={statfs} />
-			</div>
-			<div className="lg:col-span-1">
-				<StorageInfoCard statfs={statfs} />
 			</div>
 		</div>
 	);

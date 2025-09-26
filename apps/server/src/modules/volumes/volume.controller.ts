@@ -55,12 +55,16 @@ export const volumeController = new Hono()
 		const res = await volumeService.getVolume(name);
 
 		const response = {
-			...res,
 			volume: {
 				...res.volume,
 				createdAt: res.volume.createdAt.getTime(),
 				updatedAt: res.volume.updatedAt.getTime(),
 				lastHealthCheck: res.volume.lastHealthCheck.getTime(),
+			},
+			statfs: {
+				total: res.statfs.total ?? 0,
+				used: res.statfs.used ?? 0,
+				free: res.statfs.free ?? 0,
 			},
 		} satisfies GetVolumeResponseDto;
 

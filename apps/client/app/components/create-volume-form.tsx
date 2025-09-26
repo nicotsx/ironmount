@@ -62,7 +62,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 	const handleTestConnection = async () => {
 		const formValues = getValues();
 
-		if (formValues.backend === "nfs" || formValues.backend === "smb") {
+		if (formValues.backend === "nfs" || formValues.backend === "smb" || formValues.backend === "webdav") {
 			testBackendConnection.mutate({
 				body: { config: formValues },
 			});
@@ -108,6 +108,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 									<SelectItem value="directory">Directory</SelectItem>
 									<SelectItem value="nfs">NFS</SelectItem>
 									<SelectItem value="smb">SMB</SelectItem>
+									<SelectItem value="webdav">WebDAV</SelectItem>
 								</SelectContent>
 							</Select>
 							<FormDescription>Choose the storage backend for this volume.</FormDescription>
@@ -180,6 +181,102 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 										</SelectContent>
 									</Select>
 									<FormDescription>NFS protocol version to use.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
+
+				{watchedBackend === "webdav" && (
+					<>
+						<FormField
+							name="server"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Server</FormLabel>
+									<FormControl>
+										<Input placeholder="example.com" value={field.value ?? ""} onChange={field.onChange} />
+									</FormControl>
+									<FormDescription>WebDAV server hostname or IP address.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							name="path"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Path</FormLabel>
+									<FormControl>
+										<Input placeholder="/webdav" value={field.value ?? ""} onChange={field.onChange} />
+									</FormControl>
+									<FormDescription>Path to the WebDAV directory on the server.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							name="username"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Username (Optional)</FormLabel>
+									<FormControl>
+										<Input placeholder="admin" value={field.value ?? ""} onChange={field.onChange} />
+									</FormControl>
+									<FormDescription>Username for WebDAV authentication (optional).</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							name="password"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Password (Optional)</FormLabel>
+									<FormControl>
+										<Input type="password" placeholder="••••••••" value={field.value ?? ""} onChange={field.onChange} />
+									</FormControl>
+									<FormDescription>Password for WebDAV authentication (optional).</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							name="port"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Port</FormLabel>
+									<FormControl>
+										<Input
+											type="number"
+											placeholder="80"
+											value={field.value ?? ""}
+											onChange={(e) => field.onChange(parseInt(e.target.value, 10) || undefined)}
+										/>
+									</FormControl>
+									<FormDescription>WebDAV server port (default: 80 for HTTP, 443 for HTTPS).</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							name="ssl"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Use SSL/HTTPS</FormLabel>
+									<FormControl>
+										<div className="flex items-center space-x-2">
+											<input
+												type="checkbox"
+												checked={field.value ?? false}
+												onChange={(e) => field.onChange(e.target.checked)}
+												className="rounded border-gray-300"
+											/>
+											<span className="text-sm">Enable HTTPS for secure connections</span>
+										</div>
+									</FormControl>
+									<FormDescription>Use HTTPS instead of HTTP for secure connections.</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}
@@ -347,6 +444,41 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 								variant="outline"
 								onClick={handleTestConnection}
 								disabled={testStatus === "loading" || !form.watch("server") || !form.watch("exportPath")}
+								className="flex-1"
+							>
+								{testStatus === "loading" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+								{testStatus === "success" && <CheckCircle className="mr-2 h-4 w-4 text-green-500" />}
+								{testStatus === "error" && <XCircle className="mr-2 h-4 w-4 text-red-500" />}
+								{testStatus === "idle" && "Test Connection"}
+								{testStatus === "loading" && "Testing..."}
+								{testStatus === "success" && "Connection Successful"}
+								{testStatus === "error" && "Test Failed"}
+							</Button>
+						</div>
+						{testMessage && (
+							<div
+								className={`text-sm p-2 rounded-md ${
+									testStatus === "success"
+										? "bg-green-50 text-green-700 border border-green-200"
+										: testStatus === "error"
+											? "bg-red-50 text-red-700 border border-red-200"
+											: "bg-gray-50 text-gray-700 border border-gray-200"
+								}`}
+							>
+								{testMessage}
+							</div>
+						)}
+					</div>
+				)}
+
+				{watchedBackend === "webdav" && (
+					<div className="space-y-3">
+						<div className="flex items-center gap-2">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={handleTestConnection}
+								disabled={testStatus === "loading" || !form.watch("server") || !form.watch("path")}
 								className="flex-1"
 							>
 								{testStatus === "loading" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

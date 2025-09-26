@@ -27,6 +27,22 @@ export type ListVolumesResponses = {
 				  }
 				| {
 						backend: "smb";
+						password: string;
+						server: string;
+						share: string;
+						username: string;
+						vers?: "1.0" | "2.0" | "2.1" | "3.0";
+						port?: number | string;
+						domain?: string;
+				  }
+				| {
+						backend: "webdav";
+						path: string;
+						server: string;
+						port?: number | string;
+						password?: string;
+						ssl?: boolean;
+						username?: string;
 				  };
 			createdAt: number;
 			lastError: string;
@@ -34,7 +50,7 @@ export type ListVolumesResponses = {
 			name: string;
 			path: string;
 			status: "error" | "mounted" | "unknown" | "unmounted";
-			type: "directory" | "nfs" | "smb";
+			type: "directory" | "nfs" | "smb" | "webdav";
 			updatedAt: number;
 		}>;
 	};
@@ -57,6 +73,22 @@ export type CreateVolumeData = {
 			  }
 			| {
 					backend: "smb";
+					password: string;
+					server: string;
+					share: string;
+					username: string;
+					vers?: "1.0" | "2.0" | "2.1" | "3.0";
+					port?: number | string;
+					domain?: string;
+			  }
+			| {
+					backend: "webdav";
+					path: string;
+					server: string;
+					port?: number | string;
+					password?: string;
+					ssl?: boolean;
+					username?: string;
 			  };
 		name: string;
 	};
@@ -95,6 +127,22 @@ export type TestConnectionData = {
 			  }
 			| {
 					backend: "smb";
+					password: string;
+					server: string;
+					share: string;
+					username: string;
+					vers?: "1.0" | "2.0" | "2.1" | "3.0";
+					port?: number | string;
+					domain?: string;
+			  }
+			| {
+					backend: "webdav";
+					path: string;
+					server: string;
+					port?: number | string;
+					password?: string;
+					ssl?: boolean;
+					username?: string;
 			  };
 	};
 	path?: never;
@@ -175,6 +223,22 @@ export type GetVolumeResponses = {
 				  }
 				| {
 						backend: "smb";
+						password: string;
+						server: string;
+						share: string;
+						username: string;
+						vers?: "1.0" | "2.0" | "2.1" | "3.0";
+						port?: number | string;
+						domain?: string;
+				  }
+				| {
+						backend: "webdav";
+						path: string;
+						server: string;
+						port?: number | string;
+						password?: string;
+						ssl?: boolean;
+						username?: string;
 				  };
 			createdAt: number;
 			lastError: string;
@@ -182,7 +246,7 @@ export type GetVolumeResponses = {
 			name: string;
 			path: string;
 			status: "error" | "mounted" | "unknown" | "unmounted";
-			type: "directory" | "nfs" | "smb";
+			type: "directory" | "nfs" | "smb" | "webdav";
 			updatedAt: number;
 		};
 	};
@@ -205,6 +269,22 @@ export type UpdateVolumeData = {
 			  }
 			| {
 					backend: "smb";
+					password: string;
+					server: string;
+					share: string;
+					username: string;
+					vers?: "1.0" | "2.0" | "2.1" | "3.0";
+					port?: number | string;
+					domain?: string;
+			  }
+			| {
+					backend: "webdav";
+					path: string;
+					server: string;
+					port?: number | string;
+					password?: string;
+					ssl?: boolean;
+					username?: string;
 			  };
 	};
 	path: {
@@ -241,6 +321,22 @@ export type UpdateVolumeResponses = {
 				  }
 				| {
 						backend: "smb";
+						password: string;
+						server: string;
+						share: string;
+						username: string;
+						vers?: "1.0" | "2.0" | "2.1" | "3.0";
+						port?: number | string;
+						domain?: string;
+				  }
+				| {
+						backend: "webdav";
+						path: string;
+						server: string;
+						port?: number | string;
+						password?: string;
+						ssl?: boolean;
+						username?: string;
 				  };
 			createdAt: number;
 			name: string;

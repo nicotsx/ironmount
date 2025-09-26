@@ -1,5 +1,5 @@
 import type { BackendType } from "@ironmount/schemas";
-import { Folder, Server, Share2 } from "lucide-react";
+import { Cloud, Folder, Server, Share2 } from "lucide-react";
 
 type VolumeIconProps = {
 	backend: BackendType;
@@ -25,6 +25,12 @@ const getIconAndColor = (backend: BackendType) => {
 				icon: Share2,
 				color: "text-purple-600 dark:text-purple-400",
 				label: "SMB",
+			};
+		case "webdav":
+			return {
+				icon: Cloud,
+				color: "text-green-600 dark:text-green-400",
+				label: "WebDAV",
 			};
 		default:
 			return {

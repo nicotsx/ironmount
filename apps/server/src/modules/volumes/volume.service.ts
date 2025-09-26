@@ -12,6 +12,7 @@ import { createVolumeBackend } from "../backends/backend";
 import { toMessage } from "../../utils/errors";
 import { getStatFs, type StatFs } from "../../utils/mountinfo";
 import { VOLUME_MOUNT_BASE } from "../../core/constants";
+import { logger } from "../../utils/logger";
 
 const listVolumes = async () => {
 	const volumes = await db.query.volumesTable.findMany({});
@@ -73,7 +74,7 @@ const mountVolume = async (name: string) => {
 
 	await db
 		.update(volumesTable)
-		.set({ status, lastError: error, lastHealthCheck: new Date() })
+		.set({ status, lastError: error ?? null, lastHealthCheck: new Date() })
 		.where(eq(volumesTable.name, name));
 
 	return { error, status };

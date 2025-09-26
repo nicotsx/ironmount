@@ -4,6 +4,7 @@ export const BACKEND_TYPES = {
 	nfs: "nfs",
 	smb: "smb",
 	directory: "directory",
+	webdav: "webdav",
 } as const;
 
 export type BackendType = keyof typeof BACKEND_TYPES;
@@ -31,7 +32,17 @@ export const directoryConfigSchema = type({
 	backend: "'directory'",
 });
 
-export const volumeConfigSchema = nfsConfigSchema.or(smbConfigSchema).or(directoryConfigSchema);
+export const webdavConfigSchema = type({
+	backend: "'webdav'",
+	server: "string",
+	path: "string",
+	username: "string?",
+	password: "string?",
+	port: type("string.integer.parse").or(type("number")).to("1 <= number <= 65536").default("80"),
+	ssl: "boolean?",
+});
+
+export const volumeConfigSchema = nfsConfigSchema.or(smbConfigSchema).or(directoryConfigSchema).or(webdavConfigSchema);
 
 export type BackendConfig = typeof volumeConfigSchema.infer;
 

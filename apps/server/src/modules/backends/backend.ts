@@ -4,6 +4,7 @@ import type { Volume } from "../../db/schema";
 import { makeDirectoryBackend } from "./directory/directory-backend";
 import { makeNfsBackend } from "./nfs/nfs-backend";
 import { makeSmbBackend } from "./smb/smb-backend";
+import { makeWebdavBackend } from "./webdav/webdav-backend";
 
 type OperationResult = {
 	error?: string;
@@ -28,6 +29,9 @@ export const createVolumeBackend = (volume: Volume): VolumeBackend => {
 		}
 		case "directory": {
 			return makeDirectoryBackend(volume.config, path);
+		}
+		case "webdav": {
+			return makeWebdavBackend(volume.config, path);
 		}
 	}
 };

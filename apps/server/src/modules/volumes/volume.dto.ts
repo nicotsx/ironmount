@@ -6,7 +6,7 @@ import { resolver } from "hono-openapi/arktype";
 const volumeSchema = type({
 	name: "string",
 	path: "string",
-	type: type.enumerated("nfs", "smb", "directory"),
+	type: type.enumerated("nfs", "smb", "directory", "webdav"),
 	status: type.enumerated("mounted", "unmounted", "error", "unknown"),
 	lastError: "string | null",
 	createdAt: "number",
@@ -100,13 +100,15 @@ export const deleteVolumeDto = describeRoute({
 	},
 });
 
+const statfsSchema = type({
+	total: "number",
+	used: "number",
+	free: "number",
+});
+
 const getVolumeResponse = type({
 	volume: volumeSchema,
-	statfs: type({
-		total: "number = 0",
-		used: "number = 0",
-		free: "number = 0",
-	}),
+	statfs: statfsSchema,
 });
 
 export type GetVolumeResponseDto = typeof getVolumeResponse.infer;

@@ -9,14 +9,13 @@ services:
       - SYS_ADMIN
     ports:
       - "3000:3000"
-    # privileged: true
     env_file:
       - path: .env
         required: false
-    # security_opt:
-    #   - apparmor:unconfined
+    devices:
+      - /dev/fuse:/dev/fuse
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      # - /var/run/docker.sock:/var/run/docker.sock
       - /run/docker/plugins:/run/docker/plugins
 
       - ./apps/client/app:/app/apps/client/app
