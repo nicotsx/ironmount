@@ -6,7 +6,7 @@ export const StatusDot = ({ status }: { status: VolumeStatus }) => {
 	const statusMapping = {
 		mounted: {
 			color: "bg-green-500",
-			colorLight: "bg-green-400",
+			colorLight: "bg-emerald-400",
 			animated: true,
 		},
 		unmounted: {
@@ -16,7 +16,7 @@ export const StatusDot = ({ status }: { status: VolumeStatus }) => {
 		},
 		error: {
 			color: "bg-red-500",
-			colorLight: "bg-red-400",
+			colorLight: "bg-amber-700",
 			animated: true,
 		},
 		unknown: {

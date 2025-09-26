@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { VolumeIcon } from "~/components/volume-icon";
 import { parseError } from "~/lib/errors";
 import { cn } from "~/lib/utils";
+import { VolumeBackupsTabContent } from "~/modules/details/tabs/backups";
 import { DockerTabContent } from "~/modules/details/tabs/docker";
 import { VolumeInfoTabContent } from "~/modules/details/tabs/info";
 import type { Route } from "./+types/details";
@@ -131,13 +132,17 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 			<Tabs defaultValue="info" className="mt-0">
 				<TabsList>
 					<TabsTrigger value="info">Configuration</TabsTrigger>
-					<TabsTrigger value="docker">Docker usage</TabsTrigger>
+					<TabsTrigger value="docker">Docker</TabsTrigger>
+					<TabsTrigger value="backups">Backups</TabsTrigger>
 				</TabsList>
 				<TabsContent value="info">
 					<VolumeInfoTabContent volume={volume} statfs={statfs} />
 				</TabsContent>
 				<TabsContent value="docker">
 					<DockerTabContent volume={volume} />
+				</TabsContent>
+				<TabsContent value="backups">
+					<VolumeBackupsTabContent volume={volume} />
 				</TabsContent>
 			</Tabs>
 		</>
