@@ -80,13 +80,8 @@ const mount = async (config: BackendConfig, path: string) => {
 		}
 
 		logger.error("Error mounting WebDAV volume", { error: errorMsg });
-		if (errorMsg.includes("No such device")) {
-			return {
-				status: BACKEND_STATUS.error,
-				error:
-					"WebDAV filesystem not supported. Please ensure davfs2 is properly installed and the kernel module is loaded.",
-			};
-		} else if (errorMsg.includes("option") && errorMsg.includes("requires argument")) {
+
+		if (errorMsg.includes("option") && errorMsg.includes("requires argument")) {
 			return {
 				status: BACKEND_STATUS.error,
 				error: "Invalid mount options. Please check your WebDAV server configuration.",

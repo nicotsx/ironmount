@@ -19,7 +19,7 @@ export const VolumeInfoTabContent = ({ volume, statfs }: Props) => {
 				<div className="lg:row-span-1">
 					<HealthchecksCard volume={volume} />
 				</div>
-				<div className="">
+				<div>
 					<StorageChart statfs={statfs} />
 				</div>
 			</div>
