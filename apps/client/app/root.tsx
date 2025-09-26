@@ -42,7 +42,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 				<Links />
 			</head>
 			<QueryClientProvider client={queryClient}>
-				<body className="h-screen">
+				<body className="min-h-dvh">
 					{children}
 					<Toaster />
 					<ScrollRestoration />
