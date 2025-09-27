@@ -1,6 +1,7 @@
 import * as fs from "node:fs/promises";
 import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
+import { serveStatic } from "hono/bun";
 import { logger as honoLogger } from "hono/logger";
 import { openAPISpecs } from "hono-openapi";
 import { runDbMigrations } from "./db/db";
@@ -31,16 +32,13 @@ export const scalarDescriptor = Scalar({
 const driver = new Hono().use(honoLogger()).route("/", driverController);
 const app = new Hono()
 	.use(honoLogger())
+	.get("*", serveStatic({ root: "./assets/frontend" }))
 	.get("healthcheck", (c) => c.json({ status: "ok" }))
 	.basePath("/api/v1")
 	.route("/volumes", volumeController);
 
 app.get("/openapi.json", generalDescriptor(app));
 app.get("/docs", scalarDescriptor);
-
-app.get("/", (c) => {
-	return c.json({ message: "Welcome to the Ironmount API" });
-});
 
 app.onError((err, c) => {
 	logger.error(`${c.req.url}: ${err.message}`);
@@ -56,24 +54,21 @@ app.onError((err, c) => {
 
 const socketPath = "/run/docker/plugins/ironmount.sock";
 
-(async () => {
-	await fs.mkdir("/run/docker/plugins", { recursive: true });
+await fs.mkdir("/run/docker/plugins", { recursive: true });
+runDbMigrations();
 
-	runDbMigrations();
+Bun.serve({
+	unix: socketPath,
+	fetch: driver.fetch,
+});
 
-	Bun.serve({
-		unix: socketPath,
-		fetch: driver.fetch,
-	});
+Bun.serve({
+	port: 4096,
+	fetch: app.fetch,
+});
 
-	Bun.serve({
-		port: 8080,
-		fetch: app.fetch,
-	});
+startup();
 
-	startup();
-
-	logger.info(`Server is running at http://localhost:8080 and unix socket at ${socketPath}`);
-})();
+logger.info(`Server is running at http://localhost:4096 and unix socket at ${socketPath}`);
 
 export type AppType = typeof app;

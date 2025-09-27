@@ -1,17 +1,17 @@
 services:
-  ironmount:
+  ironmount-dev:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
+      target: development
     container_name: ironmount
     restart: unless-stopped
     cap_add:
       - SYS_ADMIN
+    environment:
+      - NODE_ENV=development
     ports:
-      - "3000:3000"
-    env_file:
-      - path: .env
-        required: false
+      - "4096:4097"
     devices:
       - /dev/fuse:/dev/fuse
     volumes:
@@ -22,9 +22,27 @@ services:
       - ./apps/client/app:/app/apps/client/app
       - ./apps/server/src:/app/apps/server/src
 
-      - ./data:/data
+      - ironmount_data:/data
 
-      # - /home/nicolas/mounts:/mounts:rshared
+  ironmount-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: ironmount
+    restart: unless-stopped
+    cap_add:
+      - SYS_ADMIN
+    ports:
+      - "4096:4096"
+    devices:
+      - /dev/fuse:/dev/fuse
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /run/docker/plugins:/run/docker/plugins
+      - /var/lib/docker/volumes/:/var/lib/docker/volumes:rshared
+      - ironmount_data:/data
+
 volumes:
   ironmount_data:
     driver: local

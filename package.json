@@ -5,7 +5,10 @@
 	"scripts": {
 		"dev": "turbo dev",
 		"tsc": "turbo run tsc",
-		"gen:api-client": "openapi-ts"
+		"build": "turbo build",
+		"gen:api-client": "openapi-ts",
+		"start:dev": "docker rm ironmount && docker compose up --build ironmount-dev",
+		"start:prod": "docker rm ironmount && docker compose up --build ironmount-prod"
 	},
 	"workspaces": [
 		"apps/*",

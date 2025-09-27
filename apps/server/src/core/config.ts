@@ -3,11 +3,9 @@ import "dotenv/config";
 
 const envSchema = type({
 	NODE_ENV: type.enumerated("development", "production", "test").default("development"),
-	VOLUME_ROOT: "string",
 }).pipe((s) => ({
 	__prod__: s.NODE_ENV === "production",
 	environment: s.NODE_ENV,
-	volumeRootHost: s.VOLUME_ROOT,
 }));
 
 const parseConfig = (env: unknown) => {

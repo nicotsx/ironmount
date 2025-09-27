@@ -7,6 +7,7 @@
 !**/tsconfig.json
 !**/vite.config.ts
 !**/react-router.config.ts
+!**/build.ts
 
 !apps/**/src/**
 !apps/**/drizzle/**

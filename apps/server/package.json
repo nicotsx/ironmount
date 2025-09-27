@@ -3,6 +3,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "bun run --watch src/index.ts",
+		"build": "rm -rf dist && bun build.ts",
 		"tsc": "tsc --noEmit",
 		"gen:migrations": "drizzle-kit generate"
 	},

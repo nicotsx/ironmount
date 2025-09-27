@@ -8,7 +8,7 @@ import "./app.css";
 import { client } from "./api-client/client.gen";
 
 client.setConfig({
-	baseUrl: "http://192.168.2.42:3000/",
+	baseUrl: "/",
 });
 
 export const links: Route.LinksFunction = () => [
