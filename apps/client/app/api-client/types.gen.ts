@@ -256,7 +256,8 @@ export type GetVolumeResponse = GetVolumeResponses[keyof GetVolumeResponses];
 
 export type UpdateVolumeData = {
 	body?: {
-		config:
+		autoRemount?: boolean;
+		config?:
 			| {
 					backend: "directory";
 			  }
@@ -308,6 +309,7 @@ export type UpdateVolumeResponses = {
 	200: {
 		message: string;
 		volume: {
+			autoRemount: boolean;
 			config:
 				| {
 						backend: "directory";
@@ -339,9 +341,12 @@ export type UpdateVolumeResponses = {
 						username?: string;
 				  };
 			createdAt: number;
+			lastError: string;
+			lastHealthCheck: number;
 			name: string;
 			path: string;
-			type: string;
+			status: "error" | "mounted" | "unknown" | "unmounted";
+			type: "directory" | "nfs" | "smb" | "webdav";
 			updatedAt: number;
 		};
 	};

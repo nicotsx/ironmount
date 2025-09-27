@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { HeartIcon } from "lucide-react";
 import { toast } from "sonner";
-import { healthCheckVolumeMutation } from "~/api-client/@tanstack/react-query.gen";
+import { healthCheckVolumeMutation, updateVolumeMutation } from "~/api-client/@tanstack/react-query.gen";
 import { OnOff } from "~/components/onoff";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
@@ -28,6 +28,15 @@ export const HealthchecksCard = ({ volume }: Props) => {
 		},
 	});
 
+	const toggleAutoRemount = useMutation({
+		...updateVolumeMutation(),
+		onSuccess: (d) => {
+			toast.success("Volume updated", {
+				description: `Auto remount is now ${d.volume.autoRemount ? "enabled" : "paused"}.`,
+			});
+		},
+	});
+
 	return (
 		<Card className="flex-1 flex flex-col h-full">
 			<CardHeader>
@@ -46,7 +55,15 @@ export const HealthchecksCard = ({ volume }: Props) => {
 					)}
 					<span className="flex justify-between items-center gap-2">
 						<span className="text-sm">Remount on error</span>
-						<OnOff isOn={volume.autoRemount} toggle={() => {}} enabledLabel="Enabled" disabledLabel="Paused" />
+						<OnOff
+							isOn={volume.autoRemount}
+							toggle={() =>
+								toggleAutoRemount.mutate({ path: { name: volume.name }, body: { autoRemount: !volume.autoRemount } })
+							}
+							disabled={toggleAutoRemount.isPending}
+							enabledLabel="Enabled"
+							disabledLabel="Paused"
+						/>
 					</span>
 				</div>
 				{volume.status !== "unmounted" && (

@@ -17,6 +17,7 @@ import {
 	updateVolumeBody,
 	updateVolumeDto,
 	healthCheckDto,
+	type UpdateVolumeResponseDto,
 } from "./volume.dto";
 import { volumeService } from "./volume.service";
 
@@ -86,19 +87,17 @@ export const volumeController = new Hono()
 	.put("/:name", updateVolumeDto, validator("json", updateVolumeBody), async (c) => {
 		const { name } = c.req.param();
 		const body = c.req.valid("json");
-		const res = await volumeService.updateVolume(name, body.config);
+		const res = await volumeService.updateVolume(name, body);
 
 		const response = {
 			message: "Volume updated",
 			volume: {
-				name: res.volume.name,
-				path: res.volume.path,
-				type: res.volume.type,
+				...res.volume,
 				createdAt: res.volume.createdAt.getTime(),
 				updatedAt: res.volume.updatedAt.getTime(),
-				config: res.volume.config,
+				lastHealthCheck: res.volume.lastHealthCheck.getTime(),
 			},
-		};
+		} satisfies UpdateVolumeResponseDto;
 
 		return c.json(response, 200);
 	})

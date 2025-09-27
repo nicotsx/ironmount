@@ -139,19 +139,15 @@ export const getVolumeDto = describeRoute({
  * Update a volume
  */
 export const updateVolumeBody = type({
-	config: volumeConfigSchema,
+	autoRemount: "boolean?",
+	config: volumeConfigSchema.optional(),
 });
+
+export type UpdateVolumeBody = typeof updateVolumeBody.infer;
 
 export const updateVolumeResponse = type({
 	message: "string",
-	volume: type({
-		name: "string",
-		path: "string",
-		type: "string",
-		createdAt: "number",
-		updatedAt: "number",
-		config: volumeConfigSchema,
-	}),
+	volume: volumeSchema,
 });
 
 export const updateVolumeDto = describeRoute({
@@ -173,6 +169,8 @@ export const updateVolumeDto = describeRoute({
 		},
 	},
 });
+
+export type UpdateVolumeResponseDto = typeof updateVolumeResponse.infer;
 
 /**
  * Test connection

@@ -9,7 +9,7 @@ export const startup = async () => {
 	const volumes = await db.query.volumesTable.findMany({
 		where: or(
 			eq(volumesTable.status, "mounted"),
-			and(eq(volumesTable.autoRemount, 1), eq(volumesTable.status, "error")),
+			and(eq(volumesTable.autoRemount, true), eq(volumesTable.status, "error")),
 		),
 	});
 
@@ -28,10 +28,8 @@ export const startup = async () => {
 		});
 
 		for (const volume of volumes) {
-			const { error } = await volumeService.checkHealth(volume.name);
-			if (error && volume.autoRemount) {
-				// TODO: retry with backoff based on last health check time
-				// Until we reach the max backoff and it'll try every 10 minutes
+			const { status } = await volumeService.checkHealth(volume.name);
+			if (status === "error" && volume.autoRemount) {
 				await volumeService.mountVolume(volume.name);
 			}
 		}

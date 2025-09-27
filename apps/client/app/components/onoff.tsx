@@ -6,9 +6,10 @@ type Props = {
 	toggle: (v: boolean) => void;
 	enabledLabel: string;
 	disabledLabel: string;
+	disabled?: boolean;
 };
 
-export const OnOff = ({ isOn, toggle, enabledLabel, disabledLabel }: Props) => {
+export const OnOff = ({ isOn, toggle, enabledLabel, disabledLabel, disabled }: Props) => {
 	return (
 		<div
 			className={cn(
@@ -19,7 +20,7 @@ export const OnOff = ({ isOn, toggle, enabledLabel, disabledLabel }: Props) => {
 			)}
 		>
 			<span>{isOn ? enabledLabel : disabledLabel}</span>
-			<Switch checked={isOn} onCheckedChange={toggle} />
+			<Switch disabled={disabled} checked={isOn} onCheckedChange={toggle} />
 		</div>
 	);
 };

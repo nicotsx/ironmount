@@ -13,6 +13,7 @@ import { volumesTable } from "../../db/schema";
 import { toMessage } from "../../utils/errors";
 import { getStatFs, type StatFs } from "../../utils/mountinfo";
 import { createVolumeBackend } from "../backends/backend";
+import type { UpdateVolumeBody } from "./volume.dto";
 
 const listVolumes = async () => {
 	const volumes = await db.query.volumesTable.findMany({});
@@ -114,7 +115,7 @@ const getVolume = async (name: string) => {
 	return { volume, statfs };
 };
 
-const updateVolume = async (name: string, backendConfig: BackendConfig) => {
+const updateVolume = async (name: string, volumeData: UpdateVolumeBody) => {
 	const existing = await db.query.volumesTable.findFirst({
 		where: eq(volumesTable.name, name),
 	});
@@ -126,10 +127,10 @@ const updateVolume = async (name: string, backendConfig: BackendConfig) => {
 	const [updated] = await db
 		.update(volumesTable)
 		.set({
-			config: backendConfig,
-			type: backendConfig.backend,
+			config: volumeData.config,
+			type: volumeData.config?.backend,
+			autoRemount: volumeData.autoRemount,
 			updatedAt: new Date(),
-			status: "unmounted",
 		})
 		.where(eq(volumesTable.name, name))
 		.returning();
