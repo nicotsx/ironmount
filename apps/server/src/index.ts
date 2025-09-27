@@ -5,10 +5,10 @@ import { logger as honoLogger } from "hono/logger";
 import { openAPISpecs } from "hono-openapi";
 import { runDbMigrations } from "./db/db";
 import { driverController } from "./modules/driver/driver.controller";
-import { volumeController } from "./modules/volumes/volume.controller";
-import { logger } from "./utils/logger";
 import { startup } from "./modules/lifecycle/startup";
+import { volumeController } from "./modules/volumes/volume.controller";
 import { handleServiceError } from "./utils/errors";
+import { logger } from "./utils/logger";
 
 export const generalDescriptor = (app: Hono) =>
 	openAPISpecs(app, {
@@ -51,7 +51,7 @@ app.onError((err, c) => {
 
 	const { status, message } = handleServiceError(err);
 
-	return c.json({ error: message }, status);
+	return c.json({ message }, status);
 });
 
 const socketPath = "/run/docker/plugins/ironmount.sock";

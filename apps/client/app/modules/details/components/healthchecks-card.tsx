@@ -26,6 +26,9 @@ export const HealthchecksCard = ({ volume }: Props) => {
 			}
 			toast.success("Health check completed", { description: "The volume is healthy." });
 		},
+		onError: (error) => {
+			toast.error("Health check failed", { description: error.message });
+		},
 	});
 
 	const toggleAutoRemount = useMutation({
@@ -34,6 +37,9 @@ export const HealthchecksCard = ({ volume }: Props) => {
 			toast.success("Volume updated", {
 				description: `Auto remount is now ${d.volume.autoRemount ? "enabled" : "paused"}.`,
 			});
+		},
+		onError: (error) => {
+			toast.error("Update failed", { description: error.message });
 		},
 	});
 

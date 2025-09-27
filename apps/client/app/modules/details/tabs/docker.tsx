@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
+import { Unplug } from "lucide-react";
 import * as YML from "yaml";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { CodeBlock } from "~/components/ui/code-block";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
 import type { Volume } from "~/lib/types";
 import { getContainersUsingVolumeOptions } from "../../../api-client/@tanstack/react-query.gen";
-import { Unplug } from "lucide-react";
 
 type Props = {
 	volume: Volume;
@@ -49,7 +49,7 @@ export const DockerTabContent = ({ volume }: Props) => {
 			<Card>
 				<CardHeader>
 					<CardTitle>Plug-and-play Docker integration</CardTitle>
-					<CardDescription className="mt-2">
+					<CardDescription>
 						This volume can be used in your Docker Compose files by referencing it as an external volume. The example
 						demonstrates how to mount the volume to a service (nginx in this case). Make sure to adjust the path inside
 						the container to fit your application's needs
