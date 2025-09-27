@@ -349,6 +349,39 @@ export type UpdateVolumeResponses = {
 
 export type UpdateVolumeResponse = UpdateVolumeResponses[keyof UpdateVolumeResponses];
 
+export type GetContainersUsingVolumeData = {
+	body?: never;
+	path: {
+		name: string;
+	};
+	query?: never;
+	url: "/api/v1/volumes/{name}/containers";
+};
+
+export type GetContainersUsingVolumeErrors = {
+	/**
+	 * Volume not found
+	 */
+	404: unknown;
+};
+
+export type GetContainersUsingVolumeResponses = {
+	/**
+	 * List of containers using the volume
+	 */
+	200: {
+		containers: Array<{
+			id: string;
+			image: string;
+			name: string;
+			state: string;
+		}>;
+	};
+};
+
+export type GetContainersUsingVolumeResponse =
+	GetContainersUsingVolumeResponses[keyof GetContainersUsingVolumeResponses];
+
 export type MountVolumeData = {
 	body?: never;
 	path: {

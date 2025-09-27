@@ -1,7 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
+import * as YML from "yaml";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { CodeBlock } from "~/components/ui/code-block";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
 import type { Volume } from "~/lib/types";
-import * as YML from "yaml";
+import { getContainersUsingVolumeOptions } from "../../../api-client/@tanstack/react-query.gen";
 
 type Props = {
 	volume: Volume;
@@ -24,8 +27,24 @@ export const DockerTabContent = ({ volume }: Props) => {
 
 	const dockerRunCommand = `docker run -v ${volume.name}:/path/in/container nginx:latest`;
 
+	const containersQuery = getContainersUsingVolumeOptions({ path: { name: volume.name } });
+	const { data: containersData, isLoading, error } = useQuery(containersQuery);
+
+	const containers = containersData?.containers || [];
+
+	const getStateClass = (state: string) => {
+		switch (state) {
+			case "running":
+				return "bg-green-100 text-green-800";
+			case "exited":
+				return "bg-orange-100 text-orange-800";
+			default:
+				return "bg-gray-100 text-gray-800";
+		}
+	};
+
 	return (
-		<div className="grid gap-4 xl:grid-cols-[minmax(0,_2.3fr)_minmax(320px,_1fr)]">
+		<div className="grid gap-4 xl:grid-cols-[minmax(0,_1fr)_minmax(0,_1fr)]">
 			<Card>
 				<CardHeader>
 					<CardTitle>Plug-and-play Docker integration</CardTitle>
@@ -55,11 +74,45 @@ export const DockerTabContent = ({ volume }: Props) => {
 			<div className="grid">
 				<Card>
 					<CardHeader>
-						<CardTitle>Best practices</CardTitle>
-						<CardDescription>Validate the automation before enabling it in production.</CardDescription>
+						<CardTitle>Containers Using This Volume</CardTitle>
+						<CardDescription>List of Docker containers mounting this volume.</CardDescription>
 					</CardHeader>
 
-					<CardContent className="space-y-4 text-sm"></CardContent>
+					<CardContent className="space-y-4 text-sm">
+						{isLoading && <div>Loading containers...</div>}
+						{error && <div className="text-destructive">Failed to load containers: {String(error)}</div>}
+						{!isLoading && !error && containers.length === 0 && (
+							<div>No containers are currently using this volume.</div>
+						)}
+						{!isLoading && !error && containers.length > 0 && (
+							<Table>
+								<TableHeader>
+									<TableRow>
+										<TableHead>Name</TableHead>
+										<TableHead>ID</TableHead>
+										<TableHead>State</TableHead>
+										<TableHead>Image</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{containers.map((container) => (
+										<TableRow key={container.id}>
+											<TableCell>{container.name}</TableCell>
+											<TableCell>{container.id.slice(0, 12)}</TableCell>
+											<TableCell>
+												<span
+													className={`px-2 py-1 rounded-full text-xs font-medium ${getStateClass(container.state)}`}
+												>
+													{container.state}
+												</span>
+											</TableCell>
+											<TableCell>{container.image}</TableCell>
+										</TableRow>
+									))}
+								</TableBody>
+							</Table>
+						)}
+					</CardContent>
 				</Card>
 			</div>
 		</div>

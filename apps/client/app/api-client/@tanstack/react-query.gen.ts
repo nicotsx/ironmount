@@ -8,6 +8,7 @@ import {
 	deleteVolume,
 	getVolume,
 	updateVolume,
+	getContainersUsingVolume,
 	mountVolume,
 	unmountVolume,
 } from "../sdk.gen";
@@ -23,6 +24,7 @@ import type {
 	GetVolumeData,
 	UpdateVolumeData,
 	UpdateVolumeResponse,
+	GetContainersUsingVolumeData,
 	MountVolumeData,
 	MountVolumeResponse,
 	UnmountVolumeData,
@@ -224,6 +226,27 @@ export const updateVolumeMutation = (
 		},
 	};
 	return mutationOptions;
+};
+
+export const getContainersUsingVolumeQueryKey = (options: Options<GetContainersUsingVolumeData>) =>
+	createQueryKey("getContainersUsingVolume", options);
+
+/**
+ * Get containers using a volume by name
+ */
+export const getContainersUsingVolumeOptions = (options: Options<GetContainersUsingVolumeData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await getContainersUsingVolume({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: getContainersUsingVolumeQueryKey(options),
+	});
 };
 
 export const mountVolumeQueryKey = (options: Options<MountVolumeData>) => createQueryKey("mountVolume", options);

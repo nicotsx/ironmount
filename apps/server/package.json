@@ -11,6 +11,7 @@
 		"@ironmount/schemas": "workspace:*",
 		"@scalar/hono-api-reference": "^0.9.13",
 		"arktype": "^2.1.20",
+		"dockerode": "^4.0.8",
 		"dotenv": "^17.2.1",
 		"drizzle-orm": "^0.44.4",
 		"hono": "^4.9.2",
@@ -22,6 +23,7 @@
 	},
 	"devDependencies": {
 		"@types/bun": "^1.2.20",
+		"@types/dockerode": "^3.3.44",
 		"drizzle-kit": "^0.31.4"
 	}
 }

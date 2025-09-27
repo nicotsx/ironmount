@@ -4,16 +4,18 @@ import {
 	createVolumeBody,
 	createVolumeDto,
 	deleteVolumeDto,
+	type GetVolumeResponseDto,
+	getContainersDto,
 	getVolumeDto,
+	type ListContainersResponseDto,
 	type ListVolumesResponseDto,
 	listVolumesDto,
+	mountVolumeDto,
 	testConnectionBody,
 	testConnectionDto,
+	unmountVolumeDto,
 	updateVolumeBody,
 	updateVolumeDto,
-	mountVolumeDto,
-	unmountVolumeDto,
-	type GetVolumeResponseDto,
 } from "./volume.dto";
 import { volumeService } from "./volume.service";
 
@@ -67,6 +69,16 @@ export const volumeController = new Hono()
 				free: res.statfs.free ?? 0,
 			},
 		} satisfies GetVolumeResponseDto;
+
+		return c.json(response, 200);
+	})
+	.get("/:name/containers", getContainersDto, async (c) => {
+		const { name } = c.req.param();
+		const { containers } = await volumeService.getContainersUsingVolume(name);
+
+		const response = {
+			containers,
+		} satisfies ListContainersResponseDto;
 
 		return c.json(response, 200);
 	})

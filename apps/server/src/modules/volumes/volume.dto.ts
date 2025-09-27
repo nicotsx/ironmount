@@ -258,3 +258,38 @@ export const unmountVolumeDto = describeRoute({
 		},
 	},
 });
+
+/**
+ * Get containers using a volume
+ */
+const containerSchema = type({
+	id: "string",
+	name: "string",
+	state: "string",
+	image: "string",
+});
+
+export const listContainersResponse = type({
+	containers: containerSchema.array(),
+});
+export type ListContainersResponseDto = typeof listContainersResponse.infer;
+
+export const getContainersDto = describeRoute({
+	description: "Get containers using a volume by name",
+	operationId: "getContainersUsingVolume",
+	validateResponse: true,
+	tags: ["Volumes"],
+	responses: {
+		200: {
+			description: "List of containers using the volume",
+			content: {
+				"application/json": {
+					schema: resolver(listContainersResponse),
+				},
+			},
+		},
+		404: {
+			description: "Volume not found",
+		},
+	},
+});

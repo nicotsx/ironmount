@@ -2,17 +2,17 @@ import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
 import type { BackendConfig } from "@ironmount/schemas";
+import Docker from "dockerode";
 import { eq } from "drizzle-orm";
 import { ConflictError, InternalServerError, NotFoundError } from "http-errors-enhanced";
 import slugify from "slugify";
 import { config } from "../../core/config";
+import { VOLUME_MOUNT_BASE } from "../../core/constants";
 import { db } from "../../db/db";
 import { volumesTable } from "../../db/schema";
-import { createVolumeBackend } from "../backends/backend";
 import { toMessage } from "../../utils/errors";
 import { getStatFs, type StatFs } from "../../utils/mountinfo";
-import { VOLUME_MOUNT_BASE } from "../../core/constants";
-import { logger } from "../../utils/logger";
+import { createVolumeBackend } from "../backends/backend";
 
 const listVolumes = async () => {
 	const volumes = await db.query.volumesTable.findMany({});
@@ -192,6 +192,37 @@ const checkHealth = async (name: string) => {
 	return { status, error };
 };
 
+const getContainersUsingVolume = async (name: string) => {
+	const volume = await db.query.volumesTable.findFirst({
+		where: eq(volumesTable.name, name),
+	});
+
+	if (!volume) {
+		throw new NotFoundError("Volume not found");
+	}
+
+	const docker = new Docker();
+	const containers = await docker.listContainers({ all: true });
+
+	const usingContainers = [];
+	for (const info of containers) {
+		const container = docker.getContainer(info.Id);
+		const inspect = await container.inspect();
+		const mounts = inspect.Mounts || [];
+		const usesVolume = mounts.some((mount) => mount.Type === "volume" && mount.Name === name);
+		if (usesVolume) {
+			usingContainers.push({
+				id: inspect.Id,
+				name: inspect.Name,
+				state: inspect.State.Status,
+				image: inspect.Config.Image,
+			});
+		}
+	}
+
+	return { containers: usingContainers };
+};
+
 export const volumeService = {
 	listVolumes,
 	createVolume,
@@ -202,4 +233,5 @@ export const volumeService = {
 	testConnection,
 	unmountVolume,
 	checkHealth,
+	getContainersUsingVolume,
 };

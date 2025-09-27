@@ -1,8 +1,8 @@
 import { and, eq, or } from "drizzle-orm";
+import { getTasks, schedule } from "node-cron";
 import { db } from "../../db/db";
-import { logger } from "../../utils/logger";
 import { volumesTable } from "../../db/schema";
-import { schedule, getTasks } from "node-cron";
+import { logger } from "../../utils/logger";
 import { volumeService } from "../volumes/volume.service";
 
 export const startup = async () => {
@@ -18,7 +18,7 @@ export const startup = async () => {
 	}
 
 	const existingTasks = getTasks();
-	existingTasks.forEach((task) => task.destroy());
+	existingTasks.forEach(async (task) => await task.destroy());
 
 	schedule("* * * * *", async () => {
 		logger.info("Running health check for all volumes...");

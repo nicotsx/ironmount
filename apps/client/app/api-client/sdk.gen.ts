@@ -16,6 +16,9 @@ import type {
 	UpdateVolumeData,
 	UpdateVolumeResponses,
 	UpdateVolumeErrors,
+	GetContainersUsingVolumeData,
+	GetContainersUsingVolumeResponses,
+	GetContainersUsingVolumeErrors,
 	MountVolumeData,
 	MountVolumeResponses,
 	MountVolumeErrors,
@@ -119,6 +122,22 @@ export const updateVolume = <ThrowOnError extends boolean = false>(
 			"Content-Type": "application/json",
 			...options.headers,
 		},
+	});
+};
+
+/**
+ * Get containers using a volume by name
+ */
+export const getContainersUsingVolume = <ThrowOnError extends boolean = false>(
+	options: Options<GetContainersUsingVolumeData, ThrowOnError>,
+) => {
+	return (options.client ?? _heyApiClient).get<
+		GetContainersUsingVolumeResponses,
+		GetContainersUsingVolumeErrors,
+		ThrowOnError
+	>({
+		url: "/api/v1/volumes/{name}/containers",
+		...options,
 	});
 };
 
