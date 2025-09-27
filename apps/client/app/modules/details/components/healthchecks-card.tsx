@@ -54,7 +54,7 @@ export const HealthchecksCard = ({ volume }: Props) => {
 			</CardHeader>
 			<CardContent>
 				<div className="flex flex-col flex-1 justify-start">
-					{volume.lastError && <span className="text-sm text-red-500 ">{volume.lastError}</span>}
+					{volume.lastError && <span className="text-sm text-red-500 break-words">{volume.lastError}</span>}
 					{volume.status === "mounted" && <span className="text-md text-emerald-500">Healthy</span>}
 					{volume.status !== "unmounted" && (
 						<span className="text-xs text-muted-foreground mb-4">Checked {timeAgo || "never"}</span>

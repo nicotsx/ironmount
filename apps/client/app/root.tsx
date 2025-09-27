@@ -29,6 +29,10 @@ const queryClient = new QueryClient({
 		onSuccess: () => {
 			queryClient.invalidateQueries();
 		},
+		onError: (error) => {
+			console.error("Mutation error:", error);
+			queryClient.invalidateQueries();
+		},
 	}),
 });
 

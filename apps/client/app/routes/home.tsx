@@ -2,10 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Copy, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { type ListVolumesResponse, listVolumes } from "~/api-client";
+import { listVolumes } from "~/api-client";
 import { listVolumesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { CreateVolumeDialog } from "~/components/create-volume-dialog";
-import { EditVolumeDialog } from "~/components/edit-volume-dialog";
 import { StatusDot } from "~/components/status-dot";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -31,7 +30,6 @@ export const clientLoader = async () => {
 };
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-	const [volumeToEdit, setVolumeToEdit] = useState<ListVolumesResponse["volumes"][number]>();
 	const [createVolumeOpen, setCreateVolumeOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [statusFilter, setStatusFilter] = useState("");
@@ -139,11 +137,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 					))}
 				</TableBody>
 			</Table>
-			<EditVolumeDialog
-				open={Boolean(volumeToEdit)}
-				setOpen={() => setVolumeToEdit(undefined)}
-				initialValues={volumeToEdit}
-			/>
 		</>
 	);
 }

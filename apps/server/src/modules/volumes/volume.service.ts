@@ -33,7 +33,7 @@ const createVolume = async (name: string, backendConfig: BackendConfig) => {
 
 	const volumePathHost = path.join(VOLUME_MOUNT_BASE);
 
-	const val = await db
+	const [created] = await db
 		.insert(volumesTable)
 		.values({
 			name: slug,
@@ -43,7 +43,19 @@ const createVolume = async (name: string, backendConfig: BackendConfig) => {
 		})
 		.returning();
 
-	return { volume: val[0], status: 201 };
+	if (!created) {
+		throw new InternalServerError("Failed to create volume");
+	}
+
+	const backend = createVolumeBackend(created);
+	const { error, status } = await backend.mount();
+
+	await db
+		.update(volumesTable)
+		.set({ status, lastError: error ?? null, lastHealthCheck: new Date() })
+		.where(eq(volumesTable.name, slug));
+
+	return { volume: created, status: 201 };
 };
 
 const deleteVolume = async (name: string) => {
@@ -123,6 +135,15 @@ const updateVolume = async (name: string, volumeData: UpdateVolumeBody) => {
 		throw new NotFoundError("Volume not found");
 	}
 
+	const configChanged =
+		JSON.stringify(existing.config) !== JSON.stringify(volumeData.config) && volumeData.config !== undefined;
+
+	if (configChanged) {
+		console.log("Unmounting existing volume before applying new config");
+		const backend = createVolumeBackend(existing);
+		await backend.unmount();
+	}
+
 	const [updated] = await db
 		.update(volumesTable)
 		.set({
@@ -136,6 +157,15 @@ const updateVolume = async (name: string, volumeData: UpdateVolumeBody) => {
 
 	if (!updated) {
 		throw new InternalServerError("Failed to update volume");
+	}
+
+	if (configChanged) {
+		const backend = createVolumeBackend(updated);
+		const { error, status } = await backend.mount();
+		await db
+			.update(volumesTable)
+			.set({ status, lastError: error ?? null, lastHealthCheck: new Date() })
+			.where(eq(volumesTable.name, name));
 	}
 
 	return { volume: updated };

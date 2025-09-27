@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { VOLUME_MOUNT_BASE } from "~/core/constants";
+import { VOLUME_MOUNT_BASE } from "../../core/constants";
 import { volumeService } from "../volumes/volume.service";
 
 export const driverController = new Hono()

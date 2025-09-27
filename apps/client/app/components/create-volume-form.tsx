@@ -16,16 +16,17 @@ export const formSchema = type({
 	name: "2<=string<=32",
 }).and(volumeConfigSchema);
 
-type FormValues = typeof formSchema.inferIn;
+export type FormValues = typeof formSchema.inferIn;
 
 type Props = {
 	onSubmit: (values: FormValues) => void;
 	mode?: "create" | "update";
 	initialValues?: Partial<FormValues>;
 	formId?: string;
+	loading?: boolean;
 };
 
-export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, formId }: Props) => {
+export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, formId, loading }: Props) => {
 	const form = useForm<FormValues>({
 		resolver: arktypeResolver(formSchema),
 		defaultValues: initialValues,
@@ -504,6 +505,11 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 							</div>
 						)}
 					</div>
+				)}
+				{mode === "update" && (
+					<Button type="submit" className="w-full mt-4" loading={loading}>
+						Save Changes
+					</Button>
 				)}
 			</form>
 		</Form>
