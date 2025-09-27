@@ -155,7 +155,7 @@ const testConnection = async (backendConfig: BackendConfig) => {
 		type: backendConfig.backend,
 		status: "unmounted" as const,
 		lastError: null,
-		autoRemount: 0 as const,
+		autoRemount: true,
 	};
 
 	const backend = createVolumeBackend(mockVolume);

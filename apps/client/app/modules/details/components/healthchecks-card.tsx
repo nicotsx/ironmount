@@ -1,10 +1,9 @@
 import { formatDistanceToNow } from "date-fns";
 import { HeartIcon } from "lucide-react";
+import { OnOff } from "~/components/onoff";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import { Switch } from "~/components/ui/switch";
 import type { Volume } from "~/lib/types";
-import { cn } from "~/lib/utils";
 
 type Props = {
 	volume: Volume;
@@ -34,17 +33,7 @@ export const HealthchecksCard = ({ volume }: Props) => {
 
 					<span className="flex justify-between items-center gap-2">
 						<span className="text-sm">Remount on error</span>
-						<div
-							className={cn(
-								"flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors",
-								Boolean(volume.autoRemount)
-									? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-200"
-									: "border-muted bg-muted/40 text-muted-foreground dark:border-muted/60 dark:bg-muted/10",
-							)}
-						>
-							<span>{volume.autoRemount ? "Enabled" : "Paused"}</span>
-							<Switch checked={Boolean(volume.autoRemount)} onCheckedChange={() => {}} />
-						</div>
+						<OnOff isOn={volume.autoRemount} toggle={() => {}} enabledLabel="Enabled" disabledLabel="Paused" />
 					</span>
 				</div>
 				{volume.status !== "unmounted" && (

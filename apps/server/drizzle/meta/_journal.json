@@ -29,6 +29,13 @@
       "when": 1758653407064,
       "tag": "0003_mature_hellcat",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1758961535488,
+      "tag": "0004_wealthy_tomas",
+      "breakpoints": true
     }
   ]
 }

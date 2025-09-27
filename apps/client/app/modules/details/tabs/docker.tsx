@@ -5,6 +5,7 @@ import { CodeBlock } from "~/components/ui/code-block";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
 import type { Volume } from "~/lib/types";
 import { getContainersUsingVolumeOptions } from "../../../api-client/@tanstack/react-query.gen";
+import { Unplug } from "lucide-react";
 
 type Props = {
 	volume: Volume;
@@ -78,39 +79,44 @@ export const DockerTabContent = ({ volume }: Props) => {
 						<CardDescription>List of Docker containers mounting this volume.</CardDescription>
 					</CardHeader>
 
-					<CardContent className="space-y-4 text-sm">
+					<CardContent className="space-y-4 text-sm h-full">
 						{isLoading && <div>Loading containers...</div>}
 						{error && <div className="text-destructive">Failed to load containers: {String(error)}</div>}
 						{!isLoading && !error && containers.length === 0 && (
-							<div>No containers are currently using this volume.</div>
+							<div className="flex flex-col items-center justify-center text-center h-full">
+								<Unplug className="mb-4 h-5 w-5 text-muted-foreground" />
+								<p className="text-muted-foreground">No Docker containers are currently using this volume.</p>
+							</div>
 						)}
 						{!isLoading && !error && containers.length > 0 && (
-							<Table>
-								<TableHeader>
-									<TableRow>
-										<TableHead>Name</TableHead>
-										<TableHead>ID</TableHead>
-										<TableHead>State</TableHead>
-										<TableHead>Image</TableHead>
-									</TableRow>
-								</TableHeader>
-								<TableBody>
-									{containers.map((container) => (
-										<TableRow key={container.id}>
-											<TableCell>{container.name}</TableCell>
-											<TableCell>{container.id.slice(0, 12)}</TableCell>
-											<TableCell>
-												<span
-													className={`px-2 py-1 rounded-full text-xs font-medium ${getStateClass(container.state)}`}
-												>
-													{container.state}
-												</span>
-											</TableCell>
-											<TableCell>{container.image}</TableCell>
+							<div className="max-h-130 overflow-y-auto">
+								<Table>
+									<TableHeader>
+										<TableRow>
+											<TableHead>Name</TableHead>
+											<TableHead>ID</TableHead>
+											<TableHead>State</TableHead>
+											<TableHead>Image</TableHead>
 										</TableRow>
-									))}
-								</TableBody>
-							</Table>
+									</TableHeader>
+									<TableBody className="text-sm">
+										{containers.map((container) => (
+											<TableRow key={container.id}>
+												<TableCell>{container.name}</TableCell>
+												<TableCell>{container.id.slice(0, 12)}</TableCell>
+												<TableCell>
+													<span
+														className={`px-2 py-1 rounded-full text-xs font-medium ${getStateClass(container.state)}`}
+													>
+														{container.state}
+													</span>
+												</TableCell>
+												<TableCell>{container.image}</TableCell>
+											</TableRow>
+										))}
+									</TableBody>
+								</Table>
+							</div>
 						)}
 					</CardContent>
 				</Card>

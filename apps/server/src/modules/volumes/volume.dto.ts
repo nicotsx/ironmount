@@ -13,7 +13,7 @@ const volumeSchema = type({
 	updatedAt: "number",
 	lastHealthCheck: "number",
 	config: volumeConfigSchema,
-	autoRemount: "0 | 1",
+	autoRemount: "boolean",
 });
 
 export type VolumeDto = typeof volumeSchema.infer;

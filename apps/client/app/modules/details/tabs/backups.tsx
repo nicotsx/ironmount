@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { OnOff } from "~/components/onoff";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
@@ -152,17 +153,12 @@ export const VolumeBackupsTabContent = ({ volume }: Props) => {
 									render={({ field }) => (
 										<FormItem className="flex flex-col items-center space-y-2">
 											<FormControl>
-												<div
-													className={cn(
-														"flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors",
-														field.value
-															? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-200"
-															: "border-muted bg-muted/40 text-muted-foreground dark:border-muted/60 dark:bg-muted/10",
-													)}
-												>
-													<span>{field.value ? "Enabled" : "Paused"}</span>
-													<Switch checked={field.value} onCheckedChange={field.onChange} />
-												</div>
+												<OnOff
+													isOn={field.value}
+													toggle={field.onChange}
+													enabledLabel="Enabled"
+													disabledLabel="Paused"
+												/>
 											</FormControl>
 										</FormItem>
 									)}
