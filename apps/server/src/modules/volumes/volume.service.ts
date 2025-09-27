@@ -6,7 +6,6 @@ import Docker from "dockerode";
 import { eq } from "drizzle-orm";
 import { ConflictError, InternalServerError, NotFoundError } from "http-errors-enhanced";
 import slugify from "slugify";
-import { config } from "../../core/config";
 import { VOLUME_MOUNT_BASE } from "../../core/constants";
 import { db } from "../../db/db";
 import { volumesTable } from "../../db/schema";
@@ -32,14 +31,14 @@ const createVolume = async (name: string, backendConfig: BackendConfig) => {
 		throw new ConflictError("Volume already exists");
 	}
 
-	const volumePathHost = path.join(config.volumeRootHost);
+	const volumePathHost = path.join(VOLUME_MOUNT_BASE);
 
 	const val = await db
 		.insert(volumesTable)
 		.values({
 			name: slug,
 			config: backendConfig,
-			path: path.join(volumePathHost, slug),
+			path: path.join(volumePathHost, slug, "_data"),
 			type: backendConfig.backend,
 		})
 		.returning();
@@ -210,7 +209,7 @@ const getContainersUsingVolume = async (name: string) => {
 		const container = docker.getContainer(info.Id);
 		const inspect = await container.inspect();
 		const mounts = inspect.Mounts || [];
-		const usesVolume = mounts.some((mount) => mount.Type === "volume" && mount.Name === name);
+		const usesVolume = mounts.some((mount) => mount.Type === "volume" && mount.Name === `im-${volume.name}`);
 		if (usesVolume) {
 			usingContainers.push({
 				id: inspect.Id,

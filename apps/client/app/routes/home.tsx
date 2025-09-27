@@ -48,6 +48,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 	const { data } = useQuery({
 		...listVolumesOptions(),
 		initialData: loaderData,
+		refetchInterval: 10000,
+		refetchOnWindowFocus: true,
 	});
 
 	const filteredVolumes =

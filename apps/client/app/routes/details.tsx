@@ -41,6 +41,8 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 	const { data } = useQuery({
 		...getVolumeOptions({ path: { name: name ?? "" } }),
 		initialData: loaderData,
+		refetchInterval: 10000,
+		refetchOnWindowFocus: true,
 	});
 
 	const deleteVol = useMutation({

@@ -16,17 +16,17 @@ export const DockerTabContent = ({ volume }: Props) => {
 		services: {
 			nginx: {
 				image: "nginx:latest",
-				volumes: [`${volume.name}:/path/in/container`],
+				volumes: [`im-${volume.name}:/path/in/container`],
 			},
 		},
 		volumes: {
-			[volume.name]: {
+			[`im-${volume.name}`]: {
 				external: true,
 			},
 		},
 	});
 
-	const dockerRunCommand = `docker run -v ${volume.name}:/path/in/container nginx:latest`;
+	const dockerRunCommand = `docker run -v im-${volume.name}:/path/in/container nginx:latest`;
 
 	const containersQuery = getContainersUsingVolumeOptions({ path: { name: volume.name } });
 	const { data: containersData, isLoading, error } = useQuery(containersQuery);

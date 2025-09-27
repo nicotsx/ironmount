@@ -32,10 +32,10 @@ export const scalarDescriptor = Scalar({
 const driver = new Hono().use(honoLogger()).route("/", driverController);
 const app = new Hono()
 	.use(honoLogger())
-	.get("*", serveStatic({ root: "./assets/frontend" }))
-	.get("healthcheck", (c) => c.json({ status: "ok" }))
-	.basePath("/api/v1")
-	.route("/volumes", volumeController);
+	.get("/healthcheck", (c) => c.json({ status: "ok" }))
+	.route("/api/v1/volumes", volumeController)
+	.get("/assets/*", serveStatic({ root: "./assets/frontend" }))
+	.get("*", serveStatic({ path: "./assets/frontend/index.html" }));
 
 app.get("/openapi.json", generalDescriptor(app));
 app.get("/docs", scalarDescriptor);

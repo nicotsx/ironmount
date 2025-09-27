@@ -7,8 +7,8 @@
 		"tsc": "turbo run tsc",
 		"build": "turbo build",
 		"gen:api-client": "openapi-ts",
-		"start:dev": "docker rm ironmount && docker compose up --build ironmount-dev",
-		"start:prod": "docker rm ironmount && docker compose up --build ironmount-prod"
+		"start:dev": "docker compose down && docker compose up --build ironmount-dev",
+		"start:prod": "docker compose down && docker compose up --build ironmount-prod"
 	},
 	"workspaces": [
 		"apps/*",
