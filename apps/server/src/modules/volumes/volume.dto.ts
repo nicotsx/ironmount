@@ -259,6 +259,31 @@ export const unmountVolumeDto = describeRoute({
 	},
 });
 
+export const healthCheckResponse = type({
+	error: "string?",
+	status: type.enumerated("mounted", "unmounted", "error"),
+});
+
+export const healthCheckDto = describeRoute({
+	description: "Perform a health check on a volume",
+	operationId: "healthCheckVolume",
+	validateResponse: true,
+	tags: ["Volumes"],
+	responses: {
+		200: {
+			description: "Volume health check result",
+			content: {
+				"application/json": {
+					schema: resolver(healthCheckResponse),
+				},
+			},
+		},
+		404: {
+			description: "Volume not found",
+		},
+	},
+});
+
 /**
  * Get containers using a volume
  */

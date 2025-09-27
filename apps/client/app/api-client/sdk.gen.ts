@@ -25,6 +25,9 @@ import type {
 	UnmountVolumeData,
 	UnmountVolumeResponses,
 	UnmountVolumeErrors,
+	HealthCheckVolumeData,
+	HealthCheckVolumeResponses,
+	HealthCheckVolumeErrors,
 } from "./types.gen";
 import { client as _heyApiClient } from "./client.gen";
 
@@ -159,6 +162,18 @@ export const unmountVolume = <ThrowOnError extends boolean = false>(
 ) => {
 	return (options.client ?? _heyApiClient).post<UnmountVolumeResponses, UnmountVolumeErrors, ThrowOnError>({
 		url: "/api/v1/volumes/{name}/unmount",
+		...options,
+	});
+};
+
+/**
+ * Perform a health check on a volume
+ */
+export const healthCheckVolume = <ThrowOnError extends boolean = false>(
+	options: Options<HealthCheckVolumeData, ThrowOnError>,
+) => {
+	return (options.client ?? _heyApiClient).post<HealthCheckVolumeResponses, HealthCheckVolumeErrors, ThrowOnError>({
+		url: "/api/v1/volumes/{name}/health-check",
 		...options,
 	});
 };

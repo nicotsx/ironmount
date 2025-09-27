@@ -5,7 +5,7 @@ import * as React from "react";
 import { Label, Pie, PieChart } from "recharts";
 import { ByteSize } from "~/components/bytes-size";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "~/components/ui/chart";
+import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "~/components/ui/chart";
 import type { StatFs } from "~/lib/types";
 
 type Props = {

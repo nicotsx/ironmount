@@ -16,6 +16,7 @@ import {
 	unmountVolumeDto,
 	updateVolumeBody,
 	updateVolumeDto,
+	healthCheckDto,
 } from "./volume.dto";
 import { volumeService } from "./volume.service";
 
@@ -112,4 +113,10 @@ export const volumeController = new Hono()
 		const { error, status } = await volumeService.unmountVolume(name);
 
 		return c.json({ error, status }, error ? 500 : 200);
+	})
+	.post("/:name/health-check", healthCheckDto, async (c) => {
+		const { name } = c.req.param();
+		const { error, status } = await volumeService.checkHealth(name);
+
+		return c.json({ error, status }, 200);
 	});

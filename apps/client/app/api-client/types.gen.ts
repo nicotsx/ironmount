@@ -438,6 +438,34 @@ export type UnmountVolumeResponses = {
 
 export type UnmountVolumeResponse = UnmountVolumeResponses[keyof UnmountVolumeResponses];
 
+export type HealthCheckVolumeData = {
+	body?: never;
+	path: {
+		name: string;
+	};
+	query?: never;
+	url: "/api/v1/volumes/{name}/health-check";
+};
+
+export type HealthCheckVolumeErrors = {
+	/**
+	 * Volume not found
+	 */
+	404: unknown;
+};
+
+export type HealthCheckVolumeResponses = {
+	/**
+	 * Volume health check result
+	 */
+	200: {
+		status: "error" | "mounted" | "unmounted";
+		error?: string;
+	};
+};
+
+export type HealthCheckVolumeResponse = HealthCheckVolumeResponses[keyof HealthCheckVolumeResponses];
+
 export type ClientOptions = {
 	baseUrl: "http://localhost:3000" | (string & {});
 };

@@ -11,6 +11,7 @@ import {
 	getContainersUsingVolume,
 	mountVolume,
 	unmountVolume,
+	healthCheckVolume,
 } from "../sdk.gen";
 import { queryOptions, type UseMutationOptions, type DefaultError } from "@tanstack/react-query";
 import type {
@@ -29,6 +30,8 @@ import type {
 	MountVolumeResponse,
 	UnmountVolumeData,
 	UnmountVolumeResponse,
+	HealthCheckVolumeData,
+	HealthCheckVolumeResponse,
 } from "../types.gen";
 import { client as _heyApiClient } from "../client.gen";
 
@@ -317,6 +320,46 @@ export const unmountVolumeMutation = (
 	const mutationOptions: UseMutationOptions<UnmountVolumeResponse, DefaultError, Options<UnmountVolumeData>> = {
 		mutationFn: async (localOptions) => {
 			const { data } = await unmountVolume({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
+};
+
+export const healthCheckVolumeQueryKey = (options: Options<HealthCheckVolumeData>) =>
+	createQueryKey("healthCheckVolume", options);
+
+/**
+ * Perform a health check on a volume
+ */
+export const healthCheckVolumeOptions = (options: Options<HealthCheckVolumeData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await healthCheckVolume({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: healthCheckVolumeQueryKey(options),
+	});
+};
+
+/**
+ * Perform a health check on a volume
+ */
+export const healthCheckVolumeMutation = (
+	options?: Partial<Options<HealthCheckVolumeData>>,
+): UseMutationOptions<HealthCheckVolumeResponse, DefaultError, Options<HealthCheckVolumeData>> => {
+	const mutationOptions: UseMutationOptions<HealthCheckVolumeResponse, DefaultError, Options<HealthCheckVolumeData>> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await healthCheckVolume({
 				...options,
 				...localOptions,
 				throwOnError: true,

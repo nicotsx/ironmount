@@ -15,11 +15,11 @@ export const VolumeInfoTabContent = ({ volume, statfs }: Props) => {
 			<Card className="p-6">
 				<CreateVolumeForm initialValues={{ ...volume, ...volume.config }} onSubmit={console.log} />
 			</Card>
-			<div className="grid gap-4">
-				<div className="lg:row-span-1">
+			<div className="flex flex-col gap-4">
+				<div className="self-start w-full">
 					<HealthchecksCard volume={volume} />
 				</div>
-				<div>
+				<div className="flex-1 w-full">
 					<StorageChart statfs={statfs} />
 				</div>
 			</div>
