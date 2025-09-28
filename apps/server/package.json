@@ -9,6 +9,7 @@
 	},
 	"dependencies": {
 		"@hono/arktype-validator": "^2.0.1",
+		"@hono/standard-validator": "^0.1.5",
 		"@ironmount/schemas": "workspace:*",
 		"@scalar/hono-api-reference": "^0.9.13",
 		"arktype": "^2.1.20",
@@ -16,7 +17,7 @@
 		"dotenv": "^17.2.1",
 		"drizzle-orm": "^0.44.4",
 		"hono": "^4.9.2",
-		"hono-openapi": "^0.4.8",
+		"hono-openapi": "^1.1.0",
 		"http-errors-enhanced": "^3.0.2",
 		"node-cron": "^4.2.1",
 		"slugify": "^1.6.6",

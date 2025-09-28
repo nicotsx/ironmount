@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { validator } from "hono-openapi/arktype";
+import { validator } from "hono-openapi";
 import {
 	createVolumeBody,
 	createVolumeDto,

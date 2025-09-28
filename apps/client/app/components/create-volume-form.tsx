@@ -3,7 +3,7 @@ import { volumeConfigSchema } from "@ironmount/schemas";
 import { useMutation } from "@tanstack/react-query";
 import { type } from "arktype";
 import { CheckCircle, Loader2, XCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { testConnectionMutation } from "~/api-client/@tanstack/react-query.gen";
 import { slugify } from "~/lib/utils";
@@ -26,15 +26,31 @@ type Props = {
 	loading?: boolean;
 };
 
+const defaultValuesForType = {
+	directory: { backend: "directory" as const },
+	nfs: { backend: "nfs" as const, port: 2049, version: "4.1" as const },
+	smb: { backend: "smb" as const, port: 445, vers: "3.0" as const },
+	webdav: { backend: "webdav" as const, port: 80, ssl: false },
+};
+
 export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, formId, loading }: Props) => {
 	const form = useForm<FormValues>({
 		resolver: arktypeResolver(formSchema),
 		defaultValues: initialValues,
+		resetOptions: {
+			keepDefaultValues: true,
+			keepDirtyValues: false,
+		},
 	});
 
 	const { watch, getValues } = form;
 
 	const watchedBackend = watch("backend");
+	const watchedName = watch("name");
+
+	useEffect(() => {
+		form.reset({ name: watchedName, ...defaultValuesForType[watchedBackend as keyof typeof defaultValuesForType] });
+	}, [watchedBackend, watchedName, form.reset]);
 
 	const [testStatus, setTestStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 	const [testMessage, setTestMessage] = useState<string>("");
@@ -74,14 +90,15 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 		<Form {...form}>
 			<form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 				<FormField
+					control={form.control}
 					name="name"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Name</FormLabel>
 							<FormControl>
 								<Input
+									{...field}
 									placeholder="Volume name"
-									value={field.value ?? ""}
 									onChange={(e) => field.onChange(slugify(e.target.value))}
 									max={32}
 									min={1}
@@ -95,6 +112,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 					)}
 				/>
 				<FormField
+					control={form.control}
 					name="backend"
 					render={({ field }) => (
 						<FormItem>
@@ -121,12 +139,13 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 				{watchedBackend === "nfs" && (
 					<>
 						<FormField
+							control={form.control}
 							name="server"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Server</FormLabel>
 									<FormControl>
-										<Input placeholder="192.168.1.100" value={field.value ?? ""} onChange={field.onChange} />
+										<Input placeholder="192.168.1.100" {...field} />
 									</FormControl>
 									<FormDescription>NFS server IP address or hostname.</FormDescription>
 									<FormMessage />
@@ -134,12 +153,13 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 							)}
 						/>
 						<FormField
+							control={form.control}
 							name="exportPath"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Export Path</FormLabel>
 									<FormControl>
-										<Input placeholder="/export/data" value={field.value ?? ""} onChange={field.onChange} />
+										<Input placeholder="/export/data" {...field} />
 									</FormControl>
 									<FormDescription>Path to the NFS export on the server.</FormDescription>
 									<FormMessage />
@@ -147,17 +167,14 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 							)}
 						/>
 						<FormField
+							control={form.control}
 							name="port"
+							defaultValue={2049}
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Port</FormLabel>
 									<FormControl>
-										<Input
-											type="number"
-											placeholder="2049"
-											value={field.value ?? ""}
-											onChange={(e) => field.onChange(parseInt(e.target.value, 10) || undefined)}
-										/>
+										<Input type="number" placeholder="2049" {...field} />
 									</FormControl>
 									<FormDescription>NFS server port (default: 2049).</FormDescription>
 									<FormMessage />
@@ -165,11 +182,13 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 							)}
 						/>
 						<FormField
+							control={form.control}
 							name="version"
+							defaultValue="4.1"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Version</FormLabel>
-									<Select onValueChange={field.onChange} defaultValue={field.value}>
+									<Select onValueChange={field.onChange} defaultValue="4.1">
 										<FormControl>
 											<SelectTrigger>
 												<SelectValue placeholder="Select NFS version" />
@@ -192,12 +211,13 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 				{watchedBackend === "webdav" && (
 					<>
 						<FormField
+							control={form.control}
 							name="server"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Server</FormLabel>
 									<FormControl>
-										<Input placeholder="example.com" value={field.value ?? ""} onChange={field.onChange} />
+										<Input placeholder="example.com" {...field} />
 									</FormControl>
 									<FormDescription>WebDAV server hostname or IP address.</FormDescription>
 									<FormMessage />
@@ -205,12 +225,13 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 							)}
 						/>
 						<FormField
+							control={form.control}
 							name="path"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Path</FormLabel>
 									<FormControl>
-										<Input placeholder="/webdav" value={field.value ?? ""} onChange={field.onChange} />
+										<Input placeholder="/webdav" {...field} />
 									</FormControl>
 									<FormDescription>Path to the WebDAV directory on the server.</FormDescription>
 									<FormMessage />
@@ -218,12 +239,13 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 							)}
 						/>
 						<FormField
+							control={form.control}
 							name="username"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Username (Optional)</FormLabel>
 									<FormControl>
-										<Input placeholder="admin" value={field.value ?? ""} onChange={field.onChange} />
+										<Input placeholder="admin" {...field} />
 									</FormControl>
 									<FormDescription>Username for WebDAV authentication (optional).</FormDescription>
 									<FormMessage />
@@ -231,12 +253,13 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 							)}
 						/>
 						<FormField
+							control={form.control}
 							name="password"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Password (Optional)</FormLabel>
 									<FormControl>
-										<Input type="password" placeholder="••••••••" value={field.value ?? ""} onChange={field.onChange} />
+										<Input type="password" placeholder="••••••••" {...field} />
 									</FormControl>
 									<FormDescription>Password for WebDAV authentication (optional).</FormDescription>
 									<FormMessage />
@@ -244,17 +267,14 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 							)}
 						/>
 						<FormField
+							control={form.control}
 							name="port"
+							defaultValue={80}
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Port</FormLabel>
 									<FormControl>
-										<Input
-											type="number"
-											placeholder="80"
-											value={field.value ?? ""}
-											onChange={(e) => field.onChange(parseInt(e.target.value, 10) || undefined)}
-										/>
+										<Input type="number" placeholder="80" {...field} />
 									</FormControl>
 									<FormDescription>WebDAV server port (default: 80 for HTTP, 443 for HTTPS).</FormDescription>
 									<FormMessage />
@@ -262,7 +282,9 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 							)}
 						/>
 						<FormField
+							control={form.control}
 							name="ssl"
+							defaultValue={false}
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Use SSL/HTTPS</FormLabel>
@@ -288,6 +310,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 				{watchedBackend === "smb" && (
 					<>
 						<FormField
+							control={form.control}
 							name="server"
 							render={({ field }) => (
 								<FormItem>
@@ -301,6 +324,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 							)}
 						/>
 						<FormField
+							control={form.control}
 							name="share"
 							render={({ field }) => (
 								<FormItem>
@@ -314,6 +338,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 							)}
 						/>
 						<FormField
+							control={form.control}
 							name="username"
 							render={({ field }) => (
 								<FormItem>
@@ -327,6 +352,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 							)}
 						/>
 						<FormField
+							control={form.control}
 							name="password"
 							render={({ field }) => (
 								<FormItem>
@@ -340,7 +366,9 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 							)}
 						/>
 						<FormField
+							control={form.control}
 							name="vers"
+							defaultValue="3.0"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>SMB Version</FormLabel>
@@ -363,12 +391,13 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 							)}
 						/>
 						<FormField
+							control={form.control}
 							name="domain"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Domain (Optional)</FormLabel>
 									<FormControl>
-										<Input placeholder="WORKGROUP" value={field.value ?? ""} onChange={field.onChange} />
+										<Input placeholder="WORKGROUP" value={field.value} onChange={field.onChange} />
 									</FormControl>
 									<FormDescription>Domain or workgroup for authentication (optional).</FormDescription>
 									<FormMessage />
@@ -376,7 +405,9 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 							)}
 						/>
 						<FormField
+							control={form.control}
 							name="port"
+							defaultValue={445}
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Port</FormLabel>
@@ -384,7 +415,8 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 										<Input
 											type="number"
 											placeholder="445"
-											value={field.value ?? ""}
+											value={field.value}
+											defaultValue={445}
 											onChange={(e) => field.onChange(parseInt(e.target.value, 10) || undefined)}
 										/>
 									</FormControl>

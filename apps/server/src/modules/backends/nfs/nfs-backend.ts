@@ -1,12 +1,12 @@
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import { BACKEND_STATUS, type BackendConfig } from "@ironmount/schemas";
-import type { VolumeBackend } from "../backend";
-import { logger } from "../../../utils/logger";
-import { withTimeout } from "../../../utils/timeout";
 import { OPERATION_TIMEOUT } from "../../../core/constants";
 import { toMessage } from "../../../utils/errors";
+import { logger } from "../../../utils/logger";
 import { getMountForPath } from "../../../utils/mountinfo";
+import { withTimeout } from "../../../utils/timeout";
+import type { VolumeBackend } from "../backend";
 import { createTestFile, executeMount, executeUnmount } from "../utils/backend-utils";
 
 const mount = async (config: BackendConfig, path: string) => {
@@ -78,10 +78,9 @@ const unmount = async (path: string) => {
 
 	try {
 		return await withTimeout(run(), OPERATION_TIMEOUT, "NFS unmount");
-	} catch (err: any) {
-		const msg = err.stderr?.toString().trim() || err.message;
-		logger.error("Error unmounting NFS volume", { path, error: msg });
-		return { status: BACKEND_STATUS.error, error: msg };
+	} catch (err) {
+		logger.error("Error unmounting NFS volume", { path, error: toMessage(err) });
+		return { status: BACKEND_STATUS.error, error: toMessage(err) };
 	}
 };
 

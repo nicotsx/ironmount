@@ -1,7 +1,6 @@
-import { volumeConfigSchema } from "@ironmount/schemas";
+import { volumeConfigSchemaNoUndefined } from "@ironmount/schemas";
 import { type } from "arktype";
-import { describeRoute } from "hono-openapi";
-import { resolver } from "hono-openapi/arktype";
+import { describeRoute, resolver } from "hono-openapi";
 
 const volumeSchema = type({
 	name: "string",
@@ -12,7 +11,7 @@ const volumeSchema = type({
 	createdAt: "number",
 	updatedAt: "number",
 	lastHealthCheck: "number",
-	config: volumeConfigSchema,
+	config: volumeConfigSchemaNoUndefined,
 	autoRemount: "boolean",
 });
 
@@ -30,7 +29,6 @@ export const listVolumesDto = describeRoute({
 	description: "List all volumes",
 	tags: ["Volumes"],
 	operationId: "listVolumes",
-	validateResponse: true,
 	responses: {
 		200: {
 			description: "A list of volumes",
@@ -48,7 +46,7 @@ export const listVolumesDto = describeRoute({
  */
 export const createVolumeBody = type({
 	name: "string",
-	config: volumeConfigSchema,
+	config: volumeConfigSchemaNoUndefined,
 });
 
 export const createVolumeResponse = type({
@@ -62,7 +60,6 @@ export const createVolumeResponse = type({
 export const createVolumeDto = describeRoute({
 	description: "Create a new volume",
 	operationId: "createVolume",
-	validateResponse: true,
 	tags: ["Volumes"],
 	responses: {
 		201: {
@@ -86,7 +83,6 @@ export const deleteVolumeResponse = type({
 export const deleteVolumeDto = describeRoute({
 	description: "Delete a volume",
 	operationId: "deleteVolume",
-	validateResponse: true,
 	tags: ["Volumes"],
 	responses: {
 		200: {
@@ -118,7 +114,6 @@ export type GetVolumeResponseDto = typeof getVolumeResponse.infer;
 export const getVolumeDto = describeRoute({
 	description: "Get a volume by name",
 	operationId: "getVolume",
-	validateResponse: true,
 	tags: ["Volumes"],
 	responses: {
 		200: {
@@ -140,7 +135,7 @@ export const getVolumeDto = describeRoute({
  */
 export const updateVolumeBody = type({
 	autoRemount: "boolean?",
-	config: volumeConfigSchema.optional(),
+	config: volumeConfigSchemaNoUndefined.optional(),
 });
 
 export type UpdateVolumeBody = typeof updateVolumeBody.infer;
@@ -153,7 +148,6 @@ export const updateVolumeResponse = type({
 export const updateVolumeDto = describeRoute({
 	description: "Update a volume's configuration",
 	operationId: "updateVolume",
-	validateResponse: true,
 	tags: ["Volumes"],
 	responses: {
 		200: {
@@ -176,7 +170,7 @@ export type UpdateVolumeResponseDto = typeof updateVolumeResponse.infer;
  * Test connection
  */
 export const testConnectionBody = type({
-	config: volumeConfigSchema,
+	config: volumeConfigSchemaNoUndefined,
 });
 
 export const testConnectionResponse = type({
@@ -187,7 +181,6 @@ export const testConnectionResponse = type({
 export const testConnectionDto = describeRoute({
 	description: "Test connection to backend",
 	operationId: "testConnection",
-	validateResponse: true,
 	tags: ["Volumes"],
 	responses: {
 		200: {
@@ -212,7 +205,6 @@ export const mountVolumeResponse = type({
 export const mountVolumeDto = describeRoute({
 	description: "Mount a volume",
 	operationId: "mountVolume",
-	validateResponse: true,
 	tags: ["Volumes"],
 	responses: {
 		200: {
@@ -240,7 +232,6 @@ export const unmountVolumeResponse = type({
 export const unmountVolumeDto = describeRoute({
 	description: "Unmount a volume",
 	operationId: "unmountVolume",
-	validateResponse: true,
 	tags: ["Volumes"],
 	responses: {
 		200: {
@@ -265,7 +256,6 @@ export const healthCheckResponse = type({
 export const healthCheckDto = describeRoute({
 	description: "Perform a health check on a volume",
 	operationId: "healthCheckVolume",
-	validateResponse: true,
 	tags: ["Volumes"],
 	responses: {
 		200: {
@@ -300,7 +290,6 @@ export type ListContainersResponseDto = typeof listContainersResponse.infer;
 export const getContainersDto = describeRoute({
 	description: "Get containers using a volume by name",
 	operationId: "getContainersUsingVolume",
-	validateResponse: true,
 	tags: ["Volumes"],
 	responses: {
 		200: {

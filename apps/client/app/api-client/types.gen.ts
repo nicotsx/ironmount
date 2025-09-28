@@ -23,7 +23,7 @@ export type ListVolumesResponses = {
 						exportPath: string;
 						server: string;
 						version: "3" | "4" | "4.1";
-						port?: number | string;
+						port?: number;
 				  }
 				| {
 						backend: "smb";
@@ -32,20 +32,20 @@ export type ListVolumesResponses = {
 						share: string;
 						username: string;
 						vers?: "1.0" | "2.0" | "2.1" | "3.0";
-						port?: number | string;
+						port?: number;
 						domain?: string;
 				  }
 				| {
 						backend: "webdav";
 						path: string;
 						server: string;
-						port?: number | string;
+						port?: number;
 						password?: string;
 						ssl?: boolean;
 						username?: string;
 				  };
 			createdAt: number;
-			lastError: string;
+			lastError: string | null;
 			lastHealthCheck: number;
 			name: string;
 			path: string;
@@ -69,7 +69,7 @@ export type CreateVolumeData = {
 					exportPath: string;
 					server: string;
 					version: "3" | "4" | "4.1";
-					port?: number | string;
+					port?: number;
 			  }
 			| {
 					backend: "smb";
@@ -78,14 +78,14 @@ export type CreateVolumeData = {
 					share: string;
 					username: string;
 					vers?: "1.0" | "2.0" | "2.1" | "3.0";
-					port?: number | string;
+					port?: number;
 					domain?: string;
 			  }
 			| {
 					backend: "webdav";
 					path: string;
 					server: string;
-					port?: number | string;
+					port?: number;
 					password?: string;
 					ssl?: boolean;
 					username?: string;
@@ -123,7 +123,7 @@ export type TestConnectionData = {
 					exportPath: string;
 					server: string;
 					version: "3" | "4" | "4.1";
-					port?: number | string;
+					port?: number;
 			  }
 			| {
 					backend: "smb";
@@ -132,14 +132,14 @@ export type TestConnectionData = {
 					share: string;
 					username: string;
 					vers?: "1.0" | "2.0" | "2.1" | "3.0";
-					port?: number | string;
+					port?: number;
 					domain?: string;
 			  }
 			| {
 					backend: "webdav";
 					path: string;
 					server: string;
-					port?: number | string;
+					port?: number;
 					password?: string;
 					ssl?: boolean;
 					username?: string;
@@ -219,7 +219,7 @@ export type GetVolumeResponses = {
 						exportPath: string;
 						server: string;
 						version: "3" | "4" | "4.1";
-						port?: number | string;
+						port?: number;
 				  }
 				| {
 						backend: "smb";
@@ -228,20 +228,20 @@ export type GetVolumeResponses = {
 						share: string;
 						username: string;
 						vers?: "1.0" | "2.0" | "2.1" | "3.0";
-						port?: number | string;
+						port?: number;
 						domain?: string;
 				  }
 				| {
 						backend: "webdav";
 						path: string;
 						server: string;
-						port?: number | string;
+						port?: number;
 						password?: string;
 						ssl?: boolean;
 						username?: string;
 				  };
 			createdAt: number;
-			lastError: string;
+			lastError: string | null;
 			lastHealthCheck: number;
 			name: string;
 			path: string;
@@ -266,7 +266,7 @@ export type UpdateVolumeData = {
 					exportPath: string;
 					server: string;
 					version: "3" | "4" | "4.1";
-					port?: number | string;
+					port?: number;
 			  }
 			| {
 					backend: "smb";
@@ -275,14 +275,14 @@ export type UpdateVolumeData = {
 					share: string;
 					username: string;
 					vers?: "1.0" | "2.0" | "2.1" | "3.0";
-					port?: number | string;
+					port?: number;
 					domain?: string;
 			  }
 			| {
 					backend: "webdav";
 					path: string;
 					server: string;
-					port?: number | string;
+					port?: number;
 					password?: string;
 					ssl?: boolean;
 					username?: string;
@@ -319,7 +319,7 @@ export type UpdateVolumeResponses = {
 						exportPath: string;
 						server: string;
 						version: "3" | "4" | "4.1";
-						port?: number | string;
+						port?: number;
 				  }
 				| {
 						backend: "smb";
@@ -328,20 +328,20 @@ export type UpdateVolumeResponses = {
 						share: string;
 						username: string;
 						vers?: "1.0" | "2.0" | "2.1" | "3.0";
-						port?: number | string;
+						port?: number;
 						domain?: string;
 				  }
 				| {
 						backend: "webdav";
 						path: string;
 						server: string;
-						port?: number | string;
+						port?: number;
 						password?: string;
 						ssl?: boolean;
 						username?: string;
 				  };
 			createdAt: number;
-			lastError: string;
+			lastError: string | null;
 			lastHealthCheck: number;
 			name: string;
 			path: string;
@@ -472,5 +472,5 @@ export type HealthCheckVolumeResponses = {
 export type HealthCheckVolumeResponse = HealthCheckVolumeResponses[keyof HealthCheckVolumeResponses];
 
 export type ClientOptions = {
-	baseUrl: "http://localhost:3000" | (string & {});
+	baseUrl: "http://localhost:4096" | (string & {});
 };

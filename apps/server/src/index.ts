@@ -3,7 +3,7 @@ import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { logger as honoLogger } from "hono/logger";
-import { openAPISpecs } from "hono-openapi";
+import { openAPIRouteHandler } from "hono-openapi";
 import { runDbMigrations } from "./db/db";
 import { driverController } from "./modules/driver/driver.controller";
 import { startup } from "./modules/lifecycle/startup";
@@ -12,14 +12,14 @@ import { handleServiceError } from "./utils/errors";
 import { logger } from "./utils/logger";
 
 export const generalDescriptor = (app: Hono) =>
-	openAPISpecs(app, {
+	openAPIRouteHandler(app, {
 		documentation: {
 			info: {
 				title: "Ironmount API",
 				version: "1.0.0",
 				description: "API for managing volumes",
 			},
-			servers: [{ url: "http://localhost:3000", description: "Development Server" }],
+			servers: [{ url: "http://localhost:4096", description: "Development Server" }],
 		},
 	});
 

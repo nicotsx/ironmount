@@ -28,8 +28,15 @@ export const DockerTabContent = ({ volume }: Props) => {
 
 	const dockerRunCommand = `docker run -v im-${volume.name}:/path/in/container nginx:latest`;
 
-	const containersQuery = getContainersUsingVolumeOptions({ path: { name: volume.name } });
-	const { data: containersData, isLoading, error } = useQuery(containersQuery);
+	const {
+		data: containersData,
+		isLoading,
+		error,
+	} = useQuery({
+		...getContainersUsingVolumeOptions({ path: { name: volume.name } }),
+		refetchInterval: 10000,
+		refetchOnWindowFocus: true,
+	});
 
 	const containers = containersData?.containers || [];
 

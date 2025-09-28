@@ -13,9 +13,6 @@
     "noImplicitOverride": true,
     "module": "preserve",
     "noEmit": true,
-    "lib": ["es2022"],
-    "paths": {
-      "~/*": ["./src/*"]
-    },
+    "lib": ["es2022"]
   }
 }
