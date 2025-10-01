@@ -1,5 +1,4 @@
 import { MutationCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { Toaster } from "~/components/ui/sonner";
 
@@ -52,7 +51,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
 					<ScrollRestoration />
 					<Scripts />
 				</body>
-				<ReactQueryDevtools initialIsOpen={false} />
 			</QueryClientProvider>
 		</html>
 	);

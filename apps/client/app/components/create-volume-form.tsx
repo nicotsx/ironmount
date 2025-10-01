@@ -52,25 +52,20 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 		form.reset({ name: watchedName, ...defaultValuesForType[watchedBackend as keyof typeof defaultValuesForType] });
 	}, [watchedBackend, watchedName, form.reset]);
 
-	const [testStatus, setTestStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 	const [testMessage, setTestMessage] = useState<string>("");
 
 	const testBackendConnection = useMutation({
 		...testConnectionMutation(),
 		onMutate: () => {
 			setTestMessage("");
-			setTestStatus("loading");
 		},
 		onError: () => {
-			setTestStatus("error");
 			setTestMessage("Failed to test connection. Please try again.");
 		},
 		onSuccess: (data) => {
 			if (data?.success) {
-				setTestStatus("success");
 				setTestMessage(data.message);
 			} else {
-				setTestStatus("error");
 				setTestMessage(data?.message || "Connection test failed");
 			}
 		},
@@ -435,30 +430,24 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 								type="button"
 								variant="outline"
 								onClick={handleTestConnection}
-								disabled={
-									testStatus === "loading" ||
-									!form.watch("server") ||
-									!form.watch("share") ||
-									!form.watch("username") ||
-									!form.watch("password")
-								}
+								disabled={testBackendConnection.isPending}
 								className="flex-1"
 							>
-								{testStatus === "loading" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-								{testStatus === "success" && <CheckCircle className="mr-2 h-4 w-4 text-green-500" />}
-								{testStatus === "error" && <XCircle className="mr-2 h-4 w-4 text-red-500" />}
-								{testStatus === "idle" && "Test Connection"}
-								{testStatus === "loading" && "Testing..."}
-								{testStatus === "success" && "Connection Successful"}
-								{testStatus === "error" && "Test Failed"}
+								{testBackendConnection.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+								{testBackendConnection.isSuccess && <CheckCircle className="mr-2 h-4 w-4 text-green-500" />}
+								{testBackendConnection.isError && <XCircle className="mr-2 h-4 w-4 text-red-500" />}
+								{testBackendConnection.isIdle && "Test Connection"}
+								{testBackendConnection.isPending && "Testing..."}
+								{testBackendConnection.isSuccess && "Connection Successful"}
+								{testBackendConnection.isError && "Test Failed"}
 							</Button>
 						</div>
 						{testMessage && (
 							<div
 								className={`text-sm p-2 rounded-md ${
-									testStatus === "success"
+									testBackendConnection.isSuccess
 										? "bg-green-50 text-green-700 border border-green-200"
-										: testStatus === "error"
+										: testBackendConnection.isError
 											? "bg-red-50 text-red-700 border border-red-200"
 											: "bg-gray-50 text-gray-700 border border-gray-200"
 								}`}
@@ -476,24 +465,24 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 								type="button"
 								variant="outline"
 								onClick={handleTestConnection}
-								disabled={testStatus === "loading" || !form.watch("server") || !form.watch("exportPath")}
+								disabled={testBackendConnection.isPending}
 								className="flex-1"
 							>
-								{testStatus === "loading" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-								{testStatus === "success" && <CheckCircle className="mr-2 h-4 w-4 text-green-500" />}
-								{testStatus === "error" && <XCircle className="mr-2 h-4 w-4 text-red-500" />}
-								{testStatus === "idle" && "Test Connection"}
-								{testStatus === "loading" && "Testing..."}
-								{testStatus === "success" && "Connection Successful"}
-								{testStatus === "error" && "Test Failed"}
+								{testBackendConnection.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+								{testBackendConnection.isSuccess && <CheckCircle className="mr-2 h-4 w-4 text-green-500" />}
+								{testBackendConnection.isError && <XCircle className="mr-2 h-4 w-4 text-red-500" />}
+								{testBackendConnection.isIdle && "Test Connection"}
+								{testBackendConnection.isPending && "Testing..."}
+								{testBackendConnection.isSuccess && "Connection Successful"}
+								{testBackendConnection.isError && "Test Failed"}
 							</Button>
 						</div>
 						{testMessage && (
 							<div
 								className={`text-sm p-2 rounded-md ${
-									testStatus === "success"
+									testBackendConnection.isSuccess
 										? "bg-green-50 text-green-700 border border-green-200"
-										: testStatus === "error"
+										: testBackendConnection.isError
 											? "bg-red-50 text-red-700 border border-red-200"
 											: "bg-gray-50 text-gray-700 border border-gray-200"
 								}`}
@@ -511,24 +500,24 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 								type="button"
 								variant="outline"
 								onClick={handleTestConnection}
-								disabled={testStatus === "loading" || !form.watch("server") || !form.watch("path")}
+								disabled={testBackendConnection.isPending}
 								className="flex-1"
 							>
-								{testStatus === "loading" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-								{testStatus === "success" && <CheckCircle className="mr-2 h-4 w-4 text-green-500" />}
-								{testStatus === "error" && <XCircle className="mr-2 h-4 w-4 text-red-500" />}
-								{testStatus === "idle" && "Test Connection"}
-								{testStatus === "loading" && "Testing..."}
-								{testStatus === "success" && "Connection Successful"}
-								{testStatus === "error" && "Test Failed"}
+								{testBackendConnection.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+								{testBackendConnection.isSuccess && <CheckCircle className="mr-2 h-4 w-4 text-green-500" />}
+								{testBackendConnection.isError && <XCircle className="mr-2 h-4 w-4 text-red-500" />}
+								{testBackendConnection.isIdle && "Test Connection"}
+								{testBackendConnection.isPending && "Testing..."}
+								{testBackendConnection.isSuccess && "Connection Successful"}
+								{testBackendConnection.isError && "Test Failed"}
 							</Button>
 						</div>
 						{testMessage && (
 							<div
 								className={`text-sm p-2 rounded-md ${
-									testStatus === "success"
+									testBackendConnection.isSuccess
 										? "bg-green-50 text-green-700 border border-green-200"
-										: testStatus === "error"
+										: testBackendConnection.isError
 											? "bg-red-50 text-red-700 border border-red-200"
 											: "bg-gray-50 text-gray-700 border border-gray-200"
 								}`}
