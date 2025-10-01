@@ -23,7 +23,7 @@ Ironmount is an easy to use web interface to manage your remote storage and moun
 
 ### Features
 
-- ✅&nbsp; Support for multiple protocols: NFS, SMB, FTP, Directory
+- ✅&nbsp; Support for multiple protocols: NFS, SMB, WebDAV, Directory
 - 📡&nbsp; Mount your remote storage as local folders
 - 🐳&nbsp; Docker integration: mount your remote storage directly into your containers via a docker volume syntax
 - 🔍&nbsp; Keep an eye on your mounts with health checks and automatic remounting on error
@@ -33,7 +33,7 @@ Ironmount is an easy to use web interface to manage your remote storage and moun
 
 - 🔐&nbsp; User authentication and role management
 - 💾&nbsp; Automated backups and snapshots with encryption, strategies and retention policies
-- 🔄&nbsp; Re-exporting your mounts to other protocols (e.g. mount an FTP server as an SMB share with fine-grained permissions)
+- 🔄&nbsp; Re-exporting your mounts to other protocols (e.g. mount an NFS server as an SMB share with fine-grained permissions)
 - ☁️&nbsp; Integration with cloud storage providers (e.g. AWS S3, Google Drive, Dropbox)
 - 🔀&nbsp; Storage sharding and replication for high availability and performance
 
