@@ -62,6 +62,8 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}.{{patch}},prefix=v,enable=${{ needs.determine-release-type.outputs.release_type == 'release' }}
           flavor: |
             latest=${{ needs.determine-release-type.outputs.release_type == 'release' }}
+          cache-from: type=registry,ref=ghcr.io/nicotsx/ironmount:buildcache
+          cache-to: type=registry,ref=ghcr.io/nicotsx/ironmount:buildcache,mode=max
 
       - name: Build and push images
         uses: docker/build-push-action@v6
