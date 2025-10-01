@@ -67,7 +67,7 @@ volumes:
 Then, run the following command to start Ironmount:
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 Once the container is running, you can access the web interface at `http://<your-server-ip>:4096`.
