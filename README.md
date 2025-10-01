@@ -23,8 +23,6 @@ Ironmount is an easy to use web interface to manage your remote storage and moun
 
 ### Features
 
-https://github.com/nicotsx/ironmount/blob/main/screenshots/volume-creation.png?raw=true
-
 - ✅&nbsp; Support for multiple protocols: NFS, SMB, FTP, Directory
 - 📡&nbsp; Mount your remote storage as local folders
 - 🐳&nbsp; Docker integration: mount your remote storage directly into your containers via a docker volume syntax
@@ -46,7 +44,7 @@ In order to run Ironmount, you need to have Docker and Docker Compose installed 
 ```yaml
 services:
   ironmount:
-    image: nicotsx/ironmount:v0.0.1
+    image: ghcr.io/nicotsx/ironmount:v0.0.1
     container_name: ironmount
     restart: unless-stopped
     cap_add:
