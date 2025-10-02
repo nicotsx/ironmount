@@ -31,7 +31,6 @@ Ironmount is an easy to use web interface to manage your remote storage and moun
 
 ### Coming soon
 
-- User authentication
 - Automated backups with encryption and retention policies
 - Integration with cloud storage providers (e.g. AWS S3, Google Drive, Dropbox)
 
