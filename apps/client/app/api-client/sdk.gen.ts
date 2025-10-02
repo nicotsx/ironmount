@@ -68,6 +68,10 @@ export const register = <ThrowOnError extends boolean = false>(options?: Options
 	return (options?.client ?? _heyApiClient).post<RegisterResponses, RegisterErrors, ThrowOnError>({
 		url: "/api/v1/auth/register",
 		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options?.headers,
+		},
 	});
 };
 
@@ -78,6 +82,10 @@ export const login = <ThrowOnError extends boolean = false>(options?: Options<Lo
 	return (options?.client ?? _heyApiClient).post<LoginResponses, LoginErrors, ThrowOnError>({
 		url: "/api/v1/auth/login",
 		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options?.headers,
+		},
 	});
 };
 

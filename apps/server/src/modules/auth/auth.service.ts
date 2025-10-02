@@ -10,10 +10,10 @@ export class AuthService {
 	 * Register a new user with username and password
 	 */
 	async register(username: string, password: string) {
-		const [existingUser] = await db.select().from(usersTable).where(eq(usersTable.username, username));
+		const [existingUser] = await db.select().from(usersTable);
 
 		if (existingUser) {
-			throw new Error("Username already exists");
+			throw new Error("Admin user already exists");
 		}
 
 		const passwordHash = await Bun.password.hash(password, {
@@ -29,8 +29,16 @@ export class AuthService {
 		}
 
 		logger.info(`User registered: ${username}`);
+		const sessionId = crypto.randomUUID();
+		const expiresAt = new Date(Date.now() + SESSION_DURATION);
 
-		return { user: { id: user.id, username: user.username, createdAt: user.createdAt } };
+		await db.insert(sessionsTable).values({
+			id: sessionId,
+			userId: user.id,
+			expiresAt,
+		});
+
+		return { user: { id: user.id, username: user.username, createdAt: user.createdAt }, sessionId };
 	}
 
 	/**
@@ -117,6 +125,14 @@ export class AuthService {
 		if (result.length > 0) {
 			logger.info(`Cleaned up ${result.length} expired sessions`);
 		}
+	}
+
+	/**
+	 * Check if any users exist in the system
+	 */
+	async hasUsers(): Promise<boolean> {
+		const [user] = await db.select({ id: usersTable.id }).from(usersTable).limit(1);
+		return !!user;
 	}
 }
 

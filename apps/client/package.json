@@ -36,14 +36,14 @@
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0",
 		"react-hook-form": "^7.62.0",
-		"react-router": "^7.7.1",
+		"react-router": "^7.9.3",
 		"recharts": "2.15.4",
 		"sonner": "^2.0.7",
 		"tailwind-merge": "^3.3.1",
 		"yaml": "^2.8.1"
 	},
 	"devDependencies": {
-		"@react-router/dev": "^7.7.1",
+		"@react-router/dev": "^7.9.3",
 		"@tailwindcss/vite": "^4.1.4",
 		"@types/node": "^20",
 		"@types/prismjs": "^1.26.5",
