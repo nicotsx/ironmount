@@ -17,3 +17,24 @@ export const volumesTable = sqliteTable("volumes_table", {
 });
 
 export type Volume = typeof volumesTable.$inferSelect;
+
+export const usersTable = sqliteTable("users_table", {
+	id: int().primaryKey({ autoIncrement: true }),
+	username: text().notNull().unique(),
+	passwordHash: text("password_hash").notNull(),
+	createdAt: int("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+	updatedAt: int("updated_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+});
+
+export type User = typeof usersTable.$inferSelect;
+
+export const sessionsTable = sqliteTable("sessions_table", {
+	id: text().primaryKey(),
+	userId: int("user_id")
+		.notNull()
+		.references(() => usersTable.id, { onDelete: "cascade" }),
+	expiresAt: int("expires_at", { mode: "timestamp" }).notNull(),
+	createdAt: int("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+});
+
+export type Session = typeof sessionsTable.$inferSelect;

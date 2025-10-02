@@ -31,11 +31,9 @@ Ironmount is an easy to use web interface to manage your remote storage and moun
 
 ### Coming soon
 
-- 🔐&nbsp; User authentication and role management
-- 💾&nbsp; Automated backups and snapshots with encryption, strategies and retention policies
-- 🔄&nbsp; Re-exporting your mounts to other protocols (e.g. mount an NFS server as an SMB share with fine-grained permissions)
-- ☁️&nbsp; Integration with cloud storage providers (e.g. AWS S3, Google Drive, Dropbox)
-- 🔀&nbsp; Storage sharding and replication for high availability and performance
+- User authentication
+- Automated backups with encryption and retention policies
+- Integration with cloud storage providers (e.g. AWS S3, Google Drive, Dropbox)
 
 ## Installation
 

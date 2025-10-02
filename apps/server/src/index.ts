@@ -5,6 +5,8 @@ import { serveStatic } from "hono/bun";
 import { logger as honoLogger } from "hono/logger";
 import { openAPIRouteHandler } from "hono-openapi";
 import { runDbMigrations } from "./db/db";
+import { authController } from "./modules/auth/auth.controller";
+import { requireAuth } from "./modules/auth/auth.middleware";
 import { driverController } from "./modules/driver/driver.controller";
 import { startup } from "./modules/lifecycle/startup";
 import { volumeController } from "./modules/volumes/volume.controller";
@@ -35,7 +37,8 @@ const app = new Hono()
 	.get("*", serveStatic({ root: "./assets/frontend" }))
 	.get("healthcheck", (c) => c.json({ status: "ok" }))
 	.basePath("/api/v1")
-	.route("/volumes", volumeController);
+	.route("/auth", authController)
+	.route("/volumes", volumeController.use(requireAuth));
 
 app.get("/openapi.json", generalDescriptor(app));
 app.get("/docs", scalarDescriptor);
