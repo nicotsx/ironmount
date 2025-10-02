@@ -13,7 +13,7 @@ export default function Layout() {
 			)}
 		>
 			<div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-black"></div>
-			<main className="relative flex flex-col pt-4 sm:pt-8 px-2 sm:px-4 pb-4 container mx-auto max-w-full">
+			<main className="relative flex flex-col pt-4 sm:pt-8 px-2 sm:px-4 pb-4 container mx-auto">
 				<AppBreadcrumb />
 				<Outlet />
 			</main>

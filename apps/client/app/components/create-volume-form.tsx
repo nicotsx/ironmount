@@ -6,7 +6,7 @@ import { CheckCircle, Loader2, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { testConnectionMutation } from "~/api-client/@tanstack/react-query.gen";
-import { slugify } from "~/lib/utils";
+import { cn, slugify } from "~/lib/utils";
 import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
@@ -24,6 +24,7 @@ type Props = {
 	initialValues?: Partial<FormValues>;
 	formId?: string;
 	loading?: boolean;
+	className?: string;
 };
 
 const defaultValuesForType = {
@@ -33,7 +34,7 @@ const defaultValuesForType = {
 	webdav: { backend: "webdav" as const, port: 80, ssl: false },
 };
 
-export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, formId, loading }: Props) => {
+export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, formId, loading, className }: Props) => {
 	const form = useForm<FormValues>({
 		resolver: arktypeResolver(formSchema),
 		defaultValues: initialValues,
@@ -83,7 +84,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 
 	return (
 		<Form {...form}>
-			<form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+			<form id={formId} onSubmit={form.handleSubmit(onSubmit)} className={cn("space-y-4", className)}>
 				<FormField
 					control={form.control}
 					name="name"

@@ -50,9 +50,9 @@ export const CreateVolumeDialog = ({ open, setOpen }: Props) => {
 				<ScrollArea className="h-[500px]">
 					<DialogHeader>
 						<DialogTitle>Create volume</DialogTitle>
-						<DialogDescription>Enter a name for the new volume</DialogDescription>
 					</DialogHeader>
 					<CreateVolumeForm
+						className="mt-4"
 						mode="create"
 						formId={formId}
 						onSubmit={(values) => {

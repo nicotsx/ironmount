@@ -125,7 +125,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 								</TableCell>
 								<TableCell className="hidden sm:table-cell">
 									<span className="flex items-center gap-2">
-										<span className="text-muted-foreground text-xs truncate bg-primary/10 rounded-md px-2 py-1 max-w-[200px]">
+										<span className="text-muted-foreground text-xs truncate bg-primary/10 rounded-md px-2 py-1">
 											{volume.path}
 										</span>
 										<Copy size={10} />
