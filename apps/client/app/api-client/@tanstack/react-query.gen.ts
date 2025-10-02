@@ -2,6 +2,11 @@
 
 import {
 	type Options,
+	register,
+	login,
+	logout,
+	getMe,
+	getStatus,
 	listVolumes,
 	createVolume,
 	testConnection,
@@ -15,6 +20,14 @@ import {
 } from "../sdk.gen";
 import { queryOptions, type UseMutationOptions, type DefaultError } from "@tanstack/react-query";
 import type {
+	RegisterData,
+	RegisterResponse,
+	LoginData,
+	LoginResponse,
+	LogoutData,
+	LogoutResponse,
+	GetMeData,
+	GetStatusData,
 	ListVolumesData,
 	CreateVolumeData,
 	CreateVolumeResponse,
@@ -72,6 +85,163 @@ const createQueryKey = <TOptions extends Options>(
 		params.query = options.query;
 	}
 	return [params];
+};
+
+export const registerQueryKey = (options?: Options<RegisterData>) => createQueryKey("register", options);
+
+/**
+ * Register a new user
+ */
+export const registerOptions = (options?: Options<RegisterData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await register({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: registerQueryKey(options),
+	});
+};
+
+/**
+ * Register a new user
+ */
+export const registerMutation = (
+	options?: Partial<Options<RegisterData>>,
+): UseMutationOptions<RegisterResponse, DefaultError, Options<RegisterData>> => {
+	const mutationOptions: UseMutationOptions<RegisterResponse, DefaultError, Options<RegisterData>> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await register({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
+};
+
+export const loginQueryKey = (options?: Options<LoginData>) => createQueryKey("login", options);
+
+/**
+ * Login with username and password
+ */
+export const loginOptions = (options?: Options<LoginData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await login({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: loginQueryKey(options),
+	});
+};
+
+/**
+ * Login with username and password
+ */
+export const loginMutation = (
+	options?: Partial<Options<LoginData>>,
+): UseMutationOptions<LoginResponse, DefaultError, Options<LoginData>> => {
+	const mutationOptions: UseMutationOptions<LoginResponse, DefaultError, Options<LoginData>> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await login({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
+};
+
+export const logoutQueryKey = (options?: Options<LogoutData>) => createQueryKey("logout", options);
+
+/**
+ * Logout current user
+ */
+export const logoutOptions = (options?: Options<LogoutData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await logout({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: logoutQueryKey(options),
+	});
+};
+
+/**
+ * Logout current user
+ */
+export const logoutMutation = (
+	options?: Partial<Options<LogoutData>>,
+): UseMutationOptions<LogoutResponse, DefaultError, Options<LogoutData>> => {
+	const mutationOptions: UseMutationOptions<LogoutResponse, DefaultError, Options<LogoutData>> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await logout({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
+};
+
+export const getMeQueryKey = (options?: Options<GetMeData>) => createQueryKey("getMe", options);
+
+/**
+ * Get current authenticated user
+ */
+export const getMeOptions = (options?: Options<GetMeData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await getMe({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: getMeQueryKey(options),
+	});
+};
+
+export const getStatusQueryKey = (options?: Options<GetStatusData>) => createQueryKey("getStatus", options);
+
+/**
+ * Get authentication system status
+ */
+export const getStatusOptions = (options?: Options<GetStatusData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await getStatus({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: getStatusQueryKey(options),
+	});
 };
 
 export const listVolumesQueryKey = (options?: Options<ListVolumesData>) => createQueryKey("listVolumes", options);

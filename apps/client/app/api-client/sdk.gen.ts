@@ -2,6 +2,19 @@
 
 import type { Options as ClientOptions, TDataShape, Client } from "./client";
 import type {
+	RegisterData,
+	RegisterResponses,
+	RegisterErrors,
+	LoginData,
+	LoginResponses,
+	LoginErrors,
+	LogoutData,
+	LogoutResponses,
+	GetMeData,
+	GetMeResponses,
+	GetMeErrors,
+	GetStatusData,
+	GetStatusResponses,
 	ListVolumesData,
 	ListVolumesResponses,
 	CreateVolumeData,
@@ -46,6 +59,56 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 	 * used to access values that aren't defined as part of the SDK function.
 	 */
 	meta?: Record<string, unknown>;
+};
+
+/**
+ * Register a new user
+ */
+export const register = <ThrowOnError extends boolean = false>(options?: Options<RegisterData, ThrowOnError>) => {
+	return (options?.client ?? _heyApiClient).post<RegisterResponses, RegisterErrors, ThrowOnError>({
+		url: "/api/v1/auth/register",
+		...options,
+	});
+};
+
+/**
+ * Login with username and password
+ */
+export const login = <ThrowOnError extends boolean = false>(options?: Options<LoginData, ThrowOnError>) => {
+	return (options?.client ?? _heyApiClient).post<LoginResponses, LoginErrors, ThrowOnError>({
+		url: "/api/v1/auth/login",
+		...options,
+	});
+};
+
+/**
+ * Logout current user
+ */
+export const logout = <ThrowOnError extends boolean = false>(options?: Options<LogoutData, ThrowOnError>) => {
+	return (options?.client ?? _heyApiClient).post<LogoutResponses, unknown, ThrowOnError>({
+		url: "/api/v1/auth/logout",
+		...options,
+	});
+};
+
+/**
+ * Get current authenticated user
+ */
+export const getMe = <ThrowOnError extends boolean = false>(options?: Options<GetMeData, ThrowOnError>) => {
+	return (options?.client ?? _heyApiClient).get<GetMeResponses, GetMeErrors, ThrowOnError>({
+		url: "/api/v1/auth/me",
+		...options,
+	});
+};
+
+/**
+ * Get authentication system status
+ */
+export const getStatus = <ThrowOnError extends boolean = false>(options?: Options<GetStatusData, ThrowOnError>) => {
+	return (options?.client ?? _heyApiClient).get<GetStatusResponses, unknown, ThrowOnError>({
+		url: "/api/v1/auth/status",
+		...options,
+	});
 };
 
 /**
