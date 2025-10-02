@@ -12,6 +12,9 @@
 html,
 body {
 	@apply bg-white dark:bg-[#0D0D0D];
+	overflow-x: hidden;
+	width: 100%;
+	position: relative;
 
 	@media (prefers-color-scheme: dark) {
 		color-scheme: dark;
