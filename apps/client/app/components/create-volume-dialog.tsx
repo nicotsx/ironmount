@@ -15,6 +15,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "./ui/dialog";
+import { ScrollArea } from "./ui/scroll-area";
 
 type Props = {
 	open: boolean;
@@ -46,25 +47,27 @@ export const CreateVolumeDialog = ({ open, setOpen }: Props) => {
 				</Button>
 			</DialogTrigger>
 			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Create volume</DialogTitle>
-					<DialogDescription>Enter a name for the new volume</DialogDescription>
-				</DialogHeader>
-				<CreateVolumeForm
-					mode="create"
-					formId={formId}
-					onSubmit={(values) => {
-						create.mutate({ body: { config: values, name: values.name } });
-					}}
-				/>
-				<DialogFooter>
-					<Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-						Cancel
-					</Button>
-					<Button type="submit" form={formId} disabled={create.isPending}>
-						Create
-					</Button>
-				</DialogFooter>
+				<ScrollArea className="h-[500px]">
+					<DialogHeader>
+						<DialogTitle>Create volume</DialogTitle>
+						<DialogDescription>Enter a name for the new volume</DialogDescription>
+					</DialogHeader>
+					<CreateVolumeForm
+						mode="create"
+						formId={formId}
+						onSubmit={(values) => {
+							create.mutate({ body: { config: values, name: values.name } });
+						}}
+					/>
+					<DialogFooter className="mt-4">
+						<Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+							Cancel
+						</Button>
+						<Button type="submit" form={formId} disabled={create.isPending}>
+							Create
+						</Button>
+					</DialogFooter>
+				</ScrollArea>
 			</DialogContent>
 		</Dialog>
 	);
