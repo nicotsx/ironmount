@@ -1,19 +1,32 @@
+import { arktypeResolver } from "@hookform/resolvers/arktype";
 import { useMutation } from "@tanstack/react-query";
-import { useId, useState } from "react";
+import { type } from "arktype";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { loginMutation } from "~/api-client/@tanstack/react-query.gen";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
+
+const loginSchema = type({
+	username: "2<=string<=50",
+	password: "string>=1",
+});
+
+type LoginFormValues = typeof loginSchema.inferIn;
 
 export default function LoginPage() {
 	const navigate = useNavigate();
-	const [username, setUsername] = useState("");
-	const [password, setPassword] = useState("");
-	const usernameId = useId();
-	const passwordId = useId();
+
+	const form = useForm<LoginFormValues>({
+		resolver: arktypeResolver(loginSchema),
+		defaultValues: {
+			username: "",
+			password: "",
+		},
+	});
 
 	const login = useMutation({
 		...loginMutation(),
@@ -26,17 +39,11 @@ export default function LoginPage() {
 		},
 	});
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!username.trim() || !password.trim()) {
-			toast.error("Username and password are required");
-			return;
-		}
-
+	const onSubmit = (values: LoginFormValues) => {
 		login.mutate({
 			body: {
-				username: username.trim(),
-				password: password.trim(),
+				username: values.username.trim(),
+				password: values.password.trim(),
 			},
 		});
 	};
@@ -49,36 +56,45 @@ export default function LoginPage() {
 					<CardDescription>Sign in to your account</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<form onSubmit={handleSubmit} className="space-y-4">
-						<div className="space-y-2">
-							<Label htmlFor={usernameId}>Username</Label>
-							<Input
-								id={usernameId}
-								type="text"
-								placeholder="Enter your username"
-								value={username}
-								onChange={(e) => setUsername(e.target.value)}
-								disabled={login.isPending}
-								autoFocus
-								required
+					<Form {...form}>
+						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+							<FormField
+								control={form.control}
+								name="username"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Username</FormLabel>
+										<FormControl>
+											<Input
+												{...field}
+												type="text"
+												placeholder="Enter your username"
+												disabled={login.isPending}
+												autoFocus
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
 							/>
-						</div>
-						<div className="space-y-2">
-							<Label htmlFor={passwordId}>Password</Label>
-							<Input
-								id={passwordId}
-								type="password"
-								placeholder="Enter your password"
-								value={password}
-								onChange={(e) => setPassword(e.target.value)}
-								disabled={login.isPending}
-								required
+							<FormField
+								control={form.control}
+								name="password"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Password</FormLabel>
+										<FormControl>
+											<Input {...field} type="password" placeholder="Enter your password" disabled={login.isPending} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
 							/>
-						</div>
-						<Button type="submit" className="w-full" loading={login.isPending}>
-							Sign In
-						</Button>
-					</form>
+							<Button type="submit" className="w-full" loading={login.isPending}>
+								Sign In
+							</Button>
+						</form>
+					</Form>
 				</CardContent>
 			</Card>
 		</div>

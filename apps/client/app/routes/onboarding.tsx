@@ -1,23 +1,36 @@
+import { arktypeResolver } from "@hookform/resolvers/arktype";
 import { useMutation } from "@tanstack/react-query";
-import { useId, useState } from "react";
+import { type } from "arktype";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { registerMutation } from "~/api-client/@tanstack/react-query.gen";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
+
+const onboardingSchema = type({
+	username: "2<=string<=50",
+	password: "string>=8",
+	confirmPassword: "string>=1",
+});
+
+type OnboardingFormValues = typeof onboardingSchema.inferIn;
 
 export default function OnboardingPage() {
 	const navigate = useNavigate();
-	const [username, setUsername] = useState("");
-	const [password, setPassword] = useState("");
-	const [confirmPassword, setConfirmPassword] = useState("");
-	const usernameId = useId();
-	const passwordId = useId();
-	const confirmPasswordId = useId();
 
-	const register = useMutation({
+	const form = useForm<OnboardingFormValues>({
+		resolver: arktypeResolver(onboardingSchema),
+		defaultValues: {
+			username: "",
+			password: "",
+			confirmPassword: "",
+		},
+	});
+
+	const registerUser = useMutation({
 		...registerMutation(),
 		onSuccess: async () => {
 			toast.success("Admin user created successfully!");
@@ -29,22 +42,19 @@ export default function OnboardingPage() {
 		},
 	});
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!username.trim() || !password.trim()) {
-			toast.error("Username and password are required");
+	const onSubmit = (values: OnboardingFormValues) => {
+		if (values.password !== values.confirmPassword) {
+			form.setError("confirmPassword", {
+				type: "manual",
+				message: "Passwords do not match",
+			});
 			return;
 		}
 
-		if (password !== confirmPassword) {
-			toast.error("Passwords do not match");
-			return;
-		}
-
-		register.mutate({
+		registerUser.mutate({
 			body: {
-				username: username.trim(),
-				password: password.trim(),
+				username: values.username.trim(),
+				password: values.password.trim(),
 			},
 		});
 	};
@@ -57,48 +67,64 @@ export default function OnboardingPage() {
 					<CardDescription>Create the admin user to get started</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<form onSubmit={handleSubmit} className="space-y-4">
-						<div className="space-y-2">
-							<Label htmlFor={usernameId}>Username</Label>
-							<Input
-								id={usernameId}
-								type="text"
-								placeholder="admin"
-								value={username}
-								onChange={(e) => setUsername(e.target.value)}
-								disabled={register.isPending}
-								autoFocus
-								required
+					<Form {...form}>
+						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+							<FormField
+								control={form.control}
+								name="username"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Username</FormLabel>
+										<FormControl>
+											<Input {...field} type="text" placeholder="admin" disabled={registerUser.isPending} autoFocus />
+										</FormControl>
+										<FormDescription>Choose a username for the admin account (2-50 characters).</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
 							/>
-						</div>
-						<div className="space-y-2">
-							<Label htmlFor={passwordId}>Password</Label>
-							<Input
-								id={passwordId}
-								type="password"
-								placeholder="Enter a secure password"
-								value={password}
-								onChange={(e) => setPassword(e.target.value)}
-								disabled={register.isPending}
-								required
+							<FormField
+								control={form.control}
+								name="password"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Password</FormLabel>
+										<FormControl>
+											<Input
+												{...field}
+												type="password"
+												placeholder="Enter a secure password"
+												disabled={registerUser.isPending}
+											/>
+										</FormControl>
+										<FormDescription>Password must be at least 8 characters long.</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
 							/>
-						</div>
-						<div className="space-y-2">
-							<Label htmlFor={confirmPasswordId}>Confirm Password</Label>
-							<Input
-								id={confirmPasswordId}
-								type="password"
-								placeholder="Re-enter your password"
-								value={confirmPassword}
-								onChange={(e) => setConfirmPassword(e.target.value)}
-								disabled={register.isPending}
-								required
+							<FormField
+								control={form.control}
+								name="confirmPassword"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Confirm Password</FormLabel>
+										<FormControl>
+											<Input
+												{...field}
+												type="password"
+												placeholder="Re-enter your password"
+												disabled={registerUser.isPending}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
 							/>
-						</div>
-						<Button type="submit" className="w-full" disabled={register.isPending}>
-							{register.isPending ? "Creating..." : "Create Admin User"}
-						</Button>
-					</form>
+							<Button type="submit" className="w-full" loading={registerUser.isPending}>
+								Create Admin User
+							</Button>
+						</form>
+					</Form>
 				</CardContent>
 			</Card>
 		</div>
