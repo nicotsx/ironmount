@@ -33,7 +33,7 @@ export const CreateVolumeDialog = ({ open, setOpen }: Props) => {
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button className="bg-transparent  border hover:bg-strong-accent">
+				<Button>
 					<Plus size={16} className="mr-2" />
 					Create volume
 				</Button>

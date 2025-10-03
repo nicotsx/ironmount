@@ -7,12 +7,12 @@ import { listVolumesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { CreateVolumeDialog } from "~/components/create-volume-dialog";
 import { StatusDot } from "~/components/status-dot";
 import { Button } from "~/components/ui/button";
+import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
 import { VolumeIcon } from "~/components/volume-icon";
 import type { Route } from "./+types/home";
-import { Card, CardHeader } from "~/components/ui/card";
 
 export function meta(_: Route.MetaArgs) {
 	return [

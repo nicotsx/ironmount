@@ -111,7 +111,6 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 				</div>
 				<div className="flex gap-4">
 					<Button
-						variant="secondary"
 						onClick={() => mountVol.mutate({ path: { name } })}
 						loading={mountVol.isPending}
 						className={cn({ hidden: volume.status === "mounted" })}
@@ -131,8 +130,8 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 					</Button>
 				</div>
 			</div>
-			<Tabs defaultValue="info" className="mt-0">
-				<TabsList>
+			<Tabs defaultValue="info" className="mt-4">
+				<TabsList className="mb-2">
 					<TabsTrigger value="info">Configuration</TabsTrigger>
 					<TabsTrigger value="docker">Docker</TabsTrigger>
 					<TabsTrigger value="backups">Backups</TabsTrigger>

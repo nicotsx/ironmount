@@ -14,14 +14,20 @@ export function AppBreadcrumb() {
 	const breadcrumbs = useBreadcrumbs();
 
 	return (
-		<Breadcrumb className={cn("mb-2", { invisible: breadcrumbs.length <= 1 })}>
+		<Breadcrumb>
+			<BreadcrumbLink asChild></BreadcrumbLink>
 			<BreadcrumbList>
+				{breadcrumbs.length === 1 && (
+					<BreadcrumbItem>
+						<Link to="/">Ironmount</Link>
+					</BreadcrumbItem>
+				)}
 				{breadcrumbs.map((breadcrumb, index) => {
 					const isLast = index === breadcrumbs.length - 1;
 
 					return (
 						<div key={`${breadcrumb.label}-${index}`} className="contents">
-							<BreadcrumbItem>
+							<BreadcrumbItem className={cn({ invisible: breadcrumbs.length <= 1 })}>
 								{isLast || breadcrumb.isCurrentPage ? (
 									<BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>
 								) : breadcrumb.href ? (
