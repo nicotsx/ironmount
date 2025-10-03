@@ -53,22 +53,21 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 		form.reset({ name: watchedName, ...defaultValuesForType[watchedBackend as keyof typeof defaultValuesForType] });
 	}, [watchedBackend, watchedName, form.reset]);
 
-	const [testMessage, setTestMessage] = useState<string>("");
+	const [testMessage, setTestMessage] = useState<{ success: boolean; message: string } | null>(null);
 
 	const testBackendConnection = useMutation({
 		...testConnectionMutation(),
 		onMutate: () => {
-			setTestMessage("");
+			setTestMessage(null);
 		},
-		onError: () => {
-			setTestMessage("Failed to test connection. Please try again.");
+		onError: (error) => {
+			setTestMessage({
+				success: false,
+				message: error?.message || "Failed to test connection. Please try again.",
+			});
 		},
 		onSuccess: (data) => {
-			if (data?.success) {
-				setTestMessage(data.message);
-			} else {
-				setTestMessage(data?.message || "Connection test failed");
-			}
+			setTestMessage(data);
 		},
 	});
 
@@ -424,110 +423,43 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 					</>
 				)}
 
-				{watchedBackend === "smb" && (
-					<div className="space-y-3">
-						<div className="flex items-center gap-2">
-							<Button
-								type="button"
-								variant="outline"
-								onClick={handleTestConnection}
-								disabled={testBackendConnection.isPending}
-								className="flex-1"
-							>
-								{testBackendConnection.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-								{testBackendConnection.isSuccess && <CheckCircle className="mr-2 h-4 w-4 text-green-500" />}
-								{testBackendConnection.isError && <XCircle className="mr-2 h-4 w-4 text-red-500" />}
-								{testBackendConnection.isIdle && "Test Connection"}
-								{testBackendConnection.isPending && "Testing..."}
-								{testBackendConnection.isSuccess && "Connection Successful"}
-								{testBackendConnection.isError && "Test Failed"}
-							</Button>
-						</div>
-						{testMessage && (
-							<div
-								className={`text-sm p-2 rounded-md ${
-									testBackendConnection.isSuccess
-										? "bg-green-50 text-green-700 border border-green-200"
-										: testBackendConnection.isError
-											? "bg-red-50 text-red-700 border border-red-200"
-											: "bg-gray-50 text-gray-700 border border-gray-200"
-								}`}
-							>
-								{testMessage}
-							</div>
-						)}
+				<div className="space-y-3">
+					<div className="flex items-center gap-2">
+						<Button
+							type="button"
+							variant="outline"
+							onClick={handleTestConnection}
+							disabled={testBackendConnection.isPending}
+							className="flex-1"
+						>
+							{testBackendConnection.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+							{!testBackendConnection.isPending && testMessage?.success && (
+								<CheckCircle className="mr-2 h-4 w-4 text-green-500" />
+							)}
+							{!testBackendConnection.isPending && testMessage && !testMessage.success && (
+								<XCircle className="mr-2 h-4 w-4 text-red-500" />
+							)}
+							{testBackendConnection.isPending
+								? "Testing..."
+								: testMessage
+									? testMessage.success
+										? "Connection Successful"
+										: "Test Failed"
+									: "Test Connection"}
+						</Button>
 					</div>
-				)}
-
-				{watchedBackend === "nfs" && (
-					<div className="space-y-3">
-						<div className="flex items-center gap-2">
-							<Button
-								type="button"
-								variant="outline"
-								onClick={handleTestConnection}
-								disabled={testBackendConnection.isPending}
-								className="flex-1"
-							>
-								{testBackendConnection.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-								{testBackendConnection.isSuccess && <CheckCircle className="mr-2 h-4 w-4 text-green-500" />}
-								{testBackendConnection.isError && <XCircle className="mr-2 h-4 w-4 text-red-500" />}
-								{testBackendConnection.isIdle && "Test Connection"}
-								{testBackendConnection.isPending && "Testing..."}
-								{testBackendConnection.isSuccess && "Connection Successful"}
-								{testBackendConnection.isError && "Test Failed"}
-							</Button>
+					{testMessage && (
+						<div
+							className={`text-sm p-2 rounded-md ${
+								testMessage.success
+									? "bg-green-50 text-green-700 border border-green-200"
+									: "bg-red-50 text-red-700 border border-red-200"
+							}`}
+						>
+							{testMessage.message}
 						</div>
-						{testMessage && (
-							<div
-								className={`text-sm p-2 rounded-md ${
-									testBackendConnection.isSuccess
-										? "bg-green-50 text-green-700 border border-green-200"
-										: testBackendConnection.isError
-											? "bg-red-50 text-red-700 border border-red-200"
-											: "bg-gray-50 text-gray-700 border border-gray-200"
-								}`}
-							>
-								{testMessage}
-							</div>
-						)}
-					</div>
-				)}
-
-				{watchedBackend === "webdav" && (
-					<div className="space-y-3">
-						<div className="flex items-center gap-2">
-							<Button
-								type="button"
-								variant="outline"
-								onClick={handleTestConnection}
-								disabled={testBackendConnection.isPending}
-								className="flex-1"
-							>
-								{testBackendConnection.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-								{testBackendConnection.isSuccess && <CheckCircle className="mr-2 h-4 w-4 text-green-500" />}
-								{testBackendConnection.isError && <XCircle className="mr-2 h-4 w-4 text-red-500" />}
-								{testBackendConnection.isIdle && "Test Connection"}
-								{testBackendConnection.isPending && "Testing..."}
-								{testBackendConnection.isSuccess && "Connection Successful"}
-								{testBackendConnection.isError && "Test Failed"}
-							</Button>
-						</div>
-						{testMessage && (
-							<div
-								className={`text-sm p-2 rounded-md ${
-									testBackendConnection.isSuccess
-										? "bg-green-50 text-green-700 border border-green-200"
-										: testBackendConnection.isError
-											? "bg-red-50 text-red-700 border border-red-200"
-											: "bg-gray-50 text-gray-700 border border-gray-200"
-								}`}
-							>
-								{testMessage}
-							</div>
-						)}
-					</div>
-				)}
+					)}
+				</div>
 				{mode === "update" && (
 					<Button type="submit" className="w-full mt-4" loading={loading}>
 						Save Changes
