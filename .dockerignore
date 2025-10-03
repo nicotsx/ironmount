@@ -1,6 +1,8 @@
 *
 
 !turbo.json
+!bun.lock
+!package.json
 
 !**/package.json
 !**/bun.lock
@@ -8,6 +10,7 @@
 !**/vite.config.ts
 !**/react-router.config.ts
 !**/build.ts
+!**/components.json
 
 !apps/**/src/**
 !apps/**/drizzle/**

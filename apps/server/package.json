@@ -5,7 +5,8 @@
 		"dev": "bun run --watch src/index.ts",
 		"build": "rm -rf dist && bun build.ts",
 		"tsc": "tsc --noEmit",
-		"gen:migrations": "drizzle-kit generate"
+		"gen:migrations": "drizzle-kit generate",
+		"studio": "drizzle-kit studio"
 	},
 	"dependencies": {
 		"@hono/arktype-validator": "^2.0.1",
@@ -15,7 +16,7 @@
 		"arktype": "^2.1.20",
 		"dockerode": "^4.0.8",
 		"dotenv": "^17.2.1",
-		"drizzle-orm": "^0.44.4",
+		"drizzle-orm": "^0.44.6",
 		"hono": "^4.9.2",
 		"hono-openapi": "^1.1.0",
 		"http-errors-enhanced": "^3.0.2",
@@ -24,8 +25,9 @@
 		"winston": "^3.17.0"
 	},
 	"devDependencies": {
+		"@libsql/client": "^0.15.15",
 		"@types/bun": "^1.2.20",
 		"@types/dockerode": "^3.3.44",
-		"drizzle-kit": "^0.31.4"
+		"drizzle-kit": "^0.31.5"
 	}
 }

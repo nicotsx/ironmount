@@ -8,7 +8,7 @@ export const authMiddleware: MiddlewareFunction = async ({ context }) => {
 	if (!session.data?.user.id) {
 		const status = await getStatus();
 		if (!status.data?.hasUsers) {
-			throw redirect("/register");
+			throw redirect("/onboarding");
 		}
 
 		throw redirect("/login");

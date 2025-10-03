@@ -1,8 +1,8 @@
-ARG BUN_VERSION="1.2.20"
+ARG BUN_VERSION="1.2.23"
 
 FROM oven/bun:${BUN_VERSION}-alpine AS runner_base
 
-RUN apk add --no-cache davfs2
+RUN apk add --no-cache davfs2=1.6.1-r2
 
 # ------------------------------
 # DEVELOPMENT
@@ -49,7 +49,9 @@ FROM runner_base AS production
 
 ENV NODE_ENV="production"
 
-RUN apk add --no-cache davfs2
+# RUN bun i ssh2
+
+RUN apk add --no-cache davfs2=1.6.1-r2
 
 WORKDIR /app
 

@@ -1,7 +1,7 @@
 {
 	"name": "ironmount",
 	"private": true,
-	"packageManager": "bun@1.2.15",
+	"packageManager": "bun@1.2.23",
 	"scripts": {
 		"dev": "turbo dev",
 		"tsc": "turbo run tsc",
@@ -16,6 +16,9 @@
 	],
 	"devDependencies": {
 		"@hey-api/openapi-ts": "^0.80.17",
-		"turbo": "^2.5.6"
-	}
+		"turbo": "^2.5.8"
+	},
+	"trustedDependencies": [
+		"@tailwindcss/oxide"
+	]
 }

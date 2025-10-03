@@ -9,5 +9,5 @@ await Bun.build({
 		identifiers: true,
 		syntax: true,
 	},
-	external: [],
+	external: ["ssh2"],
 });

@@ -34,14 +34,14 @@ export const scalarDescriptor = Scalar({
 const driver = new Hono().use(honoLogger()).route("/", driverController);
 const app = new Hono()
 	.use(honoLogger())
-	.get("*", serveStatic({ root: "./assets/frontend" }))
 	.get("healthcheck", (c) => c.json({ status: "ok" }))
-	.basePath("/api/v1")
-	.route("/auth", authController)
-	.route("/volumes", volumeController.use(requireAuth));
+	.route("/api/v1/auth", authController.basePath("/api/v1"))
+	.route("/api/v1/volumes", volumeController.use(requireAuth))
+	.get("/assets/*", serveStatic({ root: "./assets/frontend" }))
+	.get("*", serveStatic({ path: "./assets/frontend/index.html" }));
 
-app.get("/openapi.json", generalDescriptor(app));
-app.get("/docs", scalarDescriptor);
+app.get("/api/v1/openapi.json", generalDescriptor(app));
+app.get("/api/v1/docs", scalarDescriptor);
 
 app.onError((err, c) => {
 	logger.error(`${c.req.url}: ${err.message}`);
