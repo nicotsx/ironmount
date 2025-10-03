@@ -42,10 +42,10 @@ const getIconAndColor = (backend: BackendType) => {
 };
 
 export const VolumeIcon = ({ backend, size = 10 }: VolumeIconProps) => {
-	const { icon: Icon, color, label } = getIconAndColor(backend);
+	const { icon: Icon, label } = getIconAndColor(backend);
 
 	return (
-		<span className={`flex items-center gap-2 ${color} rounded-md px-2 py-1`}>
+		<span className={`flex items-center gap-2 rounded-md px-2 py-1`}>
 			<Icon size={size} />
 			{label}
 		</span>

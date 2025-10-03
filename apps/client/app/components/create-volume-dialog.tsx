@@ -6,15 +6,7 @@ import { createVolumeMutation } from "~/api-client/@tanstack/react-query.gen";
 import { parseError } from "~/lib/errors";
 import { CreateVolumeForm } from "./create-volume-form";
 import { Button } from "./ui/button";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from "./ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { ScrollArea } from "./ui/scroll-area";
 
 type Props = {
@@ -41,7 +33,7 @@ export const CreateVolumeDialog = ({ open, setOpen }: Props) => {
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button className="bg-blue-900 hover:bg-blue-800">
+				<Button className="bg-transparent  border hover:bg-strong-accent">
 					<Plus size={16} className="mr-2" />
 					Create volume
 				</Button>

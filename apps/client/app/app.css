@@ -11,7 +11,7 @@
 
 html,
 body {
-	@apply bg-white dark:bg-[#0D0D0D];
+	@apply bg-white dark:bg-[#131313];
 	overflow-x: hidden;
 	width: 100%;
 	position: relative;
@@ -30,6 +30,7 @@ body {
 	--color-foreground: var(--foreground);
 	--color-card: var(--card);
 	--color-card-foreground: var(--card-foreground);
+	--color-card-header: var(--card-header);
 	--color-popover: var(--popover);
 	--color-popover-foreground: var(--popover-foreground);
 	--color-primary: var(--primary);
@@ -57,6 +58,7 @@ body {
 	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
+	--color-strong-accent: var(--strong-accent);
 }
 
 :root {
@@ -65,6 +67,7 @@ body {
 	--foreground: oklch(0.145 0 0);
 	--card: oklch(1 0 0);
 	--card-foreground: oklch(0.145 0 0);
+	--card-header: oklch(0.922 0 0);
 	--popover: oklch(1 0 0);
 	--popover-foreground: oklch(0.145 0 0);
 	--primary: oklch(0.205 0 0);
@@ -92,12 +95,14 @@ body {
 	--sidebar-accent-foreground: oklch(0.205 0 0);
 	--sidebar-border: oklch(0.922 0 0);
 	--sidebar-ring: oklch(0.708 0 0);
+	--strong-accent: #ff543a;
 }
 
 .dark {
-	--background: oklch(0.145 0 0);
+	--background: #131313;
 	--foreground: oklch(0.985 0 0);
-	--card: oklch(0.1448 0 0);
+	--card: #131313;
+	--card-header: #1b1b1b;
 	/* --card: oklch(0.205 0 0); ORIGINAL */
 	--card-foreground: oklch(0.985 0 0);
 	--popover: oklch(0.205 0 0);
@@ -128,6 +133,7 @@ body {
 	--sidebar-accent-foreground: oklch(0.985 0 0);
 	--sidebar-border: oklch(1 0 0 / 10%);
 	--sidebar-ring: oklch(0.556 0 0);
+	--strong-accent: #ff543a;
 }
 
 @layer base {

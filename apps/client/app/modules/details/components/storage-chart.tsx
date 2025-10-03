@@ -18,7 +18,7 @@ export function StorageChart({ statfs }: Props) {
 			{
 				name: "Used",
 				value: statfs.used,
-				fill: "#2B7EFF",
+				fill: "#ff543a",
 			},
 			{
 				name: "Free",
@@ -63,7 +63,7 @@ export function StorageChart({ statfs }: Props) {
 				</CardTitle>
 			</CardHeader>
 			<CardContent className="flex-1 pb-0">
-				<div className="">
+				<div>
 					<ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
 						<PieChart>
 							<ChartTooltip
@@ -105,9 +105,9 @@ export function StorageChart({ statfs }: Props) {
 								<ByteSize bytes={statfs.total} className="font-mono text-sm" />
 							</div>
 
-							<div className="flex items-center justify-between p-3 rounded-lg bg-blue-500/10">
+							<div className="flex items-center justify-between p-3 rounded-lg bg-strong-accent/10">
 								<div className="flex items-center gap-3">
-									<div className="h-4 w-4 rounded-full bg-blue-500" />
+									<div className="h-4 w-4 rounded-full bg-strong-accent" />
 									<span className="font-medium">Used Space</span>
 								</div>
 								<div className="text-right">
