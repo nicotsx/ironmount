@@ -450,7 +450,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 					</div>
 					{testMessage && (
 						<div
-							className={`text-sm p-2 rounded-md ${
+							className={`text-xs p-2 rounded-md ${
 								testMessage.success
 									? "bg-green-50 text-green-700 border border-green-200"
 									: "bg-red-50 text-red-700 border border-red-200"
@@ -461,7 +461,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 					)}
 				</div>
 				{mode === "update" && (
-					<Button type="submit" className="w-full mt-4" loading={loading}>
+					<Button type="submit" className="w-full" loading={loading}>
 						Save Changes
 					</Button>
 				)}

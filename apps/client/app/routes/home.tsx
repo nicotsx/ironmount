@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import { listVolumes } from "~/api-client";
 import { listVolumesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { CreateVolumeDialog } from "~/components/create-volume-dialog";
+import { EmptyState } from "~/components/empty-state";
 import { StatusDot } from "~/components/status-dot";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
@@ -59,6 +60,17 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 			return matchesSearch && matchesStatus && matchesBackend;
 		}) || [];
 
+	const hasNoVolumes = data?.volumes.length === 0;
+	const hasNoFilteredVolumes = filteredVolumes.length === 0 && !hasNoVolumes;
+
+	if (hasNoVolumes) {
+		return (
+			<Card className="p-0 gap-0">
+				<EmptyState />
+			</Card>
+		);
+	}
+
 	return (
 		<Card className="p-0 gap-0">
 			<div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-2 md:justify-between p-4 bg-card-header py-4">
@@ -109,35 +121,49 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{filteredVolumes.map((volume) => (
-							<TableRow
-								key={volume.name}
-								className="hover:bg-accent/50 hover:cursor-pointer"
-								onClick={() => navigate(`/volumes/${volume.name}`)}
-							>
-								<TableCell className="font-medium text-strong-accent">{volume.name}</TableCell>
-								<TableCell>
-									<VolumeIcon backend={volume.type} />
-								</TableCell>
-								<TableCell className="hidden sm:table-cell">
-									<span className="flex items-center gap-2">
-										<span className="text-muted-foreground text-xs truncate bg-primary/10 rounded-md px-2 py-1">
-											{volume.path}
-										</span>
-										<Copy size={10} />
-									</span>
-								</TableCell>
-								<TableCell className="text-center">
-									<StatusDot status={volume.status} />
+						{hasNoFilteredVolumes ? (
+							<TableRow>
+								<TableCell colSpan={4} className="text-center py-12">
+									<div className="flex flex-col items-center gap-3">
+										<p className="text-muted-foreground">No volumes match your filters.</p>
+										<Button onClick={clearFilters} variant="outline" size="sm">
+											<RotateCcw className="h-4 w-4 mr-2" />
+											Clear filters
+										</Button>
+									</div>
 								</TableCell>
 							</TableRow>
-						))}
+						) : (
+							filteredVolumes.map((volume) => (
+								<TableRow
+									key={volume.name}
+									className="hover:bg-accent/50 hover:cursor-pointer"
+									onClick={() => navigate(`/volumes/${volume.name}`)}
+								>
+									<TableCell className="font-medium text-strong-accent">{volume.name}</TableCell>
+									<TableCell>
+										<VolumeIcon backend={volume.type} />
+									</TableCell>
+									<TableCell className="hidden sm:table-cell">
+										<span className="flex items-center gap-2">
+											<span className="text-muted-foreground text-xs truncate bg-primary/10 rounded-md px-2 py-1">
+												{volume.path}
+											</span>
+											<Copy size={10} />
+										</span>
+									</TableCell>
+									<TableCell className="text-center">
+										<StatusDot status={volume.status} />
+									</TableCell>
+								</TableRow>
+							))
+						)}
 					</TableBody>
 				</Table>
 			</div>
 			<div className="px-4 py-2 text-sm text-muted-foreground bg-card-header flex justify-end border-t">
-				{filteredVolumes.length === 0 ? (
-					"No volumes found."
+				{hasNoFilteredVolumes ? (
+					"No volumes match filters."
 				) : (
 					<span>
 						<span className="text-strong-accent">{filteredVolumes.length}</span> volume
