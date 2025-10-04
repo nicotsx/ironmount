@@ -9,7 +9,9 @@ import {
 	getVolumeDto,
 	healthCheckDto,
 	type ListContainersResponseDto,
+	type ListFilesResponseDto,
 	type ListVolumesResponseDto,
+	listFilesDto,
 	listVolumesDto,
 	mountVolumeDto,
 	testConnectionBody,
@@ -118,4 +120,16 @@ export const volumeController = new Hono()
 		const { error, status } = await volumeService.checkHealth(name);
 
 		return c.json({ error, status }, 200);
+	})
+	.get("/:name/files", listFilesDto, async (c) => {
+		const { name } = c.req.param();
+		const subPath = c.req.query("path");
+		const result = await volumeService.listFiles(name, subPath);
+
+		const response = {
+			files: result.files,
+			path: result.path,
+		} satisfies ListFilesResponseDto;
+
+		return c.json(response, 200);
 	});

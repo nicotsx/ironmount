@@ -600,6 +600,40 @@ export type HealthCheckVolumeResponses = {
 
 export type HealthCheckVolumeResponse = HealthCheckVolumeResponses[keyof HealthCheckVolumeResponses];
 
+export type ListFilesData = {
+	body?: never;
+	path: {
+		name: string;
+	};
+	query?: never;
+	url: "/api/v1/volumes/{name}/files";
+};
+
+export type ListFilesErrors = {
+	/**
+	 * Volume not found
+	 */
+	404: unknown;
+};
+
+export type ListFilesResponses = {
+	/**
+	 * List of files in the volume
+	 */
+	200: {
+		files: Array<{
+			name: string;
+			path: string;
+			type: "directory" | "file";
+			modifiedAt?: number;
+			size?: number;
+		}>;
+		path: string;
+	};
+};
+
+export type ListFilesResponse = ListFilesResponses[keyof ListFilesResponses];
+
 export type ClientOptions = {
 	baseUrl: "http://localhost:4096" | (string & {});
 };
