@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { loginMutation } from "~/api-client/@tanstack/react-query.gen";
+import { GridBackground } from "~/components/grid-background";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
@@ -49,9 +50,8 @@ export default function LoginPage() {
 	};
 
 	return (
-		<div className="relative min-h-screen flex items-center justify-center p-4 [background-size:20px_20px] sm:[background-size:40px_40px] [background-image:linear-gradient(to_right,#e4e4e7_1px,transparent_1px),linear-gradient(to_bottom,#e4e4e7_1px,transparent_1px)] dark:[background-image:linear-gradient(to_right,#262626_1px,transparent_1px),linear-gradient(to_bottom,#262626_1px,transparent_1px)]">
-			<div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-black" />
-			<Card className="relative w-full max-w-md">
+		<GridBackground className="flex items-center justify-center p-4">
+			<Card className="w-full max-w-md">
 				<CardHeader>
 					<CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
 					<CardDescription>Sign in to your account</CardDescription>
@@ -98,6 +98,6 @@ export default function LoginPage() {
 					</Form>
 				</CardContent>
 			</Card>
-		</div>
+		</GridBackground>
 	);
 }

@@ -3,10 +3,10 @@ import { Outlet, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { logoutMutation } from "~/api-client/@tanstack/react-query.gen";
 import { appContext } from "~/context";
-import { cn } from "~/lib/utils";
 import { authMiddleware } from "~/middleware/auth";
 import type { Route } from "./+types/layout";
 import { AppBreadcrumb } from "./app-breadcrumb";
+import { GridBackground } from "./grid-background";
 import { Button } from "./ui/button";
 
 export const clientMiddleware = [authMiddleware];
@@ -31,16 +31,8 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 	});
 
 	return (
-		<div
-			className={cn(
-				"relative min-h-dvh w-full overflow-x-hidden",
-				"[background-size:20px_20px] sm:[background-size:40px_40px]",
-				"[background-image:linear-gradient(to_right,#e4e4e7_1px,transparent_1px),linear-gradient(to_bottom,#e4e4e7_1px,transparent_1px)]",
-				"dark:[background-image:linear-gradient(to_right,#262626_1px,transparent_1px),linear-gradient(to_bottom,#262626_1px,transparent_1px)]",
-			)}
-		>
-			<div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-card"></div>
-			<header className="relative bg-card-header border-b border-border/50">
+		<GridBackground>
+			<header className="bg-card-header border-b border-border/50">
 				<div className="flex items-center justify-between py-3 sm:py-4 px-2 sm:px-4 container mx-auto">
 					<AppBreadcrumb />
 					{loaderData.user && (
@@ -55,9 +47,9 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 					)}
 				</div>
 			</header>
-			<main className="relative flex flex-col pt-4 sm:pt-8 px-2 sm:px-4 pb-4 container mx-auto">
+			<main className="flex flex-col pt-4 sm:pt-8 px-2 sm:px-4 pb-4 container mx-auto">
 				<Outlet />
 			</main>
-		</div>
+		</GridBackground>
 	);
 }

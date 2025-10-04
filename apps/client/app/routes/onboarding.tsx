@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { registerMutation } from "~/api-client/@tanstack/react-query.gen";
+import { GridBackground } from "~/components/grid-background";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
@@ -60,9 +61,8 @@ export default function OnboardingPage() {
 	};
 
 	return (
-		<div className="relative min-h-screen flex items-center justify-center p-4 [background-size:20px_20px] sm:[background-size:40px_40px] [background-image:linear-gradient(to_right,#e4e4e7_1px,transparent_1px),linear-gradient(to_bottom,#e4e4e7_1px,transparent_1px)] dark:[background-image:linear-gradient(to_right,#262626_1px,transparent_1px),linear-gradient(to_bottom,#262626_1px,transparent_1px)]">
-			<div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-black" />
-			<Card className="relative w-full max-w-md">
+		<GridBackground className="flex items-center justify-center p-4">
+			<Card className="w-full max-w-md">
 				<CardHeader>
 					<CardTitle className="text-2xl font-bold">Welcome to Ironmount</CardTitle>
 					<CardDescription>Create the admin user to get started</CardDescription>
@@ -79,7 +79,7 @@ export default function OnboardingPage() {
 										<FormControl>
 											<Input {...field} type="text" placeholder="admin" disabled={registerUser.isPending} autoFocus />
 										</FormControl>
-										<FormDescription>Choose a username for the admin account (2-50 characters).</FormDescription>
+										<FormDescription>Choose a username for the admin account</FormDescription>
 										<FormMessage />
 									</FormItem>
 								)}
@@ -128,6 +128,6 @@ export default function OnboardingPage() {
 					</Form>
 				</CardContent>
 			</Card>
-		</div>
+		</GridBackground>
 	);
 }
