@@ -41,7 +41,7 @@ In order to run Ironmount, you need to have Docker and Docker Compose installed 
 ```yaml
 services:
   ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.0.1
+    image: ghcr.io/nicotsx/ironmount:v0.1.1
     container_name: ironmount
     restart: unless-stopped
     cap_add:
@@ -72,7 +72,3 @@ Once the container is running, you can access the web interface at `http://<your
 ## Docker volume usage
 
 ![Preview](https://github.com/nicotsx/ironmount/blob/main/screenshots/docker-instructions.png?raw=true)
-
-## Volume creation
-
-![Preview](https://github.com/nicotsx/ironmount/blob/main/screenshots/volume-creation.png?raw=true)
