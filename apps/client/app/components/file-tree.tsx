@@ -32,8 +32,8 @@ interface Props {
 	className?: string;
 }
 
-export const FileTree = memo(
-	({
+export const FileTree = memo((props: Props) => {
+	const {
 		files = [],
 		onFileSelect,
 		selectedFile,
@@ -41,118 +41,107 @@ export const FileTree = memo(
 		expandedFolders = new Set(),
 		loadingFolders = new Set(),
 		className,
-	}: Props) => {
-		const fileList = useMemo(() => {
-			return buildFileList(files);
-		}, [files]);
+	} = props;
 
-		const [collapsedFolders, setCollapsedFolders] = useState<Set<string>>(new Set());
+	const fileList = useMemo(() => {
+		return buildFileList(files);
+	}, [files]);
 
-		const filteredFileList = useMemo(() => {
-			const list = [];
-			let lastDepth = Number.MAX_SAFE_INTEGER;
+	const [collapsedFolders, setCollapsedFolders] = useState<Set<string>>(new Set());
 
-			for (const fileOrFolder of fileList) {
-				const depth = fileOrFolder.depth;
+	const filteredFileList = useMemo(() => {
+		const list = [];
+		let lastDepth = Number.MAX_SAFE_INTEGER;
 
-				// if the depth is equal we reached the end of the collapsed group
-				if (lastDepth === depth) {
-					lastDepth = Number.MAX_SAFE_INTEGER;
-				}
+		for (const fileOrFolder of fileList) {
+			const depth = fileOrFolder.depth;
 
-				// ignore collapsed folders
-				if (collapsedFolders.has(fileOrFolder.fullPath)) {
-					lastDepth = Math.min(lastDepth, depth);
-				}
-
-				// ignore files and folders below the last collapsed folder
-				if (lastDepth < depth) {
-					continue;
-				}
-
-				list.push(fileOrFolder);
+			// if the depth is equal we reached the end of the collapsed group
+			if (lastDepth === depth) {
+				lastDepth = Number.MAX_SAFE_INTEGER;
 			}
 
-			return list;
-		}, [fileList, collapsedFolders]);
+			// ignore collapsed folders
+			if (collapsedFolders.has(fileOrFolder.fullPath)) {
+				lastDepth = Math.min(lastDepth, depth);
+			}
 
-		const toggleCollapseState = (fullPath: string) => {
-			setCollapsedFolders((prevSet) => {
-				const newSet = new Set(prevSet);
+			// ignore files and folders below the last collapsed folder
+			if (lastDepth < depth) {
+				continue;
+			}
 
-				if (newSet.has(fullPath)) {
-					newSet.delete(fullPath);
-					onFolderExpand?.(fullPath);
-				} else {
-					newSet.add(fullPath);
+			list.push(fileOrFolder);
+		}
+
+		return list;
+	}, [fileList, collapsedFolders]);
+
+	const toggleCollapseState = (fullPath: string) => {
+		setCollapsedFolders((prevSet) => {
+			const newSet = new Set(prevSet);
+
+			if (newSet.has(fullPath)) {
+				newSet.delete(fullPath);
+				onFolderExpand?.(fullPath);
+			} else {
+				newSet.add(fullPath);
+			}
+
+			return newSet;
+		});
+	};
+
+	// Add new folders to collapsed set when file list changes
+	useEffect(() => {
+		setCollapsedFolders((prevSet) => {
+			const newSet = new Set(prevSet);
+			for (const item of fileList) {
+				if (item.kind === "folder" && !newSet.has(item.fullPath) && !expandedFolders.has(item.fullPath)) {
+					newSet.add(item.fullPath);
 				}
+			}
+			return newSet;
+		});
+	}, [fileList, expandedFolders]);
 
-				return newSet;
-			});
-		};
-
-		// Add new folders to collapsed set when file list changes
-		useEffect(() => {
-			setCollapsedFolders((prevSet) => {
-				const newSet = new Set(prevSet);
-				for (const item of fileList) {
-					if (item.kind === "folder" && !newSet.has(item.fullPath) && !expandedFolders.has(item.fullPath)) {
-						newSet.add(item.fullPath);
+	return (
+		<div className={cn("text-sm", className)}>
+			{filteredFileList.map((fileOrFolder) => {
+				switch (fileOrFolder.kind) {
+					case "file": {
+						return (
+							<File
+								key={fileOrFolder.id}
+								selected={selectedFile === fileOrFolder.fullPath}
+								file={fileOrFolder}
+								onClick={() => {
+									onFileSelect?.(fileOrFolder.fullPath);
+								}}
+							/>
+						);
+					}
+					case "folder": {
+						return (
+							<Folder
+								key={fileOrFolder.id}
+								folder={fileOrFolder}
+								collapsed={collapsedFolders.has(fileOrFolder.fullPath)}
+								loading={loadingFolders.has(fileOrFolder.fullPath)}
+								onClick={() => {
+									toggleCollapseState(fileOrFolder.fullPath);
+								}}
+							/>
+						);
+					}
+					default: {
+						return undefined;
 					}
 				}
-				return newSet;
-			});
-		}, [fileList, expandedFolders]);
-
-		// Expand folders that are in the expandedFolders set
-		useEffect(() => {
-			setCollapsedFolders((prevSet) => {
-				const newSet = new Set(prevSet);
-				for (const folder of expandedFolders) {
-					newSet.delete(folder);
-				}
-				return newSet;
-			});
-		}, [expandedFolders]);
-
-		return (
-			<div className={cn("text-sm", className)}>
-				{filteredFileList.map((fileOrFolder) => {
-					switch (fileOrFolder.kind) {
-						case "file": {
-							return (
-								<File
-									key={fileOrFolder.id}
-									selected={selectedFile === fileOrFolder.fullPath}
-									file={fileOrFolder}
-									onClick={() => {
-										onFileSelect?.(fileOrFolder.fullPath);
-									}}
-								/>
-							);
-						}
-						case "folder": {
-							return (
-								<Folder
-									key={fileOrFolder.id}
-									folder={fileOrFolder}
-									collapsed={collapsedFolders.has(fileOrFolder.fullPath)}
-									loading={loadingFolders.has(fileOrFolder.fullPath)}
-									onClick={() => {
-										toggleCollapseState(fileOrFolder.fullPath);
-									}}
-								/>
-							);
-						}
-						default: {
-							return undefined;
-						}
-					}
-				})}
-			</div>
-		);
-	},
-);
+			})}
+		</div>
+	);
+});
 
 interface FolderProps {
 	folder: FolderNode;
