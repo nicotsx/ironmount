@@ -8,7 +8,7 @@
  * Original source: https://github.com/stackblitz/bolt.new
  */
 
-import { ChevronDown, ChevronRight, File as FileIcon, Folder as FolderIcon, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronRight, File as FileIcon, Folder as FolderIcon, FolderOpen, Loader2 } from "lucide-react";
 import { memo, type ReactNode, useEffect, useMemo, useState } from "react";
 import { cn } from "~/lib/utils";
 
@@ -151,6 +151,8 @@ interface FolderProps {
 }
 
 function Folder({ folder: { depth, name }, collapsed, loading, onClick }: FolderProps) {
+	const FolderIconComponent = collapsed ? FolderIcon : FolderOpen;
+
 	return (
 		<NodeButton
 			className={cn("group hover:bg-accent/50 text-foreground")}
@@ -166,7 +168,7 @@ function Folder({ folder: { depth, name }, collapsed, loading, onClick }: Folder
 			}
 			onClick={onClick}
 		>
-			<FolderIcon className="w-4 h-4 shrink-0 text-strong-accent" />
+			<FolderIconComponent className="w-4 h-4 shrink-0 text-strong-accent" />
 			<span className="truncate">{name}</span>
 		</NodeButton>
 	);
