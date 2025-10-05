@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { FolderOpen } from "lucide-react";
-import { useState } from "react";
-import { listFilesOptions } from "~/api-client/@tanstack/react-query.gen";
+import { useCallback, useMemo, useState } from "react";
+import { listFiles } from "~/api-client/sdk.gen";
 import { FileTree } from "~/components/file-tree";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import type { Volume } from "~/lib/types";
@@ -10,26 +10,92 @@ type Props = {
 	volume: Volume;
 };
 
+interface FileEntry {
+	name: string;
+	path: string;
+	type: "file" | "directory";
+	size?: number;
+	modifiedAt?: number;
+}
+
 export const FilesTabContent = ({ volume }: Props) => {
 	const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
+	const [fetchedFolders, setFetchedFolders] = useState<Set<string>>(new Set(["/"]));
+	const [loadingFolders, setLoadingFolders] = useState<Set<string>>(new Set());
+	const [allFiles, setAllFiles] = useState<Map<string, FileEntry>>(new Map());
 
+	// Fetch root level files
 	const { data, isLoading, error } = useQuery({
-		...listFilesOptions({
-			path: { name: volume.name },
-		}),
+		queryKey: ["volume-files", volume.name, "/"],
+		queryFn: async () => {
+			const result = await listFiles({
+				path: { name: volume.name },
+				throwOnError: true,
+			});
+			return result.data;
+		},
 		enabled: volume.status === "mounted",
 		refetchInterval: 10000,
 	});
 
-	const handleFolderExpand = (folderPath: string) => {
-		setExpandedFolders((prev) => {
-			const next = new Set(prev);
-			next.add(folderPath);
-			return next;
-		});
-		// You could optionally fetch the contents of the folder here
-		// For now, we're fetching everything at once
-	};
+	// Update allFiles when root data changes
+	useMemo(() => {
+		if (data?.files) {
+			setAllFiles((prev) => {
+				const next = new Map(prev);
+				for (const file of data.files) {
+					next.set(file.path, file);
+				}
+				return next;
+			});
+		}
+	}, [data]);
+
+	const handleFolderExpand = useCallback(
+		async (folderPath: string) => {
+			setExpandedFolders((prev) => {
+				const next = new Set(prev);
+				next.add(folderPath);
+				return next;
+			});
+
+			// If we haven't fetched this folder yet, fetch it
+			if (!fetchedFolders.has(folderPath)) {
+				setLoadingFolders((prev) => new Set(prev).add(folderPath));
+
+				try {
+					const result = await listFiles({
+						path: { name: volume.name },
+						query: { path: folderPath },
+						throwOnError: true,
+					});
+
+					if (result.data?.files) {
+						setAllFiles((prev) => {
+							const next = new Map(prev);
+							for (const file of result.data.files) {
+								next.set(file.path, file);
+							}
+							return next;
+						});
+					}
+
+					setFetchedFolders((prev) => new Set(prev).add(folderPath));
+				} catch (error) {
+					console.error("Failed to fetch folder contents:", error);
+				} finally {
+					setLoadingFolders((prev) => {
+						const next = new Set(prev);
+						next.delete(folderPath);
+						return next;
+					});
+				}
+			}
+		},
+		[volume.name, fetchedFolders],
+	);
+
+	const fileArray = useMemo(() => Array.from(allFiles.values()), [allFiles]);
 
 	if (volume.status !== "mounted") {
 		return (
@@ -60,9 +126,9 @@ export const FilesTabContent = ({ volume }: Props) => {
 						<p className="text-destructive">Failed to load files: {String(error)}</p>
 					</div>
 				)}
-				{!isLoading && !error && data?.files && (
+				{!isLoading && !error && (
 					<div className="overflow-auto flex-1 border rounded-md bg-card">
-						{data.files.length === 0 ? (
+						{fileArray.length === 0 ? (
 							<div className="flex flex-col items-center justify-center h-full text-center p-8">
 								<FolderOpen className="mb-4 h-12 w-12 text-muted-foreground" />
 								<p className="text-muted-foreground">This volume is empty.</p>
@@ -72,9 +138,10 @@ export const FilesTabContent = ({ volume }: Props) => {
 							</div>
 						) : (
 							<FileTree
-								files={data.files}
+								files={fileArray}
 								onFolderExpand={handleFolderExpand}
 								expandedFolders={expandedFolders}
+								loadingFolders={loadingFolders}
 								className="p-2"
 							/>
 						)}

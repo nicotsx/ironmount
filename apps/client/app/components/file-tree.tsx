@@ -8,7 +8,7 @@
  * Original source: https://github.com/stackblitz/bolt.new
  */
 
-import { ChevronDown, ChevronRight, File as FileIcon, Folder as FolderIcon } from "lucide-react";
+import { ChevronDown, ChevronRight, File as FileIcon, Folder as FolderIcon, Loader2 } from "lucide-react";
 import { memo, type ReactNode, useEffect, useMemo, useState } from "react";
 import { cn } from "~/lib/utils";
 
@@ -28,11 +28,20 @@ interface Props {
 	onFileSelect?: (filePath: string) => void;
 	onFolderExpand?: (folderPath: string) => void;
 	expandedFolders?: Set<string>;
+	loadingFolders?: Set<string>;
 	className?: string;
 }
 
 export const FileTree = memo(
-	({ files = [], onFileSelect, selectedFile, onFolderExpand, expandedFolders = new Set(), className }: Props) => {
+	({
+		files = [],
+		onFileSelect,
+		selectedFile,
+		onFolderExpand,
+		expandedFolders = new Set(),
+		loadingFolders = new Set(),
+		className,
+	}: Props) => {
 		const fileList = useMemo(() => {
 			return buildFileList(files);
 		}, [files]);
@@ -82,6 +91,19 @@ export const FileTree = memo(
 			});
 		};
 
+		// Add new folders to collapsed set when file list changes
+		useEffect(() => {
+			setCollapsedFolders((prevSet) => {
+				const newSet = new Set(prevSet);
+				for (const item of fileList) {
+					if (item.kind === "folder" && !newSet.has(item.fullPath) && !expandedFolders.has(item.fullPath)) {
+						newSet.add(item.fullPath);
+					}
+				}
+				return newSet;
+			});
+		}, [fileList, expandedFolders]);
+
 		// Expand folders that are in the expandedFolders set
 		useEffect(() => {
 			setCollapsedFolders((prevSet) => {
@@ -115,6 +137,7 @@ export const FileTree = memo(
 									key={fileOrFolder.id}
 									folder={fileOrFolder}
 									collapsed={collapsedFolders.has(fileOrFolder.fullPath)}
+									loading={loadingFolders.has(fileOrFolder.fullPath)}
 									onClick={() => {
 										toggleCollapseState(fileOrFolder.fullPath);
 									}}
@@ -134,15 +157,24 @@ export const FileTree = memo(
 interface FolderProps {
 	folder: FolderNode;
 	collapsed: boolean;
+	loading?: boolean;
 	onClick: () => void;
 }
 
-function Folder({ folder: { depth, name }, collapsed, onClick }: FolderProps) {
+function Folder({ folder: { depth, name }, collapsed, loading, onClick }: FolderProps) {
 	return (
 		<NodeButton
 			className={cn("group hover:bg-accent/50 text-foreground")}
 			depth={depth}
-			icon={collapsed ? <ChevronRight className="w-4 h-4 shrink-0" /> : <ChevronDown className="w-4 h-4 shrink-0" />}
+			icon={
+				loading ? (
+					<Loader2 className="w-4 h-4 shrink-0 animate-spin" />
+				) : collapsed ? (
+					<ChevronRight className="w-4 h-4 shrink-0" />
+				) : (
+					<ChevronDown className="w-4 h-4 shrink-0" />
+				)
+			}
 			onClick={onClick}
 		>
 			<FolderIcon className="w-4 h-4 shrink-0 text-strong-accent" />
@@ -213,57 +245,26 @@ interface FolderNode extends BaseNode {
 }
 
 function buildFileList(files: FileEntry[]): Node[] {
-	const folderPaths = new Set<string>();
-	const fileList: Node[] = [];
+	const fileMap = new Map<string, Node>();
 
 	for (const file of files) {
 		const segments = file.path.split("/").filter((segment) => segment);
-		let currentPath = "";
-		let depth = 0;
-
-		// Build folder hierarchy
-		for (let i = 0; i < segments.length - 1; i++) {
-			const name = segments[i];
-			currentPath += `/${name}`;
-
-			if (!folderPaths.has(currentPath)) {
-				folderPaths.add(currentPath);
-				fileList.push({
-					kind: "folder",
-					id: fileList.length,
-					name,
-					fullPath: currentPath,
-					depth,
-				});
-			}
-			depth++;
-		}
-
-		// Add the file or final folder
+		const depth = segments.length - 1;
 		const name = segments[segments.length - 1];
-		currentPath += `/${name}`;
 
-		if (file.type === "file") {
-			fileList.push({
-				kind: "file",
-				id: fileList.length,
+		if (!fileMap.has(file.path)) {
+			fileMap.set(file.path, {
+				kind: file.type === "file" ? "file" : "folder",
+				id: fileMap.size,
 				name,
-				fullPath: currentPath,
-				depth,
-			});
-		} else if (!folderPaths.has(currentPath)) {
-			folderPaths.add(currentPath);
-			fileList.push({
-				kind: "folder",
-				id: fileList.length,
-				name,
-				fullPath: currentPath,
+				fullPath: file.path,
 				depth,
 			});
 		}
 	}
 
-	return sortFileList(fileList);
+	// Convert map to array and sort
+	return sortFileList(Array.from(fileMap.values()));
 }
 
 function sortFileList(nodeList: Node[]): Node[] {

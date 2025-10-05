@@ -605,7 +605,12 @@ export type ListFilesData = {
 	path: {
 		name: string;
 	};
-	query?: never;
+	query?: {
+		/**
+		 * Subdirectory path to list (relative to volume root)
+		 */
+		path?: string;
+	};
 	url: "/api/v1/volumes/{name}/files";
 };
 

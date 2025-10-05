@@ -327,6 +327,17 @@ export const listFilesDto = describeRoute({
 	description: "List files in a volume directory",
 	operationId: "listFiles",
 	tags: ["Volumes"],
+	parameters: [
+		{
+			in: "query",
+			name: "path",
+			required: false,
+			schema: {
+				type: "string",
+			},
+			description: "Subdirectory path to list (relative to volume root)",
+		},
+	],
 	responses: {
 		200: {
 			description: "List of files in the volume",
