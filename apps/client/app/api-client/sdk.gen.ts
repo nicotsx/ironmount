@@ -41,6 +41,9 @@ import type {
 	HealthCheckVolumeData,
 	HealthCheckVolumeResponses,
 	HealthCheckVolumeErrors,
+	ListFilesData,
+	ListFilesResponses,
+	ListFilesErrors,
 } from "./types.gen";
 import { client as _heyApiClient } from "./client.gen";
 
@@ -245,6 +248,16 @@ export const healthCheckVolume = <ThrowOnError extends boolean = false>(
 ) => {
 	return (options.client ?? _heyApiClient).post<HealthCheckVolumeResponses, HealthCheckVolumeErrors, ThrowOnError>({
 		url: "/api/v1/volumes/{name}/health-check",
+		...options,
+	});
+};
+
+/**
+ * List files in a volume directory
+ */
+export const listFiles = <ThrowOnError extends boolean = false>(options: Options<ListFilesData, ThrowOnError>) => {
+	return (options.client ?? _heyApiClient).get<ListFilesResponses, ListFilesErrors, ThrowOnError>({
+		url: "/api/v1/volumes/{name}/files",
 		...options,
 	});
 };

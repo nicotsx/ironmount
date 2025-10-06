@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
-import { getVolume } from "~/api-client";
 import {
 	deleteVolumeMutation,
 	getVolumeOptions,
@@ -16,7 +15,9 @@ import { parseError } from "~/lib/errors";
 import { cn } from "~/lib/utils";
 import { VolumeBackupsTabContent } from "~/modules/details/tabs/backups";
 import { DockerTabContent } from "~/modules/details/tabs/docker";
+import { FilesTabContent } from "~/modules/details/tabs/files";
 import { VolumeInfoTabContent } from "~/modules/details/tabs/info";
+import { getVolume } from "../api-client";
 import type { Route } from "./+types/details";
 
 export function meta({ params }: Route.MetaArgs) {
@@ -133,11 +134,15 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 			<Tabs defaultValue="info" className="mt-4">
 				<TabsList className="mb-2">
 					<TabsTrigger value="info">Configuration</TabsTrigger>
+					<TabsTrigger value="files">Files</TabsTrigger>
 					<TabsTrigger value="docker">Docker</TabsTrigger>
 					<TabsTrigger value="backups">Backups</TabsTrigger>
 				</TabsList>
 				<TabsContent value="info">
 					<VolumeInfoTabContent volume={volume} statfs={statfs} />
+				</TabsContent>
+				<TabsContent value="files">
+					<FilesTabContent volume={volume} />
 				</TabsContent>
 				<TabsContent value="docker">
 					<DockerTabContent volume={volume} />

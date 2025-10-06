@@ -17,6 +17,7 @@ import {
 	mountVolume,
 	unmountVolume,
 	healthCheckVolume,
+	listFiles,
 } from "../sdk.gen";
 import { queryOptions, type UseMutationOptions, type DefaultError } from "@tanstack/react-query";
 import type {
@@ -45,6 +46,7 @@ import type {
 	UnmountVolumeResponse,
 	HealthCheckVolumeData,
 	HealthCheckVolumeResponse,
+	ListFilesData,
 } from "../types.gen";
 import { client as _heyApiClient } from "../client.gen";
 
@@ -538,4 +540,24 @@ export const healthCheckVolumeMutation = (
 		},
 	};
 	return mutationOptions;
+};
+
+export const listFilesQueryKey = (options: Options<ListFilesData>) => createQueryKey("listFiles", options);
+
+/**
+ * List files in a volume directory
+ */
+export const listFilesOptions = (options: Options<ListFilesData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await listFiles({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: listFilesQueryKey(options),
+	});
 };

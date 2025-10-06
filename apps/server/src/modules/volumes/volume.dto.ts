@@ -305,3 +305,50 @@ export const getContainersDto = describeRoute({
 		},
 	},
 });
+
+/**
+ * List files in a volume
+ */
+const fileEntrySchema = type({
+	name: "string",
+	path: "string",
+	type: type.enumerated("file", "directory"),
+	size: "number?",
+	modifiedAt: "number?",
+});
+
+export const listFilesResponse = type({
+	files: fileEntrySchema.array(),
+	path: "string",
+});
+export type ListFilesResponseDto = typeof listFilesResponse.infer;
+
+export const listFilesDto = describeRoute({
+	description: "List files in a volume directory",
+	operationId: "listFiles",
+	tags: ["Volumes"],
+	parameters: [
+		{
+			in: "query",
+			name: "path",
+			required: false,
+			schema: {
+				type: "string",
+			},
+			description: "Subdirectory path to list (relative to volume root)",
+		},
+	],
+	responses: {
+		200: {
+			description: "List of files in the volume",
+			content: {
+				"application/json": {
+					schema: resolver(listFilesResponse),
+				},
+			},
+		},
+		404: {
+			description: "Volume not found",
+		},
+	},
+});

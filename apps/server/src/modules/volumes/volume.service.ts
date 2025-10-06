@@ -253,6 +253,69 @@ const getContainersUsingVolume = async (name: string) => {
 	return { containers: usingContainers };
 };
 
+const listFiles = async (name: string, subPath?: string) => {
+	const volume = await db.query.volumesTable.findFirst({
+		where: eq(volumesTable.name, name),
+	});
+
+	if (!volume) {
+		throw new NotFoundError("Volume not found");
+	}
+
+	if (volume.status !== "mounted") {
+		throw new InternalServerError("Volume is not mounted");
+	}
+
+	const requestedPath = subPath ? path.join(volume.path, subPath) : volume.path;
+
+	const normalizedPath = path.normalize(requestedPath);
+	if (!normalizedPath.startsWith(volume.path)) {
+		throw new InternalServerError("Invalid path");
+	}
+
+	try {
+		const entries = await fs.readdir(normalizedPath, { withFileTypes: true });
+
+		const files = await Promise.all(
+			entries.map(async (entry) => {
+				const fullPath = path.join(normalizedPath, entry.name);
+				const relativePath = path.relative(volume.path, fullPath);
+
+				try {
+					const stats = await fs.stat(fullPath);
+					return {
+						name: entry.name,
+						path: `/${relativePath}`,
+						type: entry.isDirectory() ? ("directory" as const) : ("file" as const),
+						size: entry.isFile() ? stats.size : undefined,
+						modifiedAt: stats.mtimeMs,
+					};
+				} catch {
+					return {
+						name: entry.name,
+						path: `/${relativePath}`,
+						type: entry.isDirectory() ? ("directory" as const) : ("file" as const),
+						size: undefined,
+						modifiedAt: undefined,
+					};
+				}
+			}),
+		);
+
+		return {
+			files: files.sort((a, b) => {
+				if (a.type !== b.type) {
+					return a.type === "directory" ? -1 : 1;
+				}
+				return a.name.localeCompare(b.name);
+			}),
+			path: subPath || "/",
+		};
+	} catch (error) {
+		throw new InternalServerError(`Failed to list files: ${toMessage(error)}`);
+	}
+};
+
 export const volumeService = {
 	listVolumes,
 	createVolume,
@@ -264,4 +327,5 @@ export const volumeService = {
 	unmountVolume,
 	checkHealth,
 	getContainersUsingVolume,
+	listFiles,
 };
