@@ -15,7 +15,8 @@
   </figure>
 </div>
 
-<br />
+> [!WARNING]  
+> Ironmount is still in version 0.x.x and is subject to major changes from version to version. I am developing the core features and collecting feedbacks. Expect bugs! Please open issues and join the Discord to discuss together
 
 ## Intro
 
@@ -41,7 +42,7 @@ In order to run Ironmount, you need to have Docker and Docker Compose installed 
 ```yaml
 services:
   ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.1.1
+    image: ghcr.io/nicotsx/ironmount:v0.2.0
     container_name: ironmount
     restart: unless-stopped
     cap_add:

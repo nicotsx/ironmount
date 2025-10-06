@@ -21,7 +21,7 @@ export const startup = async () => {
 	existingTasks.forEach(async (task) => await task.destroy());
 
 	schedule("* * * * *", async () => {
-		logger.info("Running health check for all volumes...");
+		logger.debug("Running health check for all volumes...");
 
 		const volumes = await db.query.volumesTable.findMany({
 			where: or(eq(volumesTable.status, "mounted"), eq(volumesTable.status, "error")),

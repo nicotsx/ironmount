@@ -1,12 +1,12 @@
 import * as fs from "node:fs/promises";
 import * as npath from "node:path";
 import { BACKEND_STATUS, type BackendConfig } from "@ironmount/schemas";
-import type { VolumeBackend } from "../backend";
-import { logger } from "../../../utils/logger";
 import { toMessage } from "../../../utils/errors";
+import { logger } from "../../../utils/logger";
+import type { VolumeBackend } from "../backend";
 
 const mount = async (_config: BackendConfig, path: string) => {
-	logger.info("Mounting directory volume...");
+	logger.info("Mounting directory volume...", path);
 	await fs.mkdir(path, { recursive: true });
 	return { status: BACKEND_STATUS.mounted };
 };
