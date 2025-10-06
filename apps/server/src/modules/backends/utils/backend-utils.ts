@@ -4,6 +4,7 @@ import { execFile as execFileCb } from "node:child_process";
 import { promisify } from "node:util";
 import { OPERATION_TIMEOUT } from "../../../core/constants";
 import { logger } from "../../../utils/logger";
+import { toMessage } from "../../../utils/errors";
 
 const execFile = promisify(execFileCb);
 
@@ -33,5 +34,18 @@ export const createTestFile = async (path: string): Promise<void> => {
 	const testFilePath = npath.join(path, `.healthcheck-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
 
 	await fs.writeFile(testFilePath, "healthcheck");
-	await fs.unlink(testFilePath);
+
+	const files = await fs.readdir(path);
+	await Promise.all(
+		files.map(async (file) => {
+			if (file.startsWith(".healthcheck-")) {
+				const filePath = npath.join(path, file);
+				try {
+					await fs.unlink(filePath);
+				} catch (err) {
+					logger.warn(`Failed to stat or unlink file ${filePath}: ${toMessage(err)}`);
+				}
+			}
+		}),
+	);
 };
