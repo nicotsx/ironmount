@@ -9,7 +9,7 @@
  */
 
 import { ChevronDown, ChevronRight, File as FileIcon, Folder as FolderIcon, FolderOpen, Loader2 } from "lucide-react";
-import { memo, type ReactNode, useEffect, useMemo, useState } from "react";
+import { memo, type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { cn } from "~/lib/utils";
 
 const NODE_PADDING_LEFT = 12;
@@ -77,20 +77,23 @@ export const FileTree = memo((props: Props) => {
 		return list;
 	}, [fileList, collapsedFolders]);
 
-	const toggleCollapseState = (fullPath: string) => {
-		setCollapsedFolders((prevSet) => {
-			const newSet = new Set(prevSet);
+	const toggleCollapseState = useCallback(
+		(fullPath: string) => {
+			setCollapsedFolders((prevSet) => {
+				const newSet = new Set(prevSet);
 
-			if (newSet.has(fullPath)) {
-				newSet.delete(fullPath);
-				onFolderExpand?.(fullPath);
-			} else {
-				newSet.add(fullPath);
-			}
+				if (newSet.has(fullPath)) {
+					newSet.delete(fullPath);
+					onFolderExpand?.(fullPath);
+				} else {
+					newSet.add(fullPath);
+				}
 
-			return newSet;
-		});
-	};
+				return newSet;
+			});
+		},
+		[onFolderExpand],
+	);
 
 	// Add new folders to collapsed set when file list changes
 	useEffect(() => {
@@ -105,6 +108,13 @@ export const FileTree = memo((props: Props) => {
 		});
 	}, [fileList, expandedFolders]);
 
+	const handleFileSelect = useCallback(
+		(filePath: string) => {
+			onFileSelect?.(filePath);
+		},
+		[onFileSelect],
+	);
+
 	return (
 		<div className={cn("text-sm", className)}>
 			{filteredFileList.map((fileOrFolder) => {
@@ -115,9 +125,7 @@ export const FileTree = memo((props: Props) => {
 								key={fileOrFolder.id}
 								selected={selectedFile === fileOrFolder.fullPath}
 								file={fileOrFolder}
-								onClick={() => {
-									onFileSelect?.(fileOrFolder.fullPath);
-								}}
+								onFileSelect={handleFileSelect}
 							/>
 						);
 					}
@@ -128,9 +136,7 @@ export const FileTree = memo((props: Props) => {
 								folder={fileOrFolder}
 								collapsed={collapsedFolders.has(fileOrFolder.fullPath)}
 								loading={loadingFolders.has(fileOrFolder.fullPath)}
-								onClick={() => {
-									toggleCollapseState(fileOrFolder.fullPath);
-								}}
+								onToggle={toggleCollapseState}
 							/>
 						);
 					}
@@ -147,11 +153,16 @@ interface FolderProps {
 	folder: FolderNode;
 	collapsed: boolean;
 	loading?: boolean;
-	onClick: () => void;
+	onToggle: (fullPath: string) => void;
 }
 
-function Folder({ folder: { depth, name }, collapsed, loading, onClick }: FolderProps) {
+const Folder = memo(({ folder, collapsed, loading, onToggle }: FolderProps) => {
+	const { depth, name, fullPath } = folder;
 	const FolderIconComponent = collapsed ? FolderIcon : FolderOpen;
+
+	const handleClick = useCallback(() => {
+		onToggle(fullPath);
+	}, [onToggle, fullPath]);
 
 	return (
 		<NodeButton
@@ -166,21 +177,27 @@ function Folder({ folder: { depth, name }, collapsed, loading, onClick }: Folder
 					<ChevronDown className="w-4 h-4 shrink-0" />
 				)
 			}
-			onClick={onClick}
+			onClick={handleClick}
 		>
 			<FolderIconComponent className="w-4 h-4 shrink-0 text-strong-accent" />
 			<span className="truncate">{name}</span>
 		</NodeButton>
 	);
-}
+});
 
 interface FileProps {
 	file: FileNode;
 	selected: boolean;
-	onClick: () => void;
+	onFileSelect: (filePath: string) => void;
 }
 
-function File({ file: { depth, name }, onClick, selected }: FileProps) {
+const File = memo(({ file, onFileSelect, selected }: FileProps) => {
+	const { depth, name, fullPath } = file;
+
+	const handleClick = useCallback(() => {
+		onFileSelect(fullPath);
+	}, [onFileSelect, fullPath]);
+
 	return (
 		<NodeButton
 			className={cn("group", {
@@ -189,12 +206,12 @@ function File({ file: { depth, name }, onClick, selected }: FileProps) {
 			})}
 			depth={depth}
 			icon={<FileIcon className="w-4 h-4 shrink-0 text-gray-500" />}
-			onClick={onClick}
+			onClick={handleClick}
 		>
 			<span className="truncate">{name}</span>
 		</NodeButton>
 	);
-}
+});
 
 interface ButtonProps {
 	depth: number;
@@ -204,19 +221,21 @@ interface ButtonProps {
 	onClick?: () => void;
 }
 
-function NodeButton({ depth, icon, onClick, className, children }: ButtonProps) {
+const NodeButton = memo(({ depth, icon, onClick, className, children }: ButtonProps) => {
+	const paddingLeft = useMemo(() => `${8 + depth * NODE_PADDING_LEFT}px`, [depth]);
+
 	return (
 		<button
 			type="button"
 			className={cn("flex items-center gap-2 w-full pr-2 text-sm py-1.5 text-left", className)}
-			style={{ paddingLeft: `${8 + depth * NODE_PADDING_LEFT}px` }}
-			onClick={() => onClick?.()}
+			style={{ paddingLeft }}
+			onClick={onClick}
 		>
 			{icon}
 			<div className="truncate w-full flex items-center gap-2">{children}</div>
 		</button>
 	);
-}
+});
 
 type Node = FileNode | FolderNode;
 

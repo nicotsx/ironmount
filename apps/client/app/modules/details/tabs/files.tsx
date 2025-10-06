@@ -1,9 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { FolderOpen } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
+import { listFilesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { listFiles } from "~/api-client/sdk.gen";
 import { FileTree } from "~/components/file-tree";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { parseError } from "~/lib/errors";
 import type { Volume } from "~/lib/types";
 
 type Props = {
@@ -26,19 +28,11 @@ export const FilesTabContent = ({ volume }: Props) => {
 
 	// Fetch root level files
 	const { data, isLoading, error } = useQuery({
-		queryKey: ["volume-files", volume.name, "/"],
-		queryFn: async () => {
-			const result = await listFiles({
-				path: { name: volume.name },
-				throwOnError: true,
-			});
-			return result.data;
-		},
+		...listFilesOptions({ path: { name: volume.name } }),
 		enabled: volume.status === "mounted",
 		refetchInterval: 10000,
 	});
 
-	// Update allFiles when root data changes
 	useMemo(() => {
 		if (data?.files) {
 			setAllFiles((prev) => {
@@ -59,7 +53,6 @@ export const FilesTabContent = ({ volume }: Props) => {
 				return next;
 			});
 
-			// If we haven't fetched this folder yet, fetch it
 			if (!fetchedFolders.has(folderPath)) {
 				setLoadingFolders((prev) => new Set(prev).add(folderPath));
 
@@ -123,7 +116,7 @@ export const FilesTabContent = ({ volume }: Props) => {
 				)}
 				{error && (
 					<div className="flex items-center justify-center h-full">
-						<p className="text-destructive">Failed to load files: {String(error)}</p>
+						<p className="text-destructive">Failed to load files: {error.message}</p>
 					</div>
 				)}
 				{!isLoading && !error && (
