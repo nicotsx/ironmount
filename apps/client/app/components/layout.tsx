@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import { LifeBuoy } from "lucide-react";
 import { Outlet, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { logoutMutation } from "~/api-client/@tanstack/react-query.gen";
@@ -42,6 +43,19 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 							</span>
 							<Button variant="outline" size="sm" onClick={() => logout.mutate({})} loading={logout.isPending}>
 								Logout
+							</Button>
+							<Button variant="default" size="sm" className="relative overflow-hidden">
+								<a
+									href="https://github.com/nicotsx/ironmount/issues/new"
+									target="_blank"
+									rel="noreferrer"
+									className="flex items-center gap-2"
+								>
+									<span className="flex items-center gap-2">
+										<LifeBuoy />
+										<span>Report an issue</span>
+									</span>
+								</a>
 							</Button>
 						</div>
 					)}
