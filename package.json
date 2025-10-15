@@ -1,7 +1,7 @@
 {
 	"name": "ironmount",
 	"private": true,
-	"packageManager": "bun@1.2.23",
+	"packageManager": "bun@1.3.0",
 	"scripts": {
 		"dev": "turbo dev",
 		"tsc": "turbo run tsc",
