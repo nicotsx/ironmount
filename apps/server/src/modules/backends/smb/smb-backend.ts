@@ -1,12 +1,12 @@
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import { BACKEND_STATUS, type BackendConfig } from "@ironmount/schemas";
-import type { VolumeBackend } from "../backend";
-import { logger } from "../../../utils/logger";
-import { withTimeout } from "../../../utils/timeout";
 import { OPERATION_TIMEOUT } from "../../../core/constants";
 import { toMessage } from "../../../utils/errors";
+import { logger } from "../../../utils/logger";
 import { getMountForPath } from "../../../utils/mountinfo";
+import { withTimeout } from "../../../utils/timeout";
+import type { VolumeBackend } from "../backend";
 import { createTestFile, executeMount, executeUnmount } from "../utils/backend-utils";
 
 const mount = async (config: BackendConfig, path: string) => {
