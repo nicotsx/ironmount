@@ -1,4 +1,12 @@
-import type { BackendStatus, BackendType, volumeConfigSchema } from "@ironmount/schemas";
+import type {
+	BackendStatus,
+	BackendType,
+	CompressionMode,
+	RepositoryBackend,
+	RepositoryStatus,
+	repositoryConfigSchema,
+	volumeConfigSchema,
+} from "@ironmount/schemas";
 import { sql } from "drizzle-orm";
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
@@ -41,4 +49,15 @@ export type Session = typeof sessionsTable.$inferSelect;
 
 export const repositoriesTable = sqliteTable("repositories_table", {
 	id: text().primaryKey(),
+	name: text().notNull().unique(),
+	backend: text().$type<RepositoryBackend>().notNull(),
+	config: text("config", { mode: "json" }).$type<typeof repositoryConfigSchema.inferOut>().notNull(),
+	compressionMode: text("compression_mode").$type<CompressionMode>().default("auto"),
+	status: text().$type<RepositoryStatus>().default("unknown"),
+	lastChecked: int("last_checked", { mode: "timestamp" }),
+	lastError: text("last_error"),
+	createdAt: int("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+	updatedAt: int("updated_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
 });
+
+export type Repository = typeof repositoriesTable.$inferSelect;

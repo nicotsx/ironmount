@@ -53,3 +53,61 @@ export const BACKEND_STATUS = {
 } as const;
 
 export type BackendStatus = keyof typeof BACKEND_STATUS;
+
+export const REPOSITORY_BACKENDS = {
+	local: "local",
+	sftp: "sftp",
+	s3: "s3",
+} as const;
+
+export type RepositoryBackend = keyof typeof REPOSITORY_BACKENDS;
+
+export const localRepositoryConfigSchema = type({
+	backend: "'local'",
+	path: "string",
+	password: "string",
+});
+
+export const sftpRepositoryConfigSchema = type({
+	backend: "'sftp'",
+	host: "string",
+	user: "string",
+	port: type("string.integer").or(type("number")).to("1 <= number <= 65535").default(22),
+	path: "string",
+	sftpPassword: "string?",
+	sftpPrivateKey: "string?",
+	sftpCommand: "string?",
+	sftpArgs: "string?",
+});
+
+export const s3RepositoryConfigSchema = type({
+	backend: "'s3'",
+	endpoint: "string",
+	bucket: "string",
+	accessKeyId: "string",
+	secretAccessKey: "string",
+});
+
+export const repositoryConfigSchema = localRepositoryConfigSchema
+	.or(sftpRepositoryConfigSchema)
+	.or(s3RepositoryConfigSchema);
+
+export type RepositoryConfig = typeof repositoryConfigSchema.infer;
+
+export const COMPRESSION_MODES = {
+	off: "off",
+	auto: "auto",
+	fastest: "fastest",
+	better: "better",
+	max: "max",
+} as const;
+
+export type CompressionMode = keyof typeof COMPRESSION_MODES;
+
+export const REPOSITORY_STATUS = {
+	healthy: "healthy",
+	error: "error",
+	unknown: "unknown",
+} as const;
+
+export type RepositoryStatus = keyof typeof REPOSITORY_STATUS;
