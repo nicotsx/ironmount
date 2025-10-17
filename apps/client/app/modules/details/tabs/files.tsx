@@ -1,11 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FolderOpen } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { listFilesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { listFiles } from "~/api-client/sdk.gen";
 import { FileTree } from "~/components/file-tree";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import { parseError } from "~/lib/errors";
 import type { Volume } from "~/lib/types";
 
 type Props = {
@@ -21,6 +20,7 @@ interface FileEntry {
 }
 
 export const FilesTabContent = ({ volume }: Props) => {
+	const queryClient = useQueryClient();
 	const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
 	const [fetchedFolders, setFetchedFolders] = useState<Set<string>>(new Set(["/"]));
 	const [loadingFolders, setLoadingFolders] = useState<Set<string>>(new Set());
@@ -88,6 +88,21 @@ export const FilesTabContent = ({ volume }: Props) => {
 		[volume.name, fetchedFolders],
 	);
 
+	// Prefetch folder contents on hover
+	const handleFolderHover = useCallback(
+		(folderPath: string) => {
+			if (!fetchedFolders.has(folderPath) && !loadingFolders.has(folderPath)) {
+				queryClient.prefetchQuery(
+					listFilesOptions({
+						path: { name: volume.name },
+						query: { path: folderPath },
+					}),
+				);
+			}
+		},
+		[volume.name, fetchedFolders, loadingFolders, queryClient],
+	);
+
 	const fileArray = useMemo(() => Array.from(allFiles.values()), [allFiles]);
 
 	if (volume.status !== "mounted") {
@@ -133,6 +148,7 @@ export const FilesTabContent = ({ volume }: Props) => {
 							<FileTree
 								files={fileArray}
 								onFolderExpand={handleFolderExpand}
+								onFolderHover={handleFolderHover}
 								expandedFolders={expandedFolders}
 								loadingFolders={loadingFolders}
 								className="p-2"

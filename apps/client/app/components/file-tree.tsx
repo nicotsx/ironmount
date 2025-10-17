@@ -27,6 +27,7 @@ interface Props {
 	selectedFile?: string;
 	onFileSelect?: (filePath: string) => void;
 	onFolderExpand?: (folderPath: string) => void;
+	onFolderHover?: (folderPath: string) => void;
 	expandedFolders?: Set<string>;
 	loadingFolders?: Set<string>;
 	className?: string;
@@ -38,6 +39,7 @@ export const FileTree = memo((props: Props) => {
 		onFileSelect,
 		selectedFile,
 		onFolderExpand,
+		onFolderHover,
 		expandedFolders = new Set(),
 		loadingFolders = new Set(),
 		className,
@@ -137,6 +139,7 @@ export const FileTree = memo((props: Props) => {
 								collapsed={collapsedFolders.has(fileOrFolder.fullPath)}
 								loading={loadingFolders.has(fileOrFolder.fullPath)}
 								onToggle={toggleCollapseState}
+								onHover={onFolderHover}
 							/>
 						);
 					}
@@ -154,15 +157,22 @@ interface FolderProps {
 	collapsed: boolean;
 	loading?: boolean;
 	onToggle: (fullPath: string) => void;
+	onHover?: (fullPath: string) => void;
 }
 
-const Folder = memo(({ folder, collapsed, loading, onToggle }: FolderProps) => {
+const Folder = memo(({ folder, collapsed, loading, onToggle, onHover }: FolderProps) => {
 	const { depth, name, fullPath } = folder;
 	const FolderIconComponent = collapsed ? FolderIcon : FolderOpen;
 
 	const handleClick = useCallback(() => {
 		onToggle(fullPath);
 	}, [onToggle, fullPath]);
+
+	const handleMouseEnter = useCallback(() => {
+		if (collapsed) {
+			onHover?.(fullPath);
+		}
+	}, [onHover, fullPath, collapsed]);
 
 	return (
 		<NodeButton
@@ -178,6 +188,7 @@ const Folder = memo(({ folder, collapsed, loading, onToggle }: FolderProps) => {
 				)
 			}
 			onClick={handleClick}
+			onMouseEnter={handleMouseEnter}
 		>
 			<FolderIconComponent className="w-4 h-4 shrink-0 text-strong-accent" />
 			<span className="truncate">{name}</span>
@@ -219,9 +230,10 @@ interface ButtonProps {
 	children: ReactNode;
 	className?: string;
 	onClick?: () => void;
+	onMouseEnter?: () => void;
 }
 
-const NodeButton = memo(({ depth, icon, onClick, className, children }: ButtonProps) => {
+const NodeButton = memo(({ depth, icon, onClick, onMouseEnter, className, children }: ButtonProps) => {
 	const paddingLeft = useMemo(() => `${8 + depth * NODE_PADDING_LEFT}px`, [depth]);
 
 	return (
@@ -230,6 +242,7 @@ const NodeButton = memo(({ depth, icon, onClick, className, children }: ButtonPr
 			className={cn("flex items-center gap-2 w-full pr-2 text-sm py-1.5 text-left", className)}
 			style={{ paddingLeft }}
 			onClick={onClick}
+			onMouseEnter={onMouseEnter}
 		>
 			{icon}
 			<div className="truncate w-full flex items-center gap-2">{children}</div>

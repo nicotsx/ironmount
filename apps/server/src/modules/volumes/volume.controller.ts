@@ -131,5 +131,7 @@ export const volumeController = new Hono()
 			path: result.path,
 		} satisfies ListFilesResponseDto;
 
+		c.header("Cache-Control", "public, max-age=10, stale-while-revalidate=60");
+
 		return c.json(response, 200);
 	});
