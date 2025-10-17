@@ -13,7 +13,6 @@ import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 export const volumesTable = sqliteTable("volumes_table", {
 	id: int().primaryKey({ autoIncrement: true }),
 	name: text().notNull().unique(),
-	path: text().notNull(),
 	type: text().$type<BackendType>().notNull(),
 	status: text().$type<BackendStatus>().notNull().default("unmounted"),
 	lastError: text("last_error"),

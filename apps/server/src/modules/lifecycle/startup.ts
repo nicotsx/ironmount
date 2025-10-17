@@ -3,11 +3,13 @@ import { getTasks, schedule } from "node-cron";
 import { db } from "../../db/db";
 import { volumesTable } from "../../db/schema";
 import { logger } from "../../utils/logger";
-import { volumeService } from "../volumes/volume.service";
 import { restic } from "../../utils/restic";
+import { volumeService } from "../volumes/volume.service";
+import { cleanupDanglingMounts } from "./cleanup";
 
 export const startup = async () => {
 	await restic.ensurePassfile();
+	cleanupDanglingMounts();
 
 	const volumes = await db.query.volumesTable.findMany({
 		where: or(
@@ -22,6 +24,11 @@ export const startup = async () => {
 
 	const existingTasks = getTasks();
 	existingTasks.forEach(async (task) => await task.destroy());
+
+	schedule("0 * * * *", async () => {
+		logger.debug("Running hourly cleanup of dangling mounts...");
+		await cleanupDanglingMounts();
+	});
 
 	schedule("* * * * *", async () => {
 		logger.debug("Running health check for all volumes...");

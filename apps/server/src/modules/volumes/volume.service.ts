@@ -13,6 +13,7 @@ import { toMessage } from "../../utils/errors";
 import { getStatFs, type StatFs } from "../../utils/mountinfo";
 import { createVolumeBackend } from "../backends/backend";
 import type { UpdateVolumeBody } from "./volume.dto";
+import { getVolumePath } from "./helpers";
 
 const listVolumes = async () => {
 	const volumes = await db.query.volumesTable.findMany({});
@@ -31,14 +32,11 @@ const createVolume = async (name: string, backendConfig: BackendConfig) => {
 		throw new ConflictError("Volume already exists");
 	}
 
-	const volumePathHost = path.join(VOLUME_MOUNT_BASE);
-
 	const [created] = await db
 		.insert(volumesTable)
 		.values({
 			name: slug,
 			config: backendConfig,
-			path: path.join(volumePathHost, slug, "_data"),
 			type: backendConfig.backend,
 		})
 		.returning();
@@ -266,10 +264,12 @@ const listFiles = async (name: string, subPath?: string) => {
 		throw new InternalServerError("Volume is not mounted");
 	}
 
-	const requestedPath = subPath ? path.join(volume.path, subPath) : volume.path;
+	const volumePath = getVolumePath(volume.name);
+
+	const requestedPath = subPath ? path.join(volumePath, subPath) : volumePath;
 
 	const normalizedPath = path.normalize(requestedPath);
-	if (!normalizedPath.startsWith(volume.path)) {
+	if (!normalizedPath.startsWith(volumePath)) {
 		throw new InternalServerError("Invalid path");
 	}
 
@@ -279,7 +279,7 @@ const listFiles = async (name: string, subPath?: string) => {
 		const files = await Promise.all(
 			entries.map(async (entry) => {
 				const fullPath = path.join(normalizedPath, entry.name);
-				const relativePath = path.relative(volume.path, fullPath);
+				const relativePath = path.relative(volumePath, fullPath);
 
 				try {
 					const stats = await fs.stat(fullPath);

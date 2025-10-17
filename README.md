@@ -42,7 +42,7 @@ In order to run Ironmount, you need to have Docker and Docker Compose installed 
 ```yaml
 services:
   ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.2.0
+    image: ghcr.io/nicotsx/ironmount:v0.3.0
     container_name: ironmount
     restart: unless-stopped
     cap_add:
@@ -54,7 +54,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /run/docker/plugins:/run/docker/plugins
-      - /var/lib/docker/volumes/:/var/lib/docker/volumes:rshared
+      - /var/lib/ironmount/volumes/:/var/lib/ironmount/volumes:rshared
       - ironmount_data:/data
 
 volumes:

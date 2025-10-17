@@ -43,9 +43,17 @@ export const driverController = new Hono()
 			Err: "",
 		});
 	})
-	.post("/VolumeDriver.Path", (c) => {
+	.post("/VolumeDriver.Path", async (c) => {
+		const body = await c.req.json();
+
+		if (!body.Name) {
+			return c.json({ Err: "Volume name is required" }, 400);
+		}
+
+		const { volume } = await volumeService.getVolume(body.Name.replace(/^im-/, ""));
+
 		return c.json({
-			Mountpoint: `/mnt/something`,
+			Mountpoint: `${VOLUME_MOUNT_BASE}/${volume.name}/_data`,
 		});
 	})
 	.post("/VolumeDriver.Get", async (c) => {

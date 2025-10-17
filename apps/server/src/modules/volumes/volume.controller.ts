@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { validator } from "hono-openapi";
+import { getVolumePath } from "./helpers";
 import {
 	createVolumeBody,
 	createVolumeDto,
@@ -29,6 +30,7 @@ export const volumeController = new Hono()
 
 		const response = {
 			volumes: volumes.map((volume) => ({
+				path: getVolumePath(volume.name),
 				...volume,
 				updatedAt: volume.updatedAt.getTime(),
 				createdAt: volume.createdAt.getTime(),
@@ -63,6 +65,7 @@ export const volumeController = new Hono()
 		const response = {
 			volume: {
 				...res.volume,
+				path: getVolumePath(res.volume.name),
 				createdAt: res.volume.createdAt.getTime(),
 				updatedAt: res.volume.updatedAt.getTime(),
 				lastHealthCheck: res.volume.lastHealthCheck.getTime(),
@@ -95,6 +98,7 @@ export const volumeController = new Hono()
 			message: "Volume updated",
 			volume: {
 				...res.volume,
+				path: getVolumePath(res.volume.name),
 				createdAt: res.volume.createdAt.getTime(),
 				updatedAt: res.volume.updatedAt.getTime(),
 				lastHealthCheck: res.volume.lastHealthCheck.getTime(),

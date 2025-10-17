@@ -1,6 +1,5 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { $ } from "bun";
 
 type MountInfo = {
 	mountPoint: string;
@@ -22,7 +21,7 @@ function unescapeMount(s: string): string {
 	return s.replace(/\\([0-7]{3})/g, (_, oct) => String.fromCharCode(parseInt(oct, 8)));
 }
 
-async function readMountInfo(): Promise<MountInfo[]> {
+export async function readMountInfo(): Promise<MountInfo[]> {
 	const text = await fs.readFile("/proc/self/mountinfo", "utf-8");
 	const result: MountInfo[] = [];
 

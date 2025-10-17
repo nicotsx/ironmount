@@ -43,6 +43,13 @@
       "when": 1759416698274,
       "tag": "0005_simple_alice",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1760734377440,
+      "tag": "0006_secret_micromacro",
+      "breakpoints": true
     }
   ]
 }
