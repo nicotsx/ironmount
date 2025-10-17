@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import { VOLUME_MOUNT_BASE } from "../../core/constants";
 import { volumeService } from "../volumes/volume.service";
+import { getVolumePath } from "../volumes/helpers";
 
 export const driverController = new Hono()
 	.post("/VolumeDriver.Capabilities", (c) => {
@@ -32,10 +32,8 @@ export const driverController = new Hono()
 
 		const volumeName = body.Name.replace(/^im-/, "");
 
-		const mountpoint = `${VOLUME_MOUNT_BASE}/${volumeName}/_data`;
-
 		return c.json({
-			Mountpoint: mountpoint,
+			Mountpoint: getVolumePath(volumeName),
 		});
 	})
 	.post("/VolumeDriver.Unmount", (c) => {
@@ -53,7 +51,7 @@ export const driverController = new Hono()
 		const { volume } = await volumeService.getVolume(body.Name.replace(/^im-/, ""));
 
 		return c.json({
-			Mountpoint: `${VOLUME_MOUNT_BASE}/${volume.name}/_data`,
+			Mountpoint: getVolumePath(volume.name),
 		});
 	})
 	.post("/VolumeDriver.Get", async (c) => {
@@ -68,7 +66,7 @@ export const driverController = new Hono()
 		return c.json({
 			Volume: {
 				Name: `im-${volume.name}`,
-				Mountpoint: `${VOLUME_MOUNT_BASE}/${volume.name}/_data`,
+				Mountpoint: getVolumePath(volume.name),
 				Status: {},
 			},
 			Err: "",
@@ -79,7 +77,7 @@ export const driverController = new Hono()
 
 		const res = volumes.map((volume) => ({
 			Name: `im-${volume.name}`,
-			Mountpoint: `${VOLUME_MOUNT_BASE}/${volume.name}/_data`,
+			Mountpoint: getVolumePath(volume.name),
 			Status: {},
 		}));
 

@@ -118,7 +118,7 @@ const getVolume = async (name: string) => {
 
 	let statfs: Partial<StatFs> = {};
 	if (volume.status === "mounted") {
-		statfs = await getStatFs(`${VOLUME_MOUNT_BASE}/${name}/_data`).catch(() => ({}));
+		statfs = await getStatFs(getVolumePath(name)).catch(() => ({}));
 	}
 
 	return { volume, statfs };

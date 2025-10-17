@@ -1,6 +1,6 @@
 import type { BackendStatus } from "@ironmount/schemas";
-import { VOLUME_MOUNT_BASE } from "../../core/constants";
 import type { Volume } from "../../db/schema";
+import { getVolumePath } from "../volumes/helpers";
 import { makeDirectoryBackend } from "./directory/directory-backend";
 import { makeNfsBackend } from "./nfs/nfs-backend";
 import { makeSmbBackend } from "./smb/smb-backend";
@@ -18,7 +18,7 @@ export type VolumeBackend = {
 };
 
 export const createVolumeBackend = (volume: Volume): VolumeBackend => {
-	const path = `${VOLUME_MOUNT_BASE}/${volume.name}/_data`;
+	const path = getVolumePath(volume.name);
 
 	switch (volume.config.backend) {
 		case "nfs": {
