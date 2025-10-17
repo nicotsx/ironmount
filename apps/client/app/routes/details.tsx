@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import {
 	deleteVolumeMutation,
@@ -38,6 +38,8 @@ export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
 export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 	const { name } = useParams<{ name: string }>();
 	const navigate = useNavigate();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const activeTab = searchParams.get("tab") || "info";
 
 	const { data } = useQuery({
 		...getVolumeOptions({ path: { name: name ?? "" } }),
@@ -131,7 +133,7 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 					</Button>
 				</div>
 			</div>
-			<Tabs defaultValue="info" className="mt-4">
+			<Tabs value={activeTab} onValueChange={(value) => setSearchParams({ tab: value })} className="mt-4">
 				<TabsList className="mb-2">
 					<TabsTrigger value="info">Configuration</TabsTrigger>
 					<TabsTrigger value="files">Files</TabsTrigger>
