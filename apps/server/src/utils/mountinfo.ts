@@ -1,5 +1,6 @@
 import path from "node:path";
 import fs from "node:fs/promises";
+import { $ } from "bun";
 
 type MountInfo = {
 	mountPoint: string;
@@ -59,11 +60,18 @@ export async function getMountForPath(p: string): Promise<MountInfo | undefined>
 }
 
 export async function getStatFs(mountPoint: string) {
-	const stats = await fs.statfs(mountPoint);
+	const res = await $`df -Pk ${mountPoint}`.text();
 
-	const total = Number(stats.blocks) * Number(stats.bsize);
-	const free = Number(stats.bfree) * Number(stats.bsize);
-	const used = total - free;
+	const lines = res.trim().split("\n");
+	if (lines.length < 2) {
+		throw new Error(`Unexpected df output: ${res}`);
+	}
+
+	const parts = lines.at(-1)?.trim().split(/\s+/) as [string, string, string, string, string, string];
+
+	const total = Number(parts[1]) * 1024;
+	const used = Number(parts[2]) * 1024;
+	const free = Number(parts[3]) * 1024;
 
 	return { total, used, free };
 }
