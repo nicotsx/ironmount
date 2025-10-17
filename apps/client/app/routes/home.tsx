@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Copy, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 import { listVolumes } from "~/api-client";
 import { listVolumesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { CreateVolumeDialog } from "~/components/create-volume-dialog";
@@ -13,6 +14,7 @@ import { Input } from "~/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
 import { VolumeIcon } from "~/components/volume-icon";
+import { copyToClipboard } from "~/utils/clipboard";
 import type { Route } from "./+types/home";
 
 export function meta(_: Route.MetaArgs) {
@@ -145,12 +147,20 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 										<VolumeIcon backend={volume.type} />
 									</TableCell>
 									<TableCell className="hidden sm:table-cell">
-										<span className="flex items-center gap-2">
+										<button
+											type="button"
+											className="flex items-center gap-2 cursor-pointer hover:opacity-70 transition-opacity"
+											onClick={(e) => {
+												e.stopPropagation();
+												copyToClipboard(volume.path);
+												toast.success("Path copied to clipboard");
+											}}
+										>
 											<span className="text-muted-foreground text-xs truncate bg-primary/10 rounded-md px-2 py-1">
 												{volume.path}
 											</span>
 											<Copy size={10} />
-										</span>
+										</button>
 									</TableCell>
 									<TableCell className="text-center">
 										<StatusDot status={volume.status} />
