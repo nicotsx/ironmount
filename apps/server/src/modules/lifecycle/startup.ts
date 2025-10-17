@@ -4,8 +4,11 @@ import { db } from "../../db/db";
 import { volumesTable } from "../../db/schema";
 import { logger } from "../../utils/logger";
 import { volumeService } from "../volumes/volume.service";
+import { restic } from "../../utils/restic";
 
 export const startup = async () => {
+	await restic.ensurePassfile();
+
 	const volumes = await db.query.volumesTable.findMany({
 		where: or(
 			eq(volumesTable.status, "mounted"),

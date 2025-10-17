@@ -38,3 +38,7 @@ export const sessionsTable = sqliteTable("sessions_table", {
 });
 
 export type Session = typeof sessionsTable.$inferSelect;
+
+export const repositoriesTable = sqliteTable("repositories_table", {
+	id: text().primaryKey(),
+});
