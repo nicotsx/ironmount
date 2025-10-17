@@ -41,7 +41,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 							<span className="text-sm text-muted-foreground">
 								Welcome, <span className="text-strong-accent">{loaderData.user?.username}</span>
 							</span>
-							<Button variant="outline" size="sm" onClick={() => logout.mutate({})} loading={logout.isPending}>
+							<Button variant="default" size="sm" onClick={() => logout.mutate({})} loading={logout.isPending}>
 								Logout
 							</Button>
 							<Button variant="default" size="sm" className="relative overflow-hidden">

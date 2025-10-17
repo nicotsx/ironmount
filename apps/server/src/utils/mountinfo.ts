@@ -1,5 +1,5 @@
-import path from "node:path";
 import fs from "node:fs/promises";
+import path from "node:path";
 import { $ } from "bun";
 
 type MountInfo = {
@@ -60,18 +60,27 @@ export async function getMountForPath(p: string): Promise<MountInfo | undefined>
 }
 
 export async function getStatFs(mountPoint: string) {
-	const res = await $`df -Pk ${mountPoint}`.text();
+	const s = await fs.statfs(mountPoint, { bigint: true });
 
-	const lines = res.trim().split("\n");
-	if (lines.length < 2) {
-		throw new Error(`Unexpected df output: ${res}`);
-	}
+	const unit = s.bsize > 0n ? s.bsize : 1n;
 
-	const parts = lines.at(-1)?.trim().split(/\s+/) as [string, string, string, string, string, string];
+	const blocks = s.blocks > 0n ? s.blocks : 0n;
 
-	const total = Number(parts[1]) * 1024;
-	const used = Number(parts[2]) * 1024;
-	const free = Number(parts[3]) * 1024;
+	let bfree = s.bfree > 0n ? s.bfree : 0n;
+	if (bfree > blocks) bfree = blocks;
 
-	return { total, used, free };
+	const bavail = s.bavail > 0n ? s.bavail : 0n;
+
+	const totalB = blocks * unit;
+	const usedB = (blocks - bfree) * unit;
+	const freeB = bavail * unit;
+
+	const MAX = BigInt(Number.MAX_SAFE_INTEGER);
+	const toNumber = (x: bigint) => (x > MAX ? Number.MAX_SAFE_INTEGER : Number(x));
+
+	return {
+		total: toNumber(totalB),
+		used: toNumber(usedB),
+		free: toNumber(freeB),
+	};
 }
