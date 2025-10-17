@@ -39,7 +39,7 @@ export const CreateVolumeDialog = ({ open, setOpen }: Props) => {
 				</Button>
 			</DialogTrigger>
 			<DialogContent>
-				<ScrollArea className="h-[500px]">
+				<ScrollArea className="h-[500px] p-4">
 					<DialogHeader>
 						<DialogTitle>Create volume</DialogTitle>
 					</DialogHeader>

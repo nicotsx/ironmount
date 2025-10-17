@@ -1,4 +1,4 @@
-import { volumeConfigSchemaNoUndefined } from "@ironmount/schemas";
+import { volumeConfigSchema } from "@ironmount/schemas";
 import { type } from "arktype";
 import { describeRoute, resolver } from "hono-openapi";
 
@@ -11,7 +11,7 @@ const volumeSchema = type({
 	createdAt: "number",
 	updatedAt: "number",
 	lastHealthCheck: "number",
-	config: volumeConfigSchemaNoUndefined,
+	config: volumeConfigSchema,
 	autoRemount: "boolean",
 });
 
@@ -46,7 +46,7 @@ export const listVolumesDto = describeRoute({
  */
 export const createVolumeBody = type({
 	name: "string",
-	config: volumeConfigSchemaNoUndefined,
+	config: volumeConfigSchema,
 });
 
 export const createVolumeResponse = type({
@@ -135,7 +135,7 @@ export const getVolumeDto = describeRoute({
  */
 export const updateVolumeBody = type({
 	autoRemount: "boolean?",
-	config: volumeConfigSchemaNoUndefined.optional(),
+	config: volumeConfigSchema.optional(),
 });
 
 export type UpdateVolumeBody = typeof updateVolumeBody.infer;
@@ -170,7 +170,7 @@ export type UpdateVolumeResponseDto = typeof updateVolumeResponse.infer;
  * Test connection
  */
 export const testConnectionBody = type({
-	config: volumeConfigSchemaNoUndefined,
+	config: volumeConfigSchema,
 });
 
 export const testConnectionResponse = type({

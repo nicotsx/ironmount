@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { testConnectionMutation } from "~/api-client/@tanstack/react-query.gen";
 import { cn, slugify } from "~/lib/utils";
+import { deepClean } from "~/utils/object";
 import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
@@ -15,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 export const formSchema = type({
 	name: "2<=string<=32",
 }).and(volumeConfigSchema);
+const cleanSchema = type.pipe((d) => formSchema(deepClean(d)));
 
 export type FormValues = typeof formSchema.inferIn;
 
@@ -36,7 +38,7 @@ const defaultValuesForType = {
 
 export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, formId, loading, className }: Props) => {
 	const form = useForm<FormValues>({
-		resolver: arktypeResolver(formSchema),
+		resolver: arktypeResolver(cleanSchema as unknown as typeof formSchema),
 		defaultValues: initialValues,
 		resetOptions: {
 			keepDefaultValues: true,
@@ -311,7 +313,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 								<FormItem>
 									<FormLabel>Server</FormLabel>
 									<FormControl>
-										<Input placeholder="192.168.1.100" value={field.value ?? ""} onChange={field.onChange} />
+										<Input placeholder="192.168.1.100" value={field.value} onChange={field.onChange} />
 									</FormControl>
 									<FormDescription>SMB server IP address or hostname.</FormDescription>
 									<FormMessage />
@@ -325,7 +327,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 								<FormItem>
 									<FormLabel>Share</FormLabel>
 									<FormControl>
-										<Input placeholder="myshare" value={field.value ?? ""} onChange={field.onChange} />
+										<Input placeholder="myshare" value={field.value} onChange={field.onChange} />
 									</FormControl>
 									<FormDescription>SMB share name on the server.</FormDescription>
 									<FormMessage />
@@ -339,7 +341,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 								<FormItem>
 									<FormLabel>Username</FormLabel>
 									<FormControl>
-										<Input placeholder="admin" value={field.value ?? ""} onChange={field.onChange} />
+										<Input placeholder="admin" value={field.value} onChange={field.onChange} />
 									</FormControl>
 									<FormDescription>Username for SMB authentication.</FormDescription>
 									<FormMessage />
@@ -353,7 +355,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 								<FormItem>
 									<FormLabel>Password</FormLabel>
 									<FormControl>
-										<Input type="password" placeholder="••••••••" value={field.value ?? ""} onChange={field.onChange} />
+										<Input type="password" placeholder="••••••••" value={field.value} onChange={field.onChange} />
 									</FormControl>
 									<FormDescription>Password for SMB authentication.</FormDescription>
 									<FormMessage />
@@ -450,11 +452,10 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 					</div>
 					{testMessage && (
 						<div
-							className={`text-xs p-2 rounded-md ${
-								testMessage.success
-									? "bg-green-50 text-green-700 border border-green-200"
-									: "bg-red-50 text-red-700 border border-red-200"
-							}`}
+							className={cn("text-xs p-2 rounded-md text-wrap wrap-anywhere", {
+								"bg-green-50 text-green-700 border border-green-200": testMessage.success,
+								"bg-red-50 text-red-700 border border-red-200": !testMessage.success,
+							})}
 						>
 							{testMessage.message}
 						</div>

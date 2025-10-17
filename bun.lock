@@ -27,7 +27,7 @@
         "@tanstack/react-query": "^5.90.2",
         "@tanstack/react-query-devtools": "^5.90.2",
         "@tanstack/react-table": "^8.21.3",
-        "arktype": "^2.1.22",
+        "arktype": "^2.1.23",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "date-fns": "^4.1.0",
@@ -96,9 +96,11 @@
     "@tailwindcss/oxide",
   ],
   "packages": {
-    "@ark/schema": ["@ark/schema@0.49.0", "", { "dependencies": { "@ark/util": "0.49.0" } }, "sha512-GphZBLpW72iS0v4YkeUtV3YIno35Gimd7+ezbPO9GwEi9kzdUrPVjvf6aXSBAfHikaFc/9pqZOpv3pOXnC71tw=="],
+    "@ark/regex": ["@ark/regex@0.0.0", "", { "dependencies": { "@ark/util": "0.50.0" } }, "sha512-p4vsWnd/LRGOdGQglbwOguIVhPmCAf5UzquvnDoxqhhPWTP84wWgi1INea8MgJ4SnI2gp37f13oA4Waz9vwNYg=="],
 
-    "@ark/util": ["@ark/util@0.49.0", "", {}, "sha512-/BtnX7oCjNkxi2vi6y1399b+9xd1jnCrDYhZ61f0a+3X8x8DxlK52VgEEzyuC2UQMPACIfYrmHkhD3lGt2GaMA=="],
+    "@ark/schema": ["@ark/schema@0.50.0", "", { "dependencies": { "@ark/util": "0.50.0" } }, "sha512-hfmP82GltBZDadIOeR3argKNlYYyB2wyzHp0eeAqAOFBQguglMV/S7Ip2q007bRtKxIMLDqFY6tfPie1dtssaQ=="],
+
+    "@ark/util": ["@ark/util@0.50.0", "", {}, "sha512-tIkgIMVRpkfXRQIEf0G2CJryZVtHVrqcWHMDa5QKo0OEEBu0tHkRSIMm4Ln8cd8Bn9TPZtvc/kE2Gma8RESPSg=="],
 
     "@babel/code-frame": ["@babel/code-frame@7.27.1", "", { "dependencies": { "@babel/helper-validator-identifier": "^7.27.1", "js-tokens": "^4.0.0", "picocolors": "^1.1.1" } }, "sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg=="],
 
@@ -570,7 +572,7 @@
 
     "aria-hidden": ["aria-hidden@1.2.6", "", { "dependencies": { "tslib": "^2.0.0" } }, "sha512-ik3ZgC9dY/lYVVM++OISsaYDeg1tb0VtP5uL3ouh1koGOaUMDPpbFIei4JkFimWUFPn90sbMNMXQAIVOlnYKJA=="],
 
-    "arktype": ["arktype@2.1.22", "", { "dependencies": { "@ark/schema": "0.49.0", "@ark/util": "0.49.0" } }, "sha512-xdzl6WcAhrdahvRRnXaNwsipCgHuNoLobRqhiP8RjnfL9Gp947abGlo68GAIyLtxbD+MLzNyH2YR4kEqioMmYQ=="],
+    "arktype": ["arktype@2.1.23", "", { "dependencies": { "@ark/regex": "0.0.0", "@ark/schema": "0.50.0", "@ark/util": "0.50.0" } }, "sha512-tyxNWX6xJVMb2EPJJ3OjgQS1G/vIeQRrZuY4DeBNQmh8n7geS+czgbauQWB6Pr+RXiOO8ChEey44XdmxsqGmfQ=="],
 
     "array-flatten": ["array-flatten@1.1.1", "", {}, "sha512-PCVAQswWemu6UdxsDFFX/+gVeYqKAod3D3UVm91jHwynguOwAvYPhx8nNlM++NqRcK6CxxpUafjmhIdKiHibqg=="],
 
@@ -1294,6 +1296,8 @@
 
     "@grpc/grpc-js/@grpc/proto-loader": ["@grpc/proto-loader@0.8.0", "", { "dependencies": { "lodash.camelcase": "^4.3.0", "long": "^5.0.0", "protobufjs": "^7.5.3", "yargs": "^17.7.2" }, "bin": { "proto-loader-gen-types": "build/bin/proto-loader-gen-types.js" } }, "sha512-rc1hOQtjIWGxcxpb9aHAfLpIctjEnsDehj0DAiVfBlmT84uvR0uUtN2hEi/ecvWVjXUGf5qPF4qEgiLOx1YIMQ=="],
 
+    "@ironmount/server/arktype": ["arktype@2.1.22", "", { "dependencies": { "@ark/schema": "0.49.0", "@ark/util": "0.49.0" } }, "sha512-xdzl6WcAhrdahvRRnXaNwsipCgHuNoLobRqhiP8RjnfL9Gp947abGlo68GAIyLtxbD+MLzNyH2YR4kEqioMmYQ=="],
+
     "@isaacs/cliui/string-width": ["string-width@5.1.2", "", { "dependencies": { "eastasianwidth": "^0.2.0", "emoji-regex": "^9.2.2", "strip-ansi": "^7.0.1" } }, "sha512-HnLOCR3vjcY8beoNLtcjZ5/nxn2afmME6lhrDrebokqMap+XbeW8n9TXpPDOqdGK5qcI3oT0GKTW6wC7EMiVqA=="],
 
     "@isaacs/cliui/strip-ansi": ["strip-ansi@7.1.2", "", { "dependencies": { "ansi-regex": "^6.0.1" } }, "sha512-gmBGslpoQJtgnMAvOVqGZpEz9dyoKTCzy2nfz/n8aIFhN/jCE/rCmcxabB6jOOHV+0WNnylOxaxBQPSvcWklhA=="],
@@ -1425,6 +1429,10 @@
     "@esbuild-kit/core-utils/esbuild/@esbuild/win32-ia32": ["@esbuild/win32-ia32@0.18.20", "", { "os": "win32", "cpu": "ia32" }, "sha512-Wv7QBi3ID/rROT08SABTS7eV4hX26sVduqDOTe1MvGMjNd3EjOz4b7zeexIR62GTIEKrfJXKL9LFxTYgkyeu7g=="],
 
     "@esbuild-kit/core-utils/esbuild/@esbuild/win32-x64": ["@esbuild/win32-x64@0.18.20", "", { "os": "win32", "cpu": "x64" }, "sha512-kTdfRcSiDfQca/y9QIkng02avJ+NCaQvrMejlsB3RRv5sE9rRoeBPISaZpKxHELzRxZyLvNts1P27W3wV+8geQ=="],
+
+    "@ironmount/server/arktype/@ark/schema": ["@ark/schema@0.49.0", "", { "dependencies": { "@ark/util": "0.49.0" } }, "sha512-GphZBLpW72iS0v4YkeUtV3YIno35Gimd7+ezbPO9GwEi9kzdUrPVjvf6aXSBAfHikaFc/9pqZOpv3pOXnC71tw=="],
+
+    "@ironmount/server/arktype/@ark/util": ["@ark/util@0.49.0", "", {}, "sha512-/BtnX7oCjNkxi2vi6y1399b+9xd1jnCrDYhZ61f0a+3X8x8DxlK52VgEEzyuC2UQMPACIfYrmHkhD3lGt2GaMA=="],
 
     "@isaacs/cliui/string-width/emoji-regex": ["emoji-regex@9.2.2", "", {}, "sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg=="],
 

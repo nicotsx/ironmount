@@ -24,7 +24,7 @@ export const smbConfigSchema = type({
 	username: "string",
 	password: "string",
 	vers: type("'1.0' | '2.0' | '2.1' | '3.0'").default("3.0"),
-	domain: "string | undefined?",
+	domain: "string?",
 	port: type("string.integer").or(type("number")).to("1 <= number <= 65535").default(445),
 });
 
@@ -36,16 +36,11 @@ export const webdavConfigSchema = type({
 	backend: "'webdav'",
 	server: "string",
 	path: "string",
-	username: "string | undefined?",
-	password: "string | undefined?",
+	username: "string?",
+	password: "string?",
 	port: type("string.integer").or(type("number")).to("1 <= number <= 65536").default(80),
 	ssl: "boolean?",
 });
-
-export const volumeConfigSchemaNoUndefined = nfsConfigSchema
-	.or(smbConfigSchema.omit("domain").and(type({ domain: "string?" })))
-	.or(webdavConfigSchema.omit("username", "password").and(type({ username: "string?", password: "string?" })))
-	.or(directoryConfigSchema);
 
 export const volumeConfigSchema = nfsConfigSchema.or(smbConfigSchema).or(webdavConfigSchema).or(directoryConfigSchema);
 
