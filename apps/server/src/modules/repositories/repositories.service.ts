@@ -7,10 +7,22 @@ import { db } from "../../db/db";
 import { repositoriesTable } from "../../db/schema";
 import { toMessage } from "../../utils/errors";
 import { restic } from "../../utils/restic";
+import { cryptoUtils } from "../../utils/crypto";
 
 const listRepositories = async () => {
 	const repositories = await db.query.repositoriesTable.findMany({});
 	return repositories;
+};
+
+const encryptConfig = async (config: RepositoryConfig): Promise<RepositoryConfig> => {
+	const encryptedConfig = { ...config };
+	switch (config.backend) {
+		case "s3":
+			encryptedConfig.accessKeyId = await cryptoUtils.encrypt(config.accessKeyId);
+			encryptedConfig.secretAccessKey = await cryptoUtils.encrypt(config.secretAccessKey);
+			break;
+	}
+	return encryptedConfig;
 };
 
 const createRepository = async (name: string, config: RepositoryConfig, compressionMode?: CompressionMode) => {
@@ -26,13 +38,15 @@ const createRepository = async (name: string, config: RepositoryConfig, compress
 
 	const id = crypto.randomUUID();
 
+	const encryptedConfig = await encryptConfig(config);
+
 	const [created] = await db
 		.insert(repositoriesTable)
 		.values({
 			id,
 			name: slug,
 			backend: config.backend,
-			config,
+			config: encryptedConfig,
 			compressionMode: compressionMode ?? "auto",
 			status: "unknown",
 		})
@@ -42,7 +56,7 @@ const createRepository = async (name: string, config: RepositoryConfig, compress
 		throw new InternalServerError("Failed to create repository");
 	}
 
-	const { success, error } = await restic.init(config);
+	const { success, error } = await restic.init(encryptedConfig);
 
 	if (success) {
 		await db
@@ -58,14 +72,7 @@ const createRepository = async (name: string, config: RepositoryConfig, compress
 	}
 
 	const errorMessage = toMessage(error);
-	await db
-		.update(repositoriesTable)
-		.set({
-			status: "error",
-			lastError: errorMessage,
-			lastChecked: new Date(),
-		})
-		.where(eq(repositoriesTable.id, id));
+	await db.delete(repositoriesTable).where(eq(repositoriesTable.id, id));
 
 	throw new InternalServerError(`Failed to initialize repository: ${errorMessage}`);
 };
