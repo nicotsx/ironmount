@@ -62,24 +62,6 @@ export const REPOSITORY_BACKENDS = {
 
 export type RepositoryBackend = keyof typeof REPOSITORY_BACKENDS;
 
-export const localRepositoryConfigSchema = type({
-	backend: "'local'",
-	path: "string",
-	password: "string",
-});
-
-export const sftpRepositoryConfigSchema = type({
-	backend: "'sftp'",
-	host: "string",
-	user: "string",
-	port: type("string.integer").or(type("number")).to("1 <= number <= 65535").default(22),
-	path: "string",
-	sftpPassword: "string?",
-	sftpPrivateKey: "string?",
-	sftpCommand: "string?",
-	sftpArgs: "string?",
-});
-
 export const s3RepositoryConfigSchema = type({
 	backend: "'s3'",
 	endpoint: "string",
@@ -88,9 +70,7 @@ export const s3RepositoryConfigSchema = type({
 	secretAccessKey: "string",
 });
 
-export const repositoryConfigSchema = localRepositoryConfigSchema
-	.or(sftpRepositoryConfigSchema)
-	.or(s3RepositoryConfigSchema);
+export const repositoryConfigSchema = s3RepositoryConfigSchema;
 
 export type RepositoryConfig = typeof repositoryConfigSchema.infer;
 

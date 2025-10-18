@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
+import type { RepositoryConfig } from "@ironmount/schemas";
 import { type } from "arktype";
 import { $ } from "bun";
 import { RESTIC_PASS_FILE } from "../core/constants";
@@ -34,14 +35,53 @@ const ensurePassfile = async () => {
 	}
 };
 
-const init = async (name: string) => {
-	const res =
-		await $`restic init --repo /data/repositories/${name} --password-file /data/secrets/restic.pass --json`.nothrow();
+const buildRepoUrl = (config: RepositoryConfig): string => {
+	switch (config.backend) {
+		case "s3":
+			return `s3:${config.endpoint}/${config.bucket}`;
+		default: {
+			throw new Error(`Unsupported repository backend: ${JSON.stringify(config)}`);
+		}
+	}
 };
 
-const backup = async (repo: string, source: string) => {
-	const res =
-		await $`restic --repo /data/repositories/${repo} backup ${source} --password-file /data/secrets/restic.pass --json`.nothrow();
+const buildEnv = (config: RepositoryConfig): Record<string, string> => {
+	const env: Record<string, string> = {};
+
+	switch (config.backend) {
+		case "s3":
+			env.AWS_ACCESS_KEY_ID = config.accessKeyId;
+			env.AWS_SECRET_ACCESS_KEY = config.secretAccessKey;
+			break;
+	}
+
+	return env;
+};
+
+const init = async (config: RepositoryConfig) => {
+	await ensurePassfile();
+
+	const repoUrl = buildRepoUrl(config);
+	const env = buildEnv(config);
+
+	const res = await $`restic init --repo ${repoUrl} --password-file ${RESTIC_PASS_FILE} --json`.env(env).nothrow();
+
+	if (res.exitCode !== 0) {
+		logger.error(`Restic init failed: ${res.stderr}`);
+		return { success: false, error: res.stderr };
+	}
+
+	logger.info(`Restic repository initialized: ${repoUrl}`);
+	return { success: true, error: null };
+};
+
+const backup = async (config: RepositoryConfig, source: string) => {
+	const repoUrl = buildRepoUrl(config);
+	const env = buildEnv(config);
+
+	const res = await $`restic --repo ${repoUrl} backup ${source} --password-file /data/secrets/restic.pass --json`
+		.env(env)
+		.nothrow();
 
 	if (res.exitCode !== 0) {
 		logger.error(`Restic backup failed: ${res.stderr}`);

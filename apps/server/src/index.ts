@@ -9,6 +9,7 @@ import { authController } from "./modules/auth/auth.controller";
 import { requireAuth } from "./modules/auth/auth.middleware";
 import { driverController } from "./modules/driver/driver.controller";
 import { startup } from "./modules/lifecycle/startup";
+import { repositoriesController } from "./modules/repositories/repositories.controller";
 import { volumeController } from "./modules/volumes/volume.controller";
 import { handleServiceError } from "./utils/errors";
 import { logger } from "./utils/logger";
@@ -21,7 +22,7 @@ export const generalDescriptor = (app: Hono) =>
 				version: "1.0.0",
 				description: "API for managing volumes",
 			},
-			servers: [{ url: "http://localhost:4096", description: "Development Server" }],
+			servers: [{ url: "http://192.168.2.42:4096", description: "Development Server" }],
 		},
 	});
 
@@ -37,6 +38,7 @@ const app = new Hono()
 	.get("healthcheck", (c) => c.json({ status: "ok" }))
 	.route("/api/v1/auth", authController.basePath("/api/v1"))
 	.route("/api/v1/volumes", volumeController.use(requireAuth))
+	.route("/api/v1/repositories", repositoriesController.use(requireAuth))
 	.get("/assets/*", serveStatic({ root: "./assets/frontend" }))
 	.get("*", serveStatic({ path: "./assets/frontend/index.html" }));
 
