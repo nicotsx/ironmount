@@ -15,6 +15,7 @@ body {
 	overflow-x: hidden;
 	width: 100%;
 	position: relative;
+	overscroll-behavior: none;
 
 	@media (prefers-color-scheme: dark) {
 		color-scheme: dark;

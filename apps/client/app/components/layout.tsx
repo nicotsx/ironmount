@@ -9,6 +9,8 @@ import type { Route } from "./+types/layout";
 import { AppBreadcrumb } from "./app-breadcrumb";
 import { GridBackground } from "./grid-background";
 import { Button } from "./ui/button";
+import { SidebarProvider, SidebarTrigger } from "./ui/sidebar";
+import { AppSidebar } from "./app-sidebar";
 
 export const clientMiddleware = [authMiddleware];
 
@@ -32,38 +34,47 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 	});
 
 	return (
-		<GridBackground>
-			<header className="bg-card-header border-b border-border/50">
-				<div className="flex items-center justify-between py-3 sm:py-4 px-2 sm:px-4 container mx-auto">
-					<AppBreadcrumb />
-					{loaderData.user && (
+		<SidebarProvider defaultOpen={false}>
+			<AppSidebar />
+			<GridBackground>
+				<header className="bg-card-header border-b border-border/50">
+					<div className="flex items-center justify-between py-3 sm:py-4 px-2 sm:px-4 container mx-auto">
 						<div className="flex items-center gap-4">
-							<span className="text-sm text-muted-foreground">
-								Welcome, <span className="text-strong-accent">{loaderData.user?.username}</span>
-							</span>
-							<Button variant="default" size="sm" onClick={() => logout.mutate({})} loading={logout.isPending}>
-								Logout
-							</Button>
-							<Button variant="default" size="sm" className="relative overflow-hidden">
-								<a
-									href="https://github.com/nicotsx/ironmount/issues/new"
-									target="_blank"
-									rel="noreferrer"
-									className="flex items-center gap-2"
-								>
-									<span className="flex items-center gap-2">
-										<LifeBuoy />
-										<span>Report an issue</span>
-									</span>
-								</a>
-							</Button>
+							<SidebarTrigger />
+							<AppBreadcrumb />
 						</div>
-					)}
-				</div>
-			</header>
-			<main className="flex flex-col pt-4 sm:pt-8 px-2 sm:px-4 pb-4 container mx-auto">
-				<Outlet />
-			</main>
-		</GridBackground>
+						{loaderData.user && (
+							<div className="flex items-center gap-4">
+								<span className="text-sm text-muted-foreground hidden md:inline-flex">
+									Welcome,&nbsp;
+									<span className="text-strong-accent">
+										{loaderData.user?.username[0].toUpperCase() + loaderData.user?.username.slice(1)}
+									</span>
+								</span>
+								<Button variant="default" size="sm" onClick={() => logout.mutate({})} loading={logout.isPending}>
+									Logout
+								</Button>
+								<Button variant="default" size="sm" className="relative overflow-hidden hidden lg:inline-flex">
+									<a
+										href="https://github.com/nicotsx/ironmount/issues/new"
+										target="_blank"
+										rel="noreferrer"
+										className="flex items-center gap-2"
+									>
+										<span className="flex items-center gap-2">
+											<LifeBuoy />
+											<span>Report an issue</span>
+										</span>
+									</a>
+								</Button>
+							</div>
+						)}
+					</div>
+				</header>
+				<main className="flex flex-col pt-4 sm:pt-8 px-2 sm:px-4 pb-4 container mx-auto">
+					<Outlet />
+				</main>
+			</GridBackground>
+		</SidebarProvider>
 	);
 }
