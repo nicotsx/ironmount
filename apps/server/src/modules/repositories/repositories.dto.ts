@@ -1,4 +1,4 @@
-import { repositoryConfigSchema } from "@ironmount/schemas";
+import { repositoryConfigSchema } from "@ironmount/schemas/restic";
 import { type } from "arktype";
 import { describeRoute, resolver } from "hono-openapi";
 

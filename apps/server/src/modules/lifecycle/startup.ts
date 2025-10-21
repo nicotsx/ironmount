@@ -8,8 +8,12 @@ import { volumeService } from "../volumes/volume.service";
 import { cleanupDanglingMounts } from "./cleanup";
 
 export const startup = async () => {
-	await restic.ensurePassfile();
-	cleanupDanglingMounts();
+	await restic.ensurePassfile().catch((err) => {
+		logger.error(`Error ensuring restic passfile exists: ${err.message}`);
+	});
+	cleanupDanglingMounts().catch((err) => {
+		logger.error(`Error during startup cleanup of dangling mounts: ${err.message}`);
+	});
 
 	const volumes = await db.query.volumesTable.findMany({
 		where: or(
@@ -19,7 +23,9 @@ export const startup = async () => {
 	});
 
 	for (const volume of volumes) {
-		await volumeService.mountVolume(volume.name);
+		await volumeService.mountVolume(volume.name).catch((err) => {
+			logger.error(`Error auto-remounting volume ${volume.name} on startup: ${err.message}`);
+		});
 	}
 
 	const existingTasks = getTasks();
