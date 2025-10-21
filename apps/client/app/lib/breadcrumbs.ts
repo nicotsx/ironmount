@@ -18,8 +18,8 @@ export function generateBreadcrumbs(pathname: string, params: Record<string, str
 	// Always start with Home
 	breadcrumbs.push({
 		label: "Volumes",
-		href: "/",
-		isCurrentPage: pathname === "/",
+		href: "/volumes",
+		isCurrentPage: pathname === "/volumes",
 	});
 
 	// Handle volume details page

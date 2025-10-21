@@ -16,7 +16,7 @@ import { cn } from "~/lib/utils";
 const items = [
 	{
 		title: "Volumes",
-		url: "/",
+		url: "/volumes",
 		icon: HardDrive,
 	},
 	{
@@ -42,7 +42,7 @@ export function AppSidebar() {
 										<Tooltip>
 											<TooltipTrigger asChild>
 												<SidebarMenuButton asChild>
-													<NavLink to={item.url} end>
+													<NavLink to={item.url}>
 														{({ isActive }) => (
 															<>
 																<item.icon className={cn({ "text-strong-accent": isActive })} />

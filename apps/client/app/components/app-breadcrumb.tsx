@@ -19,7 +19,7 @@ export function AppBreadcrumb() {
 			<BreadcrumbList>
 				{breadcrumbs.length === 1 && (
 					<BreadcrumbItem>
-						<Link to="/">Ironmount</Link>
+						<Link to="/volumes">Ironmount</Link>
 					</BreadcrumbItem>
 				)}
 				{breadcrumbs.map((breadcrumb, index) => {

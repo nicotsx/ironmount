@@ -52,7 +52,7 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 		...deleteVolumeMutation(),
 		onSuccess: () => {
 			toast.success("Volume deleted successfully");
-			navigate("/");
+			navigate("/volumes");
 		},
 		onError: (error) => {
 			toast.error("Failed to delete volume", {

@@ -32,7 +32,7 @@ export default function LoginPage() {
 	const login = useMutation({
 		...loginMutation(),
 		onSuccess: async () => {
-			navigate("/");
+			navigate("/volumes");
 		},
 		onError: (error) => {
 			console.error(error);
