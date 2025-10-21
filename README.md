@@ -73,3 +73,18 @@ Once the container is running, you can access the web interface at `http://<your
 ## Docker volume usage
 
 ![Preview](https://github.com/nicotsx/ironmount/blob/main/screenshots/docker-instructions.png?raw=true)
+
+## Third-Party Software
+
+This project includes the following third-party software components:
+
+### Restic
+
+Ironmount includes [Restic](https://github.com/restic/restic) for backup functionality.
+
+- **License**: BSD 2-Clause License
+- **Copyright**: Copyright (c) 2014, Alexander Neumann <alexander@bumpern.de>
+- **Status**: Included unchanged
+- **License Text**: See [LICENSES/BSD-2-Clause-Restic.txt](LICENSES/BSD-2-Clause-Restic.txt)
+
+For a complete list of third-party software licenses and attributions, please refer to the [NOTICES.md](NOTICES.md) file.

@@ -59,6 +59,10 @@ COPY --from=builder /app/apps/server/dist ./
 COPY --from=builder /app/apps/server/drizzle ./assets/migrations
 COPY --from=builder /app/apps/client/dist/client ./assets/frontend
 
+# Include third-party licenses and attribution
+COPY ./LICENSES ./LICENSES
+COPY ./NOTICES.md ./NOTICES.md
+COPY ./LICENSE ./LICENSE.md
 
 CMD ["bun", "./index.js"]
 

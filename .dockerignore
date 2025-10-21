@@ -18,3 +18,8 @@
 !apps/**/public/**
 
 !packages/**/src/**
+
+# License files and attributions
+!LICENSE
+!NOTICES.md
+!LICENSES/**
