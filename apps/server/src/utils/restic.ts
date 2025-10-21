@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { RepositoryConfig } from "@ironmount/schemas";
+import type { RepositoryConfig } from "@ironmount/schemas/restic";
 import { type } from "arktype";
 import { $ } from "bun";
 import { RESTIC_PASS_FILE } from "../core/constants";
@@ -38,6 +38,8 @@ const ensurePassfile = async () => {
 
 const buildRepoUrl = (config: RepositoryConfig): string => {
 	switch (config.backend) {
+		case "local":
+			return config.path;
 		case "s3":
 			return `s3:${config.endpoint}/${config.bucket}`;
 		default: {
@@ -47,7 +49,9 @@ const buildRepoUrl = (config: RepositoryConfig): string => {
 };
 
 const buildEnv = async (config: RepositoryConfig) => {
-	const env: Record<string, string> = {};
+	const env: Record<string, string> = {
+		RESTIC_PASSWORD_FILE: RESTIC_PASS_FILE,
+	};
 
 	switch (config.backend) {
 		case "s3":
@@ -65,7 +69,7 @@ const init = async (config: RepositoryConfig) => {
 	const repoUrl = buildRepoUrl(config);
 	const env = await buildEnv(config);
 
-	const res = await $`restic init --repo ${repoUrl} --password-file ${RESTIC_PASS_FILE} --json`.env(env).nothrow();
+	const res = await $`restic init --repo ${repoUrl} --json`.env(env).nothrow();
 
 	if (res.exitCode !== 0) {
 		logger.error(`Restic init failed: ${res.stderr}`);
@@ -80,9 +84,7 @@ const backup = async (config: RepositoryConfig, source: string) => {
 	const repoUrl = buildRepoUrl(config);
 	const env = await buildEnv(config);
 
-	const res = await $`restic --repo ${repoUrl} backup ${source} --password-file /data/secrets/restic.pass --json`
-		.env(env)
-		.nothrow();
+	const res = await $`restic --repo ${repoUrl} backup ${source} --json`.env(env).nothrow();
 
 	if (res.exitCode !== 0) {
 		logger.error(`Restic backup failed: ${res.stderr}`);
@@ -99,8 +101,23 @@ const backup = async (config: RepositoryConfig, source: string) => {
 	return result;
 };
 
+const restore = async (config: RepositoryConfig, snapshotId: string, target: string) => {
+	const repoUrl = buildRepoUrl(config);
+	const env = await buildEnv(config);
+
+	const res = await $`restic --repo ${repoUrl} restore ${snapshotId} --target ${target} --json`.env(env).nothrow();
+
+	if (res.exitCode !== 0) {
+		logger.error(`Restic restore failed: ${res.stderr}`);
+		throw new Error(`Restic restore failed: ${res.stderr}`);
+	}
+
+	logger.info(`Restic restore completed for snapshot ${snapshotId} to target ${target}`);
+};
+
 export const restic = {
 	ensurePassfile,
 	init,
 	backup,
+	restore,
 };

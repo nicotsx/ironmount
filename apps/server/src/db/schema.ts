@@ -1,12 +1,10 @@
+import type { BackendStatus, BackendType, volumeConfigSchema } from "@ironmount/schemas";
 import type {
-	BackendStatus,
-	BackendType,
 	CompressionMode,
 	RepositoryBackend,
-	RepositoryStatus,
 	repositoryConfigSchema,
-	volumeConfigSchema,
-} from "@ironmount/schemas";
+	RepositoryStatus,
+} from "@ironmount/schemas/restic";
 import { sql } from "drizzle-orm";
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
