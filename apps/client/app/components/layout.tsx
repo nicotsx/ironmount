@@ -38,7 +38,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 			<AppSidebar />
 			<GridBackground>
 				<header className="bg-card-header border-b border-border/50">
-					<div className="flex items-center justify-between py-3 sm:py-4 px-2 sm:px-4 container mx-auto">
+					<div className="flex items-center justify-between py-3 sm:py-4 px-2 sm:px-8 mx-auto">
 						<div className="flex items-center gap-4">
 							<SidebarTrigger />
 							<AppBreadcrumb />
@@ -71,7 +71,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 						)}
 					</div>
 				</header>
-				<main className="flex flex-col pt-4 sm:pt-8 px-2 sm:px-4 pb-4 container mx-auto">
+				<main className="flex flex-col p-2 pt-4 sm:p-8 sm:pt-4 mx-auto">
 					<Outlet />
 				</main>
 			</GridBackground>
