@@ -8,7 +8,6 @@ import {
 	BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
 import { useBreadcrumbs } from "~/lib/breadcrumbs";
-import { cn } from "../lib/utils";
 
 export function AppBreadcrumb() {
 	const breadcrumbs = useBreadcrumbs();
@@ -17,17 +16,12 @@ export function AppBreadcrumb() {
 		<Breadcrumb>
 			<BreadcrumbLink asChild></BreadcrumbLink>
 			<BreadcrumbList>
-				{breadcrumbs.length === 1 && (
-					<BreadcrumbItem>
-						<Link to="/volumes">Ironmount</Link>
-					</BreadcrumbItem>
-				)}
 				{breadcrumbs.map((breadcrumb, index) => {
 					const isLast = index === breadcrumbs.length - 1;
 
 					return (
 						<div key={`${breadcrumb.label}-${index}`} className="contents">
-							<BreadcrumbItem className={cn({ invisible: breadcrumbs.length <= 1 })}>
+							<BreadcrumbItem>
 								{isLast || breadcrumb.isCurrentPage ? (
 									<BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>
 								) : breadcrumb.href ? (

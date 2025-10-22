@@ -4,6 +4,7 @@ export default [
 	route("onboarding", "./routes/onboarding.tsx"),
 	route("login", "./routes/login.tsx"),
 	layout("./components/layout.tsx", [
+		route("/", "./routes/root.tsx"),
 		route("volumes", "./routes/home.tsx"),
 		route("volumes/:name", "./routes/details.tsx"),
 	]),
