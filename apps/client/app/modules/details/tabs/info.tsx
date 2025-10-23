@@ -42,7 +42,6 @@ export const VolumeInfoTabContent = ({ volume, statfs }: Props) => {
 	const [pendingValues, setPendingValues] = useState<FormValues | null>(null);
 
 	const handleSubmit = (values: FormValues) => {
-		console.log({ values });
 		setPendingValues(values);
 		setOpen(true);
 	};

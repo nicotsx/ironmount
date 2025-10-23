@@ -14,6 +14,7 @@ import { getStatFs, type StatFs } from "../../utils/mountinfo";
 import { createVolumeBackend } from "../backends/backend";
 import type { UpdateVolumeBody } from "./volume.dto";
 import { getVolumePath } from "./helpers";
+import { logger } from "../../utils/logger";
 
 const listVolumes = async () => {
 	const volumes = await db.query.volumesTable.findMany({});
@@ -137,7 +138,7 @@ const updateVolume = async (name: string, volumeData: UpdateVolumeBody) => {
 		JSON.stringify(existing.config) !== JSON.stringify(volumeData.config) && volumeData.config !== undefined;
 
 	if (configChanged) {
-		console.log("Unmounting existing volume before applying new config");
+		logger.debug("Unmounting existing volume before applying new config");
 		const backend = createVolumeBackend(existing);
 		await backend.unmount();
 	}

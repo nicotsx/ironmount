@@ -41,10 +41,6 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 	const hasNoSnapshots = snapshots.length === 0;
 	const hasNoFilteredSnapshots = filteredSnapshots.length === 0 && !hasNoSnapshots;
 
-	const formatDate = (timestamp: number) => {
-		return new Date(timestamp * 1000).toLocaleString();
-	};
-
 	const formatSnapshotDuration = (seconds: number) => {
 		const duration = intervalToDuration({ start: 0, end: seconds * 1000 });
 		const parts: string[] = [];
@@ -176,7 +172,7 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 									<TableCell>
 										<div className="flex items-center gap-2">
 											<Calendar className="h-4 w-4 text-muted-foreground" />
-											<span className="text-sm">{formatDate(snapshot.time / 1000)}</span>
+											<span className="text-sm">{new Date(snapshot.time).toLocaleString()}</span>
 										</div>
 									</TableCell>
 									<TableCell>

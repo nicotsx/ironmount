@@ -139,8 +139,6 @@ const checkHealth = async (path: string) => {
 
 		const mount = await getMountForPath(path);
 
-		console.log(mount);
-
 		if (!mount || mount.fstype !== "fuse") {
 			throw new Error(`Path ${path} is not mounted as WebDAV.`);
 		}
