@@ -33,13 +33,12 @@ export function AppSidebar() {
 	return (
 		<Sidebar variant="inset" collapsible="icon" className="p-0">
 			<SidebarHeader className="bg-card-header border-b border-border/50 hidden md:flex h-[65px] flex-row items-center p-4">
-				<Link to="/volumes" className="flex items-center gap-3 font-semibold">
-					<Mountain className="size-5 text-strong-accent ml-[6px]" />
+				<Link to="/volumes" className="flex items-center gap-3 font-semibold pl-2">
+					<Mountain className="size-5 text-strong-accent" />
 					<span
-						className={cn(
-							"text-base transition-opacity duration-200",
-							state === "collapsed" && "opacity-0 w-0 overflow-hidden",
-						)}
+						className={cn("text-base transition-all duration-200", {
+							"opacity-0 w-0 overflow-hidden ": state === "collapsed",
+						})}
 					>
 						Ironmount
 					</span>

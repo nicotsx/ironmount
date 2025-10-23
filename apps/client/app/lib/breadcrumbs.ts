@@ -15,14 +15,29 @@ export interface BreadcrumbItem {
 export function generateBreadcrumbs(pathname: string, params: Record<string, string | undefined>): BreadcrumbItem[] {
 	const breadcrumbs: BreadcrumbItem[] = [];
 
-	// Always start with Home
+	if (pathname.startsWith("/repositories")) {
+		breadcrumbs.push({
+			label: "Repositories",
+			href: "/repositories",
+			isCurrentPage: pathname === "/repositories",
+		});
+
+		if (pathname.startsWith("/repositories/") && params.name) {
+			breadcrumbs.push({
+				label: params.name,
+				isCurrentPage: true,
+			});
+		}
+
+		return breadcrumbs;
+	}
+
 	breadcrumbs.push({
 		label: "Volumes",
 		href: "/volumes",
 		isCurrentPage: pathname === "/volumes",
 	});
 
-	// Handle volume details page
 	if (pathname.startsWith("/volumes/") && params.name) {
 		breadcrumbs.push({
 			label: params.name,
