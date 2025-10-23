@@ -2,7 +2,6 @@ import { type } from "arktype";
 
 export const REPOSITORY_BACKENDS = {
 	local: "local",
-	sftp: "sftp",
 	s3: "s3",
 } as const;
 

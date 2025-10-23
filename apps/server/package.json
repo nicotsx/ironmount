@@ -9,11 +9,10 @@
 		"studio": "drizzle-kit studio"
 	},
 	"dependencies": {
-		"@hono/arktype-validator": "^2.0.1",
 		"@hono/standard-validator": "^0.1.5",
 		"@ironmount/schemas": "workspace:*",
 		"@scalar/hono-api-reference": "^0.9.13",
-		"arktype": "^2.1.20",
+		"arktype": "^2.1.23",
 		"dockerode": "^4.0.8",
 		"dotenv": "^17.2.1",
 		"drizzle-orm": "^0.44.6",

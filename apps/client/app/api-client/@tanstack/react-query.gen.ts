@@ -18,6 +18,10 @@ import {
 	unmountVolume,
 	healthCheckVolume,
 	listFiles,
+	listRepositories,
+	createRepository,
+	deleteRepository,
+	getRepository,
 } from "../sdk.gen";
 import { queryOptions, type UseMutationOptions, type DefaultError } from "@tanstack/react-query";
 import type {
@@ -47,6 +51,12 @@ import type {
 	HealthCheckVolumeData,
 	HealthCheckVolumeResponse,
 	ListFilesData,
+	ListRepositoriesData,
+	CreateRepositoryData,
+	CreateRepositoryResponse,
+	DeleteRepositoryData,
+	DeleteRepositoryResponse,
+	GetRepositoryData,
 } from "../types.gen";
 import { client as _heyApiClient } from "../client.gen";
 
@@ -559,5 +569,105 @@ export const listFilesOptions = (options: Options<ListFilesData>) => {
 			return data;
 		},
 		queryKey: listFilesQueryKey(options),
+	});
+};
+
+export const listRepositoriesQueryKey = (options?: Options<ListRepositoriesData>) =>
+	createQueryKey("listRepositories", options);
+
+/**
+ * List all repositories
+ */
+export const listRepositoriesOptions = (options?: Options<ListRepositoriesData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await listRepositories({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: listRepositoriesQueryKey(options),
+	});
+};
+
+export const createRepositoryQueryKey = (options?: Options<CreateRepositoryData>) =>
+	createQueryKey("createRepository", options);
+
+/**
+ * Create a new restic repository
+ */
+export const createRepositoryOptions = (options?: Options<CreateRepositoryData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await createRepository({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: createRepositoryQueryKey(options),
+	});
+};
+
+/**
+ * Create a new restic repository
+ */
+export const createRepositoryMutation = (
+	options?: Partial<Options<CreateRepositoryData>>,
+): UseMutationOptions<CreateRepositoryResponse, DefaultError, Options<CreateRepositoryData>> => {
+	const mutationOptions: UseMutationOptions<CreateRepositoryResponse, DefaultError, Options<CreateRepositoryData>> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await createRepository({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
+};
+
+/**
+ * Delete a repository
+ */
+export const deleteRepositoryMutation = (
+	options?: Partial<Options<DeleteRepositoryData>>,
+): UseMutationOptions<DeleteRepositoryResponse, DefaultError, Options<DeleteRepositoryData>> => {
+	const mutationOptions: UseMutationOptions<DeleteRepositoryResponse, DefaultError, Options<DeleteRepositoryData>> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await deleteRepository({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
+};
+
+export const getRepositoryQueryKey = (options: Options<GetRepositoryData>) => createQueryKey("getRepository", options);
+
+/**
+ * Get a single repository by name
+ */
+export const getRepositoryOptions = (options: Options<GetRepositoryData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await getRepository({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: getRepositoryQueryKey(options),
 	});
 };

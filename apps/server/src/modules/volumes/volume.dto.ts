@@ -1,12 +1,12 @@
-import { volumeConfigSchema } from "@ironmount/schemas";
+import { BACKEND_STATUS, BACKEND_TYPES, volumeConfigSchema } from "@ironmount/schemas";
 import { type } from "arktype";
 import { describeRoute, resolver } from "hono-openapi";
 
 const volumeSchema = type({
 	name: "string",
 	path: "string",
-	type: type.enumerated("nfs", "smb", "directory", "webdav"),
-	status: type.enumerated("mounted", "unmounted", "error", "unknown"),
+	type: type.valueOf(BACKEND_TYPES),
+	status: type.valueOf(BACKEND_STATUS),
 	lastError: "string | null",
 	createdAt: "number",
 	updatedAt: "number",
@@ -199,7 +199,7 @@ export const testConnectionDto = describeRoute({
  */
 export const mountVolumeResponse = type({
 	error: "string?",
-	status: type.enumerated("mounted", "unmounted", "error"),
+	status: type.valueOf(BACKEND_STATUS),
 });
 
 export const mountVolumeDto = describeRoute({
@@ -226,7 +226,7 @@ export const mountVolumeDto = describeRoute({
  */
 export const unmountVolumeResponse = type({
 	error: "string?",
-	status: type.enumerated("mounted", "unmounted", "error"),
+	status: type.valueOf(BACKEND_STATUS),
 });
 
 export const unmountVolumeDto = describeRoute({
@@ -250,7 +250,7 @@ export const unmountVolumeDto = describeRoute({
 
 export const healthCheckResponse = type({
 	error: "string?",
-	status: type.enumerated("mounted", "unmounted", "error"),
+	status: type.valueOf(BACKEND_STATUS),
 });
 
 export const healthCheckDto = describeRoute({

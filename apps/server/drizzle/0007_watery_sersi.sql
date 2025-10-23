@@ -1,0 +1,1 @@
+ALTER TABLE `repositories_table` RENAME COLUMN "backend" TO "type";

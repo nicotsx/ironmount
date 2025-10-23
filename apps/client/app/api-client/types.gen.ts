@@ -178,7 +178,7 @@ export type ListVolumesResponses = {
 			lastHealthCheck: number;
 			name: string;
 			path: string;
-			status: "error" | "mounted" | "unknown" | "unmounted";
+			status: "error" | "mounted" | "unmounted";
 			type: "directory" | "nfs" | "smb" | "webdav";
 			updatedAt: number;
 		}>;
@@ -374,7 +374,7 @@ export type GetVolumeResponses = {
 			lastHealthCheck: number;
 			name: string;
 			path: string;
-			status: "error" | "mounted" | "unknown" | "unmounted";
+			status: "error" | "mounted" | "unmounted";
 			type: "directory" | "nfs" | "smb" | "webdav";
 			updatedAt: number;
 		};
@@ -474,7 +474,7 @@ export type UpdateVolumeResponses = {
 			lastHealthCheck: number;
 			name: string;
 			path: string;
-			status: "error" | "mounted" | "unknown" | "unmounted";
+			status: "error" | "mounted" | "unmounted";
 			type: "directory" | "nfs" | "smb" | "webdav";
 			updatedAt: number;
 		};
@@ -639,6 +639,145 @@ export type ListFilesResponses = {
 
 export type ListFilesResponse = ListFilesResponses[keyof ListFilesResponses];
 
+export type ListRepositoriesData = {
+	body?: never;
+	path?: never;
+	query?: never;
+	url: "/api/v1/repositories";
+};
+
+export type ListRepositoriesResponses = {
+	/**
+	 * List of repositories
+	 */
+	200: {
+		repositories: Array<{
+			compressionMode: "auto" | "better" | "fastest" | "max" | "off" | null;
+			config:
+				| {
+						accessKeyId: string;
+						backend: "s3";
+						bucket: string;
+						endpoint: string;
+						secretAccessKey: string;
+				  }
+				| {
+						backend: "local";
+						path: string;
+				  };
+			createdAt: number;
+			id: string;
+			lastChecked: number | null;
+			lastError: string | null;
+			name: string;
+			status: "error" | "healthy" | "unknown" | null;
+			type: "local" | "s3";
+			updatedAt: number;
+		}>;
+	};
+};
+
+export type ListRepositoriesResponse = ListRepositoriesResponses[keyof ListRepositoriesResponses];
+
+export type CreateRepositoryData = {
+	body?: {
+		config:
+			| {
+					accessKeyId: string;
+					backend: "s3";
+					bucket: string;
+					endpoint: string;
+					secretAccessKey: string;
+			  }
+			| {
+					backend: "local";
+					path: string;
+			  };
+		name: string;
+		compressionMode?: "auto" | "better" | "fastest" | "max" | "off";
+	};
+	path?: never;
+	query?: never;
+	url: "/api/v1/repositories";
+};
+
+export type CreateRepositoryResponses = {
+	/**
+	 * Repository created successfully
+	 */
+	201: {
+		message: string;
+		repository: {
+			id: string;
+			name: string;
+		};
+	};
+};
+
+export type CreateRepositoryResponse = CreateRepositoryResponses[keyof CreateRepositoryResponses];
+
+export type DeleteRepositoryData = {
+	body?: never;
+	path: {
+		name: string;
+	};
+	query?: never;
+	url: "/api/v1/repositories/{name}";
+};
+
+export type DeleteRepositoryResponses = {
+	/**
+	 * Repository deleted successfully
+	 */
+	200: {
+		message: string;
+	};
+};
+
+export type DeleteRepositoryResponse = DeleteRepositoryResponses[keyof DeleteRepositoryResponses];
+
+export type GetRepositoryData = {
+	body?: never;
+	path: {
+		name: string;
+	};
+	query?: never;
+	url: "/api/v1/repositories/{name}";
+};
+
+export type GetRepositoryResponses = {
+	/**
+	 * Repository details
+	 */
+	200: {
+		repository: {
+			compressionMode: "auto" | "better" | "fastest" | "max" | "off" | null;
+			config:
+				| {
+						accessKeyId: string;
+						backend: "s3";
+						bucket: string;
+						endpoint: string;
+						secretAccessKey: string;
+				  }
+				| {
+						backend: "local";
+						path: string;
+				  };
+			createdAt: number;
+			id: string;
+			lastChecked: number | null;
+			lastError: string | null;
+			name: string;
+			status: "error" | "healthy" | "unknown" | null;
+			type: "local" | "s3";
+			updatedAt: number;
+		};
+	};
+};
+
+export type GetRepositoryResponse = GetRepositoryResponses[keyof GetRepositoryResponses];
+
 export type ClientOptions = {
-	baseUrl: "http://localhost:4096" | (string & {});
+	baseUrl: "http://192.168.2.42:4096" | (string & {});
 };

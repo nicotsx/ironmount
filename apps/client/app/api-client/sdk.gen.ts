@@ -44,6 +44,14 @@ import type {
 	ListFilesData,
 	ListFilesResponses,
 	ListFilesErrors,
+	ListRepositoriesData,
+	ListRepositoriesResponses,
+	CreateRepositoryData,
+	CreateRepositoryResponses,
+	DeleteRepositoryData,
+	DeleteRepositoryResponses,
+	GetRepositoryData,
+	GetRepositoryResponses,
 } from "./types.gen";
 import { client as _heyApiClient } from "./client.gen";
 
@@ -258,6 +266,58 @@ export const healthCheckVolume = <ThrowOnError extends boolean = false>(
 export const listFiles = <ThrowOnError extends boolean = false>(options: Options<ListFilesData, ThrowOnError>) => {
 	return (options.client ?? _heyApiClient).get<ListFilesResponses, ListFilesErrors, ThrowOnError>({
 		url: "/api/v1/volumes/{name}/files",
+		...options,
+	});
+};
+
+/**
+ * List all repositories
+ */
+export const listRepositories = <ThrowOnError extends boolean = false>(
+	options?: Options<ListRepositoriesData, ThrowOnError>,
+) => {
+	return (options?.client ?? _heyApiClient).get<ListRepositoriesResponses, unknown, ThrowOnError>({
+		url: "/api/v1/repositories",
+		...options,
+	});
+};
+
+/**
+ * Create a new restic repository
+ */
+export const createRepository = <ThrowOnError extends boolean = false>(
+	options?: Options<CreateRepositoryData, ThrowOnError>,
+) => {
+	return (options?.client ?? _heyApiClient).post<CreateRepositoryResponses, unknown, ThrowOnError>({
+		url: "/api/v1/repositories",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options?.headers,
+		},
+	});
+};
+
+/**
+ * Delete a repository
+ */
+export const deleteRepository = <ThrowOnError extends boolean = false>(
+	options: Options<DeleteRepositoryData, ThrowOnError>,
+) => {
+	return (options.client ?? _heyApiClient).delete<DeleteRepositoryResponses, unknown, ThrowOnError>({
+		url: "/api/v1/repositories/{name}",
+		...options,
+	});
+};
+
+/**
+ * Get a single repository by name
+ */
+export const getRepository = <ThrowOnError extends boolean = false>(
+	options: Options<GetRepositoryData, ThrowOnError>,
+) => {
+	return (options.client ?? _heyApiClient).get<GetRepositoryResponses, unknown, ThrowOnError>({
+		url: "/api/v1/repositories/{name}",
 		...options,
 	});
 };

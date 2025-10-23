@@ -1,14 +1,19 @@
-import { repositoryConfigSchema } from "@ironmount/schemas/restic";
+import {
+	COMPRESSION_MODES,
+	REPOSITORY_BACKENDS,
+	REPOSITORY_STATUS,
+	repositoryConfigSchema,
+} from "@ironmount/schemas/restic";
 import { type } from "arktype";
 import { describeRoute, resolver } from "hono-openapi";
 
 const repositorySchema = type({
 	id: "string",
 	name: "string",
-	backend: type.enumerated("local", "sftp", "s3"),
+	type: type.valueOf(REPOSITORY_BACKENDS),
 	config: repositoryConfigSchema,
-	compressionMode: type.enumerated("off", "auto", "fastest", "better", "max").or("null"),
-	status: type.enumerated("healthy", "error", "unknown").or("null"),
+	compressionMode: type.valueOf(COMPRESSION_MODES).or("null"),
+	status: type.valueOf(REPOSITORY_STATUS).or("null"),
 	lastChecked: "number | null",
 	lastError: "string | null",
 	createdAt: "number",
@@ -46,8 +51,8 @@ export const listRepositoriesDto = describeRoute({
  */
 export const createRepositoryBody = type({
 	name: "string",
+	compressionMode: type.valueOf(COMPRESSION_MODES).optional(),
 	config: repositoryConfigSchema,
-	"compressionMode?": type.enumerated("off", "auto", "fastest", "better", "max"),
 });
 
 export type CreateRepositoryBody = typeof createRepositoryBody.infer;

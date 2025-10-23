@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import type { CompressionMode, RepositoryConfig } from "@ironmount/schemas";
+import type { CompressionMode, RepositoryConfig } from "@ironmount/schemas/restic";
 import { eq } from "drizzle-orm";
 import { ConflictError, InternalServerError, NotFoundError } from "http-errors-enhanced";
 import slugify from "slugify";
@@ -15,14 +15,16 @@ const listRepositories = async () => {
 };
 
 const encryptConfig = async (config: RepositoryConfig): Promise<RepositoryConfig> => {
-	const encryptedConfig = { ...config };
+	const encryptedConfig: Record<string, string> = { ...config };
+
 	switch (config.backend) {
 		case "s3":
 			encryptedConfig.accessKeyId = await cryptoUtils.encrypt(config.accessKeyId);
 			encryptedConfig.secretAccessKey = await cryptoUtils.encrypt(config.secretAccessKey);
 			break;
 	}
-	return encryptedConfig;
+
+	return encryptedConfig as RepositoryConfig;
 };
 
 const createRepository = async (name: string, config: RepositoryConfig, compressionMode?: CompressionMode) => {
@@ -45,7 +47,7 @@ const createRepository = async (name: string, config: RepositoryConfig, compress
 		.values({
 			id,
 			name: slug,
-			backend: config.backend,
+			type: config.backend,
 			config: encryptedConfig,
 			compressionMode: compressionMode ?? "auto",
 			status: "unknown",
