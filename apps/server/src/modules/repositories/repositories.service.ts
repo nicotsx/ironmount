@@ -105,9 +105,23 @@ const deleteRepository = async (name: string) => {
 	await db.delete(repositoriesTable).where(eq(repositoriesTable.name, name));
 };
 
+const listSnapshots = async (name: string) => {
+	const repository = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.name, name),
+	});
+
+	if (!repository) {
+		throw new NotFoundError("Repository not found");
+	}
+
+	const snapshots = await restic.snapshots(repository.config);
+	return snapshots;
+};
+
 export const repositoriesService = {
 	listRepositories,
 	createRepository,
 	getRepository,
 	deleteRepository,
+	listSnapshots,
 };

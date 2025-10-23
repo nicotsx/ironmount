@@ -47,9 +47,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 							<div className="flex items-center gap-4">
 								<span className="text-sm text-muted-foreground hidden md:inline-flex">
 									Welcome,&nbsp;
-									<span className="text-strong-accent">
-										{loaderData.user?.username[0].toUpperCase() + loaderData.user?.username.slice(1)}
-									</span>
+									<span className="text-strong-accent">{loaderData.user?.username}</span>
 								</span>
 								<Button variant="default" size="sm" onClick={() => logout.mutate({})} loading={logout.isPending}>
 									Logout

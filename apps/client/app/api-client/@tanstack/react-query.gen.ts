@@ -22,6 +22,7 @@ import {
 	createRepository,
 	deleteRepository,
 	getRepository,
+	listSnapshots,
 } from "../sdk.gen";
 import { queryOptions, type UseMutationOptions, type DefaultError } from "@tanstack/react-query";
 import type {
@@ -57,6 +58,7 @@ import type {
 	DeleteRepositoryData,
 	DeleteRepositoryResponse,
 	GetRepositoryData,
+	ListSnapshotsData,
 } from "../types.gen";
 import { client as _heyApiClient } from "../client.gen";
 
@@ -669,5 +671,25 @@ export const getRepositoryOptions = (options: Options<GetRepositoryData>) => {
 			return data;
 		},
 		queryKey: getRepositoryQueryKey(options),
+	});
+};
+
+export const listSnapshotsQueryKey = (options: Options<ListSnapshotsData>) => createQueryKey("listSnapshots", options);
+
+/**
+ * List all snapshots in a repository
+ */
+export const listSnapshotsOptions = (options: Options<ListSnapshotsData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await listSnapshots({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: listSnapshotsQueryKey(options),
 	});
 };

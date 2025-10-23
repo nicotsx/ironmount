@@ -127,3 +127,36 @@ export const deleteRepositoryDto = describeRoute({
 		},
 	},
 });
+
+/**
+ * List snapshots in a repository
+ */
+export const snapshotSchema = type({
+	short_id: "string",
+	time: "number",
+	paths: "string[]",
+	size: "number",
+	duration: "number",
+});
+
+const listSnapshotsResponse = type({
+	snapshots: snapshotSchema.array(),
+});
+
+export type ListSnapshotsResponseDto = typeof listSnapshotsResponse.infer;
+
+export const listSnapshotsDto = describeRoute({
+	description: "List all snapshots in a repository",
+	tags: ["Repositories"],
+	operationId: "listSnapshots",
+	responses: {
+		200: {
+			description: "List of snapshots",
+			content: {
+				"application/json": {
+					schema: resolver(listSnapshotsResponse),
+				},
+			},
+		},
+	},
+});

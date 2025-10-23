@@ -778,6 +778,32 @@ export type GetRepositoryResponses = {
 
 export type GetRepositoryResponse = GetRepositoryResponses[keyof GetRepositoryResponses];
 
+export type ListSnapshotsData = {
+	body?: never;
+	path: {
+		name: string;
+	};
+	query?: never;
+	url: "/api/v1/repositories/{name}/snapshots";
+};
+
+export type ListSnapshotsResponses = {
+	/**
+	 * List of snapshots
+	 */
+	200: {
+		snapshots: Array<{
+			duration: number;
+			paths: Array<string>;
+			short_id: string;
+			size: number;
+			time: number;
+		}>;
+	};
+};
+
+export type ListSnapshotsResponse = ListSnapshotsResponses[keyof ListSnapshotsResponses];
+
 export type ClientOptions = {
 	baseUrl: "http://192.168.2.42:4096" | (string & {});
 };

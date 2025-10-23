@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 type ByteSizeProps = {
 	bytes: number;
@@ -54,7 +54,7 @@ export function formatBytes(
 		idx = Math.max(0, Math.min(idx, units.length - 1));
 	}
 
-	const numeric = (abs / Math.pow(base, idx)) * sign;
+	const numeric = (abs / base ** idx) * sign;
 
 	const maxFrac = (() => {
 		if (!smartRounding) return maximumFractionDigits;

@@ -52,6 +52,8 @@ import type {
 	DeleteRepositoryResponses,
 	GetRepositoryData,
 	GetRepositoryResponses,
+	ListSnapshotsData,
+	ListSnapshotsResponses,
 } from "./types.gen";
 import { client as _heyApiClient } from "./client.gen";
 
@@ -318,6 +320,18 @@ export const getRepository = <ThrowOnError extends boolean = false>(
 ) => {
 	return (options.client ?? _heyApiClient).get<GetRepositoryResponses, unknown, ThrowOnError>({
 		url: "/api/v1/repositories/{name}",
+		...options,
+	});
+};
+
+/**
+ * List all snapshots in a repository
+ */
+export const listSnapshots = <ThrowOnError extends boolean = false>(
+	options: Options<ListSnapshotsData, ThrowOnError>,
+) => {
+	return (options.client ?? _heyApiClient).get<ListSnapshotsResponses, unknown, ThrowOnError>({
+		url: "/api/v1/repositories/{name}/snapshots",
 		...options,
 	});
 };

@@ -25,6 +25,35 @@ const backupOutputSchema = type({
 	snapshot_id: "string",
 });
 
+const snapshotInfoSchema = type({
+	gid: "number",
+	hostname: "string",
+	id: "string",
+	parent: "string?",
+	paths: "string[]",
+	program_version: "string",
+	short_id: "string",
+	time: "string",
+	uid: "number",
+	username: "string",
+	summary: type({
+		backup_end: "string",
+		backup_start: "string",
+		data_added: "number",
+		data_added_packed: "number",
+		data_blobs: "number",
+		dirs_changed: "number",
+		dirs_new: "number",
+		dirs_unmodified: "number",
+		files_changed: "number",
+		files_new: "number",
+		files_unmodified: "number",
+		total_bytes_processed: "number",
+		total_files_processed: "number",
+		tree_blobs: "number",
+	}),
+});
+
 const ensurePassfile = async () => {
 	await fs.mkdir(path.dirname(RESTIC_PASS_FILE), { recursive: true });
 
@@ -115,9 +144,31 @@ const restore = async (config: RepositoryConfig, snapshotId: string, target: str
 	logger.info(`Restic restore completed for snapshot ${snapshotId} to target ${target}`);
 };
 
+const snapshots = async (config: RepositoryConfig) => {
+	const repoUrl = buildRepoUrl(config);
+	const env = await buildEnv(config);
+
+	const res = await $`restic --repo ${repoUrl} snapshots --json`.env(env).nothrow();
+
+	if (res.exitCode !== 0) {
+		logger.error(`Restic snapshots retrieval failed: ${res.stderr}`);
+		throw new Error(`Restic snapshots retrieval failed: ${res.stderr}`);
+	}
+
+	const result = snapshotInfoSchema.array()(res.json());
+
+	if (result instanceof type.errors) {
+		logger.error(`Restic snapshots output validation failed: ${result}`);
+		throw new Error(`Restic snapshots output validation failed: ${result}`);
+	}
+
+	return result;
+};
+
 export const restic = {
 	ensurePassfile,
 	init,
 	backup,
 	restore,
+	snapshots,
 };

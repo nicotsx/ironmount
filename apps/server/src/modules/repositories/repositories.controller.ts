@@ -8,6 +8,8 @@ import {
 	type GetRepositoryResponseDto,
 	type ListRepositoriesResponseDto,
 	listRepositoriesDto,
+	listSnapshotsDto,
+	type ListSnapshotsResponseDto,
 } from "./repositories.dto";
 import { repositoriesService } from "./repositories.service";
 
@@ -52,4 +54,26 @@ export const repositoriesController = new Hono()
 		await repositoriesService.deleteRepository(name);
 
 		return c.json({ message: "Repository deleted" }, 200);
+	})
+	.get("/:name/snapshots", listSnapshotsDto, async (c) => {
+		const { name } = c.req.param();
+		const res = await repositoriesService.listSnapshots(name);
+
+		const snapshots = res.map((snapshot) => {
+			const { summary } = snapshot;
+			const { backup_start, backup_end } = summary;
+			const duration = new Date(backup_end).getTime() - new Date(backup_start).getTime();
+
+			return {
+				short_id: snapshot.short_id,
+				duration,
+				paths: snapshot.paths,
+				size: summary.total_bytes_processed,
+				time: new Date(snapshot.time).getTime(),
+			};
+		});
+
+		const response = { snapshots } satisfies ListSnapshotsResponseDto;
+
+		return c.json(response, 200);
 	});
