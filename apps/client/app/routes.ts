@@ -7,7 +7,7 @@ export default [
 		route("/", "./routes/root.tsx"),
 		route("volumes", "./routes/home.tsx"),
 		route("volumes/:name", "./routes/details.tsx"),
-		route("repositories", "./routes/repositories.tsx"),
-		route("repositories/:name", "./routes/repository-details.tsx"),
+		route("repositories", "./modules/repositories/routes/repositories.tsx"),
+		route("repositories/:name", "./modules/repositories/routes/repository-details.tsx"),
 	]),
 ] satisfies RouteConfig;

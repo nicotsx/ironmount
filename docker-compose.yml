@@ -18,6 +18,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /run/docker/plugins:/run/docker/plugins
       - /var/lib/ironmount/volumes/:/var/lib/ironmount/volumes:rshared
+      - /var/lib/repositories/:/var/lib/repositories
       - ironmount_data:/data
 
       - ./apps/client/app:/app/apps/client/app

@@ -26,15 +26,15 @@ const backupOutputSchema = type({
 });
 
 const snapshotInfoSchema = type({
-	gid: "number",
+	gid: "number?",
 	hostname: "string",
 	id: "string",
 	parent: "string?",
 	paths: "string[]",
-	program_version: "string",
+	program_version: "string?",
 	short_id: "string",
 	time: "string",
-	uid: "number",
+	uid: "number?",
 	username: "string",
 	summary: type({
 		backup_end: "string",
@@ -51,7 +51,7 @@ const snapshotInfoSchema = type({
 		total_bytes_processed: "number",
 		total_files_processed: "number",
 		tree_blobs: "number",
-	}),
+	}).optional(),
 });
 
 const ensurePassfile = async () => {

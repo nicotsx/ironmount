@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import { validator } from "hono-openapi";
-import { getVolumePath } from "./helpers";
 import {
 	createVolumeBody,
 	createVolumeDto,
@@ -23,6 +22,7 @@ import {
 	updateVolumeDto,
 } from "./volume.dto";
 import { volumeService } from "./volume.service";
+import { getVolumePath } from "./helpers";
 
 export const volumeController = new Hono()
 	.get("/", listVolumesDto, async (c) => {

@@ -61,19 +61,25 @@ export const repositoriesController = new Hono()
 
 		const snapshots = res.map((snapshot) => {
 			const { summary } = snapshot;
-			const { backup_start, backup_end } = summary;
-			const duration = new Date(backup_end).getTime() - new Date(backup_start).getTime();
+
+			let duration = 0;
+			if (summary) {
+				const { backup_start, backup_end } = summary;
+				duration = new Date(backup_end).getTime() - new Date(backup_start).getTime();
+			}
 
 			return {
 				short_id: snapshot.short_id,
 				duration,
 				paths: snapshot.paths,
-				size: summary.total_bytes_processed,
+				size: summary?.total_bytes_processed || 0,
 				time: new Date(snapshot.time).getTime(),
 			};
 		});
 
 		const response = { snapshots } satisfies ListSnapshotsResponseDto;
+
+		c.header("Cache-Control", "max-age=30, stale-while-revalidate=300");
 
 		return c.json(response, 200);
 	});
