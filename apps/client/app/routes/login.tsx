@@ -5,9 +5,8 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { loginMutation } from "~/api-client/@tanstack/react-query.gen";
-import { GridBackground } from "~/components/grid-background";
+import { AuthLayout } from "~/components/auth-layout";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 
@@ -50,54 +49,49 @@ export default function LoginPage() {
 	};
 
 	return (
-		<GridBackground className="flex items-center justify-center p-4">
-			<Card className="w-full max-w-md">
-				<CardHeader>
-					<CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
-					<CardDescription>Sign in to your account</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-							<FormField
-								control={form.control}
-								name="username"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Username</FormLabel>
-										<FormControl>
-											<Input
-												{...field}
-												type="text"
-												placeholder="Enter your username"
-												disabled={login.isPending}
-												autoFocus
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name="password"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Password</FormLabel>
-										<FormControl>
-											<Input {...field} type="password" placeholder="Enter your password" disabled={login.isPending} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<Button type="submit" className="w-full" loading={login.isPending}>
-								Sign In
-							</Button>
-						</form>
-					</Form>
-				</CardContent>
-			</Card>
-		</GridBackground>
+		<AuthLayout title="Login to your account" description="Enter your credentials below to login to your account">
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+					<FormField
+						control={form.control}
+						name="username"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Username</FormLabel>
+								<FormControl>
+									<Input {...field} type="text" placeholder="admin" disabled={login.isPending} autoFocus />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="password"
+						render={({ field }) => (
+							<FormItem>
+								<div className="flex items-center justify-between">
+									<FormLabel>Password</FormLabel>
+									<button
+										type="button"
+										className="text-xs text-muted-foreground hover:underline"
+										onClick={() => toast.info("Password reset not implemented")}
+									>
+										Forgot your password?
+									</button>
+								</div>
+								<FormControl>
+									<Input {...field} type="password" disabled={login.isPending} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<Button type="submit" className="w-full" loading={login.isPending}>
+						Login
+					</Button>
+				</form>
+			</Form>
+		</AuthLayout>
 	);
 }

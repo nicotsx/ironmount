@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "dither-plugin";
 
 @custom-variant dark (&:is(.dark *));
 

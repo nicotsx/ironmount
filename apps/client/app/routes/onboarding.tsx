@@ -5,9 +5,8 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { registerMutation } from "~/api-client/@tanstack/react-query.gen";
-import { GridBackground } from "~/components/grid-background";
+import { AuthLayout } from "~/components/auth-layout";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 
@@ -61,73 +60,65 @@ export default function OnboardingPage() {
 	};
 
 	return (
-		<GridBackground className="flex items-center justify-center p-4">
-			<Card className="w-full max-w-md">
-				<CardHeader>
-					<CardTitle className="text-2xl font-bold">Welcome to Ironmount</CardTitle>
-					<CardDescription>Create the admin user to get started</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-							<FormField
-								control={form.control}
-								name="username"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Username</FormLabel>
-										<FormControl>
-											<Input {...field} type="text" placeholder="admin" disabled={registerUser.isPending} autoFocus />
-										</FormControl>
-										<FormDescription>Choose a username for the admin account</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name="password"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Password</FormLabel>
-										<FormControl>
-											<Input
-												{...field}
-												type="password"
-												placeholder="Enter a secure password"
-												disabled={registerUser.isPending}
-											/>
-										</FormControl>
-										<FormDescription>Password must be at least 8 characters long.</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name="confirmPassword"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Confirm Password</FormLabel>
-										<FormControl>
-											<Input
-												{...field}
-												type="password"
-												placeholder="Re-enter your password"
-												disabled={registerUser.isPending}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<Button type="submit" className="w-full" loading={registerUser.isPending}>
-								Create Admin User
-							</Button>
-						</form>
-					</Form>
-				</CardContent>
-			</Card>
-		</GridBackground>
+		<AuthLayout title="Welcome to Ironmount" description="Create the admin user to get started">
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+					<FormField
+						control={form.control}
+						name="username"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Username</FormLabel>
+								<FormControl>
+									<Input {...field} type="text" placeholder="admin" disabled={registerUser.isPending} autoFocus />
+								</FormControl>
+								<FormDescription>Choose a username for the admin account</FormDescription>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="password"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Password</FormLabel>
+								<FormControl>
+									<Input
+										{...field}
+										type="password"
+										placeholder="Enter a secure password"
+										disabled={registerUser.isPending}
+									/>
+								</FormControl>
+								<FormDescription>Password must be at least 8 characters long.</FormDescription>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="confirmPassword"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Confirm Password</FormLabel>
+								<FormControl>
+									<Input
+										{...field}
+										type="password"
+										placeholder="Re-enter your password"
+										disabled={registerUser.isPending}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<Button type="submit" className="w-full" loading={registerUser.isPending}>
+						Create Admin User
+					</Button>
+				</form>
+			</Form>
+		</AuthLayout>
 	);
 }
