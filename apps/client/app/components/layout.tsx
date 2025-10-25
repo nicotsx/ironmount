@@ -29,7 +29,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 		},
 		onError: (error) => {
 			console.error(error);
-			toast.error("Logout failed");
+			toast.error("Logout failed", { description: error.message });
 		},
 	});
 

@@ -9,6 +9,9 @@ import { AuthLayout } from "~/components/auth-layout";
 import { Button } from "~/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
+import { authMiddleware } from "~/middleware/auth";
+
+export const clientMiddleware = [authMiddleware];
 
 const onboardingSchema = type({
 	username: "2<=string<=50",
@@ -38,7 +41,7 @@ export default function OnboardingPage() {
 		},
 		onError: (error) => {
 			console.error(error);
-			toast.error("Failed to create admin user");
+			toast.error("Failed to create admin user", { description: error.message });
 		},
 	});
 
