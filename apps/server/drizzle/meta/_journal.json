@@ -57,6 +57,13 @@
       "when": 1761224911352,
       "tag": "0007_watery_sersi",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1761414054481,
+      "tag": "0008_silent_lady_bullseye",
+      "breakpoints": true
     }
   ]
 }

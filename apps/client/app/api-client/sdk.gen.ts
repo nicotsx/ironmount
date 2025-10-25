@@ -54,6 +54,18 @@ import type {
 	GetRepositoryResponses,
 	ListSnapshotsData,
 	ListSnapshotsResponses,
+	ListBackupSchedulesData,
+	ListBackupSchedulesResponses,
+	CreateBackupScheduleData,
+	CreateBackupScheduleResponses,
+	DeleteBackupScheduleData,
+	DeleteBackupScheduleResponses,
+	GetBackupScheduleData,
+	GetBackupScheduleResponses,
+	UpdateBackupScheduleData,
+	UpdateBackupScheduleResponses,
+	RunBackupNowData,
+	RunBackupNowResponses,
 } from "./types.gen";
 import { client as _heyApiClient } from "./client.gen";
 
@@ -332,6 +344,86 @@ export const listSnapshots = <ThrowOnError extends boolean = false>(
 ) => {
 	return (options.client ?? _heyApiClient).get<ListSnapshotsResponses, unknown, ThrowOnError>({
 		url: "/api/v1/repositories/{name}/snapshots",
+		...options,
+	});
+};
+
+/**
+ * List all backup schedules
+ */
+export const listBackupSchedules = <ThrowOnError extends boolean = false>(
+	options?: Options<ListBackupSchedulesData, ThrowOnError>,
+) => {
+	return (options?.client ?? _heyApiClient).get<ListBackupSchedulesResponses, unknown, ThrowOnError>({
+		url: "/api/v1/backups",
+		...options,
+	});
+};
+
+/**
+ * Create a new backup schedule for a volume
+ */
+export const createBackupSchedule = <ThrowOnError extends boolean = false>(
+	options?: Options<CreateBackupScheduleData, ThrowOnError>,
+) => {
+	return (options?.client ?? _heyApiClient).post<CreateBackupScheduleResponses, unknown, ThrowOnError>({
+		url: "/api/v1/backups",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options?.headers,
+		},
+	});
+};
+
+/**
+ * Delete a backup schedule
+ */
+export const deleteBackupSchedule = <ThrowOnError extends boolean = false>(
+	options: Options<DeleteBackupScheduleData, ThrowOnError>,
+) => {
+	return (options.client ?? _heyApiClient).delete<DeleteBackupScheduleResponses, unknown, ThrowOnError>({
+		url: "/api/v1/backups/{scheduleId}",
+		...options,
+	});
+};
+
+/**
+ * Get a backup schedule by ID
+ */
+export const getBackupSchedule = <ThrowOnError extends boolean = false>(
+	options: Options<GetBackupScheduleData, ThrowOnError>,
+) => {
+	return (options.client ?? _heyApiClient).get<GetBackupScheduleResponses, unknown, ThrowOnError>({
+		url: "/api/v1/backups/{scheduleId}",
+		...options,
+	});
+};
+
+/**
+ * Update a backup schedule
+ */
+export const updateBackupSchedule = <ThrowOnError extends boolean = false>(
+	options: Options<UpdateBackupScheduleData, ThrowOnError>,
+) => {
+	return (options.client ?? _heyApiClient).patch<UpdateBackupScheduleResponses, unknown, ThrowOnError>({
+		url: "/api/v1/backups/{scheduleId}",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options.headers,
+		},
+	});
+};
+
+/**
+ * Trigger a backup immediately for a schedule
+ */
+export const runBackupNow = <ThrowOnError extends boolean = false>(
+	options: Options<RunBackupNowData, ThrowOnError>,
+) => {
+	return (options.client ?? _heyApiClient).post<RunBackupNowResponses, unknown, ThrowOnError>({
+		url: "/api/v1/backups/{scheduleId}/run",
 		...options,
 	});
 };

@@ -7,6 +7,7 @@ import { $ } from "bun";
 import { RESTIC_PASS_FILE } from "../core/constants";
 import { logger } from "./logger";
 import { cryptoUtils } from "./crypto";
+import type { RetentionPolicy } from "../modules/backups/backups.dto";
 
 const backupOutputSchema = type({
 	message_type: "'summary'",
@@ -110,18 +111,44 @@ const init = async (config: RepositoryConfig) => {
 	return { success: true, error: null };
 };
 
-const backup = async (config: RepositoryConfig, source: string) => {
+const backup = async (
+	config: RepositoryConfig,
+	source: string,
+	options?: { exclude?: string[]; include?: string[] },
+) => {
 	const repoUrl = buildRepoUrl(config);
 	const env = await buildEnv(config);
 
-	const res = await $`restic --repo ${repoUrl} backup ${source} --json`.env(env).nothrow();
+	const args: string[] = ["--repo", repoUrl, "backup", source];
+
+	if (options?.exclude && options.exclude.length > 0) {
+		for (const pattern of options.exclude) {
+			args.push("--exclude", pattern);
+		}
+	}
+
+	if (options?.include && options.include.length > 0) {
+		for (const pattern of options.include) {
+			args.push("--include", pattern);
+		}
+	}
+
+	args.push("--json");
+
+	const res = await $`restic ${args}`.env(env).nothrow();
 
 	if (res.exitCode !== 0) {
 		logger.error(`Restic backup failed: ${res.stderr}`);
 		throw new Error(`Restic backup failed: ${res.stderr}`);
 	}
 
-	const result = backupOutputSchema(res.json());
+	// res is a succession of JSON objects, we need to parse the last one which contains the summary
+	const stdout = res.text();
+	const outputLines = stdout.trim().split("\n");
+	const lastLine = outputLines[outputLines.length - 1];
+	const resSummary = JSON.parse(lastLine ?? "{}");
+
+	const result = backupOutputSchema(resSummary);
 
 	if (result instanceof type.errors) {
 		logger.error(`Restic backup output validation failed: ${result}`);
@@ -166,10 +193,53 @@ const snapshots = async (config: RepositoryConfig) => {
 	return result;
 };
 
+const forget = async (config: RepositoryConfig, options: RetentionPolicy) => {
+	const repoUrl = buildRepoUrl(config);
+	const env = await buildEnv(config);
+
+	const args: string[] = ["--repo", repoUrl, "forget"];
+
+	if (options.keepLast) {
+		args.push("--keep-last", String(options.keepLast));
+	}
+	if (options.keepHourly) {
+		args.push("--keep-hourly", String(options.keepHourly));
+	}
+	if (options.keepDaily) {
+		args.push("--keep-daily", String(options.keepDaily));
+	}
+	if (options.keepWeekly) {
+		args.push("--keep-weekly", String(options.keepWeekly));
+	}
+	if (options.keepMonthly) {
+		args.push("--keep-monthly", String(options.keepMonthly));
+	}
+	if (options.keepYearly) {
+		args.push("--keep-yearly", String(options.keepYearly));
+	}
+	if (options.keepWithinDuration) {
+		args.push("--keep-within-duration", options.keepWithinDuration);
+	}
+
+	args.push("--prune");
+	args.push("--json");
+
+	const res = await $`restic ${args}`.env(env).nothrow();
+
+	if (res.exitCode !== 0) {
+		logger.error(`Restic forget failed: ${res.stderr}`);
+		throw new Error(`Restic forget failed: ${res.stderr}`);
+	}
+
+	logger.info("Restic forget completed successfully");
+	return { success: true };
+};
+
 export const restic = {
 	ensurePassfile,
 	init,
 	backup,
 	restore,
 	snapshots,
+	forget,
 };

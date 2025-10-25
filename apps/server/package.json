@@ -13,6 +13,7 @@
 		"@ironmount/schemas": "workspace:*",
 		"@scalar/hono-api-reference": "^0.9.13",
 		"arktype": "^2.1.23",
+		"cron-parser": "^5.4.0",
 		"dockerode": "^4.0.8",
 		"dotenv": "^17.2.1",
 		"drizzle-orm": "^0.44.6",

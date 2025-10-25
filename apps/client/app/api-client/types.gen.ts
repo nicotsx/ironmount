@@ -804,6 +804,258 @@ export type ListSnapshotsResponses = {
 
 export type ListSnapshotsResponse = ListSnapshotsResponses[keyof ListSnapshotsResponses];
 
+export type ListBackupSchedulesData = {
+	body?: never;
+	path?: never;
+	query?: never;
+	url: "/api/v1/backups";
+};
+
+export type ListBackupSchedulesResponses = {
+	/**
+	 * List of backup schedules
+	 */
+	200: {
+		schedules: Array<{
+			createdAt: number;
+			cronExpression: string;
+			enabled: boolean;
+			excludePatterns: Array<string>;
+			id: number;
+			includePatterns: Array<string>;
+			lastBackupAt: number | null;
+			lastBackupError: string | null;
+			lastBackupStatus: "error" | "success" | null;
+			nextBackupAt: number | null;
+			repositoryId: string;
+			repositoryName: string;
+			retentionPolicy: {
+				keepDaily?: number;
+				keepHourly?: number;
+				keepLast?: number;
+				keepMonthly?: number;
+				keepWeekly?: number;
+				keepWithinDuration?: string;
+				keepYearly?: number;
+			} | null;
+			updatedAt: number;
+			volumeId: number;
+			volumeName: string;
+		}>;
+	};
+};
+
+export type ListBackupSchedulesResponse = ListBackupSchedulesResponses[keyof ListBackupSchedulesResponses];
+
+export type CreateBackupScheduleData = {
+	body?: {
+		cronExpression: string;
+		enabled: boolean;
+		repositoryId: string;
+		volumeId: number;
+		excludePatterns?: Array<string>;
+		includePatterns?: Array<string>;
+		retentionPolicy?: {
+			keepDaily?: number;
+			keepHourly?: number;
+			keepLast?: number;
+			keepMonthly?: number;
+			keepWeekly?: number;
+			keepWithinDuration?: string;
+			keepYearly?: number;
+		};
+		tags?: Array<string>;
+	};
+	path?: never;
+	query?: never;
+	url: "/api/v1/backups";
+};
+
+export type CreateBackupScheduleResponses = {
+	/**
+	 * Backup schedule created successfully
+	 */
+	201: {
+		message: string;
+		schedule: {
+			createdAt: number;
+			cronExpression: string;
+			enabled: boolean;
+			excludePatterns: Array<string>;
+			id: number;
+			includePatterns: Array<string>;
+			lastBackupAt: number | null;
+			lastBackupError: string | null;
+			lastBackupStatus: "error" | "success" | null;
+			nextBackupAt: number | null;
+			repositoryId: string;
+			repositoryName: string;
+			retentionPolicy: {
+				keepDaily?: number;
+				keepHourly?: number;
+				keepLast?: number;
+				keepMonthly?: number;
+				keepWeekly?: number;
+				keepWithinDuration?: string;
+				keepYearly?: number;
+			} | null;
+			updatedAt: number;
+			volumeId: number;
+			volumeName: string;
+		};
+	};
+};
+
+export type CreateBackupScheduleResponse = CreateBackupScheduleResponses[keyof CreateBackupScheduleResponses];
+
+export type DeleteBackupScheduleData = {
+	body?: never;
+	path: {
+		scheduleId: string;
+	};
+	query?: never;
+	url: "/api/v1/backups/{scheduleId}";
+};
+
+export type DeleteBackupScheduleResponses = {
+	/**
+	 * Backup schedule deleted successfully
+	 */
+	200: {
+		message: string;
+	};
+};
+
+export type DeleteBackupScheduleResponse = DeleteBackupScheduleResponses[keyof DeleteBackupScheduleResponses];
+
+export type GetBackupScheduleData = {
+	body?: never;
+	path: {
+		scheduleId: string;
+	};
+	query?: never;
+	url: "/api/v1/backups/{scheduleId}";
+};
+
+export type GetBackupScheduleResponses = {
+	/**
+	 * Backup schedule details
+	 */
+	200: {
+		schedule: {
+			createdAt: number;
+			cronExpression: string;
+			enabled: boolean;
+			excludePatterns: Array<string>;
+			id: number;
+			includePatterns: Array<string>;
+			lastBackupAt: number | null;
+			lastBackupError: string | null;
+			lastBackupStatus: "error" | "success" | null;
+			nextBackupAt: number | null;
+			repositoryId: string;
+			repositoryName: string;
+			retentionPolicy: {
+				keepDaily?: number;
+				keepHourly?: number;
+				keepLast?: number;
+				keepMonthly?: number;
+				keepWeekly?: number;
+				keepWithinDuration?: string;
+				keepYearly?: number;
+			} | null;
+			updatedAt: number;
+			volumeId: number;
+			volumeName: string;
+		};
+	};
+};
+
+export type GetBackupScheduleResponse = GetBackupScheduleResponses[keyof GetBackupScheduleResponses];
+
+export type UpdateBackupScheduleData = {
+	body?: {
+		cronExpression?: string;
+		enabled?: boolean;
+		excludePatterns?: Array<string>;
+		includePatterns?: Array<string>;
+		repositoryId?: string;
+		retentionPolicy?: {
+			keepDaily?: number;
+			keepHourly?: number;
+			keepLast?: number;
+			keepMonthly?: number;
+			keepWeekly?: number;
+			keepWithinDuration?: string;
+			keepYearly?: number;
+		};
+		tags?: Array<string>;
+	};
+	path: {
+		scheduleId: string;
+	};
+	query?: never;
+	url: "/api/v1/backups/{scheduleId}";
+};
+
+export type UpdateBackupScheduleResponses = {
+	/**
+	 * Backup schedule updated successfully
+	 */
+	200: {
+		message: string;
+		schedule: {
+			createdAt: number;
+			cronExpression: string;
+			enabled: boolean;
+			excludePatterns: Array<string>;
+			id: number;
+			includePatterns: Array<string>;
+			lastBackupAt: number | null;
+			lastBackupError: string | null;
+			lastBackupStatus: "error" | "success" | null;
+			nextBackupAt: number | null;
+			repositoryId: string;
+			repositoryName: string;
+			retentionPolicy: {
+				keepDaily?: number;
+				keepHourly?: number;
+				keepLast?: number;
+				keepMonthly?: number;
+				keepWeekly?: number;
+				keepWithinDuration?: string;
+				keepYearly?: number;
+			} | null;
+			updatedAt: number;
+			volumeId: number;
+			volumeName: string;
+		};
+	};
+};
+
+export type UpdateBackupScheduleResponse = UpdateBackupScheduleResponses[keyof UpdateBackupScheduleResponses];
+
+export type RunBackupNowData = {
+	body?: never;
+	path: {
+		scheduleId: string;
+	};
+	query?: never;
+	url: "/api/v1/backups/{scheduleId}/run";
+};
+
+export type RunBackupNowResponses = {
+	/**
+	 * Backup started successfully
+	 */
+	200: {
+		backupStarted: boolean;
+		message: string;
+	};
+};
+
+export type RunBackupNowResponse = RunBackupNowResponses[keyof RunBackupNowResponses];
+
 export type ClientOptions = {
 	baseUrl: "http://192.168.2.42:4096" | (string & {});
 };

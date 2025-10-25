@@ -11,6 +11,7 @@ import { driverController } from "./modules/driver/driver.controller";
 import { startup } from "./modules/lifecycle/startup";
 import { repositoriesController } from "./modules/repositories/repositories.controller";
 import { volumeController } from "./modules/volumes/volume.controller";
+import { backupScheduleController } from "./modules/backups/backups.controller";
 import { handleServiceError } from "./utils/errors";
 import { logger } from "./utils/logger";
 
@@ -39,6 +40,7 @@ const app = new Hono()
 	.route("/api/v1/auth", authController.basePath("/api/v1"))
 	.route("/api/v1/volumes", volumeController.use(requireAuth))
 	.route("/api/v1/repositories", repositoriesController.use(requireAuth))
+	.route("/api/v1/backups", backupScheduleController.use(requireAuth))
 	.get("/assets/*", serveStatic({ root: "./assets/frontend" }))
 	.get("*", serveStatic({ path: "./assets/frontend/index.html" }));
 

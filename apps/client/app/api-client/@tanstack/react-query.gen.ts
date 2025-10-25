@@ -23,6 +23,12 @@ import {
 	deleteRepository,
 	getRepository,
 	listSnapshots,
+	listBackupSchedules,
+	createBackupSchedule,
+	deleteBackupSchedule,
+	getBackupSchedule,
+	updateBackupSchedule,
+	runBackupNow,
 } from "../sdk.gen";
 import { queryOptions, type UseMutationOptions, type DefaultError } from "@tanstack/react-query";
 import type {
@@ -59,6 +65,16 @@ import type {
 	DeleteRepositoryResponse,
 	GetRepositoryData,
 	ListSnapshotsData,
+	ListBackupSchedulesData,
+	CreateBackupScheduleData,
+	CreateBackupScheduleResponse,
+	DeleteBackupScheduleData,
+	DeleteBackupScheduleResponse,
+	GetBackupScheduleData,
+	UpdateBackupScheduleData,
+	UpdateBackupScheduleResponse,
+	RunBackupNowData,
+	RunBackupNowResponse,
 } from "../types.gen";
 import { client as _heyApiClient } from "../client.gen";
 
@@ -692,4 +708,175 @@ export const listSnapshotsOptions = (options: Options<ListSnapshotsData>) => {
 		},
 		queryKey: listSnapshotsQueryKey(options),
 	});
+};
+
+export const listBackupSchedulesQueryKey = (options?: Options<ListBackupSchedulesData>) =>
+	createQueryKey("listBackupSchedules", options);
+
+/**
+ * List all backup schedules
+ */
+export const listBackupSchedulesOptions = (options?: Options<ListBackupSchedulesData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await listBackupSchedules({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: listBackupSchedulesQueryKey(options),
+	});
+};
+
+export const createBackupScheduleQueryKey = (options?: Options<CreateBackupScheduleData>) =>
+	createQueryKey("createBackupSchedule", options);
+
+/**
+ * Create a new backup schedule for a volume
+ */
+export const createBackupScheduleOptions = (options?: Options<CreateBackupScheduleData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await createBackupSchedule({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: createBackupScheduleQueryKey(options),
+	});
+};
+
+/**
+ * Create a new backup schedule for a volume
+ */
+export const createBackupScheduleMutation = (
+	options?: Partial<Options<CreateBackupScheduleData>>,
+): UseMutationOptions<CreateBackupScheduleResponse, DefaultError, Options<CreateBackupScheduleData>> => {
+	const mutationOptions: UseMutationOptions<
+		CreateBackupScheduleResponse,
+		DefaultError,
+		Options<CreateBackupScheduleData>
+	> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await createBackupSchedule({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
+};
+
+/**
+ * Delete a backup schedule
+ */
+export const deleteBackupScheduleMutation = (
+	options?: Partial<Options<DeleteBackupScheduleData>>,
+): UseMutationOptions<DeleteBackupScheduleResponse, DefaultError, Options<DeleteBackupScheduleData>> => {
+	const mutationOptions: UseMutationOptions<
+		DeleteBackupScheduleResponse,
+		DefaultError,
+		Options<DeleteBackupScheduleData>
+	> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await deleteBackupSchedule({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
+};
+
+export const getBackupScheduleQueryKey = (options: Options<GetBackupScheduleData>) =>
+	createQueryKey("getBackupSchedule", options);
+
+/**
+ * Get a backup schedule by ID
+ */
+export const getBackupScheduleOptions = (options: Options<GetBackupScheduleData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await getBackupSchedule({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: getBackupScheduleQueryKey(options),
+	});
+};
+
+/**
+ * Update a backup schedule
+ */
+export const updateBackupScheduleMutation = (
+	options?: Partial<Options<UpdateBackupScheduleData>>,
+): UseMutationOptions<UpdateBackupScheduleResponse, DefaultError, Options<UpdateBackupScheduleData>> => {
+	const mutationOptions: UseMutationOptions<
+		UpdateBackupScheduleResponse,
+		DefaultError,
+		Options<UpdateBackupScheduleData>
+	> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await updateBackupSchedule({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
+};
+
+export const runBackupNowQueryKey = (options: Options<RunBackupNowData>) => createQueryKey("runBackupNow", options);
+
+/**
+ * Trigger a backup immediately for a schedule
+ */
+export const runBackupNowOptions = (options: Options<RunBackupNowData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await runBackupNow({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: runBackupNowQueryKey(options),
+	});
+};
+
+/**
+ * Trigger a backup immediately for a schedule
+ */
+export const runBackupNowMutation = (
+	options?: Partial<Options<RunBackupNowData>>,
+): UseMutationOptions<RunBackupNowResponse, DefaultError, Options<RunBackupNowData>> => {
+	const mutationOptions: UseMutationOptions<RunBackupNowResponse, DefaultError, Options<RunBackupNowData>> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await runBackupNow({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
 };

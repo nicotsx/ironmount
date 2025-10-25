@@ -58,3 +58,35 @@ export const repositoriesTable = sqliteTable("repositories_table", {
 });
 
 export type Repository = typeof repositoriesTable.$inferSelect;
+
+export const backupSchedulesTable = sqliteTable("backup_schedules_table", {
+	id: int().primaryKey({ autoIncrement: true }),
+	volumeId: int("volume_id")
+		.notNull()
+		.unique()
+		.references(() => volumesTable.id, { onDelete: "cascade" }),
+	repositoryId: text("repository_id")
+		.notNull()
+		.references(() => repositoriesTable.id, { onDelete: "cascade" }),
+	enabled: int("enabled", { mode: "boolean" }).notNull().default(true),
+	cronExpression: text("cron_expression").notNull(),
+	retentionPolicy: text("retention_policy", { mode: "json" }).$type<{
+		keepLast?: number;
+		keepHourly?: number;
+		keepDaily?: number;
+		keepWeekly?: number;
+		keepMonthly?: number;
+		keepYearly?: number;
+		keepWithinDuration?: string;
+	}>(),
+	excludePatterns: text("exclude_patterns", { mode: "json" }).$type<string[]>().default([]),
+	includePatterns: text("include_patterns", { mode: "json" }).$type<string[]>().default([]),
+	lastBackupAt: int("last_backup_at", { mode: "timestamp" }),
+	lastBackupStatus: text("last_backup_status").$type<"success" | "error">(),
+	lastBackupError: text("last_backup_error"),
+	nextBackupAt: int("next_backup_at", { mode: "timestamp" }),
+	createdAt: int("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+	updatedAt: int("updated_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+});
+
+export type BackupSchedule = typeof backupSchedulesTable.$inferSelect;
