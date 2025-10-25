@@ -1,18 +1,18 @@
+import { Scheduler } from "../../core/scheduler";
 import { and, eq, or } from "drizzle-orm";
-import { getTasks, schedule } from "node-cron";
 import { db } from "../../db/db";
 import { volumesTable } from "../../db/schema";
 import { logger } from "../../utils/logger";
 import { restic } from "../../utils/restic";
 import { volumeService } from "../volumes/volume.service";
-import { cleanupDanglingMounts } from "./cleanup";
+import { CleanupDanglingMountsJob } from "../../jobs/cleanup-dangling";
+import { VolumeHealthCheckJob } from "../../jobs/healthchecks";
 
 export const startup = async () => {
+	await Scheduler.start();
+
 	await restic.ensurePassfile().catch((err) => {
 		logger.error(`Error ensuring restic passfile exists: ${err.message}`);
-	});
-	cleanupDanglingMounts().catch((err) => {
-		logger.error(`Error during startup cleanup of dangling mounts: ${err.message}`);
 	});
 
 	const volumes = await db.query.volumesTable.findMany({
@@ -28,26 +28,6 @@ export const startup = async () => {
 		});
 	}
 
-	const existingTasks = getTasks();
-	existingTasks.forEach(async (task) => await task.destroy());
-
-	schedule("0 * * * *", async () => {
-		logger.debug("Running hourly cleanup of dangling mounts...");
-		await cleanupDanglingMounts();
-	});
-
-	schedule("* * * * *", async () => {
-		logger.debug("Running health check for all volumes...");
-
-		const volumes = await db.query.volumesTable.findMany({
-			where: or(eq(volumesTable.status, "mounted"), eq(volumesTable.status, "error")),
-		});
-
-		for (const volume of volumes) {
-			const { status } = await volumeService.checkHealth(volume.name);
-			if (status === "error" && volume.autoRemount) {
-				await volumeService.mountVolume(volume.name);
-			}
-		}
-	});
+	Scheduler.build(CleanupDanglingMountsJob).schedule("0 * * * *");
+	Scheduler.build(VolumeHealthCheckJob).schedule("* * * * *");
 };
