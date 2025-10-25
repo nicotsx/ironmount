@@ -9,7 +9,7 @@ import { logger } from "../../../utils/logger";
 const execFile = promisify(execFileCb);
 
 export const executeMount = async (args: string[]): Promise<void> => {
-	const { stderr } = await execFile("mount", args, {
+	const { stderr } = await execFile("nsenter", ["--mount=/host/proc/1/ns/mnt", "mount", ...args], {
 		timeout: OPERATION_TIMEOUT,
 		maxBuffer: 1024 * 1024,
 	});
@@ -20,7 +20,7 @@ export const executeMount = async (args: string[]): Promise<void> => {
 };
 
 export const executeUnmount = async (path: string): Promise<void> => {
-	const { stderr } = await execFile("umount", ["-l", "-f", path], {
+	const { stderr } = await execFile("nsenter", ["--mount=/host/proc/1/ns/mnt", "umount", "-l", "-f", path], {
 		timeout: OPERATION_TIMEOUT,
 		maxBuffer: 1024 * 1024,
 	});

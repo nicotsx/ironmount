@@ -6,19 +6,17 @@ services:
       target: development
     container_name: ironmount
     restart: unless-stopped
-    cap_add:
-      - SYS_ADMIN
+    privileged: true
     environment:
       - NODE_ENV=development
     ports:
       - "4096:4097"
-    devices:
-      - /dev/fuse:/dev/fuse
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /run/docker/plugins:/run/docker/plugins
-      - /var/lib/ironmount/volumes/:/var/lib/ironmount/volumes:rshared
+      - /var/lib/ironmount/volumes/:/var/lib/ironmount/volumes:rslave
       - /var/lib/repositories/:/var/lib/repositories
+      - /proc:/host/proc:ro
       - ironmount_data:/data
 
       - ./apps/client/app:/app/apps/client/app
@@ -31,16 +29,15 @@ services:
       target: production
     container_name: ironmount
     restart: unless-stopped
-    cap_add:
-      - SYS_ADMIN
+    privileged: true
     ports:
       - "4096:4096"
-    devices:
-      - /dev/fuse:/dev/fuse
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /run/docker/plugins:/run/docker/plugins
-      - /var/lib/ironmount/volumes/:/var/lib/ironmount/volumes:rshared
+      - /var/lib/ironmount/volumes/:/var/lib/ironmount/volumes:rslave
+      - /var/lib/repositories/:/var/lib/repositories
+      - /proc:/host/proc:ro
       - ironmount_data:/data
 
 volumes:

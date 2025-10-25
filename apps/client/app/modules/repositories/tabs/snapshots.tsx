@@ -72,7 +72,7 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 		);
 	}
 
-	if (isLoading && !data) {
+	if (isLoading && !data && !error) {
 		return (
 			<Card>
 				<CardContent className="flex items-center justify-center py-12">
