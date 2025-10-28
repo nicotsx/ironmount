@@ -174,6 +174,7 @@ export type ListVolumesResponses = {
 						username?: string;
 				  };
 			createdAt: number;
+			id: number;
 			lastError: string | null;
 			lastHealthCheck: number;
 			name: string;
@@ -370,6 +371,7 @@ export type GetVolumeResponses = {
 						username?: string;
 				  };
 			createdAt: number;
+			id: number;
 			lastError: string | null;
 			lastHealthCheck: number;
 			name: string;
@@ -470,6 +472,7 @@ export type UpdateVolumeResponses = {
 						username?: string;
 				  };
 			createdAt: number;
+			id: number;
 			lastError: string | null;
 			lastHealthCheck: number;
 			name: string;
@@ -820,15 +823,14 @@ export type ListBackupSchedulesResponses = {
 			createdAt: number;
 			cronExpression: string;
 			enabled: boolean;
-			excludePatterns: Array<string>;
+			excludePatterns: Array<string> | null;
 			id: number;
-			includePatterns: Array<string>;
+			includePatterns: Array<string> | null;
 			lastBackupAt: number | null;
 			lastBackupError: string | null;
 			lastBackupStatus: "error" | "success" | null;
 			nextBackupAt: number | null;
 			repositoryId: string;
-			repositoryName: string;
 			retentionPolicy: {
 				keepDaily?: number;
 				keepHourly?: number;
@@ -840,7 +842,6 @@ export type ListBackupSchedulesResponses = {
 			} | null;
 			updatedAt: number;
 			volumeId: number;
-			volumeName: string;
 		}>;
 	};
 };
@@ -881,15 +882,14 @@ export type CreateBackupScheduleResponses = {
 			createdAt: number;
 			cronExpression: string;
 			enabled: boolean;
-			excludePatterns: Array<string>;
+			excludePatterns: Array<string> | null;
 			id: number;
-			includePatterns: Array<string>;
+			includePatterns: Array<string> | null;
 			lastBackupAt: number | null;
 			lastBackupError: string | null;
 			lastBackupStatus: "error" | "success" | null;
 			nextBackupAt: number | null;
 			repositoryId: string;
-			repositoryName: string;
 			retentionPolicy: {
 				keepDaily?: number;
 				keepHourly?: number;
@@ -901,7 +901,6 @@ export type CreateBackupScheduleResponses = {
 			} | null;
 			updatedAt: number;
 			volumeId: number;
-			volumeName: string;
 		};
 	};
 };
@@ -946,15 +945,14 @@ export type GetBackupScheduleResponses = {
 			createdAt: number;
 			cronExpression: string;
 			enabled: boolean;
-			excludePatterns: Array<string>;
+			excludePatterns: Array<string> | null;
 			id: number;
-			includePatterns: Array<string>;
+			includePatterns: Array<string> | null;
 			lastBackupAt: number | null;
 			lastBackupError: string | null;
 			lastBackupStatus: "error" | "success" | null;
 			nextBackupAt: number | null;
 			repositoryId: string;
-			repositoryName: string;
 			retentionPolicy: {
 				keepDaily?: number;
 				keepHourly?: number;
@@ -966,7 +964,6 @@ export type GetBackupScheduleResponses = {
 			} | null;
 			updatedAt: number;
 			volumeId: number;
-			volumeName: string;
 		};
 	};
 };
@@ -1008,15 +1005,14 @@ export type UpdateBackupScheduleResponses = {
 			createdAt: number;
 			cronExpression: string;
 			enabled: boolean;
-			excludePatterns: Array<string>;
+			excludePatterns: Array<string> | null;
 			id: number;
-			includePatterns: Array<string>;
+			includePatterns: Array<string> | null;
 			lastBackupAt: number | null;
 			lastBackupError: string | null;
 			lastBackupStatus: "error" | "success" | null;
 			nextBackupAt: number | null;
 			repositoryId: string;
-			repositoryName: string;
 			retentionPolicy: {
 				keepDaily?: number;
 				keepHourly?: number;
@@ -1028,12 +1024,53 @@ export type UpdateBackupScheduleResponses = {
 			} | null;
 			updatedAt: number;
 			volumeId: number;
-			volumeName: string;
 		};
 	};
 };
 
 export type UpdateBackupScheduleResponse = UpdateBackupScheduleResponses[keyof UpdateBackupScheduleResponses];
+
+export type GetBackupScheduleForVolumeData = {
+	body?: never;
+	path: {
+		volumeId: string;
+	};
+	query?: never;
+	url: "/api/v1/backups/volume/{volumeId}";
+};
+
+export type GetBackupScheduleForVolumeResponses = {
+	/**
+	 * Backup schedule details for the volume
+	 */
+	200: {
+		createdAt: number;
+		cronExpression: string;
+		enabled: boolean;
+		excludePatterns: Array<string> | null;
+		id: number;
+		includePatterns: Array<string> | null;
+		lastBackupAt: number | null;
+		lastBackupError: string | null;
+		lastBackupStatus: "error" | "success" | null;
+		nextBackupAt: number | null;
+		repositoryId: string;
+		retentionPolicy: {
+			keepDaily?: number;
+			keepHourly?: number;
+			keepLast?: number;
+			keepMonthly?: number;
+			keepWeekly?: number;
+			keepWithinDuration?: string;
+			keepYearly?: number;
+		} | null;
+		updatedAt: number;
+		volumeId: number;
+	} | null;
+};
+
+export type GetBackupScheduleForVolumeResponse =
+	GetBackupScheduleForVolumeResponses[keyof GetBackupScheduleForVolumeResponses];
 
 export type RunBackupNowData = {
 	body?: never;

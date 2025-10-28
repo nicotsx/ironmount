@@ -5,6 +5,7 @@ import {
 	createBackupScheduleDto,
 	deleteBackupScheduleDto,
 	getBackupScheduleDto,
+	getBackupScheduleForVolumeDto,
 	listBackupSchedulesDto,
 	runBackupNowDto,
 	updateBackupScheduleBody,
@@ -24,6 +25,12 @@ export const backupScheduleController = new Hono()
 		const schedule = await backupsService.getSchedule(Number(scheduleId));
 
 		return c.json({ schedule }, 200);
+	})
+	.get("/volume/:volumeId", getBackupScheduleForVolumeDto, async (c) => {
+		const volumeId = c.req.param("volumeId");
+		const schedule = await backupsService.getScheduleForVolume(Number(volumeId));
+
+		return c.json(schedule, 200);
 	})
 	.post("/", createBackupScheduleDto, validator("json", createBackupScheduleBody), async (c) => {
 		const body = c.req.valid("json");

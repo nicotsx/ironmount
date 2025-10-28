@@ -16,12 +16,12 @@ export const formSchema = type({
 }).and(repositoryConfigSchema);
 const cleanSchema = type.pipe((d) => formSchema(deepClean(d)));
 
-export type FormValues = typeof formSchema.inferIn;
+export type RepositoryFormValues = typeof formSchema.inferIn;
 
 type Props = {
-	onSubmit: (values: FormValues) => void;
+	onSubmit: (values: RepositoryFormValues) => void;
 	mode?: "create" | "update";
-	initialValues?: Partial<FormValues>;
+	initialValues?: Partial<RepositoryFormValues>;
 	formId?: string;
 	loading?: boolean;
 	className?: string;
@@ -40,7 +40,7 @@ export const CreateRepositoryForm = ({
 	loading,
 	className,
 }: Props) => {
-	const form = useForm<FormValues>({
+	const form = useForm<RepositoryFormValues>({
 		resolver: arktypeResolver(cleanSchema as unknown as typeof formSchema),
 		defaultValues: initialValues,
 		resetOptions: {

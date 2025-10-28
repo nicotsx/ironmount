@@ -16,14 +16,12 @@ export type RetentionPolicy = typeof retentionPolicySchema.infer;
 const backupScheduleSchema = type({
 	id: "number",
 	volumeId: "number",
-	volumeName: "string",
 	repositoryId: "string",
-	repositoryName: "string",
 	enabled: "boolean",
 	cronExpression: "string",
 	retentionPolicy: retentionPolicySchema.or("null"),
-	excludePatterns: "string[]",
-	includePatterns: "string[]",
+	excludePatterns: "string[] | null",
+	includePatterns: "string[] | null",
 	lastBackupAt: "number | null",
 	lastBackupStatus: "'success' | 'error' | null",
 	lastBackupError: "string | null",
@@ -66,7 +64,7 @@ export const getBackupScheduleResponse = type({
 	schedule: backupScheduleSchema,
 });
 
-export type GetBackupScheduleResponseDto = typeof getBackupScheduleResponse.infer;
+export type GetBackupScheduleDto = typeof getBackupScheduleResponse.infer;
 
 export const getBackupScheduleDto = describeRoute({
 	description: "Get a backup schedule by ID",
@@ -78,6 +76,26 @@ export const getBackupScheduleDto = describeRoute({
 			content: {
 				"application/json": {
 					schema: resolver(getBackupScheduleResponse),
+				},
+			},
+		},
+	},
+});
+
+export const getBackupScheduleForVolumeResponse = backupScheduleSchema.or("null");
+
+export type GetBackupScheduleForVolumeResponseDto = typeof getBackupScheduleForVolumeResponse.infer;
+
+export const getBackupScheduleForVolumeDto = describeRoute({
+	description: "Get a backup schedule for a specific volume",
+	tags: ["Backups"],
+	operationId: "getBackupScheduleForVolume",
+	responses: {
+		200: {
+			description: "Backup schedule details for the volume",
+			content: {
+				"application/json": {
+					schema: resolver(getBackupScheduleForVolumeResponse),
 				},
 			},
 		},
@@ -104,6 +122,8 @@ export const createBackupScheduleResponse = type({
 	message: "string",
 	schedule: backupScheduleSchema,
 });
+
+export type CreateBackupScheduleDto = typeof createBackupScheduleResponse.infer;
 
 export const createBackupScheduleDto = describeRoute({
 	description: "Create a new backup schedule for a volume",

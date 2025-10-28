@@ -64,6 +64,8 @@ import type {
 	GetBackupScheduleResponses,
 	UpdateBackupScheduleData,
 	UpdateBackupScheduleResponses,
+	GetBackupScheduleForVolumeData,
+	GetBackupScheduleForVolumeResponses,
 	RunBackupNowData,
 	RunBackupNowResponses,
 } from "./types.gen";
@@ -413,6 +415,18 @@ export const updateBackupSchedule = <ThrowOnError extends boolean = false>(
 			"Content-Type": "application/json",
 			...options.headers,
 		},
+	});
+};
+
+/**
+ * Get a backup schedule for a specific volume
+ */
+export const getBackupScheduleForVolume = <ThrowOnError extends boolean = false>(
+	options: Options<GetBackupScheduleForVolumeData, ThrowOnError>,
+) => {
+	return (options.client ?? _heyApiClient).get<GetBackupScheduleForVolumeResponses, unknown, ThrowOnError>({
+		url: "/api/v1/backups/volume/{volumeId}",
+		...options,
 	});
 };
 

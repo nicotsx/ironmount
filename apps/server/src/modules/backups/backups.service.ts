@@ -247,6 +247,14 @@ const getSchedulesToExecute = async () => {
 	return schedulesToRun;
 };
 
+const getScheduleForVolume = async (volumeId: number) => {
+	const schedule = await db.query.backupSchedulesTable.findFirst({
+		where: eq(backupSchedulesTable.volumeId, volumeId),
+	});
+
+	return schedule ?? null;
+};
+
 export const backupsService = {
 	listSchedules,
 	getSchedule,
@@ -255,4 +263,5 @@ export const backupsService = {
 	deleteSchedule,
 	executeBackup,
 	getSchedulesToExecute,
+	getScheduleForVolume,
 };

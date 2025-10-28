@@ -3,6 +3,7 @@ import { type } from "arktype";
 import { describeRoute, resolver } from "hono-openapi";
 
 const volumeSchema = type({
+	id: "number",
 	name: "string",
 	path: "string",
 	type: type.valueOf(BACKEND_TYPES),
