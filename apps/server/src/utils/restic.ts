@@ -135,6 +135,7 @@ const backup = async (
 
 	args.push("--json");
 
+	await $`restic unlock --repo ${repoUrl}`.env(env).nothrow();
 	const res = await $`restic ${args}`.env(env).nothrow();
 
 	if (res.exitCode !== 0) {
