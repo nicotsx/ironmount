@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, lt } from "drizzle-orm";
 import { db } from "../../db/db";
 import { sessionsTable, usersTable } from "../../db/schema";
 import { logger } from "../../utils/logger";
@@ -30,7 +30,7 @@ export class AuthService {
 
 		logger.info(`User registered: ${username}`);
 		const sessionId = crypto.randomUUID();
-		const expiresAt = new Date(Date.now() + SESSION_DURATION);
+		const expiresAt = new Date(Date.now() + SESSION_DURATION).getTime();
 
 		await db.insert(sessionsTable).values({
 			id: sessionId,
@@ -58,7 +58,7 @@ export class AuthService {
 		}
 
 		const sessionId = crypto.randomUUID();
-		const expiresAt = new Date(Date.now() + SESSION_DURATION);
+		const expiresAt = new Date(Date.now() + SESSION_DURATION).getTime();
 
 		await db.insert(sessionsTable).values({
 			id: sessionId,
@@ -100,7 +100,7 @@ export class AuthService {
 			return null;
 		}
 
-		if (session.session.expiresAt < new Date()) {
+		if (session.session.expiresAt < Date.now()) {
 			await db.delete(sessionsTable).where(eq(sessionsTable.id, sessionId));
 			return null;
 		}
@@ -121,7 +121,7 @@ export class AuthService {
 	 * Clean up expired sessions
 	 */
 	async cleanupExpiredSessions() {
-		const result = await db.delete(sessionsTable).where(eq(sessionsTable.expiresAt, new Date())).returning();
+		const result = await db.delete(sessionsTable).where(lt(sessionsTable.expiresAt, Date.now())).returning();
 		if (result.length > 0) {
 			logger.info(`Cleaned up ${result.length} expired sessions`);
 		}

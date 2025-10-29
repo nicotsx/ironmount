@@ -26,8 +26,8 @@ export function meta(_: Route.MetaArgs) {
 
 export const clientLoader = async () => {
 	const repositories = await listRepositories();
-	if (repositories.data) return { repositories: repositories.data.repositories };
-	return { repositories: [] };
+	if (repositories.data) return repositories.data;
+	return [];
 };
 
 export default function Repositories({ loaderData }: Route.ComponentProps) {
@@ -52,14 +52,14 @@ export default function Repositories({ loaderData }: Route.ComponentProps) {
 	});
 
 	const filteredRepositories =
-		data?.repositories.filter((repository) => {
+		data?.filter((repository) => {
 			const matchesSearch = repository.name.toLowerCase().includes(searchQuery.toLowerCase());
 			const matchesStatus = !statusFilter || repository.status === statusFilter;
 			const matchesBackend = !backendFilter || repository.type === backendFilter;
 			return matchesSearch && matchesStatus && matchesBackend;
 		}) || [];
 
-	const hasNoRepositories = data?.repositories.length === 0;
+	const hasNoRepositories = data?.length === 0;
 	const hasNoFilteredRepositories = filteredRepositories.length === 0 && !hasNoRepositories;
 
 	if (hasNoRepositories) {

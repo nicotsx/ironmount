@@ -24,7 +24,7 @@ export type VolumeDto = typeof volumeSchema.infer;
 export const listVolumesResponse = type({
 	volumes: volumeSchema.array(),
 });
-export type ListVolumesResponseDto = typeof listVolumesResponse.infer;
+export type ListVolumesDto = typeof listVolumesResponse.infer;
 
 export const listVolumesDto = describeRoute({
 	description: "List all volumes",
@@ -50,13 +50,8 @@ export const createVolumeBody = type({
 	config: volumeConfigSchema,
 });
 
-export const createVolumeResponse = type({
-	message: "string",
-	volume: type({
-		name: "string",
-		path: "string",
-	}),
-});
+export const createVolumeResponse = volumeSchema;
+export type CreateVolumeDto = typeof createVolumeResponse.infer;
 
 export const createVolumeDto = describeRoute({
 	description: "Create a new volume",
@@ -80,6 +75,7 @@ export const createVolumeDto = describeRoute({
 export const deleteVolumeResponse = type({
 	message: "string",
 });
+export type DeleteVolumeDto = typeof deleteVolumeResponse.infer;
 
 export const deleteVolumeDto = describeRoute({
 	description: "Delete a volume",
@@ -108,7 +104,7 @@ const getVolumeResponse = type({
 	statfs: statfsSchema,
 });
 
-export type GetVolumeResponseDto = typeof getVolumeResponse.infer;
+export type GetVolumeDto = typeof getVolumeResponse.infer;
 /**
  * Get a volume
  */
@@ -141,10 +137,8 @@ export const updateVolumeBody = type({
 
 export type UpdateVolumeBody = typeof updateVolumeBody.infer;
 
-export const updateVolumeResponse = type({
-	message: "string",
-	volume: volumeSchema,
-});
+export const updateVolumeResponse = volumeSchema;
+export type UpdateVolumeDto = typeof updateVolumeResponse.infer;
 
 export const updateVolumeDto = describeRoute({
 	description: "Update a volume's configuration",
@@ -165,8 +159,6 @@ export const updateVolumeDto = describeRoute({
 	},
 });
 
-export type UpdateVolumeResponseDto = typeof updateVolumeResponse.infer;
-
 /**
  * Test connection
  */
@@ -178,6 +170,7 @@ export const testConnectionResponse = type({
 	success: "boolean",
 	message: "string",
 });
+export type TestConnectionDto = typeof testConnectionResponse.infer;
 
 export const testConnectionDto = describeRoute({
 	description: "Test connection to backend",
@@ -202,6 +195,7 @@ export const mountVolumeResponse = type({
 	error: "string?",
 	status: type.valueOf(BACKEND_STATUS),
 });
+export type MountVolumeDto = typeof mountVolumeResponse.infer;
 
 export const mountVolumeDto = describeRoute({
 	description: "Mount a volume",
@@ -216,9 +210,6 @@ export const mountVolumeDto = describeRoute({
 				},
 			},
 		},
-		404: {
-			description: "Volume not found",
-		},
 	},
 });
 
@@ -229,6 +220,7 @@ export const unmountVolumeResponse = type({
 	error: "string?",
 	status: type.valueOf(BACKEND_STATUS),
 });
+export type UnmountVolumeDto = typeof unmountVolumeResponse.infer;
 
 export const unmountVolumeDto = describeRoute({
 	description: "Unmount a volume",
@@ -243,9 +235,6 @@ export const unmountVolumeDto = describeRoute({
 				},
 			},
 		},
-		404: {
-			description: "Volume not found",
-		},
 	},
 });
 
@@ -253,6 +242,7 @@ export const healthCheckResponse = type({
 	error: "string?",
 	status: type.valueOf(BACKEND_STATUS),
 });
+export type HealthCheckDto = typeof healthCheckResponse.infer;
 
 export const healthCheckDto = describeRoute({
 	description: "Perform a health check on a volume",
@@ -283,10 +273,8 @@ const containerSchema = type({
 	image: "string",
 });
 
-export const listContainersResponse = type({
-	containers: containerSchema.array(),
-});
-export type ListContainersResponseDto = typeof listContainersResponse.infer;
+export const listContainersResponse = containerSchema.array();
+export type ListContainersDto = typeof listContainersResponse.infer;
 
 export const getContainersDto = describeRoute({
 	description: "Get containers using a volume by name",
@@ -322,7 +310,7 @@ export const listFilesResponse = type({
 	files: fileEntrySchema.array(),
 	path: "string",
 });
-export type ListFilesResponseDto = typeof listFilesResponse.infer;
+export type ListFilesDto = typeof listFilesResponse.infer;
 
 export const listFilesDto = describeRoute({
 	description: "List files in a volume directory",
@@ -347,9 +335,6 @@ export const listFilesDto = describeRoute({
 					schema: resolver(listFilesResponse),
 				},
 			},
-		},
-		404: {
-			description: "Volume not found",
 		},
 	},
 });

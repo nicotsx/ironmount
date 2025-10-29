@@ -51,7 +51,7 @@ export const VolumeBackupsTabContent = ({ volume }: Props) => {
 
 	const [isEnabled, setIsEnabled] = useState(existingSchedule?.enabled ?? true);
 
-	const repositories = repositoriesData?.repositories || [];
+	const repositories = repositoriesData || [];
 	const selectedRepository = repositories.find((r) => r.id === (existingSchedule?.repositoryId ?? ""));
 
 	const summary = useMemo(() => {

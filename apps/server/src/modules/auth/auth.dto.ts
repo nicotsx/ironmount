@@ -14,10 +14,11 @@ export const registerBodySchema = type({
 
 const loginResponseSchema = type({
 	message: "string",
+	success: "boolean",
 	user: type({
-		id: "string",
+		id: "number",
 		username: "string",
-	}),
+	}).optional(),
 });
 
 export const loginDto = describeRoute({
@@ -39,6 +40,8 @@ export const loginDto = describeRoute({
 	},
 });
 
+export type LoginDto = typeof loginResponseSchema.infer;
+
 export const registerDto = describeRoute({
 	description: "Register a new user",
 	operationId: "register",
@@ -58,6 +61,12 @@ export const registerDto = describeRoute({
 	},
 });
 
+export type RegisterDto = typeof loginResponseSchema.infer;
+
+const logoutResponseSchema = type({
+	success: "boolean",
+});
+
 export const logoutDto = describeRoute({
 	description: "Logout current user",
 	operationId: "logout",
@@ -67,12 +76,14 @@ export const logoutDto = describeRoute({
 			description: "Logout successful",
 			content: {
 				"application/json": {
-					schema: resolver(type({ message: "string" })),
+					schema: resolver(logoutResponseSchema),
 				},
 			},
 		},
 	},
 });
+
+export type LogoutDto = typeof logoutResponseSchema.infer;
 
 export const getMeDto = describeRoute({
 	description: "Get current authenticated user",
@@ -87,11 +98,10 @@ export const getMeDto = describeRoute({
 				},
 			},
 		},
-		401: {
-			description: "Not authenticated",
-		},
 	},
 });
+
+export type GetMeDto = typeof loginResponseSchema.infer;
 
 const statusResponseSchema = type({
 	hasUsers: "boolean",
@@ -112,6 +122,8 @@ export const getStatusDto = describeRoute({
 		},
 	},
 });
+
+export type GetStatusDto = typeof statusResponseSchema.infer;
 
 export type LoginBody = typeof loginBodySchema.infer;
 export type RegisterBody = typeof registerBodySchema.infer;

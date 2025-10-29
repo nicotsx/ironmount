@@ -65,7 +65,7 @@ const createRepository = async (name: string, config: RepositoryConfig, compress
 			.update(repositoriesTable)
 			.set({
 				status: "healthy",
-				lastChecked: new Date(),
+				lastChecked: Date.now(),
 				lastError: null,
 			})
 			.where(eq(repositoriesTable.id, id));

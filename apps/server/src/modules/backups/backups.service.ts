@@ -10,19 +10,19 @@ import { getVolumePath } from "../volumes/helpers";
 import type { CreateBackupScheduleBody, UpdateBackupScheduleBody } from "./backups.dto";
 import { toMessage } from "../../utils/errors";
 
-const calculateNextRun = (cronExpression: string): Date => {
+const calculateNextRun = (cronExpression: string): number => {
 	try {
 		const interval = CronExpressionParser.parse(cronExpression, {
 			currentDate: new Date(),
 			tz: "UTC",
 		});
 
-		return interval.next().toDate();
+		return interval.next().getTime();
 	} catch (error) {
 		logger.error(`Failed to parse cron expression "${cronExpression}": ${error}`);
 		const fallback = new Date();
 		fallback.setMinutes(fallback.getMinutes() + 1);
-		return fallback;
+		return fallback.getTime();
 	}
 };
 
@@ -123,7 +123,7 @@ const updateSchedule = async (scheduleId: number, data: UpdateBackupScheduleBody
 
 	const [updated] = await db
 		.update(backupSchedulesTable)
-		.set({ ...data, nextBackupAt, updatedAt: new Date() })
+		.set({ ...data, nextBackupAt, updatedAt: Date.now() })
 		.where(eq(backupSchedulesTable.id, scheduleId))
 		.returning();
 
@@ -204,11 +204,11 @@ const executeBackup = async (scheduleId: number) => {
 		await db
 			.update(backupSchedulesTable)
 			.set({
-				lastBackupAt: new Date(),
+				lastBackupAt: Date.now(),
 				lastBackupStatus: "success",
 				lastBackupError: null,
 				nextBackupAt: nextBackupAt,
-				updatedAt: new Date(),
+				updatedAt: Date.now(),
 			})
 			.where(eq(backupSchedulesTable.id, scheduleId));
 
@@ -219,10 +219,10 @@ const executeBackup = async (scheduleId: number) => {
 		await db
 			.update(backupSchedulesTable)
 			.set({
-				lastBackupAt: new Date(),
+				lastBackupAt: Date.now(),
 				lastBackupStatus: "error",
 				lastBackupError: toMessage(error),
-				updatedAt: new Date(),
+				updatedAt: Date.now(),
 			})
 			.where(eq(backupSchedulesTable.id, scheduleId));
 
@@ -231,7 +231,7 @@ const executeBackup = async (scheduleId: number) => {
 };
 
 const getSchedulesToExecute = async () => {
-	const now = new Date();
+	const now = Date.now();
 	const schedules = await db.query.backupSchedulesTable.findMany({
 		where: eq(backupSchedulesTable.enabled, true),
 	});

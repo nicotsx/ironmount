@@ -6,7 +6,6 @@ import Docker from "dockerode";
 import { eq } from "drizzle-orm";
 import { ConflictError, InternalServerError, NotFoundError } from "http-errors-enhanced";
 import slugify from "slugify";
-import { VOLUME_MOUNT_BASE } from "../../core/constants";
 import { db } from "../../db/db";
 import { volumesTable } from "../../db/schema";
 import { toMessage } from "../../utils/errors";
@@ -51,7 +50,7 @@ const createVolume = async (name: string, backendConfig: BackendConfig) => {
 
 	await db
 		.update(volumesTable)
-		.set({ status, lastError: error ?? null, lastHealthCheck: new Date() })
+		.set({ status, lastError: error ?? null, lastHealthCheck: Date.now() })
 		.where(eq(volumesTable.name, slug));
 
 	return { volume: created, status: 201 };
@@ -85,7 +84,7 @@ const mountVolume = async (name: string) => {
 
 	await db
 		.update(volumesTable)
-		.set({ status, lastError: error ?? null, lastHealthCheck: new Date() })
+		.set({ status, lastError: error ?? null, lastHealthCheck: Date.now() })
 		.where(eq(volumesTable.name, name));
 
 	return { error, status };
@@ -149,7 +148,7 @@ const updateVolume = async (name: string, volumeData: UpdateVolumeBody) => {
 			config: volumeData.config,
 			type: volumeData.config?.backend,
 			autoRemount: volumeData.autoRemount,
-			updatedAt: new Date(),
+			updatedAt: Date.now(),
 		})
 		.where(eq(volumesTable.name, name))
 		.returning();
@@ -163,7 +162,7 @@ const updateVolume = async (name: string, volumeData: UpdateVolumeBody) => {
 		const { error, status } = await backend.mount();
 		await db
 			.update(volumesTable)
-			.set({ status, lastError: error ?? null, lastHealthCheck: new Date() })
+			.set({ status, lastError: error ?? null, lastHealthCheck: Date.now() })
 			.where(eq(volumesTable.name, name));
 	}
 
@@ -178,9 +177,9 @@ const testConnection = async (backendConfig: BackendConfig) => {
 		name: "test-connection",
 		path: tempDir,
 		config: backendConfig,
-		createdAt: new Date(),
-		updatedAt: new Date(),
-		lastHealthCheck: new Date(),
+		createdAt: Date.now(),
+		updatedAt: Date.now(),
+		lastHealthCheck: Date.now(),
 		type: backendConfig.backend,
 		status: "unmounted" as const,
 		lastError: null,
@@ -215,7 +214,7 @@ const checkHealth = async (name: string) => {
 
 	await db
 		.update(volumesTable)
-		.set({ lastHealthCheck: new Date(), status, lastError: error ?? null })
+		.set({ lastHealthCheck: Date.now(), status, lastError: error ?? null })
 		.where(eq(volumesTable.name, volume.name));
 
 	return { status, error };

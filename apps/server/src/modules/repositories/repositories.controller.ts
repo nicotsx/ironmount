@@ -5,11 +5,12 @@ import {
 	createRepositoryDto,
 	deleteRepositoryDto,
 	getRepositoryDto,
-	type GetRepositoryResponseDto,
-	type ListRepositoriesResponseDto,
 	listRepositoriesDto,
 	listSnapshotsDto,
-	type ListSnapshotsResponseDto,
+	type DeleteRepositoryDto,
+	type GetRepositoryDto,
+	type ListRepositoriesDto,
+	type ListSnapshotsDto,
 } from "./repositories.dto";
 import { repositoriesService } from "./repositories.service";
 
@@ -17,16 +18,7 @@ export const repositoriesController = new Hono()
 	.get("/", listRepositoriesDto, async (c) => {
 		const repositories = await repositoriesService.listRepositories();
 
-		const response = {
-			repositories: repositories.map((repository) => ({
-				...repository,
-				updatedAt: repository.updatedAt.getTime(),
-				createdAt: repository.createdAt.getTime(),
-				lastChecked: repository.lastChecked?.getTime() ?? null,
-			})),
-		} satisfies ListRepositoriesResponseDto;
-
-		return c.json(response, 200);
+		return c.json<ListRepositoriesDto>(repositories, 200);
 	})
 	.post("/", createRepositoryDto, validator("json", createRepositoryBody), async (c) => {
 		const body = c.req.valid("json");
@@ -38,22 +30,13 @@ export const repositoriesController = new Hono()
 		const { name } = c.req.param();
 		const res = await repositoriesService.getRepository(name);
 
-		const response = {
-			repository: {
-				...res.repository,
-				createdAt: res.repository.createdAt.getTime(),
-				updatedAt: res.repository.updatedAt.getTime(),
-				lastChecked: res.repository.lastChecked?.getTime() ?? null,
-			},
-		} satisfies GetRepositoryResponseDto;
-
-		return c.json(response, 200);
+		return c.json<GetRepositoryDto>(res.repository, 200);
 	})
 	.delete("/:name", deleteRepositoryDto, async (c) => {
 		const { name } = c.req.param();
 		await repositoriesService.deleteRepository(name);
 
-		return c.json({ message: "Repository deleted" }, 200);
+		return c.json<DeleteRepositoryDto>({ message: "Repository deleted" }, 200);
 	})
 	.get("/:name/snapshots", listSnapshotsDto, async (c) => {
 		const { name } = c.req.param();
@@ -77,9 +60,9 @@ export const repositoriesController = new Hono()
 			};
 		});
 
-		const response = { snapshots } satisfies ListSnapshotsResponseDto;
+		const response = { snapshots };
 
 		c.header("Cache-Control", "max-age=30, stale-while-revalidate=300");
 
-		return c.json(response, 200);
+		return c.json<ListSnapshotsDto>(response, 200);
 	});

@@ -23,8 +23,9 @@ export type RegisterResponses = {
 	 */
 	201: {
 		message: string;
-		user: {
-			id: string;
+		success: boolean;
+		user?: {
+			id: number;
 			username: string;
 		};
 	};
@@ -55,8 +56,9 @@ export type LoginResponses = {
 	 */
 	200: {
 		message: string;
-		user: {
-			id: string;
+		success: boolean;
+		user?: {
+			id: number;
 			username: string;
 		};
 	};
@@ -76,7 +78,7 @@ export type LogoutResponses = {
 	 * Logout successful
 	 */
 	200: {
-		message: string;
+		success: boolean;
 	};
 };
 
@@ -89,21 +91,15 @@ export type GetMeData = {
 	url: "/api/v1/auth/me";
 };
 
-export type GetMeErrors = {
-	/**
-	 * Not authenticated
-	 */
-	401: unknown;
-};
-
 export type GetMeResponses = {
 	/**
 	 * Current user information
 	 */
 	200: {
 		message: string;
-		user: {
-			id: string;
+		success: boolean;
+		user?: {
+			id: number;
 			username: string;
 		};
 	};
@@ -232,11 +228,46 @@ export type CreateVolumeResponses = {
 	 * Volume created successfully
 	 */
 	201: {
-		message: string;
-		volume: {
-			name: string;
-			path: string;
-		};
+		autoRemount: boolean;
+		config:
+			| {
+					backend: "directory";
+			  }
+			| {
+					backend: "nfs";
+					exportPath: string;
+					server: string;
+					version: "3" | "4" | "4.1";
+					port?: number;
+			  }
+			| {
+					backend: "smb";
+					password: string;
+					server: string;
+					share: string;
+					username: string;
+					vers?: "1.0" | "2.0" | "2.1" | "3.0";
+					port?: number;
+					domain?: string;
+			  }
+			| {
+					backend: "webdav";
+					path: string;
+					server: string;
+					port?: number;
+					password?: string;
+					ssl?: boolean;
+					username?: string;
+			  };
+		createdAt: number;
+		id: number;
+		lastError: string | null;
+		lastHealthCheck: number;
+		name: string;
+		path: string;
+		status: "error" | "mounted" | "unmounted";
+		type: "directory" | "nfs" | "smb" | "webdav";
+		updatedAt: number;
 	};
 };
 
@@ -438,49 +469,46 @@ export type UpdateVolumeResponses = {
 	 * Volume updated successfully
 	 */
 	200: {
-		message: string;
-		volume: {
-			autoRemount: boolean;
-			config:
-				| {
-						backend: "directory";
-				  }
-				| {
-						backend: "nfs";
-						exportPath: string;
-						server: string;
-						version: "3" | "4" | "4.1";
-						port?: number;
-				  }
-				| {
-						backend: "smb";
-						password: string;
-						server: string;
-						share: string;
-						username: string;
-						vers?: "1.0" | "2.0" | "2.1" | "3.0";
-						port?: number;
-						domain?: string;
-				  }
-				| {
-						backend: "webdav";
-						path: string;
-						server: string;
-						port?: number;
-						password?: string;
-						ssl?: boolean;
-						username?: string;
-				  };
-			createdAt: number;
-			id: number;
-			lastError: string | null;
-			lastHealthCheck: number;
-			name: string;
-			path: string;
-			status: "error" | "mounted" | "unmounted";
-			type: "directory" | "nfs" | "smb" | "webdav";
-			updatedAt: number;
-		};
+		autoRemount: boolean;
+		config:
+			| {
+					backend: "directory";
+			  }
+			| {
+					backend: "nfs";
+					exportPath: string;
+					server: string;
+					version: "3" | "4" | "4.1";
+					port?: number;
+			  }
+			| {
+					backend: "smb";
+					password: string;
+					server: string;
+					share: string;
+					username: string;
+					vers?: "1.0" | "2.0" | "2.1" | "3.0";
+					port?: number;
+					domain?: string;
+			  }
+			| {
+					backend: "webdav";
+					path: string;
+					server: string;
+					port?: number;
+					password?: string;
+					ssl?: boolean;
+					username?: string;
+			  };
+		createdAt: number;
+		id: number;
+		lastError: string | null;
+		lastHealthCheck: number;
+		name: string;
+		path: string;
+		status: "error" | "mounted" | "unmounted";
+		type: "directory" | "nfs" | "smb" | "webdav";
+		updatedAt: number;
 	};
 };
 
@@ -506,14 +534,12 @@ export type GetContainersUsingVolumeResponses = {
 	/**
 	 * List of containers using the volume
 	 */
-	200: {
-		containers: Array<{
-			id: string;
-			image: string;
-			name: string;
-			state: string;
-		}>;
-	};
+	200: Array<{
+		id: string;
+		image: string;
+		name: string;
+		state: string;
+	}>;
 };
 
 export type GetContainersUsingVolumeResponse =
@@ -526,13 +552,6 @@ export type MountVolumeData = {
 	};
 	query?: never;
 	url: "/api/v1/volumes/{name}/mount";
-};
-
-export type MountVolumeErrors = {
-	/**
-	 * Volume not found
-	 */
-	404: unknown;
 };
 
 export type MountVolumeResponses = {
@@ -554,13 +573,6 @@ export type UnmountVolumeData = {
 	};
 	query?: never;
 	url: "/api/v1/volumes/{name}/unmount";
-};
-
-export type UnmountVolumeErrors = {
-	/**
-	 * Volume not found
-	 */
-	404: unknown;
 };
 
 export type UnmountVolumeResponses = {
@@ -617,13 +629,6 @@ export type ListFilesData = {
 	url: "/api/v1/volumes/{name}/files";
 };
 
-export type ListFilesErrors = {
-	/**
-	 * Volume not found
-	 */
-	404: unknown;
-};
-
 export type ListFilesResponses = {
 	/**
 	 * List of files in the volume
@@ -653,31 +658,29 @@ export type ListRepositoriesResponses = {
 	/**
 	 * List of repositories
 	 */
-	200: {
-		repositories: Array<{
-			compressionMode: "auto" | "better" | "fastest" | "max" | "off" | null;
-			config:
-				| {
-						accessKeyId: string;
-						backend: "s3";
-						bucket: string;
-						endpoint: string;
-						secretAccessKey: string;
-				  }
-				| {
-						backend: "local";
-						path: string;
-				  };
-			createdAt: number;
-			id: string;
-			lastChecked: number | null;
-			lastError: string | null;
-			name: string;
-			status: "error" | "healthy" | "unknown" | null;
-			type: "local" | "s3";
-			updatedAt: number;
-		}>;
-	};
+	200: Array<{
+		compressionMode: "auto" | "better" | "fastest" | "max" | "off" | null;
+		config:
+			| {
+					accessKeyId: string;
+					backend: "s3";
+					bucket: string;
+					endpoint: string;
+					secretAccessKey: string;
+			  }
+			| {
+					backend: "local";
+					path: string;
+			  };
+		createdAt: number;
+		id: string;
+		lastChecked: number | null;
+		lastError: string | null;
+		name: string;
+		status: "error" | "healthy" | "unknown" | null;
+		type: "local" | "s3";
+		updatedAt: number;
+	}>;
 };
 
 export type ListRepositoriesResponse = ListRepositoriesResponses[keyof ListRepositoriesResponses];
@@ -753,29 +756,27 @@ export type GetRepositoryResponses = {
 	 * Repository details
 	 */
 	200: {
-		repository: {
-			compressionMode: "auto" | "better" | "fastest" | "max" | "off" | null;
-			config:
-				| {
-						accessKeyId: string;
-						backend: "s3";
-						bucket: string;
-						endpoint: string;
-						secretAccessKey: string;
-				  }
-				| {
-						backend: "local";
-						path: string;
-				  };
-			createdAt: number;
-			id: string;
-			lastChecked: number | null;
-			lastError: string | null;
-			name: string;
-			status: "error" | "healthy" | "unknown" | null;
-			type: "local" | "s3";
-			updatedAt: number;
-		};
+		compressionMode: "auto" | "better" | "fastest" | "max" | "off" | null;
+		config:
+			| {
+					accessKeyId: string;
+					backend: "s3";
+					bucket: string;
+					endpoint: string;
+					secretAccessKey: string;
+			  }
+			| {
+					backend: "local";
+					path: string;
+			  };
+		createdAt: number;
+		id: string;
+		lastChecked: number | null;
+		lastError: string | null;
+		name: string;
+		status: "error" | "healthy" | "unknown" | null;
+		type: "local" | "s3";
+		updatedAt: number;
 	};
 };
 
@@ -818,32 +819,30 @@ export type ListBackupSchedulesResponses = {
 	/**
 	 * List of backup schedules
 	 */
-	200: {
-		schedules: Array<{
-			createdAt: number;
-			cronExpression: string;
-			enabled: boolean;
-			excludePatterns: Array<string> | null;
-			id: number;
-			includePatterns: Array<string> | null;
-			lastBackupAt: number | null;
-			lastBackupError: string | null;
-			lastBackupStatus: "error" | "success" | null;
-			nextBackupAt: number | null;
-			repositoryId: string;
-			retentionPolicy: {
-				keepDaily?: number;
-				keepHourly?: number;
-				keepLast?: number;
-				keepMonthly?: number;
-				keepWeekly?: number;
-				keepWithinDuration?: string;
-				keepYearly?: number;
-			} | null;
-			updatedAt: number;
-			volumeId: number;
-		}>;
-	};
+	200: Array<{
+		createdAt: number;
+		cronExpression: string;
+		enabled: boolean;
+		excludePatterns: Array<string> | null;
+		id: number;
+		includePatterns: Array<string> | null;
+		lastBackupAt: number | null;
+		lastBackupError: string | null;
+		lastBackupStatus: "error" | "success" | null;
+		nextBackupAt: number | null;
+		repositoryId: string;
+		retentionPolicy: {
+			keepDaily?: number;
+			keepHourly?: number;
+			keepLast?: number;
+			keepMonthly?: number;
+			keepWeekly?: number;
+			keepWithinDuration?: string;
+			keepYearly?: number;
+		} | null;
+		updatedAt: number;
+		volumeId: number;
+	}>;
 };
 
 export type ListBackupSchedulesResponse = ListBackupSchedulesResponses[keyof ListBackupSchedulesResponses];
@@ -877,31 +876,28 @@ export type CreateBackupScheduleResponses = {
 	 * Backup schedule created successfully
 	 */
 	201: {
-		message: string;
-		schedule: {
-			createdAt: number;
-			cronExpression: string;
-			enabled: boolean;
-			excludePatterns: Array<string> | null;
-			id: number;
-			includePatterns: Array<string> | null;
-			lastBackupAt: number | null;
-			lastBackupError: string | null;
-			lastBackupStatus: "error" | "success" | null;
-			nextBackupAt: number | null;
-			repositoryId: string;
-			retentionPolicy: {
-				keepDaily?: number;
-				keepHourly?: number;
-				keepLast?: number;
-				keepMonthly?: number;
-				keepWeekly?: number;
-				keepWithinDuration?: string;
-				keepYearly?: number;
-			} | null;
-			updatedAt: number;
-			volumeId: number;
-		};
+		createdAt: number;
+		cronExpression: string;
+		enabled: boolean;
+		excludePatterns: Array<string> | null;
+		id: number;
+		includePatterns: Array<string> | null;
+		lastBackupAt: number | null;
+		lastBackupError: string | null;
+		lastBackupStatus: "error" | "success" | null;
+		nextBackupAt: number | null;
+		repositoryId: string;
+		retentionPolicy: {
+			keepDaily?: number;
+			keepHourly?: number;
+			keepLast?: number;
+			keepMonthly?: number;
+			keepWeekly?: number;
+			keepWithinDuration?: string;
+			keepYearly?: number;
+		} | null;
+		updatedAt: number;
+		volumeId: number;
 	};
 };
 
@@ -921,7 +917,7 @@ export type DeleteBackupScheduleResponses = {
 	 * Backup schedule deleted successfully
 	 */
 	200: {
-		message: string;
+		success: boolean;
 	};
 };
 
@@ -941,30 +937,28 @@ export type GetBackupScheduleResponses = {
 	 * Backup schedule details
 	 */
 	200: {
-		schedule: {
-			createdAt: number;
-			cronExpression: string;
-			enabled: boolean;
-			excludePatterns: Array<string> | null;
-			id: number;
-			includePatterns: Array<string> | null;
-			lastBackupAt: number | null;
-			lastBackupError: string | null;
-			lastBackupStatus: "error" | "success" | null;
-			nextBackupAt: number | null;
-			repositoryId: string;
-			retentionPolicy: {
-				keepDaily?: number;
-				keepHourly?: number;
-				keepLast?: number;
-				keepMonthly?: number;
-				keepWeekly?: number;
-				keepWithinDuration?: string;
-				keepYearly?: number;
-			} | null;
-			updatedAt: number;
-			volumeId: number;
-		};
+		createdAt: number;
+		cronExpression: string;
+		enabled: boolean;
+		excludePatterns: Array<string> | null;
+		id: number;
+		includePatterns: Array<string> | null;
+		lastBackupAt: number | null;
+		lastBackupError: string | null;
+		lastBackupStatus: "error" | "success" | null;
+		nextBackupAt: number | null;
+		repositoryId: string;
+		retentionPolicy: {
+			keepDaily?: number;
+			keepHourly?: number;
+			keepLast?: number;
+			keepMonthly?: number;
+			keepWeekly?: number;
+			keepWithinDuration?: string;
+			keepYearly?: number;
+		} | null;
+		updatedAt: number;
+		volumeId: number;
 	};
 };
 
@@ -1000,31 +994,28 @@ export type UpdateBackupScheduleResponses = {
 	 * Backup schedule updated successfully
 	 */
 	200: {
-		message: string;
-		schedule: {
-			createdAt: number;
-			cronExpression: string;
-			enabled: boolean;
-			excludePatterns: Array<string> | null;
-			id: number;
-			includePatterns: Array<string> | null;
-			lastBackupAt: number | null;
-			lastBackupError: string | null;
-			lastBackupStatus: "error" | "success" | null;
-			nextBackupAt: number | null;
-			repositoryId: string;
-			retentionPolicy: {
-				keepDaily?: number;
-				keepHourly?: number;
-				keepLast?: number;
-				keepMonthly?: number;
-				keepWeekly?: number;
-				keepWithinDuration?: string;
-				keepYearly?: number;
-			} | null;
-			updatedAt: number;
-			volumeId: number;
-		};
+		createdAt: number;
+		cronExpression: string;
+		enabled: boolean;
+		excludePatterns: Array<string> | null;
+		id: number;
+		includePatterns: Array<string> | null;
+		lastBackupAt: number | null;
+		lastBackupError: string | null;
+		lastBackupStatus: "error" | "success" | null;
+		nextBackupAt: number | null;
+		repositoryId: string;
+		retentionPolicy: {
+			keepDaily?: number;
+			keepHourly?: number;
+			keepLast?: number;
+			keepMonthly?: number;
+			keepWeekly?: number;
+			keepWithinDuration?: string;
+			keepYearly?: number;
+		} | null;
+		updatedAt: number;
+		volumeId: number;
 	};
 };
 
@@ -1086,8 +1077,7 @@ export type RunBackupNowResponses = {
 	 * Backup started successfully
 	 */
 	200: {
-		backupStarted: boolean;
-		message: string;
+		success: boolean;
 	};
 };
 

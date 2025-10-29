@@ -25,10 +25,8 @@ export type RepositoryDto = typeof repositorySchema.infer;
 /**
  * List all repositories
  */
-export const listRepositoriesResponse = type({
-	repositories: repositorySchema.array(),
-});
-export type ListRepositoriesResponseDto = typeof listRepositoriesResponse.infer;
+export const listRepositoriesResponse = repositorySchema.array();
+export type ListRepositoriesDto = typeof listRepositoriesResponse.infer;
 
 export const listRepositoriesDto = describeRoute({
 	description: "List all repositories",
@@ -65,6 +63,8 @@ export const createRepositoryResponse = type({
 	}),
 });
 
+export type CreateRepositoryDto = typeof createRepositoryResponse.infer;
+
 export const createRepositoryDto = describeRoute({
 	description: "Create a new restic repository",
 	operationId: "createRepository",
@@ -84,10 +84,8 @@ export const createRepositoryDto = describeRoute({
 /**
  * Get a single repository
  */
-export const getRepositoryResponse = type({
-	repository: repositorySchema,
-});
-export type GetRepositoryResponseDto = typeof getRepositoryResponse.infer;
+export const getRepositoryResponse = repositorySchema;
+export type GetRepositoryDto = typeof getRepositoryResponse.infer;
 
 export const getRepositoryDto = describeRoute({
 	description: "Get a single repository by name",
@@ -111,6 +109,8 @@ export const getRepositoryDto = describeRoute({
 export const deleteRepositoryResponse = type({
 	message: "string",
 });
+
+export type DeleteRepositoryDto = typeof deleteRepositoryResponse.infer;
 
 export const deleteRepositoryDto = describeRoute({
 	description: "Delete a repository",
@@ -143,7 +143,7 @@ const listSnapshotsResponse = type({
 	snapshots: snapshotSchema.array(),
 });
 
-export type ListSnapshotsResponseDto = typeof listSnapshotsResponse.infer;
+export type ListSnapshotsDto = typeof listSnapshotsResponse.infer;
 
 export const listSnapshotsDto = describeRoute({
 	description: "List all snapshots in a repository",

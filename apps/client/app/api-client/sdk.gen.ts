@@ -12,7 +12,6 @@ import type {
 	LogoutResponses,
 	GetMeData,
 	GetMeResponses,
-	GetMeErrors,
 	GetStatusData,
 	GetStatusResponses,
 	ListVolumesData,
@@ -34,16 +33,13 @@ import type {
 	GetContainersUsingVolumeErrors,
 	MountVolumeData,
 	MountVolumeResponses,
-	MountVolumeErrors,
 	UnmountVolumeData,
 	UnmountVolumeResponses,
-	UnmountVolumeErrors,
 	HealthCheckVolumeData,
 	HealthCheckVolumeResponses,
 	HealthCheckVolumeErrors,
 	ListFilesData,
 	ListFilesResponses,
-	ListFilesErrors,
 	ListRepositoriesData,
 	ListRepositoriesResponses,
 	CreateRepositoryData,
@@ -130,7 +126,7 @@ export const logout = <ThrowOnError extends boolean = false>(options?: Options<L
  * Get current authenticated user
  */
 export const getMe = <ThrowOnError extends boolean = false>(options?: Options<GetMeData, ThrowOnError>) => {
-	return (options?.client ?? _heyApiClient).get<GetMeResponses, GetMeErrors, ThrowOnError>({
+	return (options?.client ?? _heyApiClient).get<GetMeResponses, unknown, ThrowOnError>({
 		url: "/api/v1/auth/me",
 		...options,
 	});
@@ -246,7 +242,7 @@ export const getContainersUsingVolume = <ThrowOnError extends boolean = false>(
  * Mount a volume
  */
 export const mountVolume = <ThrowOnError extends boolean = false>(options: Options<MountVolumeData, ThrowOnError>) => {
-	return (options.client ?? _heyApiClient).post<MountVolumeResponses, MountVolumeErrors, ThrowOnError>({
+	return (options.client ?? _heyApiClient).post<MountVolumeResponses, unknown, ThrowOnError>({
 		url: "/api/v1/volumes/{name}/mount",
 		...options,
 	});
@@ -258,7 +254,7 @@ export const mountVolume = <ThrowOnError extends boolean = false>(options: Optio
 export const unmountVolume = <ThrowOnError extends boolean = false>(
 	options: Options<UnmountVolumeData, ThrowOnError>,
 ) => {
-	return (options.client ?? _heyApiClient).post<UnmountVolumeResponses, UnmountVolumeErrors, ThrowOnError>({
+	return (options.client ?? _heyApiClient).post<UnmountVolumeResponses, unknown, ThrowOnError>({
 		url: "/api/v1/volumes/{name}/unmount",
 		...options,
 	});
@@ -280,7 +276,7 @@ export const healthCheckVolume = <ThrowOnError extends boolean = false>(
  * List files in a volume directory
  */
 export const listFiles = <ThrowOnError extends boolean = false>(options: Options<ListFilesData, ThrowOnError>) => {
-	return (options.client ?? _heyApiClient).get<ListFilesResponses, ListFilesErrors, ThrowOnError>({
+	return (options.client ?? _heyApiClient).get<ListFilesResponses, unknown, ThrowOnError>({
 		url: "/api/v1/volumes/{name}/files",
 		...options,
 	});

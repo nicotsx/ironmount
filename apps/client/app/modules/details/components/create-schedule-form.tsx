@@ -114,7 +114,7 @@ export const CreateScheduleForm = ({ initialValues, onSubmit, volume, loading, s
 													<SelectValue placeholder="Select a repository" />
 												</SelectTrigger>
 												<SelectContent>
-													{repositoriesData?.repositories.map((repo) => (
+													{repositoriesData?.map((repo) => (
 														<SelectItem key={repo.id} value={repo.id}>
 															<span className="flex items-center gap-2">
 																<RepositoryIcon backend={repo.type} />

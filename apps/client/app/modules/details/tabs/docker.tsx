@@ -38,7 +38,7 @@ export const DockerTabContent = ({ volume }: Props) => {
 		refetchOnWindowFocus: true,
 	});
 
-	const containers = containersData?.containers || [];
+	const containers = containersData || [];
 
 	const getStateClass = (state: string) => {
 		switch (state) {

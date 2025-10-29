@@ -6,6 +6,6 @@ export type VolumeStatus = Volume["status"];
 
 export type User = GetMeResponse["user"];
 
-export type Repository = GetRepositoryResponse["repository"];
+export type Repository = GetRepositoryResponse;
 
-export type BackupSchedule = GetBackupScheduleResponse["schedule"];
+export type BackupSchedule = GetBackupScheduleResponse;

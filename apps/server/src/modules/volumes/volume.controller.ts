@@ -4,22 +4,23 @@ import {
 	createVolumeBody,
 	createVolumeDto,
 	deleteVolumeDto,
-	type GetVolumeResponseDto,
 	getContainersDto,
 	getVolumeDto,
 	healthCheckDto,
-	type ListContainersResponseDto,
-	type ListFilesResponseDto,
-	type ListVolumesResponseDto,
+	type ListVolumesDto,
 	listFilesDto,
 	listVolumesDto,
 	mountVolumeDto,
 	testConnectionBody,
 	testConnectionDto,
-	type UpdateVolumeResponseDto,
 	unmountVolumeDto,
 	updateVolumeBody,
 	updateVolumeDto,
+	type CreateVolumeDto,
+	type GetVolumeDto,
+	type ListContainersDto,
+	type UpdateVolumeDto,
+	type ListFilesDto,
 } from "./volume.dto";
 import { volumeService } from "./volume.service";
 import { getVolumePath } from "./helpers";
@@ -32,19 +33,21 @@ export const volumeController = new Hono()
 			volumes: volumes.map((volume) => ({
 				path: getVolumePath(volume.name),
 				...volume,
-				updatedAt: volume.updatedAt.getTime(),
-				createdAt: volume.createdAt.getTime(),
-				lastHealthCheck: volume.lastHealthCheck.getTime(),
 			})),
-		} satisfies ListVolumesResponseDto;
+		};
 
-		return c.json(response, 200);
+		return c.json<ListVolumesDto>(response, 200);
 	})
 	.post("/", createVolumeDto, validator("json", createVolumeBody), async (c) => {
 		const body = c.req.valid("json");
 		const res = await volumeService.createVolume(body.name, body.config);
 
-		return c.json({ message: "Volume created", volume: res.volume }, 201);
+		const response = {
+			...res.volume,
+			path: getVolumePath(res.volume.name),
+		};
+
+		return c.json<CreateVolumeDto>(response, 201);
 	})
 	.post("/test-connection", testConnectionDto, validator("json", testConnectionBody), async (c) => {
 		const body = c.req.valid("json");
@@ -66,28 +69,21 @@ export const volumeController = new Hono()
 			volume: {
 				...res.volume,
 				path: getVolumePath(res.volume.name),
-				createdAt: res.volume.createdAt.getTime(),
-				updatedAt: res.volume.updatedAt.getTime(),
-				lastHealthCheck: res.volume.lastHealthCheck.getTime(),
 			},
 			statfs: {
 				total: res.statfs.total ?? 0,
 				used: res.statfs.used ?? 0,
 				free: res.statfs.free ?? 0,
 			},
-		} satisfies GetVolumeResponseDto;
+		};
 
-		return c.json(response, 200);
+		return c.json<GetVolumeDto>(response, 200);
 	})
 	.get("/:name/containers", getContainersDto, async (c) => {
 		const { name } = c.req.param();
 		const { containers } = await volumeService.getContainersUsingVolume(name);
 
-		const response = {
-			containers,
-		} satisfies ListContainersResponseDto;
-
-		return c.json(response, 200);
+		return c.json<ListContainersDto>(containers, 200);
 	})
 	.put("/:name", updateVolumeDto, validator("json", updateVolumeBody), async (c) => {
 		const { name } = c.req.param();
@@ -95,17 +91,11 @@ export const volumeController = new Hono()
 		const res = await volumeService.updateVolume(name, body);
 
 		const response = {
-			message: "Volume updated",
-			volume: {
-				...res.volume,
-				path: getVolumePath(res.volume.name),
-				createdAt: res.volume.createdAt.getTime(),
-				updatedAt: res.volume.updatedAt.getTime(),
-				lastHealthCheck: res.volume.lastHealthCheck.getTime(),
-			},
-		} satisfies UpdateVolumeResponseDto;
+			...res.volume,
+			path: getVolumePath(res.volume.name),
+		};
 
-		return c.json(response, 200);
+		return c.json<UpdateVolumeDto>(response, 200);
 	})
 	.post("/:name/mount", mountVolumeDto, async (c) => {
 		const { name } = c.req.param();
@@ -133,9 +123,9 @@ export const volumeController = new Hono()
 		const response = {
 			files: result.files,
 			path: result.path,
-		} satisfies ListFilesResponseDto;
+		};
 
 		c.header("Cache-Control", "public, max-age=10, stale-while-revalidate=60");
 
-		return c.json(response, 200);
+		return c.json<ListFilesDto>(response, 200);
 	});

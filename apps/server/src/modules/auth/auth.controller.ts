@@ -10,8 +10,14 @@ import {
 	logoutDto,
 	registerBodySchema,
 	registerDto,
+	type GetMeDto,
+	type GetStatusDto,
+	type LoginDto,
+	type LogoutDto,
+	type RegisterDto,
 } from "./auth.dto";
 import { authService } from "./auth.service";
+import { toMessage } from "../../utils/errors";
 
 const COOKIE_NAME = "session_id";
 const COOKIE_OPTIONS = {
@@ -33,9 +39,12 @@ export const authController = new Hono()
 				expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
 			});
 
-			return c.json({ message: "User registered successfully", user: { id: user.id, username: user.username } }, 201);
+			return c.json<RegisterDto>(
+				{ success: true, message: "User registered successfully", user: { id: user.id, username: user.username } },
+				201,
+			);
 		} catch (error) {
-			return c.json({ message: error instanceof Error ? error.message : "Registration failed" }, 400);
+			return c.json<RegisterDto>({ success: false, message: toMessage(error) }, 400);
 		}
 	})
 	.post("/login", loginDto, validator("json", loginBodySchema), async (c) => {
@@ -46,15 +55,16 @@ export const authController = new Hono()
 
 			setCookie(c, COOKIE_NAME, sessionId, {
 				...COOKIE_OPTIONS,
-				expires: expiresAt,
+				expires: new Date(expiresAt),
 			});
 
-			return c.json({
+			return c.json<LoginDto>({
+				success: true,
 				message: "Login successful",
 				user: { id: user.id, username: user.username },
 			});
 		} catch (error) {
-			return c.json({ message: error instanceof Error ? error.message : "Login failed" }, 401);
+			return c.json<LoginDto>({ success: false, message: toMessage(error) }, 401);
 		}
 	})
 	.post("/logout", logoutDto, async (c) => {
@@ -65,13 +75,13 @@ export const authController = new Hono()
 			deleteCookie(c, COOKIE_NAME, COOKIE_OPTIONS);
 		}
 
-		return c.json({ message: "Logout successful" });
+		return c.json<LogoutDto>({ success: true });
 	})
 	.get("/me", getMeDto, async (c) => {
 		const sessionId = getCookie(c, COOKIE_NAME);
 
 		if (!sessionId) {
-			return c.json({ message: "Not authenticated" }, 401);
+			return c.json<GetMeDto>({ success: false, message: "Not authenticated" }, 401);
 		}
 
 		const session = await authService.verifySession(sessionId);
@@ -81,11 +91,13 @@ export const authController = new Hono()
 			return c.json({ message: "Not authenticated" }, 401);
 		}
 
-		return c.json({
+		return c.json<GetMeDto>({
+			success: true,
 			user: session.user,
+			message: "Authenticated",
 		});
 	})
 	.get("/status", getStatusDto, async (c) => {
 		const hasUsers = await authService.hasUsers();
-		return c.json({ hasUsers });
+		return c.json<GetStatusDto>({ hasUsers });
 	});

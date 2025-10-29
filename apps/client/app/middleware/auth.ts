@@ -7,7 +7,7 @@ export const authMiddleware: MiddlewareFunction = async ({ context, request }) =
 
 	const isAuthRoute = ["/login", "/onboarding"].includes(new URL(request.url).pathname);
 
-	if (!session.data?.user.id && !isAuthRoute) {
+	if (!session.data?.user?.id && !isAuthRoute) {
 		const status = await getStatus();
 		if (!status.data?.hasUsers) {
 			throw redirect("/onboarding");
@@ -16,7 +16,7 @@ export const authMiddleware: MiddlewareFunction = async ({ context, request }) =
 		throw redirect("/login");
 	}
 
-	if (session.data?.user.id) {
+	if (session.data?.user?.id) {
 		context.set(appContext, { user: session.data.user, hasUsers: true });
 
 		if (isAuthRoute) {

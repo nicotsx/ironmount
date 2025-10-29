@@ -35,7 +35,7 @@ export const HealthchecksCard = ({ volume }: Props) => {
 		...updateVolumeMutation(),
 		onSuccess: (d) => {
 			toast.success("Volume updated", {
-				description: `Auto remount is now ${d.volume.autoRemount ? "enabled" : "paused"}.`,
+				description: `Auto remount is now ${d.autoRemount ? "enabled" : "paused"}.`,
 			});
 		},
 		onError: (error) => {

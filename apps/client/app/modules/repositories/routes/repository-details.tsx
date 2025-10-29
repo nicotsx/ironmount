@@ -83,8 +83,6 @@ export default function RepositoryDetailsPage({ loaderData }: Route.ComponentPro
 		return <div>Loading...</div>;
 	}
 
-	const { repository } = data;
-
 	return (
 		<>
 			<div className="flex items-center justify-between mb-4">
@@ -94,14 +92,14 @@ export default function RepositoryDetailsPage({ loaderData }: Route.ComponentPro
 							className={cn(
 								"inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs bg-gray-500/10 text-gray-500",
 								{
-									"bg-green-500/10 text-green-500": repository.status === "healthy",
-									"bg-red-500/10 text-red-500": repository.status === "error",
+									"bg-green-500/10 text-green-500": data.status === "healthy",
+									"bg-red-500/10 text-red-500": data.status === "error",
 								},
 							)}
 						>
-							{repository.status || "unknown"}
+							{data.status || "unknown"}
 						</span>
-						<span className="text-xs bg-primary/10 rounded-md px-2 py-1">{repository.type}</span>
+						<span className="text-xs bg-primary/10 rounded-md px-2 py-1">{data.type}</span>
 					</div>
 				</div>
 				<div className="flex gap-4">
@@ -117,10 +115,10 @@ export default function RepositoryDetailsPage({ loaderData }: Route.ComponentPro
 					<TabsTrigger value="snapshots">Snapshots</TabsTrigger>
 				</TabsList>
 				<TabsContent value="info">
-					<RepositoryInfoTabContent repository={data.repository} />
+					<RepositoryInfoTabContent repository={data} />
 				</TabsContent>
 				<TabsContent value="snapshots">
-					<RepositorySnapshotsTabContent repository={data.repository} />
+					<RepositorySnapshotsTabContent repository={data} />
 				</TabsContent>
 			</Tabs>
 		</>

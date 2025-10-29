@@ -35,9 +35,7 @@ export type BackupScheduleDto = typeof backupScheduleSchema.infer;
 /**
  * List all backup schedules
  */
-export const listBackupSchedulesResponse = type({
-	schedules: backupScheduleSchema.array(),
-});
+export const listBackupSchedulesResponse = backupScheduleSchema.array();
 
 export type ListBackupSchedulesResponseDto = typeof listBackupSchedulesResponse.infer;
 
@@ -60,9 +58,7 @@ export const listBackupSchedulesDto = describeRoute({
 /**
  * Get a single backup schedule
  */
-export const getBackupScheduleResponse = type({
-	schedule: backupScheduleSchema,
-});
+export const getBackupScheduleResponse = backupScheduleSchema;
 
 export type GetBackupScheduleDto = typeof getBackupScheduleResponse.infer;
 
@@ -118,10 +114,7 @@ export const createBackupScheduleBody = type({
 
 export type CreateBackupScheduleBody = typeof createBackupScheduleBody.infer;
 
-export const createBackupScheduleResponse = type({
-	message: "string",
-	schedule: backupScheduleSchema,
-});
+export const createBackupScheduleResponse = backupScheduleSchema;
 
 export type CreateBackupScheduleDto = typeof createBackupScheduleResponse.infer;
 
@@ -156,10 +149,9 @@ export const updateBackupScheduleBody = type({
 
 export type UpdateBackupScheduleBody = typeof updateBackupScheduleBody.infer;
 
-export const updateBackupScheduleResponse = type({
-	message: "string",
-	schedule: backupScheduleSchema,
-});
+export const updateBackupScheduleResponse = backupScheduleSchema;
+
+export type UpdateBackupScheduleDto = typeof updateBackupScheduleResponse.infer;
 
 export const updateBackupScheduleDto = describeRoute({
 	description: "Update a backup schedule",
@@ -181,8 +173,10 @@ export const updateBackupScheduleDto = describeRoute({
  * Delete a backup schedule
  */
 export const deleteBackupScheduleResponse = type({
-	message: "string",
+	success: "boolean",
 });
+
+export type DeleteBackupScheduleDto = typeof deleteBackupScheduleResponse.infer;
 
 export const deleteBackupScheduleDto = describeRoute({
 	description: "Delete a backup schedule",
@@ -204,9 +198,10 @@ export const deleteBackupScheduleDto = describeRoute({
  * Run a backup immediately
  */
 export const runBackupNowResponse = type({
-	message: "string",
-	backupStarted: "boolean",
+	success: "boolean",
 });
+
+export type RunBackupNowDto = typeof runBackupNowResponse.infer;
 
 export const runBackupNowDto = describeRoute({
 	description: "Trigger a backup immediately for a schedule",
