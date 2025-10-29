@@ -170,6 +170,42 @@ export const updateBackupScheduleDto = describeRoute({
 });
 
 /**
+ * Upsert a backup schedule (create or update)
+ */
+export const upsertBackupScheduleBody = type({
+	volumeId: "number",
+	repositoryId: "string",
+	enabled: "boolean",
+	cronExpression: "string",
+	retentionPolicy: retentionPolicySchema.optional(),
+	excludePatterns: "string[]?",
+	includePatterns: "string[]?",
+	tags: "string[]?",
+});
+
+export type UpsertBackupScheduleBody = typeof upsertBackupScheduleBody.infer;
+
+export const upsertBackupScheduleResponse = backupScheduleSchema;
+
+export type UpsertBackupScheduleDto = typeof upsertBackupScheduleResponse.infer;
+
+export const upsertBackupScheduleDto = describeRoute({
+	description: "Create or update a backup schedule for a volume",
+	operationId: "upsertBackupSchedule",
+	tags: ["Backups"],
+	responses: {
+		200: {
+			description: "Backup schedule upserted successfully",
+			content: {
+				"application/json": {
+					schema: resolver(upsertBackupScheduleResponse),
+				},
+			},
+		},
+	},
+});
+
+/**
  * Delete a backup schedule
  */
 export const deleteBackupScheduleResponse = type({

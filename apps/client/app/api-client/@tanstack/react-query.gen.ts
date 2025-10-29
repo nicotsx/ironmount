@@ -29,6 +29,7 @@ import {
 	getBackupSchedule,
 	updateBackupSchedule,
 	getBackupScheduleForVolume,
+	upsertBackupSchedule,
 	runBackupNow,
 } from "../sdk.gen";
 import { queryOptions, type UseMutationOptions, type DefaultError } from "@tanstack/react-query";
@@ -75,6 +76,8 @@ import type {
 	UpdateBackupScheduleData,
 	UpdateBackupScheduleResponse,
 	GetBackupScheduleForVolumeData,
+	UpsertBackupScheduleData,
+	UpsertBackupScheduleResponse,
 	RunBackupNowData,
 	RunBackupNowResponse,
 } from "../types.gen";
@@ -863,6 +866,29 @@ export const getBackupScheduleForVolumeOptions = (options: Options<GetBackupSche
 		},
 		queryKey: getBackupScheduleForVolumeQueryKey(options),
 	});
+};
+
+/**
+ * Create or update a backup schedule for a volume
+ */
+export const upsertBackupScheduleMutation = (
+	options?: Partial<Options<UpsertBackupScheduleData>>,
+): UseMutationOptions<UpsertBackupScheduleResponse, DefaultError, Options<UpsertBackupScheduleData>> => {
+	const mutationOptions: UseMutationOptions<
+		UpsertBackupScheduleResponse,
+		DefaultError,
+		Options<UpsertBackupScheduleData>
+	> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await upsertBackupSchedule({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
 };
 
 export const runBackupNowQueryKey = (options: Options<RunBackupNowData>) => createQueryKey("runBackupNow", options);

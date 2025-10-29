@@ -9,8 +9,7 @@ import { OnOff } from "~/components/onoff";
 import type { Volume } from "~/lib/types";
 import {
 	listRepositoriesOptions,
-	createBackupScheduleMutation,
-	updateBackupScheduleMutation,
+	upsertBackupScheduleMutation,
 	getBackupScheduleForVolumeOptions,
 } from "~/api-client/@tanstack/react-query.gen";
 import { parseError } from "~/lib/errors";
@@ -76,27 +75,15 @@ export const VolumeBackupsTabContent = ({ volume }: Props) => {
 		};
 	}, [existingSchedule, selectedRepository, volume.name]);
 
-	const createSchedule = useMutation({
-		...createBackupScheduleMutation(),
+	const upsertSchedule = useMutation({
+		...upsertBackupScheduleMutation(),
 		onSuccess: () => {
-			toast.success("Backup schedule created successfully");
+			toast.success("Backup schedule saved successfully");
 			queryClient.invalidateQueries({ queryKey: ["listBackupSchedules"] });
+			queryClient.invalidateQueries({ queryKey: ["getBackupScheduleForVolume", volume.id.toString()] });
 		},
 		onError: (error) => {
-			toast.error("Failed to create backup schedule", {
-				description: parseError(error)?.message,
-			});
-		},
-	});
-
-	const updateSchedule = useMutation({
-		...updateBackupScheduleMutation(),
-		onSuccess: () => {
-			toast.success("Backup schedule updated successfully");
-			queryClient.invalidateQueries({ queryKey: ["listBackupSchedules"] });
-		},
-		onError: (error) => {
-			toast.error("Failed to update backup schedule", {
+			toast.error("Failed to save backup schedule", {
 				description: parseError(error)?.message,
 			});
 		},
@@ -113,27 +100,15 @@ export const VolumeBackupsTabContent = ({ volume }: Props) => {
 		if (formValues.keepMonthly) retentionPolicy.keepMonthly = formValues.keepMonthly;
 		if (formValues.keepYearly) retentionPolicy.keepYearly = formValues.keepYearly;
 
-		if (existingSchedule) {
-			updateSchedule.mutate({
-				path: { scheduleId: existingSchedule.id.toString() },
-				body: {
-					repositoryId: formValues.repositoryId,
-					enabled: isEnabled,
-					cronExpression,
-					retentionPolicy: Object.keys(retentionPolicy).length > 0 ? retentionPolicy : undefined,
-				},
-			});
-		} else {
-			createSchedule.mutate({
-				body: {
-					volumeId: volume.id,
-					repositoryId: formValues.repositoryId,
-					enabled: true,
-					cronExpression,
-					retentionPolicy: Object.keys(retentionPolicy).length > 0 ? retentionPolicy : undefined,
-				},
-			});
-		}
+		upsertSchedule.mutate({
+			body: {
+				volumeId: volume.id,
+				repositoryId: formValues.repositoryId,
+				enabled: existingSchedule ? isEnabled : true,
+				cronExpression,
+				retentionPolicy: Object.keys(retentionPolicy).length > 0 ? retentionPolicy : undefined,
+			},
+		});
 	};
 
 	if (loadingRepositories || loadingSchedules) {
@@ -180,9 +155,9 @@ export const VolumeBackupsTabContent = ({ volume }: Props) => {
 		if (!existingSchedule) return;
 
 		setIsEnabled(enabled);
-		updateSchedule.mutate({
-			path: { scheduleId: existingSchedule.id.toString() },
+		upsertSchedule.mutate({
 			body: {
+				volumeId: existingSchedule.volumeId,
 				repositoryId: existingSchedule.repositoryId,
 				enabled,
 				cronExpression: existingSchedule.cronExpression,

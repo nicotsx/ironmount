@@ -10,6 +10,8 @@ import {
 	runBackupNowDto,
 	updateBackupScheduleBody,
 	updateBackupScheduleDto,
+	upsertBackupScheduleBody,
+	upsertBackupScheduleDto,
 	type CreateBackupScheduleDto,
 	type DeleteBackupScheduleDto,
 	type GetBackupScheduleDto,
@@ -17,6 +19,7 @@ import {
 	type ListBackupSchedulesResponseDto,
 	type RunBackupNowDto,
 	type UpdateBackupScheduleDto,
+	type UpsertBackupScheduleDto,
 } from "./backups.dto";
 import { backupsService } from "./backups.service";
 
@@ -53,6 +56,13 @@ export const backupScheduleController = new Hono()
 		const schedule = await backupsService.updateSchedule(Number(scheduleId), body);
 
 		return c.json<UpdateBackupScheduleDto>(schedule, 200);
+	})
+	.put("/upsert", upsertBackupScheduleDto, validator("json", upsertBackupScheduleBody), async (c) => {
+		const body = c.req.valid("json");
+
+		const schedule = await backupsService.upsertSchedule(body);
+
+		return c.json<UpsertBackupScheduleDto>(schedule, 200);
 	})
 	.delete("/:scheduleId", deleteBackupScheduleDto, async (c) => {
 		const scheduleId = c.req.param("scheduleId");
