@@ -9,5 +9,6 @@ export default [
 		route("volumes/:name", "./routes/details.tsx"),
 		route("repositories", "./modules/repositories/routes/repositories.tsx"),
 		route("repositories/:name", "./modules/repositories/routes/repository-details.tsx"),
+		route("repositories/:name/:snapshotId", "./modules/repositories/routes/snapshot-details.tsx"),
 	]),
 ] satisfies RouteConfig;

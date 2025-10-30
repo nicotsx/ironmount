@@ -26,7 +26,6 @@ export const FilesTabContent = ({ volume }: Props) => {
 	const [loadingFolders, setLoadingFolders] = useState<Set<string>>(new Set());
 	const [allFiles, setAllFiles] = useState<Map<string, FileEntry>>(new Map());
 
-	// Fetch root level files
 	const { data, isLoading, error } = useQuery({
 		...listFilesOptions({ path: { name: volume.name } }),
 		enabled: volume.status === "mounted",

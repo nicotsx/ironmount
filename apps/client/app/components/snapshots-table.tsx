@@ -1,4 +1,5 @@
 import { Calendar, Clock, Database, FolderTree, HardDrive } from "lucide-react";
+import { useNavigate } from "react-router";
 import type { ListSnapshotsResponse } from "~/api-client/types.gen";
 import { ByteSize } from "~/components/bytes-size";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
@@ -9,9 +10,16 @@ type Snapshot = ListSnapshotsResponse["snapshots"][0];
 
 type Props = {
 	snapshots: Snapshot[];
+	repositoryName: string;
 };
 
-export const SnapshotsTable = ({ snapshots }: Props) => {
+export const SnapshotsTable = ({ snapshots, repositoryName }: Props) => {
+	const navigate = useNavigate();
+
+	const handleRowClick = (snapshotId: string) => {
+		navigate(`/repositories/${repositoryName}/${snapshotId}`);
+	};
+
 	return (
 		<div className="overflow-x-auto">
 			<Table className="border-t">
@@ -26,7 +34,11 @@ export const SnapshotsTable = ({ snapshots }: Props) => {
 				</TableHeader>
 				<TableBody>
 					{snapshots.map((snapshot) => (
-						<TableRow key={snapshot.short_id} className="hover:bg-accent/50">
+						<TableRow
+							key={snapshot.short_id}
+							className="hover:bg-accent/50 cursor-pointer"
+							onClick={() => handleRowClick(snapshot.short_id)}
+						>
 							<TableCell className="font-mono text-sm">
 								<div className="flex items-center gap-2">
 									<HardDrive className="h-4 w-4 text-muted-foreground" />

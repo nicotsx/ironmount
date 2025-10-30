@@ -23,10 +23,20 @@ export function generateBreadcrumbs(pathname: string, params: Record<string, str
 		});
 
 		if (pathname.startsWith("/repositories/") && params.name) {
+			const isSnapshotPage = !!params.snapshotId;
+
 			breadcrumbs.push({
 				label: params.name,
-				isCurrentPage: true,
+				href: isSnapshotPage ? `/repositories/${params.name}` : undefined,
+				isCurrentPage: !isSnapshotPage,
 			});
+
+			if (isSnapshotPage && params.snapshotId) {
+				breadcrumbs.push({
+					label: params.snapshotId,
+					isCurrentPage: true,
+				});
+			}
 		}
 
 		return breadcrumbs;

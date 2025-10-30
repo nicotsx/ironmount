@@ -153,7 +153,7 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 					</TableBody>
 				</Table>
 			) : (
-				<SnapshotsTable snapshots={filteredSnapshots} />
+				<SnapshotsTable snapshots={filteredSnapshots} repositoryName={repository.name} />
 			)}
 			<div className="px-4 py-2 text-sm text-muted-foreground bg-card-header flex justify-between border-t">
 				<span>

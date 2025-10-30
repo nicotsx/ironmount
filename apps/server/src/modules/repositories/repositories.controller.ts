@@ -72,13 +72,18 @@ export const repositoriesController = new Hono()
 
 		return c.json<ListSnapshotsDto>(response, 200);
 	})
-	.get("/:name/snapshots/:snapshotId/files", listSnapshotFilesDto, validator("query", listSnapshotFilesQuery), async (c) => {
-		const { name, snapshotId } = c.req.param();
-		const { path } = c.req.valid("query");
+	.get(
+		"/:name/snapshots/:snapshotId/files",
+		listSnapshotFilesDto,
+		validator("query", listSnapshotFilesQuery),
+		async (c) => {
+			const { name, snapshotId } = c.req.param();
+			const { path } = c.req.valid("query");
 
-		const result = await repositoriesService.listSnapshotFiles(name, snapshotId, path);
+			const result = await repositoriesService.listSnapshotFiles(name, snapshotId, path);
 
-		c.header("Cache-Control", "max-age=300, stale-while-revalidate=600");
+			c.header("Cache-Control", "max-age=300, stale-while-revalidate=600");
 
-		return c.json<ListSnapshotFilesDto>(result, 200);
-	});
+			return c.json<ListSnapshotFilesDto>(result, 200);
+		},
+	);

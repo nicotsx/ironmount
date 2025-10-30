@@ -135,7 +135,7 @@ export const ScheduleSummary = (props: Props) => {
 					</CardContent>
 				) : (
 					<>
-						<SnapshotsTable snapshots={snapshots.snapshots} />
+						<SnapshotsTable snapshots={snapshots.snapshots} repositoryName={repository.name} />
 						<div className="px-4 py-2 text-sm text-muted-foreground bg-card-header flex justify-between border-t">
 							<span>{`Showing ${snapshots.snapshots.length} of ${snapshots.snapshots.length}`}</span>
 							<span>
