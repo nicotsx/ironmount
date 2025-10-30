@@ -1,15 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { intervalToDuration } from "date-fns";
-import { Calendar, Clock, Database, FolderTree, HardDrive } from "lucide-react";
+import { Database } from "lucide-react";
 import { useState } from "react";
 import { listSnapshotsOptions } from "~/api-client/@tanstack/react-query.gen";
 import type { ListSnapshotsResponse } from "~/api-client/types.gen";
 import { ByteSize } from "~/components/bytes-size";
+import { SnapshotsTable } from "~/components/snapshots-table";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
-import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
+import { Table, TableBody, TableCell, TableRow } from "~/components/ui/table";
 import type { Repository } from "~/lib/types";
 
 type Props = {
@@ -137,97 +137,24 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 					</div>
 				</div>
 			</CardHeader>
-			<div className="overflow-x-auto">
+			{hasNoFilteredSnapshots ? (
 				<Table className="border-t">
-					<TableHeader className="bg-card-header">
-						<TableRow>
-							<TableHead className="uppercase">Snapshot ID</TableHead>
-							<TableHead className="uppercase">Date & Time</TableHead>
-							<TableHead className="uppercase">Size</TableHead>
-							<TableHead className="uppercase hidden md:table-cell text-right">Duration</TableHead>
-							<TableHead className="uppercase hidden text-right lg:table-cell">Paths</TableHead>
-						</TableRow>
-					</TableHeader>
 					<TableBody>
-						{hasNoFilteredSnapshots ? (
-							<TableRow>
-								<TableCell colSpan={5} className="text-center py-12">
-									<div className="flex flex-col items-center gap-3">
-										<p className="text-muted-foreground">No snapshots match your search.</p>
-										<Button onClick={() => setSearchQuery("")} variant="outline" size="sm">
-											Clear search
-										</Button>
-									</div>
-								</TableCell>
-							</TableRow>
-						) : (
-							filteredSnapshots.map((snapshot) => (
-								<TableRow key={snapshot.short_id} className="hover:bg-accent/50">
-									<TableCell className="font-mono text-sm">
-										<div className="flex items-center gap-2">
-											<HardDrive className="h-4 w-4 text-muted-foreground" />
-											<span className="text-strong-accent">{snapshot.short_id}</span>
-										</div>
-									</TableCell>
-									<TableCell>
-										<div className="flex items-center gap-2">
-											<Calendar className="h-4 w-4 text-muted-foreground" />
-											<span className="text-sm">{new Date(snapshot.time).toLocaleString()}</span>
-										</div>
-									</TableCell>
-									<TableCell>
-										<div className="flex items-center gap-2">
-											<Database className="h-4 w-4 text-muted-foreground" />
-											<span className="font-medium">
-												<ByteSize bytes={snapshot.size} base={1024} />
-											</span>
-										</div>
-									</TableCell>
-									<TableCell className="hidden md:table-cell">
-										<div className="flex items-center justify-end gap-2">
-											<Clock className="h-4 w-4 text-muted-foreground" />
-											<span className="text-sm text-muted-foreground">
-												{formatSnapshotDuration(snapshot.duration / 1000)}
-											</span>
-										</div>
-									</TableCell>
-									<TableCell className="hidden lg:table-cell">
-										<div className="flex items-center justify-end gap-2">
-											<FolderTree className="h-4 w-4 text-muted-foreground" />
-											<div className="flex flex-wrap gap-1">
-												<span
-													className="text-xs bg-primary/10 text-primary rounded-md px-2 py-1"
-													title={snapshot.paths[0]}
-												>
-													{snapshot.paths[0].split("/").filter(Boolean).pop() || "/"}
-												</span>
-												<Tooltip>
-													<TooltipTrigger asChild>
-														<span
-															className={`text-xs bg-muted text-muted-foreground rounded-md px-2 py-1 cursor-help ${snapshot.paths.length <= 1 ? "hidden" : ""}`}
-														>
-															+{snapshot.paths.length - 1}
-														</span>
-													</TooltipTrigger>
-													<TooltipContent side="top" className="max-w-md">
-														<div className="flex flex-col gap-1">
-															{snapshot.paths.slice(1).map((path) => (
-																<div key={`${snapshot.short_id}-${path}`} className="text-xs">
-																	{path}
-																</div>
-															))}
-														</div>
-													</TooltipContent>
-												</Tooltip>
-											</div>
-										</div>
-									</TableCell>
-								</TableRow>
-							))
-						)}
+						<TableRow>
+							<TableCell colSpan={5} className="text-center py-12">
+								<div className="flex flex-col items-center gap-3">
+									<p className="text-muted-foreground">No snapshots match your search.</p>
+									<Button onClick={() => setSearchQuery("")} variant="outline" size="sm">
+										Clear search
+									</Button>
+								</div>
+							</TableCell>
+						</TableRow>
 					</TableBody>
 				</Table>
-			</div>
+			) : (
+				<SnapshotsTable snapshots={filteredSnapshots} />
+			)}
 			<div className="px-4 py-2 text-sm text-muted-foreground bg-card-header flex justify-between border-t">
 				<span>
 					{hasNoFilteredSnapshots
