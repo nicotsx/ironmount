@@ -36,8 +36,8 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 	return (
 		<SidebarProvider defaultOpen={true}>
 			<AppSidebar />
-			<div className="w-full relative">
-				<header className="sticky top-0 z-50 bg-card-header border-b border-border/50">
+			<div className="w-full relative flex flex-col h-screen overflow-hidden">
+				<header className="z-50 bg-card-header border-b border-border/50 flex-shrink-0">
 					<div className="flex items-center justify-between py-3 sm:py-4 px-2 sm:px-8 mx-auto container">
 						<div className="flex items-center gap-4">
 							<SidebarTrigger />
@@ -69,11 +69,13 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 						)}
 					</div>
 				</header>
-				<GridBackground>
-					<main className="flex flex-col p-2 pt-2 sm:p-8 sm:pt-6 mx-auto">
-						<Outlet />
-					</main>
-				</GridBackground>
+				<div className="main-content flex-1 overflow-y-auto">
+					<GridBackground>
+						<main className="flex flex-col p-2 pt-2 sm:p-8 sm:pt-6 mx-auto">
+							<Outlet />
+						</main>
+					</GridBackground>
+				</div>
 			</div>
 		</SidebarProvider>
 	);
