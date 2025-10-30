@@ -4,10 +4,11 @@ import { eq } from "drizzle-orm";
 import { ConflictError, InternalServerError, NotFoundError } from "http-errors-enhanced";
 import slugify from "slugify";
 import { db } from "../../db/db";
-import { repositoriesTable } from "../../db/schema";
+import { repositoriesTable, volumesTable } from "../../db/schema";
 import { toMessage } from "../../utils/errors";
 import { restic } from "../../utils/restic";
 import { cryptoUtils } from "../../utils/crypto";
+import { getVolumePath } from "../volumes/helpers";
 
 const listRepositories = async () => {
 	const repositories = await db.query.repositoriesTable.findMany({});
@@ -105,7 +106,7 @@ const deleteRepository = async (name: string) => {
 	await db.delete(repositoriesTable).where(eq(repositoriesTable.name, name));
 };
 
-const listSnapshots = async (name: string) => {
+const listSnapshots = async (name: string, volumeId?: number) => {
 	const repository = await db.query.repositoriesTable.findFirst({
 		where: eq(repositoriesTable.name, name),
 	});
@@ -114,7 +115,22 @@ const listSnapshots = async (name: string) => {
 		throw new NotFoundError("Repository not found");
 	}
 
-	const snapshots = await restic.snapshots(repository.config);
+	let snapshots = await restic.snapshots(repository.config);
+
+	if (volumeId) {
+		const volume = await db.query.volumesTable.findFirst({
+			where: eq(volumesTable.id, volumeId),
+		});
+
+		if (!volume) {
+			throw new NotFoundError("Volume not found");
+		}
+
+		snapshots = snapshots.filter((snapshot) => {
+			return snapshot.paths.some((path) => path.includes(getVolumePath(volume.name)));
+		});
+	}
+
 	return snapshots;
 };
 

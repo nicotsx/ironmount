@@ -155,6 +155,11 @@ const executeBackup = async (scheduleId: number) => {
 		throw new NotFoundError("Backup schedule not found");
 	}
 
+	if (!schedule.enabled) {
+		logger.info(`Backup schedule ${scheduleId} is disabled. Skipping execution.`);
+		return;
+	}
+
 	const volume = await db.query.volumesTable.findFirst({
 		where: eq(volumesTable.id, schedule.volumeId),
 	});

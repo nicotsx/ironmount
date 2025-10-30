@@ -7,6 +7,7 @@ import {
 	getRepositoryDto,
 	listRepositoriesDto,
 	listSnapshotsDto,
+	listSnapshotsFilters,
 	type DeleteRepositoryDto,
 	type GetRepositoryDto,
 	type ListRepositoriesDto,
@@ -38,9 +39,11 @@ export const repositoriesController = new Hono()
 
 		return c.json<DeleteRepositoryDto>({ message: "Repository deleted" }, 200);
 	})
-	.get("/:name/snapshots", listSnapshotsDto, async (c) => {
+	.get("/:name/snapshots", listSnapshotsDto, validator("query", listSnapshotsFilters), async (c) => {
 		const { name } = c.req.param();
-		const res = await repositoriesService.listSnapshots(name);
+		const { volumeId } = c.req.valid("query");
+
+		const res = await repositoriesService.listSnapshots(name, Number(volumeId));
 
 		const snapshots = res.map((snapshot) => {
 			const { summary } = snapshot;

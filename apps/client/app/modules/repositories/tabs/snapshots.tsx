@@ -18,6 +18,18 @@ type Props = {
 
 type Snapshot = ListSnapshotsResponse["snapshots"][0];
 
+export const formatSnapshotDuration = (seconds: number) => {
+	const duration = intervalToDuration({ start: 0, end: seconds * 1000 });
+	const parts: string[] = [];
+
+	if (duration.days) parts.push(`${duration.days}d`);
+	if (duration.hours) parts.push(`${duration.hours}h`);
+	if (duration.minutes) parts.push(`${duration.minutes}m`);
+	if (duration.seconds || parts.length === 0) parts.push(`${duration.seconds || 0}s`);
+
+	return parts.join(" ");
+};
+
 export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 	const [searchQuery, setSearchQuery] = useState("");
 
@@ -40,18 +52,6 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 
 	const hasNoSnapshots = snapshots.length === 0;
 	const hasNoFilteredSnapshots = filteredSnapshots.length === 0 && !hasNoSnapshots;
-
-	const formatSnapshotDuration = (seconds: number) => {
-		const duration = intervalToDuration({ start: 0, end: seconds * 1000 });
-		const parts: string[] = [];
-
-		if (duration.days) parts.push(`${duration.days}d`);
-		if (duration.hours) parts.push(`${duration.hours}h`);
-		if (duration.minutes) parts.push(`${duration.minutes}m`);
-		if (duration.seconds || parts.length === 0) parts.push(`${duration.seconds || 0}s`);
-
-		return parts.join(" ");
-	};
 
 	if (repository.status === "error") {
 		return (

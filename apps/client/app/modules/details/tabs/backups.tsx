@@ -1,11 +1,10 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { toast } from "sonner";
 import { Database, Plus } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import { OnOff } from "~/components/onoff";
+import { Card, CardContent } from "~/components/ui/card";
 import type { Volume } from "~/lib/types";
 import {
 	listRepositoriesOptions,
@@ -14,6 +13,7 @@ import {
 } from "~/api-client/@tanstack/react-query.gen";
 import { parseError } from "~/lib/errors";
 import { CreateScheduleForm, type BackupScheduleFormValues } from "../components/create-schedule-form";
+import { ScheduleSummary } from "../components/schedule-summary";
 
 type Props = {
 	volume: Volume;
@@ -39,6 +39,7 @@ const getCronExpression = (frequency: string, dailyTime?: string, weeklyDay?: st
 
 export const VolumeBackupsTabContent = ({ volume }: Props) => {
 	const queryClient = useQueryClient();
+	const [isEditMode, setIsEditMode] = useState(false);
 
 	const { data: repositoriesData, isLoading: loadingRepositories } = useQuery({
 		...listRepositoriesOptions(),
@@ -48,32 +49,7 @@ export const VolumeBackupsTabContent = ({ volume }: Props) => {
 		...getBackupScheduleForVolumeOptions({ path: { volumeId: volume.id.toString() } }),
 	});
 
-	const [isEnabled, setIsEnabled] = useState(existingSchedule?.enabled ?? true);
-
 	const repositories = repositoriesData || [];
-	const selectedRepository = repositories.find((r) => r.id === (existingSchedule?.repositoryId ?? ""));
-
-	const summary = useMemo(() => {
-		const scheduleLabel = existingSchedule ? existingSchedule.cronExpression : "Every day at 02:00";
-
-		const retentionParts: string[] = [];
-		if (existingSchedule?.retentionPolicy) {
-			const rp = existingSchedule.retentionPolicy;
-			if (rp.keepLast) retentionParts.push(`${rp.keepLast} last`);
-			if (rp.keepHourly) retentionParts.push(`${rp.keepHourly} hourly`);
-			if (rp.keepDaily) retentionParts.push(`${rp.keepDaily} daily`);
-			if (rp.keepWeekly) retentionParts.push(`${rp.keepWeekly} weekly`);
-			if (rp.keepMonthly) retentionParts.push(`${rp.keepMonthly} monthly`);
-			if (rp.keepYearly) retentionParts.push(`${rp.keepYearly} yearly`);
-		}
-
-		return {
-			vol: volume.name,
-			scheduleLabel,
-			repositoryLabel: selectedRepository?.name || "No repository selected",
-			retentionLabel: retentionParts.length > 0 ? retentionParts.join(" • ") : "No retention policy",
-		};
-	}, [existingSchedule, selectedRepository, volume.name]);
 
 	const upsertSchedule = useMutation({
 		...upsertBackupScheduleMutation(),
@@ -104,11 +80,15 @@ export const VolumeBackupsTabContent = ({ volume }: Props) => {
 			body: {
 				volumeId: volume.id,
 				repositoryId: formValues.repositoryId,
-				enabled: existingSchedule ? isEnabled : true,
+				enabled: existingSchedule?.enabled ?? true,
 				cronExpression,
 				retentionPolicy: Object.keys(retentionPolicy).length > 0 ? retentionPolicy : undefined,
 			},
 		});
+
+		if (existingSchedule) {
+			setIsEditMode(false);
+		}
 	};
 
 	if (loadingRepositories || loadingSchedules) {
@@ -154,7 +134,6 @@ export const VolumeBackupsTabContent = ({ volume }: Props) => {
 	const handleToggleEnabled = (enabled: boolean) => {
 		if (!existingSchedule) return;
 
-		setIsEnabled(enabled);
 		upsertSchedule.mutate({
 			body: {
 				volumeId: existingSchedule.volumeId,
@@ -166,87 +145,30 @@ export const VolumeBackupsTabContent = ({ volume }: Props) => {
 		});
 	};
 
+	const repository = repositories.find((repo) => repo.id === existingSchedule?.repositoryId);
+
+	if (existingSchedule && repository && !isEditMode) {
+		return (
+			<ScheduleSummary
+				handleToggleEnabled={handleToggleEnabled}
+				repository={repository}
+				setIsEditMode={setIsEditMode}
+				schedule={existingSchedule}
+				volume={volume}
+			/>
+		);
+	}
+
 	return (
-		<CreateScheduleForm
-			volume={volume}
-			initialValues={existingSchedule ?? undefined}
-			onSubmit={handleSubmit}
-			summaryContent={
-				existingSchedule ? (
-					<Card className="h-full">
-						<CardHeader className="flex flex-row items-center justify-between gap-4">
-							<div>
-								<CardTitle>Schedule summary</CardTitle>
-								<CardDescription>Review the backup configuration.</CardDescription>
-							</div>
-							<OnOff isOn={isEnabled} toggle={handleToggleEnabled} enabledLabel="Enabled" disabledLabel="Paused" />
-						</CardHeader>
-						<CardContent className="flex flex-col gap-4 text-sm">
-							<div>
-								<p className="text-xs uppercase text-muted-foreground">Volume</p>
-								<p className="font-medium">{summary.vol}</p>
-							</div>
-							<div>
-								<p className="text-xs uppercase text-muted-foreground">Schedule</p>
-								<p className="font-medium">{summary.scheduleLabel}</p>
-							</div>
-							<div>
-								<p className="text-xs uppercase text-muted-foreground">Repository</p>
-								<p className="font-medium">{summary.repositoryLabel}</p>
-							</div>
-							<div>
-								<p className="text-xs uppercase text-muted-foreground">Retention</p>
-								<p className="font-medium">{summary.retentionLabel}</p>
-							</div>
-							{existingSchedule && (
-								<>
-									<div>
-										<p className="text-xs uppercase text-muted-foreground">Last backup</p>
-										<p className="font-medium">
-											{existingSchedule.lastBackupAt
-												? new Date(existingSchedule.lastBackupAt).toLocaleString()
-												: "Never"}
-										</p>
-									</div>
-									<div>
-										<p className="text-xs uppercase text-muted-foreground">Status</p>
-										<p className="font-medium">
-											{existingSchedule.lastBackupStatus === "success" && "✓ Success"}
-											{existingSchedule.lastBackupStatus === "error" && "✗ Error"}
-											{!existingSchedule.lastBackupStatus && "—"}
-										</p>
-									</div>
-								</>
-							)}
-						</CardContent>
-					</Card>
-				) : (
-					<Card className="h-full">
-						<CardHeader>
-							<CardTitle>Schedule summary</CardTitle>
-							<CardDescription>Review the backup configuration before saving.</CardDescription>
-						</CardHeader>
-						<CardContent className="flex flex-col gap-4 text-sm">
-							<div>
-								<p className="text-xs uppercase text-muted-foreground">Volume</p>
-								<p className="font-medium">{summary.vol}</p>
-							</div>
-							<div>
-								<p className="text-xs uppercase text-muted-foreground">Schedule</p>
-								<p className="font-medium">{summary.scheduleLabel}</p>
-							</div>
-							<div>
-								<p className="text-xs uppercase text-muted-foreground">Repository</p>
-								<p className="font-medium">{summary.repositoryLabel}</p>
-							</div>
-							<div>
-								<p className="text-xs uppercase text-muted-foreground">Retention</p>
-								<p className="font-medium">{summary.retentionLabel}</p>
-							</div>
-						</CardContent>
-					</Card>
-				)
-			}
-		/>
+		<div className="space-y-4">
+			{existingSchedule && isEditMode && (
+				<div className="flex justify-end">
+					<Button variant="outline" onClick={() => setIsEditMode(false)}>
+						Cancel
+					</Button>
+				</div>
+			)}
+			<CreateScheduleForm volume={volume} initialValues={existingSchedule ?? undefined} onSubmit={handleSubmit} />
+		</div>
 	);
 };

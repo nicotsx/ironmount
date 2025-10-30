@@ -17,6 +17,7 @@ body {
 	width: 100%;
 	position: relative;
 	overscroll-behavior: none;
+	scrollbar-width: thin;
 
 	@media (prefers-color-scheme: dark) {
 		color-scheme: dark;

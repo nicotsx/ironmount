@@ -18,8 +18,7 @@ export function GridBackground({ children, className, containerClassName }: Grid
 				containerClassName,
 			)}
 		>
-			<div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-card" />
-			<div className={cn("relative h-screen", className)}>{children}</div>
+			<div className={cn("relative container m-auto", className)}>{children}</div>
 		</div>
 	);
 }

@@ -787,7 +787,9 @@ export type ListSnapshotsData = {
 	path: {
 		name: string;
 	};
-	query?: never;
+	query?: {
+		volumeId?: number;
+	};
 	url: "/api/v1/repositories/{name}/snapshots";
 };
 

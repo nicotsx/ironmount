@@ -145,6 +145,10 @@ const listSnapshotsResponse = type({
 
 export type ListSnapshotsDto = typeof listSnapshotsResponse.infer;
 
+export const listSnapshotsFilters = type({
+	volumeId: "string?",
+});
+
 export const listSnapshotsDto = describeRoute({
 	description: "List all snapshots in a repository",
 	tags: ["Repositories"],

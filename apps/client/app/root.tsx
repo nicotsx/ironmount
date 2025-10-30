@@ -45,7 +45,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 				<Links />
 			</head>
 			<QueryClientProvider client={queryClient}>
-				<body className="min-h-dvh">
+				<body>
 					{children}
 					<Toaster />
 					<ScrollRestoration />

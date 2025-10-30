@@ -73,9 +73,7 @@ const backupScheduleToFormValues = (schedule?: BackupSchedule): BackupScheduleFo
 	};
 };
 
-export const CreateScheduleForm = ({ initialValues, onSubmit, volume, loading, summaryContent }: Props) => {
-	console.log("Initial Values:", initialValues);
-
+export const CreateScheduleForm = ({ initialValues, onSubmit, volume, loading }: Props) => {
 	const form = useForm<BackupScheduleFormValues>({
 		resolver: arktypeResolver(cleanSchema as unknown as typeof formSchema),
 		defaultValues: backupScheduleToFormValues(initialValues),
@@ -86,6 +84,7 @@ export const CreateScheduleForm = ({ initialValues, onSubmit, volume, loading, s
 	});
 
 	const frequency = form.watch("frequency");
+	const formValues = form.watch();
 
 	return (
 		<Form {...form}>
@@ -343,8 +342,46 @@ export const CreateScheduleForm = ({ initialValues, onSubmit, volume, loading, s
 						</CardFooter>
 					</Card>
 				</div>
-
-				{summaryContent && <div className="h-full">{summaryContent}</div>}
+				<div className="h-full">
+					<Card className="h-full">
+						<CardHeader className="flex flex-row items-center justify-between gap-4">
+							<div>
+								<CardTitle>Schedule summary</CardTitle>
+								<CardDescription>Review the backup configuration.</CardDescription>
+							</div>
+						</CardHeader>
+						<CardContent className="flex flex-col gap-4 text-sm">
+							<div>
+								<p className="text-xs uppercase text-muted-foreground">Volume</p>
+								<p className="font-medium">{volume.name}</p>
+							</div>
+							<div>
+								<p className="text-xs uppercase text-muted-foreground">Schedule</p>
+								<p className="font-medium">
+									{frequency ? frequency.charAt(0).toUpperCase() + frequency.slice(1) : "-"}
+								</p>
+							</div>
+							<div>
+								<p className="text-xs uppercase text-muted-foreground">Repository</p>
+								<p className="font-medium">
+									{repositoriesData?.find((r) => r.id === formValues.repositoryId)?.name || "—"}
+								</p>
+							</div>
+							<div>
+								<p className="text-xs uppercase text-muted-foreground">Retention</p>
+								<p className="font-medium">
+									{Object.entries(formValues)
+										.filter(([key, value]) => key.startsWith("keep") && Boolean(value))
+										.map(([key, value]) => {
+											const label = key.replace("keep", "").toLowerCase();
+											return `${value} ${label}`;
+										})
+										.join(", ") || "-"}
+								</p>
+							</div>
+						</CardContent>
+					</Card>
+				</div>
 			</form>
 		</Form>
 	);
