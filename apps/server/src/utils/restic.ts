@@ -236,6 +236,86 @@ const forget = async (config: RepositoryConfig, options: RetentionPolicy) => {
 	return { success: true };
 };
 
+const lsNodeSchema = type({
+	name: "string",
+	type: "string",
+	path: "string",
+	uid: "number?",
+	gid: "number?",
+	size: "number?",
+	mode: "number?",
+	mtime: "string?",
+	atime: "string?",
+	ctime: "string?",
+	struct_type: "'node'",
+});
+
+const lsSnapshotInfoSchema = type({
+	time: "string",
+	parent: "string?",
+	tree: "string",
+	paths: "string[]",
+	hostname: "string",
+	username: "string?",
+	id: "string",
+	short_id: "string",
+	struct_type: "'snapshot'",
+	message_type: "'snapshot'",
+});
+
+const ls = async (config: RepositoryConfig, snapshotId: string, path?: string) => {
+	const repoUrl = buildRepoUrl(config);
+	const env = await buildEnv(config);
+
+	const args: string[] = ["--repo", repoUrl, "ls", snapshotId, "--json", "--long"];
+
+	if (path) {
+		args.push(path);
+	}
+
+	const res = await $`restic ${args}`.env(env).nothrow();
+
+	if (res.exitCode !== 0) {
+		logger.error(`Restic ls failed: ${res.stderr}`);
+		throw new Error(`Restic ls failed: ${res.stderr}`);
+	}
+
+	// The output is a stream of JSON objects, first is snapshot info, rest are file/dir nodes
+	const stdout = res.text();
+	const lines = stdout
+		.trim()
+		.split("\n")
+		.filter((line) => line.trim());
+
+	if (lines.length === 0) {
+		return { snapshot: null, nodes: [] };
+	}
+
+	// First line is snapshot info
+	const snapshotLine = JSON.parse(lines[0] ?? "{}");
+	const snapshot = lsSnapshotInfoSchema(snapshotLine);
+
+	if (snapshot instanceof type.errors) {
+		logger.error(`Restic ls snapshot info validation failed: ${snapshot}`);
+		throw new Error(`Restic ls snapshot info validation failed: ${snapshot}`);
+	}
+
+	const nodes: Array<typeof lsNodeSchema.infer> = [];
+	for (let i = 1; i < lines.length; i++) {
+		const nodeLine = JSON.parse(lines[i] ?? "{}");
+		const nodeValidation = lsNodeSchema(nodeLine);
+
+		if (nodeValidation instanceof type.errors) {
+			logger.warn(`Skipping invalid node: ${nodeValidation}`);
+			continue;
+		}
+
+		nodes.push(nodeValidation);
+	}
+
+	return { snapshot, nodes };
+};
+
 export const restic = {
 	ensurePassfile,
 	init,
@@ -243,4 +323,5 @@ export const restic = {
 	restore,
 	snapshots,
 	forget,
+	ls,
 };

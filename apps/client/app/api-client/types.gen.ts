@@ -788,7 +788,7 @@ export type ListSnapshotsData = {
 		name: string;
 	};
 	query?: {
-		volumeId?: number;
+		volumeId?: string;
 	};
 	url: "/api/v1/repositories/{name}/snapshots";
 };
@@ -809,6 +809,47 @@ export type ListSnapshotsResponses = {
 };
 
 export type ListSnapshotsResponse = ListSnapshotsResponses[keyof ListSnapshotsResponses];
+
+export type ListSnapshotFilesData = {
+	body?: never;
+	path: {
+		name: string;
+		snapshotId: string;
+	};
+	query?: {
+		path?: string;
+	};
+	url: "/api/v1/repositories/{name}/snapshots/{snapshotId}/files";
+};
+
+export type ListSnapshotFilesResponses = {
+	/**
+	 * List of files and directories in the snapshot
+	 */
+	200: {
+		files: Array<{
+			name: string;
+			path: string;
+			type: string;
+			atime?: string;
+			ctime?: string;
+			gid?: number;
+			mode?: number;
+			mtime?: string;
+			size?: number;
+			uid?: number;
+		}>;
+		snapshot: {
+			hostname: string;
+			id: string;
+			paths: Array<string>;
+			short_id: string;
+			time: string;
+		};
+	};
+};
+
+export type ListSnapshotFilesResponse = ListSnapshotFilesResponses[keyof ListSnapshotFilesResponses];
 
 export type ListBackupSchedulesData = {
 	body?: never;

@@ -23,6 +23,7 @@ import {
 	deleteRepository,
 	getRepository,
 	listSnapshots,
+	listSnapshotFiles,
 	listBackupSchedules,
 	createBackupSchedule,
 	deleteBackupSchedule,
@@ -67,6 +68,7 @@ import type {
 	DeleteRepositoryResponse,
 	GetRepositoryData,
 	ListSnapshotsData,
+	ListSnapshotFilesData,
 	ListBackupSchedulesData,
 	CreateBackupScheduleData,
 	CreateBackupScheduleResponse,
@@ -712,6 +714,27 @@ export const listSnapshotsOptions = (options: Options<ListSnapshotsData>) => {
 			return data;
 		},
 		queryKey: listSnapshotsQueryKey(options),
+	});
+};
+
+export const listSnapshotFilesQueryKey = (options: Options<ListSnapshotFilesData>) =>
+	createQueryKey("listSnapshotFiles", options);
+
+/**
+ * List files and directories in a snapshot
+ */
+export const listSnapshotFilesOptions = (options: Options<ListSnapshotFilesData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await listSnapshotFiles({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: listSnapshotFilesQueryKey(options),
 	});
 };
 

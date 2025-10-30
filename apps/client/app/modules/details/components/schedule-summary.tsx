@@ -23,7 +23,7 @@ export const ScheduleSummary = (props: Props) => {
 	const { data: snapshots, isLoading: loadingSnapshots } = useQuery({
 		...listSnapshotsOptions({
 			path: { name: repository.name },
-			query: { volumeId: volume.id },
+			query: { volumeId: volume.id.toString() },
 		}),
 		refetchInterval: 10000,
 		refetchOnWindowFocus: true,

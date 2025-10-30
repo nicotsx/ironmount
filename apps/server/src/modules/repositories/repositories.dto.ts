@@ -164,3 +164,52 @@ export const listSnapshotsDto = describeRoute({
 		},
 	},
 });
+
+/**
+ * List files in a snapshot
+ */
+export const snapshotFileNodeSchema = type({
+	name: "string",
+	type: "string",
+	path: "string",
+	uid: "number?",
+	gid: "number?",
+	size: "number?",
+	mode: "number?",
+	mtime: "string?",
+	atime: "string?",
+	ctime: "string?",
+});
+
+export const listSnapshotFilesResponse = type({
+	snapshot: type({
+		id: "string",
+		short_id: "string",
+		time: "string",
+		hostname: "string",
+		paths: "string[]",
+	}),
+	files: snapshotFileNodeSchema.array(),
+});
+
+export type ListSnapshotFilesDto = typeof listSnapshotFilesResponse.infer;
+
+export const listSnapshotFilesQuery = type({
+	path: "string?",
+});
+
+export const listSnapshotFilesDto = describeRoute({
+	description: "List files and directories in a snapshot",
+	tags: ["Repositories"],
+	operationId: "listSnapshotFiles",
+	responses: {
+		200: {
+			description: "List of files and directories in the snapshot",
+			content: {
+				"application/json": {
+					schema: resolver(listSnapshotFilesResponse),
+				},
+			},
+		},
+	},
+});
