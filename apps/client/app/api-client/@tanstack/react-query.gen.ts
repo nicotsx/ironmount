@@ -24,6 +24,7 @@ import {
 	getRepository,
 	listSnapshots,
 	listSnapshotFiles,
+	restoreSnapshot,
 	listBackupSchedules,
 	createBackupSchedule,
 	deleteBackupSchedule,
@@ -69,6 +70,8 @@ import type {
 	GetRepositoryData,
 	ListSnapshotsData,
 	ListSnapshotFilesData,
+	RestoreSnapshotData,
+	RestoreSnapshotResponse,
 	ListBackupSchedulesData,
 	CreateBackupScheduleData,
 	CreateBackupScheduleResponse,
@@ -736,6 +739,46 @@ export const listSnapshotFilesOptions = (options: Options<ListSnapshotFilesData>
 		},
 		queryKey: listSnapshotFilesQueryKey(options),
 	});
+};
+
+export const restoreSnapshotQueryKey = (options: Options<RestoreSnapshotData>) =>
+	createQueryKey("restoreSnapshot", options);
+
+/**
+ * Restore a snapshot to a target path on the filesystem
+ */
+export const restoreSnapshotOptions = (options: Options<RestoreSnapshotData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await restoreSnapshot({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: restoreSnapshotQueryKey(options),
+	});
+};
+
+/**
+ * Restore a snapshot to a target path on the filesystem
+ */
+export const restoreSnapshotMutation = (
+	options?: Partial<Options<RestoreSnapshotData>>,
+): UseMutationOptions<RestoreSnapshotResponse, DefaultError, Options<RestoreSnapshotData>> => {
+	const mutationOptions: UseMutationOptions<RestoreSnapshotResponse, DefaultError, Options<RestoreSnapshotData>> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await restoreSnapshot({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
 };
 
 export const listBackupSchedulesQueryKey = (options?: Options<ListBackupSchedulesData>) =>

@@ -52,6 +52,8 @@ import type {
 	ListSnapshotsResponses,
 	ListSnapshotFilesData,
 	ListSnapshotFilesResponses,
+	RestoreSnapshotData,
+	RestoreSnapshotResponses,
 	ListBackupSchedulesData,
 	ListBackupSchedulesResponses,
 	CreateBackupScheduleData,
@@ -359,6 +361,22 @@ export const listSnapshotFiles = <ThrowOnError extends boolean = false>(
 	return (options.client ?? _heyApiClient).get<ListSnapshotFilesResponses, unknown, ThrowOnError>({
 		url: "/api/v1/repositories/{name}/snapshots/{snapshotId}/files",
 		...options,
+	});
+};
+
+/**
+ * Restore a snapshot to a target path on the filesystem
+ */
+export const restoreSnapshot = <ThrowOnError extends boolean = false>(
+	options: Options<RestoreSnapshotData, ThrowOnError>,
+) => {
+	return (options.client ?? _heyApiClient).post<RestoreSnapshotResponses, unknown, ThrowOnError>({
+		url: "/api/v1/repositories/{name}/restore",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options.headers,
+		},
 	});
 };
 

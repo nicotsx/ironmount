@@ -6,15 +6,19 @@ import {
 	deleteRepositoryDto,
 	getRepositoryDto,
 	listRepositoriesDto,
-	listSnapshotsDto,
-	listSnapshotsFilters,
 	listSnapshotFilesDto,
 	listSnapshotFilesQuery,
+	listSnapshotsDto,
+	listSnapshotsFilters,
+	restoreSnapshotBody,
+	restoreSnapshotDto,
+	type CreateRepositoryDto,
 	type DeleteRepositoryDto,
 	type GetRepositoryDto,
 	type ListRepositoriesDto,
-	type ListSnapshotsDto,
 	type ListSnapshotFilesDto,
+	type ListSnapshotsDto,
+	type RestoreSnapshotDto,
 } from "./repositories.dto";
 import { repositoriesService } from "./repositories.service";
 
@@ -86,4 +90,12 @@ export const repositoriesController = new Hono()
 
 			return c.json<ListSnapshotFilesDto>(result, 200);
 		},
-	);
+	)
+	.post("/:name/restore", restoreSnapshotDto, validator("json", restoreSnapshotBody), async (c) => {
+		const { name } = c.req.param();
+		const { snapshotId, targetPath, path, include, exclude } = c.req.valid("json");
+
+		const result = await repositoriesService.restoreSnapshot(name, snapshotId, targetPath, { path, include, exclude });
+
+		return c.json<RestoreSnapshotDto>(result, 200);
+	});

@@ -159,18 +159,90 @@ const backup = async (
 	return result;
 };
 
-const restore = async (config: RepositoryConfig, snapshotId: string, target: string) => {
+const restoreOutputSchema = type({
+	message_type: "'summary'",
+	files_restored: "number",
+	files_updated: "number",
+	files_unchanged: "number",
+	total_bytes: "number",
+	total_errors: "number?",
+});
+
+const restore = async (
+	config: RepositoryConfig,
+	snapshotId: string,
+	target: string,
+	options?: {
+		include?: string[];
+		exclude?: string[];
+		path?: string;
+	},
+) => {
 	const repoUrl = buildRepoUrl(config);
 	const env = await buildEnv(config);
 
-	const res = await $`restic --repo ${repoUrl} restore ${snapshotId} --target ${target} --json`.env(env).nothrow();
+	const args: string[] = ["--repo", repoUrl, "restore", snapshotId, "--target", target];
+
+	if (options?.path) {
+		args[args.length - 4] = `${snapshotId}:${options.path}`;
+	}
+
+	if (options?.include && options.include.length > 0) {
+		for (const pattern of options.include) {
+			args.push("--include", pattern);
+		}
+	}
+
+	if (options?.exclude && options.exclude.length > 0) {
+		for (const pattern of options.exclude) {
+			args.push("--exclude", pattern);
+		}
+	}
+
+	args.push("--json");
+
+	const res = await $`restic ${args}`.env(env).nothrow();
 
 	if (res.exitCode !== 0) {
 		logger.error(`Restic restore failed: ${res.stderr}`);
 		throw new Error(`Restic restore failed: ${res.stderr}`);
 	}
 
-	logger.info(`Restic restore completed for snapshot ${snapshotId} to target ${target}`);
+	const stdout = res.text();
+	const outputLines = stdout.trim().split("\n");
+	const lastLine = outputLines[outputLines.length - 1];
+
+	if (!lastLine) {
+		logger.info(`Restic restore completed for snapshot ${snapshotId} to target ${target}`);
+		return {
+			message_type: "summary" as const,
+			files_restored: 0,
+			files_updated: 0,
+			files_unchanged: 0,
+			total_bytes: 0,
+		};
+	}
+
+	const resSummary = JSON.parse(lastLine);
+	const result = restoreOutputSchema(resSummary);
+
+	if (result instanceof type.errors) {
+		logger.warn(`Restic restore output validation failed: ${result}`);
+		logger.info(`Restic restore completed for snapshot ${snapshotId} to target ${target}`);
+		return {
+			message_type: "summary" as const,
+			files_restored: 0,
+			files_updated: 0,
+			files_unchanged: 0,
+			total_bytes: 0,
+		};
+	}
+
+	logger.info(
+		`Restic restore completed for snapshot ${snapshotId} to target ${target}: ${result.files_restored} restored, ${result.files_updated} updated`,
+	);
+
+	return result;
 };
 
 const snapshots = async (config: RepositoryConfig) => {

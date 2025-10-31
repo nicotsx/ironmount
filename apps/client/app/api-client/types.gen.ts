@@ -851,6 +851,36 @@ export type ListSnapshotFilesResponses = {
 
 export type ListSnapshotFilesResponse = ListSnapshotFilesResponses[keyof ListSnapshotFilesResponses];
 
+export type RestoreSnapshotData = {
+	body?: {
+		snapshotId: string;
+		targetPath: string;
+		exclude?: Array<string>;
+		include?: Array<string>;
+		path?: string;
+	};
+	path: {
+		name: string;
+	};
+	query?: never;
+	url: "/api/v1/repositories/{name}/restore";
+};
+
+export type RestoreSnapshotResponses = {
+	/**
+	 * Snapshot restored successfully
+	 */
+	200: {
+		filesRestored: number;
+		filesUpdated: number;
+		message: string;
+		success: boolean;
+		totalBytes: number;
+	};
+};
+
+export type RestoreSnapshotResponse = RestoreSnapshotResponses[keyof RestoreSnapshotResponses];
+
 export type ListBackupSchedulesData = {
 	body?: never;
 	path?: never;

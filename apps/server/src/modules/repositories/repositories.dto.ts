@@ -213,3 +213,42 @@ export const listSnapshotFilesDto = describeRoute({
 		},
 	},
 });
+
+/**
+ * Restore a snapshot
+ */
+export const restoreSnapshotBody = type({
+	snapshotId: "string",
+	targetPath: "string",
+	path: "string?",
+	include: "string[]?",
+	exclude: "string[]?",
+});
+
+export type RestoreSnapshotBody = typeof restoreSnapshotBody.infer;
+
+export const restoreSnapshotResponse = type({
+	success: "boolean",
+	message: "string",
+	filesRestored: "number",
+	filesUpdated: "number",
+	totalBytes: "number",
+});
+
+export type RestoreSnapshotDto = typeof restoreSnapshotResponse.infer;
+
+export const restoreSnapshotDto = describeRoute({
+	description: "Restore a snapshot to a target path on the filesystem",
+	tags: ["Repositories"],
+	operationId: "restoreSnapshot",
+	responses: {
+		200: {
+			description: "Snapshot restored successfully",
+			content: {
+				"application/json": {
+					schema: resolver(restoreSnapshotResponse),
+				},
+			},
+		},
+	},
+});
