@@ -219,7 +219,6 @@ export const listSnapshotFilesDto = describeRoute({
  */
 export const restoreSnapshotBody = type({
 	snapshotId: "string",
-	targetPath: "string",
 	path: "string?",
 	include: "string[]?",
 	exclude: "string[]?",
@@ -231,8 +230,7 @@ export const restoreSnapshotResponse = type({
 	success: "boolean",
 	message: "string",
 	filesRestored: "number",
-	filesUpdated: "number",
-	totalBytes: "number",
+	filesSkipped: "number",
 });
 
 export type RestoreSnapshotDto = typeof restoreSnapshotResponse.infer;

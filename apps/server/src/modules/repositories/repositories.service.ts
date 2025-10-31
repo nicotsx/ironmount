@@ -164,7 +164,6 @@ const listSnapshotFiles = async (name: string, snapshotId: string, path?: string
 const restoreSnapshot = async (
 	name: string,
 	snapshotId: string,
-	targetPath: string,
 	options?: {
 		path?: string;
 		include?: string[];
@@ -179,14 +178,13 @@ const restoreSnapshot = async (
 		throw new NotFoundError("Repository not found");
 	}
 
-	const result = await restic.restore(repository.config, snapshotId, targetPath, options);
+	const result = await restic.restore(repository.config, snapshotId, "/", options);
 
 	return {
 		success: true,
 		message: "Snapshot restored successfully",
 		filesRestored: result.files_restored,
-		filesUpdated: result.files_updated,
-		totalBytes: result.total_bytes,
+		filesSkipped: result.files_skipped,
 	};
 };
 

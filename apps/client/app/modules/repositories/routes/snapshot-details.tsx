@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { listSnapshotFilesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { RestoreSnapshotDialog } from "../components/restore-snapshot-dialog";
 import { SnapshotFilesList } from "../components/snapshot-files";
 
 export default function SnapshotDetailsPage() {
@@ -30,6 +31,7 @@ export default function SnapshotDetailsPage() {
 					<h1 className="text-2xl font-bold">{name}</h1>
 					<p className="text-sm text-muted-foreground">Snapshot: {snapshotId}</p>
 				</div>
+				<RestoreSnapshotDialog name={name} snapshotId={snapshotId} />
 			</div>
 
 			<Card className="h-[600px] flex flex-col">

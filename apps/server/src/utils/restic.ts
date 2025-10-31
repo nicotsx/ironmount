@@ -161,11 +161,10 @@ const backup = async (
 
 const restoreOutputSchema = type({
 	message_type: "'summary'",
+	total_files: "number",
 	files_restored: "number",
-	files_updated: "number",
-	files_unchanged: "number",
-	total_bytes: "number",
-	total_errors: "number?",
+	files_skipped: "number",
+	bytes_skipped: "number",
 });
 
 const restore = async (
@@ -216,14 +215,15 @@ const restore = async (
 		logger.info(`Restic restore completed for snapshot ${snapshotId} to target ${target}`);
 		return {
 			message_type: "summary" as const,
+			total_files: 0,
 			files_restored: 0,
-			files_updated: 0,
-			files_unchanged: 0,
-			total_bytes: 0,
+			files_skipped: 0,
+			bytes_skipped: 0,
 		};
 	}
 
 	const resSummary = JSON.parse(lastLine);
+
 	const result = restoreOutputSchema(resSummary);
 
 	if (result instanceof type.errors) {
@@ -231,15 +231,15 @@ const restore = async (
 		logger.info(`Restic restore completed for snapshot ${snapshotId} to target ${target}`);
 		return {
 			message_type: "summary" as const,
+			total_files: 0,
 			files_restored: 0,
-			files_updated: 0,
-			files_unchanged: 0,
-			total_bytes: 0,
+			files_skipped: 0,
+			bytes_skipped: 0,
 		};
 	}
 
 	logger.info(
-		`Restic restore completed for snapshot ${snapshotId} to target ${target}: ${result.files_restored} restored, ${result.files_updated} updated`,
+		`Restic restore completed for snapshot ${snapshotId} to target ${target}: ${result.files_restored} restored, ${result.files_skipped} skipped`,
 	);
 
 	return result;

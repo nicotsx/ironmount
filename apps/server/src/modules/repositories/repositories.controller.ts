@@ -12,7 +12,6 @@ import {
 	listSnapshotsFilters,
 	restoreSnapshotBody,
 	restoreSnapshotDto,
-	type CreateRepositoryDto,
 	type DeleteRepositoryDto,
 	type GetRepositoryDto,
 	type ListRepositoriesDto,
@@ -93,9 +92,9 @@ export const repositoriesController = new Hono()
 	)
 	.post("/:name/restore", restoreSnapshotDto, validator("json", restoreSnapshotBody), async (c) => {
 		const { name } = c.req.param();
-		const { snapshotId, targetPath, path, include, exclude } = c.req.valid("json");
+		const { snapshotId, path, include, exclude } = c.req.valid("json");
 
-		const result = await repositoriesService.restoreSnapshot(name, snapshotId, targetPath, { path, include, exclude });
+		const result = await repositoriesService.restoreSnapshot(name, snapshotId, { path, include, exclude });
 
 		return c.json<RestoreSnapshotDto>(result, 200);
 	});
