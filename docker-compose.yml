@@ -14,8 +14,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /run/docker/plugins:/run/docker/plugins
-      - ./data/volumes/:/var/lib/ironmount/volumes
-      - /var/lib/repositories/:/var/lib/repositories
+      - ./data/volumes/:/volumes
       # - /proc:/host/proc:ro
       - ./data:/data
 

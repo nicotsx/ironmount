@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Database, Pencil } from "lucide-react";
+import { Database, Pencil, Play } from "lucide-react";
 import { useMemo } from "react";
 import { listSnapshotsOptions } from "~/api-client/@tanstack/react-query.gen";
 import { ByteSize } from "~/components/bytes-size";
@@ -14,11 +14,12 @@ type Props = {
 	schedule: BackupSchedule;
 	repository: Repository;
 	handleToggleEnabled: (enabled: boolean) => void;
+	handleRunBackupNow: () => void;
 	setIsEditMode: (isEdit: boolean) => void;
 };
 
 export const ScheduleSummary = (props: Props) => {
-	const { volume, schedule, repository, handleToggleEnabled, setIsEditMode } = props;
+	const { volume, schedule, repository, handleToggleEnabled, handleRunBackupNow, setIsEditMode } = props;
 
 	const { data: snapshots, isLoading: loadingSnapshots } = useQuery({
 		...listSnapshotsOptions({
@@ -61,6 +62,10 @@ export const ScheduleSummary = (props: Props) => {
 					</div>
 					<div className="flex items-center gap-2">
 						<OnOff isOn={schedule.enabled} toggle={handleToggleEnabled} enabledLabel="Enabled" disabledLabel="Paused" />
+						<Button variant="default" size="sm" onClick={handleRunBackupNow}>
+							<Play className="h-4 w-4 mr-2" />
+							Backup Now
+						</Button>
 						<Button variant="outline" size="sm" onClick={() => setIsEditMode(true)}>
 							<Pencil className="h-4 w-4 mr-2" />
 							Edit schedule

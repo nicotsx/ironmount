@@ -10,6 +10,7 @@ import {
 	listRepositoriesOptions,
 	upsertBackupScheduleMutation,
 	getBackupScheduleForVolumeOptions,
+	runBackupNowMutation,
 } from "~/api-client/@tanstack/react-query.gen";
 import { parseError } from "~/lib/errors";
 import { CreateScheduleForm, type BackupScheduleFormValues } from "../components/create-schedule-form";
@@ -60,6 +61,19 @@ export const VolumeBackupsTabContent = ({ volume }: Props) => {
 		},
 		onError: (error) => {
 			toast.error("Failed to save backup schedule", {
+				description: parseError(error)?.message,
+			});
+		},
+	});
+
+	const runBackupNow = useMutation({
+		...runBackupNowMutation(),
+		onSuccess: () => {
+			toast.success("Backup started successfully");
+			queryClient.invalidateQueries({ queryKey: ["getBackupScheduleForVolume", volume.id.toString()] });
+		},
+		onError: (error) => {
+			toast.error("Failed to start backup", {
 				description: parseError(error)?.message,
 			});
 		},
@@ -145,12 +159,23 @@ export const VolumeBackupsTabContent = ({ volume }: Props) => {
 		});
 	};
 
+	const handleRunBackupNow = () => {
+		if (!existingSchedule) return;
+
+		runBackupNow.mutate({
+			path: {
+				scheduleId: existingSchedule.id.toString(),
+			},
+		});
+	};
+
 	const repository = repositories.find((repo) => repo.id === existingSchedule?.repositoryId);
 
 	if (existingSchedule && repository && !isEditMode) {
 		return (
 			<ScheduleSummary
 				handleToggleEnabled={handleToggleEnabled}
+				handleRunBackupNow={handleRunBackupNow}
 				repository={repository}
 				setIsEditMode={setIsEditMode}
 				schedule={existingSchedule}
