@@ -33,7 +33,7 @@ export const formatSnapshotDuration = (seconds: number) => {
 export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 	const [searchQuery, setSearchQuery] = useState("");
 
-	const { data, isLoading, error } = useQuery({
+	const { data, isLoading, failureReason } = useQuery({
 		...listSnapshotsOptions({ path: { name: repository.name } }),
 		refetchInterval: 10000,
 		refetchOnWindowFocus: true,
@@ -72,23 +72,23 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 		);
 	}
 
-	if (isLoading && !data && !error) {
+	if (isLoading && !data && !failureReason) {
 		return (
 			<Card>
 				<CardContent className="flex items-center justify-center py-12">
-					<p className="text-muted-foreground">Loading snapshots...</p>
+					<p className="text-muted-foreground">Loading snapshots yo...</p>
 				</CardContent>
 			</Card>
 		);
 	}
 
-	if (error) {
+	if (failureReason) {
 		return (
 			<Card>
 				<CardContent className="flex flex-col items-center justify-center text-center py-12">
 					<Database className="mb-4 h-12 w-12 text-destructive" />
 					<p className="text-destructive font-semibold">Failed to Load Snapshots</p>
-					<p className="text-sm text-muted-foreground mt-2">{error.message}</p>
+					<p className="text-sm text-muted-foreground mt-2">{failureReason.message}</p>
 				</CardContent>
 			</Card>
 		);
