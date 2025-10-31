@@ -41,3 +41,5 @@ node_modules/
 .turbo
 
 mutagen.yml.lock
+
+data/

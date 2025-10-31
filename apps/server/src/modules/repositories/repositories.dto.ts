@@ -219,7 +219,6 @@ export const listSnapshotFilesDto = describeRoute({
  */
 export const restoreSnapshotBody = type({
 	snapshotId: "string",
-	path: "string?",
 	include: "string[]?",
 	exclude: "string[]?",
 });

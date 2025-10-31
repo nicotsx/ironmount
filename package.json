@@ -8,7 +8,9 @@
 		"build": "turbo build",
 		"gen:api-client": "openapi-ts",
 		"start:dev": "docker compose down && docker compose up --build ironmount-dev",
-		"start:prod": "docker compose down && docker compose up --build ironmount-prod"
+		"start:prod": "docker compose down && docker compose up --build ironmount-prod",
+		"gen:migrations": "drizzle-kit generate",
+		"studio": "drizzle-kit studio"
 	},
 	"workspaces": [
 		"apps/*",
@@ -16,6 +18,8 @@
 	],
 	"devDependencies": {
 		"@hey-api/openapi-ts": "^0.80.17",
+		"dotenv": "^17.2.3",
+		"drizzle-kit": "^0.31.6",
 		"turbo": "^2.5.8"
 	},
 	"trustedDependencies": [
