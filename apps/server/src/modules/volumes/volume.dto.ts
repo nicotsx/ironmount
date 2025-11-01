@@ -2,7 +2,7 @@ import { BACKEND_STATUS, BACKEND_TYPES, volumeConfigSchema } from "@ironmount/sc
 import { type } from "arktype";
 import { describeRoute, resolver } from "hono-openapi";
 
-const volumeSchema = type({
+export const volumeSchema = type({
 	id: "number",
 	name: "string",
 	path: "string",

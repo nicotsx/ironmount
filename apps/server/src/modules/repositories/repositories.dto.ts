@@ -7,7 +7,7 @@ import {
 import { type } from "arktype";
 import { describeRoute, resolver } from "hono-openapi";
 
-const repositorySchema = type({
+export const repositorySchema = type({
 	id: "string",
 	name: "string",
 	type: type.valueOf(REPOSITORY_BACKENDS),

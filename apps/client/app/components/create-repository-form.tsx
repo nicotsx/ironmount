@@ -134,23 +134,6 @@ export const CreateRepositoryForm = ({
 					)}
 				/>
 
-				{watchedBackend === "local" && (
-					<FormField
-						control={form.control}
-						name="path"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Path</FormLabel>
-								<FormControl>
-									<Input placeholder="/path/to/repository" {...field} />
-								</FormControl>
-								<FormDescription>Local filesystem path where the repository will be stored.</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				)}
-
 				{watchedBackend === "s3" && (
 					<>
 						<FormField

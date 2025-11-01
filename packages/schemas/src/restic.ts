@@ -17,7 +17,7 @@ export const s3RepositoryConfigSchema = type({
 
 export const localRepositoryConfigSchema = type({
 	backend: "'local'",
-	path: "string",
+	name: "string",
 });
 
 export const repositoryConfigSchema = s3RepositoryConfigSchema.or(localRepositoryConfigSchema);

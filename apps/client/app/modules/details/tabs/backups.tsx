@@ -133,8 +133,8 @@ export const VolumeBackupsTabContent = ({ volume }: Props) => {
 							To schedule automated backups, you need to create a repository first. Repositories are secure storage
 							locations where your backups will be stored.
 						</p>
-						<Button asChild>
-							<Link to="/repositories">
+						<Button>
+							<Link to="/repositories" className="flex items-center">
 								<Plus className="h-4 w-4 mr-2" />
 								Create a repository
 							</Link>

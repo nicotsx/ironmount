@@ -1,5 +1,7 @@
 import { type } from "arktype";
 import { describeRoute, resolver } from "hono-openapi";
+import { volumeSchema } from "../volumes/volume.dto";
+import { repositorySchema } from "../repositories/repositories.dto";
 
 const retentionPolicySchema = type({
 	keepLast: "number?",
@@ -58,7 +60,12 @@ export const listBackupSchedulesDto = describeRoute({
 /**
  * Get a single backup schedule
  */
-export const getBackupScheduleResponse = backupScheduleSchema;
+export const getBackupScheduleResponse = backupScheduleSchema.and(
+	type({
+		volume: volumeSchema,
+		repository: repositorySchema,
+	}),
+);
 
 export type GetBackupScheduleDto = typeof getBackupScheduleResponse.infer;
 

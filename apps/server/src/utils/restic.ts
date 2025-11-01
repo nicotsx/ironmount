@@ -69,7 +69,7 @@ const ensurePassfile = async () => {
 const buildRepoUrl = (config: RepositoryConfig): string => {
 	switch (config.backend) {
 		case "local":
-			return config.path;
+			return `/repositories/${config.name}`;
 		case "s3":
 			return `s3:${config.endpoint}/${config.bucket}`;
 		default: {

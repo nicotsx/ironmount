@@ -1,7 +1,7 @@
 import { defaultPlugins, defineConfig } from "@hey-api/openapi-ts";
 
 export default defineConfig({
-	input: "http://192.168.2.42:4096/api/v1/openapi.json",
+	input: "http://localhost:4096/api/v1/openapi.json",
 	output: {
 		path: "./apps/client/app/api-client",
 		format: "biome",

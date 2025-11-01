@@ -5,9 +5,12 @@ import type {
 	repositoryConfigSchema,
 	RepositoryStatus,
 } from "@ironmount/schemas/restic";
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { int, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
+/**
+ * Volumes Table
+ */
 export const volumesTable = sqliteTable("volumes_table", {
 	id: int().primaryKey({ autoIncrement: true }),
 	name: text().notNull().unique(),
@@ -20,9 +23,11 @@ export const volumesTable = sqliteTable("volumes_table", {
 	config: text("config", { mode: "json" }).$type<typeof volumeConfigSchema.inferOut>().notNull(),
 	autoRemount: int("auto_remount", { mode: "boolean" }).notNull().default(true),
 });
-
 export type Volume = typeof volumesTable.$inferSelect;
 
+/**
+ * Users Table
+ */
 export const usersTable = sqliteTable("users_table", {
 	id: int().primaryKey({ autoIncrement: true }),
 	username: text().notNull().unique(),
@@ -30,9 +35,7 @@ export const usersTable = sqliteTable("users_table", {
 	createdAt: int("created_at", { mode: "number" }).notNull().default(sql`(unixepoch())`),
 	updatedAt: int("updated_at", { mode: "number" }).notNull().default(sql`(unixepoch())`),
 });
-
 export type User = typeof usersTable.$inferSelect;
-
 export const sessionsTable = sqliteTable("sessions_table", {
 	id: text().primaryKey(),
 	userId: int("user_id")
@@ -41,9 +44,11 @@ export const sessionsTable = sqliteTable("sessions_table", {
 	expiresAt: int("expires_at", { mode: "number" }).notNull(),
 	createdAt: int("created_at", { mode: "number" }).notNull().default(sql`(unixepoch())`),
 });
-
 export type Session = typeof sessionsTable.$inferSelect;
 
+/**
+ * Repositories Table
+ */
 export const repositoriesTable = sqliteTable("repositories_table", {
 	id: text().primaryKey(),
 	name: text().notNull().unique(),
@@ -56,9 +61,11 @@ export const repositoriesTable = sqliteTable("repositories_table", {
 	createdAt: int("created_at", { mode: "number" }).notNull().default(sql`(unixepoch())`),
 	updatedAt: int("updated_at", { mode: "number" }).notNull().default(sql`(unixepoch())`),
 });
-
 export type Repository = typeof repositoriesTable.$inferSelect;
 
+/**
+ * Backup Schedules Table
+ */
 export const backupSchedulesTable = sqliteTable("backup_schedules_table", {
 	id: int().primaryKey({ autoIncrement: true }),
 	volumeId: int("volume_id")
@@ -88,5 +95,14 @@ export const backupSchedulesTable = sqliteTable("backup_schedules_table", {
 	createdAt: int("created_at", { mode: "number" }).notNull().default(sql`(unixepoch())`),
 	updatedAt: int("updated_at", { mode: "number" }).notNull().default(sql`(unixepoch())`),
 });
-
+export const backupScheduleRelations = relations(backupSchedulesTable, ({ one }) => ({
+	volume: one(volumesTable, {
+		fields: [backupSchedulesTable.volumeId],
+		references: [volumesTable.id],
+	}),
+	repository: one(repositoriesTable, {
+		fields: [backupSchedulesTable.repositoryId],
+		references: [repositoriesTable.id],
+	}),
+}));
 export type BackupSchedule = typeof backupSchedulesTable.$inferSelect;

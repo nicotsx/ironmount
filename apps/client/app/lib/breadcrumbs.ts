@@ -42,6 +42,23 @@ export function generateBreadcrumbs(pathname: string, params: Record<string, str
 		return breadcrumbs;
 	}
 
+	if (pathname.startsWith("/backup-jobs")) {
+		breadcrumbs.push({
+			label: "Backup jobs",
+			href: "/backup-jobs",
+			isCurrentPage: pathname === "/backup-jobs",
+		});
+
+		if (pathname.startsWith("/backup-jobs/") && params.scheduleId) {
+			breadcrumbs.push({
+				label: `Schedule #${params.scheduleId}`,
+				isCurrentPage: true,
+			});
+		}
+
+		return breadcrumbs;
+	}
+
 	breadcrumbs.push({
 		label: "Volumes",
 		href: "/volumes",

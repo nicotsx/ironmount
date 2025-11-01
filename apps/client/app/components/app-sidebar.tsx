@@ -1,4 +1,4 @@
-import { Database, HardDrive, Mountain } from "lucide-react";
+import { CalendarClock, Database, HardDrive, Mountain } from "lucide-react";
 import { Link, NavLink } from "react-router";
 import {
 	Sidebar,
@@ -24,6 +24,11 @@ const items = [
 		title: "Repositories",
 		url: "/repositories",
 		icon: Database,
+	},
+	{
+		title: "Backup jobs",
+		url: "/backup-jobs",
+		icon: CalendarClock,
 	},
 ];
 

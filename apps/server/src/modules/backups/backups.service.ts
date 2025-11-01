@@ -34,6 +34,10 @@ const listSchedules = async () => {
 const getSchedule = async (scheduleId: number) => {
 	const schedule = await db.query.backupSchedulesTable.findFirst({
 		where: eq(volumesTable.id, scheduleId),
+		with: {
+			volume: true,
+			repository: true,
+		},
 	});
 
 	if (!schedule) {

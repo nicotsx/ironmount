@@ -56,7 +56,6 @@ export const RestoreSnapshotDialog = ({ name, snapshotId }: Props) => {
 			path: { name },
 			body: {
 				snapshotId,
-				path: values.path || undefined,
 				include: include && include.length > 0 ? include : undefined,
 				exclude: exclude && exclude.length > 0 ? exclude : undefined,
 			},
