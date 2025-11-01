@@ -5,7 +5,6 @@ import { describeRoute, resolver } from "hono-openapi";
 export const volumeSchema = type({
 	id: "number",
 	name: "string",
-	path: "string",
 	type: type.valueOf(BACKEND_TYPES),
 	status: type.valueOf(BACKEND_STATUS),
 	lastError: "string | null",
@@ -21,9 +20,7 @@ export type VolumeDto = typeof volumeSchema.infer;
 /**
  * List all volumes
  */
-export const listVolumesResponse = type({
-	volumes: volumeSchema.array(),
-});
+export const listVolumesResponse = volumeSchema.array();
 export type ListVolumesDto = typeof listVolumesResponse.infer;
 
 export const listVolumesDto = describeRoute({

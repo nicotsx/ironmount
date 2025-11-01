@@ -29,14 +29,7 @@ export const volumeController = new Hono()
 	.get("/", listVolumesDto, async (c) => {
 		const volumes = await volumeService.listVolumes();
 
-		const response = {
-			volumes: volumes.map((volume) => ({
-				path: getVolumePath(volume.name),
-				...volume,
-			})),
-		};
-
-		return c.json<ListVolumesDto>(response, 200);
+		return c.json<ListVolumesDto>(volumes, 200);
 	})
 	.post("/", createVolumeDto, validator("json", createVolumeBody), async (c) => {
 		const body = c.req.valid("json");

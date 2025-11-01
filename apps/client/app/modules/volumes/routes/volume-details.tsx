@@ -13,12 +13,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { VolumeIcon } from "~/components/volume-icon";
 import { parseError } from "~/lib/errors";
 import { cn } from "~/lib/utils";
-import { VolumeBackupsTabContent } from "~/modules/details/tabs/backups";
-import { DockerTabContent } from "~/modules/details/tabs/docker";
-import { FilesTabContent } from "~/modules/details/tabs/files";
-import { VolumeInfoTabContent } from "~/modules/details/tabs/info";
-import { getVolume } from "../api-client";
-import type { Route } from "./+types/details";
+import type { Route } from "./+types/volume-details";
+import { getVolume } from "~/api-client";
+import { VolumeInfoTabContent } from "../tabs/info";
+import { FilesTabContent } from "../tabs/files";
+import { DockerTabContent } from "../tabs/docker";
 
 export function meta({ params }: Route.MetaArgs) {
 	return [
@@ -35,7 +34,7 @@ export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
 	if (volume.data) return volume.data;
 };
 
-export default function DetailsPage({ loaderData }: Route.ComponentProps) {
+export default function VolumeDetails({ loaderData }: Route.ComponentProps) {
 	const { name } = useParams<{ name: string }>();
 	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -138,7 +137,6 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 					<TabsTrigger value="info">Configuration</TabsTrigger>
 					<TabsTrigger value="files">Files</TabsTrigger>
 					<TabsTrigger value="docker">Docker</TabsTrigger>
-					<TabsTrigger value="backups">Backups</TabsTrigger>
 				</TabsList>
 				<TabsContent value="info">
 					<VolumeInfoTabContent volume={volume} statfs={statfs} />
@@ -148,9 +146,6 @@ export default function DetailsPage({ loaderData }: Route.ComponentProps) {
 				</TabsContent>
 				<TabsContent value="docker">
 					<DockerTabContent volume={volume} />
-				</TabsContent>
-				<TabsContent value="backups">
-					<VolumeBackupsTabContent volume={volume} />
 				</TabsContent>
 			</Tabs>
 		</>

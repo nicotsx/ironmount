@@ -4,7 +4,7 @@ import path from "node:path";
 import type { RepositoryConfig } from "@ironmount/schemas/restic";
 import { type } from "arktype";
 import { $ } from "bun";
-import { RESTIC_PASS_FILE } from "../core/constants";
+import { REPOSITORY_BASE, RESTIC_PASS_FILE } from "../core/constants";
 import { logger } from "./logger";
 import { cryptoUtils } from "./crypto";
 import type { RetentionPolicy } from "../modules/backups/backups.dto";
@@ -69,7 +69,7 @@ const ensurePassfile = async () => {
 const buildRepoUrl = (config: RepositoryConfig): string => {
 	switch (config.backend) {
 		case "local":
-			return `/repositories/${config.name}`;
+			return `${REPOSITORY_BASE}/${config.name}`;
 		case "s3":
 			return `s3:${config.endpoint}/${config.bucket}`;
 		default: {

@@ -26,8 +26,8 @@ const items = [
 		icon: Database,
 	},
 	{
-		title: "Backup jobs",
-		url: "/backup-jobs",
+		title: "Backups",
+		url: "/backups",
 		icon: CalendarClock,
 	},
 ];

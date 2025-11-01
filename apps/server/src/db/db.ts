@@ -7,6 +7,7 @@ import { DATABASE_URL } from "../core/constants";
 import * as schema from "./schema";
 
 const sqlite = new Database(DATABASE_URL);
+sqlite.run("PRAGMA foreign_keys = ON;");
 
 export const db = drizzle({ client: sqlite, schema });
 

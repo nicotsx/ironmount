@@ -136,50 +136,47 @@ export type ListVolumesResponses = {
 	/**
 	 * A list of volumes
 	 */
-	200: {
-		volumes: Array<{
-			autoRemount: boolean;
-			config:
-				| {
-						backend: "directory";
-				  }
-				| {
-						backend: "nfs";
-						exportPath: string;
-						server: string;
-						version: "3" | "4" | "4.1";
-						port?: number;
-				  }
-				| {
-						backend: "smb";
-						password: string;
-						server: string;
-						share: string;
-						username: string;
-						vers?: "1.0" | "2.0" | "2.1" | "3.0";
-						port?: number;
-						domain?: string;
-				  }
-				| {
-						backend: "webdav";
-						path: string;
-						server: string;
-						port?: number;
-						password?: string;
-						ssl?: boolean;
-						username?: string;
-				  };
-			createdAt: number;
-			id: number;
-			lastError: string | null;
-			lastHealthCheck: number;
-			name: string;
-			path: string;
-			status: "error" | "mounted" | "unmounted";
-			type: "directory" | "nfs" | "smb" | "webdav";
-			updatedAt: number;
-		}>;
-	};
+	200: Array<{
+		autoRemount: boolean;
+		config:
+			| {
+					backend: "directory";
+			  }
+			| {
+					backend: "nfs";
+					exportPath: string;
+					server: string;
+					version: "3" | "4" | "4.1";
+					port?: number;
+			  }
+			| {
+					backend: "smb";
+					password: string;
+					server: string;
+					share: string;
+					username: string;
+					vers?: "1.0" | "2.0" | "2.1" | "3.0";
+					port?: number;
+					domain?: string;
+			  }
+			| {
+					backend: "webdav";
+					path: string;
+					server: string;
+					port?: number;
+					password?: string;
+					ssl?: boolean;
+					username?: string;
+			  };
+		createdAt: number;
+		id: number;
+		lastError: string | null;
+		lastHealthCheck: number;
+		name: string;
+		status: "error" | "mounted" | "unmounted";
+		type: "directory" | "nfs" | "smb" | "webdav";
+		updatedAt: number;
+	}>;
 };
 
 export type ListVolumesResponse = ListVolumesResponses[keyof ListVolumesResponses];
@@ -264,7 +261,6 @@ export type CreateVolumeResponses = {
 		lastError: string | null;
 		lastHealthCheck: number;
 		name: string;
-		path: string;
 		status: "error" | "mounted" | "unmounted";
 		type: "directory" | "nfs" | "smb" | "webdav";
 		updatedAt: number;
@@ -406,7 +402,6 @@ export type GetVolumeResponses = {
 			lastError: string | null;
 			lastHealthCheck: number;
 			name: string;
-			path: string;
 			status: "error" | "mounted" | "unmounted";
 			type: "directory" | "nfs" | "smb" | "webdav";
 			updatedAt: number;
@@ -505,7 +500,6 @@ export type UpdateVolumeResponses = {
 		lastError: string | null;
 		lastHealthCheck: number;
 		name: string;
-		path: string;
 		status: "error" | "mounted" | "unmounted";
 		type: "directory" | "nfs" | "smb" | "webdav";
 		updatedAt: number;
@@ -900,6 +894,29 @@ export type ListBackupSchedulesResponses = {
 		lastBackupError: string | null;
 		lastBackupStatus: "error" | "success" | null;
 		nextBackupAt: number | null;
+		repository: {
+			compressionMode: "auto" | "better" | "fastest" | "max" | "off" | null;
+			config:
+				| {
+						accessKeyId: string;
+						backend: "s3";
+						bucket: string;
+						endpoint: string;
+						secretAccessKey: string;
+				  }
+				| {
+						backend: "local";
+						name: string;
+				  };
+			createdAt: number;
+			id: string;
+			lastChecked: number | null;
+			lastError: string | null;
+			name: string;
+			status: "error" | "healthy" | "unknown" | null;
+			type: "local" | "s3";
+			updatedAt: number;
+		};
 		repositoryId: string;
 		retentionPolicy: {
 			keepDaily?: number;
@@ -911,6 +928,47 @@ export type ListBackupSchedulesResponses = {
 			keepYearly?: number;
 		} | null;
 		updatedAt: number;
+		volume: {
+			autoRemount: boolean;
+			config:
+				| {
+						backend: "directory";
+				  }
+				| {
+						backend: "nfs";
+						exportPath: string;
+						server: string;
+						version: "3" | "4" | "4.1";
+						port?: number;
+				  }
+				| {
+						backend: "smb";
+						password: string;
+						server: string;
+						share: string;
+						username: string;
+						vers?: "1.0" | "2.0" | "2.1" | "3.0";
+						port?: number;
+						domain?: string;
+				  }
+				| {
+						backend: "webdav";
+						path: string;
+						server: string;
+						port?: number;
+						password?: string;
+						ssl?: boolean;
+						username?: string;
+				  };
+			createdAt: number;
+			id: number;
+			lastError: string | null;
+			lastHealthCheck: number;
+			name: string;
+			status: "error" | "mounted" | "unmounted";
+			type: "directory" | "nfs" | "smb" | "webdav";
+			updatedAt: number;
+		};
 		volumeId: number;
 	}>;
 };
@@ -1088,7 +1146,6 @@ export type GetBackupScheduleResponses = {
 			lastError: string | null;
 			lastHealthCheck: number;
 			name: string;
-			path: string;
 			status: "error" | "mounted" | "unmounted";
 			type: "directory" | "nfs" | "smb" | "webdav";
 			updatedAt: number;
@@ -1180,6 +1237,29 @@ export type GetBackupScheduleForVolumeResponses = {
 		lastBackupError: string | null;
 		lastBackupStatus: "error" | "success" | null;
 		nextBackupAt: number | null;
+		repository: {
+			compressionMode: "auto" | "better" | "fastest" | "max" | "off" | null;
+			config:
+				| {
+						accessKeyId: string;
+						backend: "s3";
+						bucket: string;
+						endpoint: string;
+						secretAccessKey: string;
+				  }
+				| {
+						backend: "local";
+						name: string;
+				  };
+			createdAt: number;
+			id: string;
+			lastChecked: number | null;
+			lastError: string | null;
+			name: string;
+			status: "error" | "healthy" | "unknown" | null;
+			type: "local" | "s3";
+			updatedAt: number;
+		};
 		repositoryId: string;
 		retentionPolicy: {
 			keepDaily?: number;
@@ -1191,6 +1271,47 @@ export type GetBackupScheduleForVolumeResponses = {
 			keepYearly?: number;
 		} | null;
 		updatedAt: number;
+		volume: {
+			autoRemount: boolean;
+			config:
+				| {
+						backend: "directory";
+				  }
+				| {
+						backend: "nfs";
+						exportPath: string;
+						server: string;
+						version: "3" | "4" | "4.1";
+						port?: number;
+				  }
+				| {
+						backend: "smb";
+						password: string;
+						server: string;
+						share: string;
+						username: string;
+						vers?: "1.0" | "2.0" | "2.1" | "3.0";
+						port?: number;
+						domain?: string;
+				  }
+				| {
+						backend: "webdav";
+						path: string;
+						server: string;
+						port?: number;
+						password?: string;
+						ssl?: boolean;
+						username?: string;
+				  };
+			createdAt: number;
+			id: number;
+			lastError: string | null;
+			lastHealthCheck: number;
+			name: string;
+			status: "error" | "mounted" | "unmounted";
+			type: "directory" | "nfs" | "smb" | "webdav";
+			updatedAt: number;
+		};
 		volumeId: number;
 	} | null;
 };

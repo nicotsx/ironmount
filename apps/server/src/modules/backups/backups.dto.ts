@@ -30,9 +30,12 @@ const backupScheduleSchema = type({
 	nextBackupAt: "number | null",
 	createdAt: "number",
 	updatedAt: "number",
-});
-
-export type BackupScheduleDto = typeof backupScheduleSchema.infer;
+}).and(
+	type({
+		volume: volumeSchema,
+		repository: repositorySchema,
+	}),
+);
 
 /**
  * List all backup schedules
@@ -60,12 +63,7 @@ export const listBackupSchedulesDto = describeRoute({
 /**
  * Get a single backup schedule
  */
-export const getBackupScheduleResponse = backupScheduleSchema.and(
-	type({
-		volume: volumeSchema,
-		repository: repositorySchema,
-	}),
-);
+export const getBackupScheduleResponse = backupScheduleSchema;
 
 export type GetBackupScheduleDto = typeof getBackupScheduleResponse.infer;
 
@@ -121,7 +119,7 @@ export const createBackupScheduleBody = type({
 
 export type CreateBackupScheduleBody = typeof createBackupScheduleBody.infer;
 
-export const createBackupScheduleResponse = backupScheduleSchema;
+export const createBackupScheduleResponse = backupScheduleSchema.omit("volume", "repository");
 
 export type CreateBackupScheduleDto = typeof createBackupScheduleResponse.infer;
 
@@ -156,7 +154,7 @@ export const updateBackupScheduleBody = type({
 
 export type UpdateBackupScheduleBody = typeof updateBackupScheduleBody.infer;
 
-export const updateBackupScheduleResponse = backupScheduleSchema;
+export const updateBackupScheduleResponse = backupScheduleSchema.omit("volume", "repository");
 
 export type UpdateBackupScheduleDto = typeof updateBackupScheduleResponse.infer;
 
@@ -192,7 +190,7 @@ export const upsertBackupScheduleBody = type({
 
 export type UpsertBackupScheduleBody = typeof upsertBackupScheduleBody.infer;
 
-export const upsertBackupScheduleResponse = backupScheduleSchema;
+export const upsertBackupScheduleResponse = backupScheduleSchema.omit("volume", "repository");
 
 export type UpsertBackupScheduleDto = typeof upsertBackupScheduleResponse.infer;
 

@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
 import type { Route } from "./+types/repositories";
 import { cn } from "~/lib/utils";
+import { EmptyState } from "~/components/empty-state";
 
 export function meta(_: Route.MetaArgs) {
 	return [
@@ -64,9 +65,12 @@ export default function Repositories({ loaderData }: Route.ComponentProps) {
 
 	if (hasNoRepositories) {
 		return (
-			<Card className="p-0 gap-0">
-				<RepositoriesEmptyState />
-			</Card>
+			<EmptyState
+				icon={Database}
+				title="No repository"
+				description="Repositories are remote storage locations where you can backup your volumes securely. Encrypted and optimized for storage efficiency."
+				button={<CreateRepositoryDialog open={createRepositoryOpen} setOpen={setCreateRepositoryOpen} />}
+			/>
 		);
 	}
 
@@ -181,32 +185,5 @@ export default function Repositories({ loaderData }: Route.ComponentProps) {
 				)}
 			</div>
 		</Card>
-	);
-}
-
-function RepositoriesEmptyState() {
-	const [createRepositoryOpen, setCreateRepositoryOpen] = useState(false);
-
-	return (
-		<div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-			<div className="relative mb-8">
-				<div className="absolute inset-0 animate-pulse">
-					<div className="w-32 h-32 rounded-full bg-primary/10 blur-2xl" />
-				</div>
-
-				<div className="relative flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/20">
-					<Database className="w-16 h-16 text-primary/70" strokeWidth={1.5} />
-				</div>
-			</div>
-			<div className="max-w-md space-y-3 mb-8">
-				<h3 className="text-2xl font-semibold text-foreground">No repositories yet</h3>
-				<p className="text-muted-foreground text-sm">
-					Repositories are remote storage locations where you can backup your volumes securely. Encrypted and optimized
-					for storage efficiency.
-				</p>
-			</div>
-
-			<CreateRepositoryDialog open={createRepositoryOpen} setOpen={setCreateRepositoryOpen} />
-		</div>
 	);
 }

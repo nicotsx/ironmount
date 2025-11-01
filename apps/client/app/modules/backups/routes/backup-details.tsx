@@ -10,26 +10,9 @@ import {
 	runBackupNowMutation,
 } from "~/api-client/@tanstack/react-query.gen";
 import { parseError } from "~/lib/errors";
-import { CreateScheduleForm, type BackupScheduleFormValues } from "~/modules/details/components/create-schedule-form";
-import { ScheduleSummary } from "~/modules/details/components/schedule-summary";
-
-const getCronExpression = (frequency: string, dailyTime?: string, weeklyDay?: string): string => {
-	if (frequency === "hourly") {
-		return "0 * * * *";
-	}
-
-	if (!dailyTime) {
-		dailyTime = "02:00";
-	}
-
-	const [hours, minutes] = dailyTime.split(":");
-
-	if (frequency === "daily") {
-		return `${minutes} ${hours} * * *`;
-	}
-
-	return `${minutes} ${hours} * * ${weeklyDay ?? "0"}`;
-};
+import { getCronExpression } from "~/utils/utils";
+import { CreateScheduleForm, type BackupScheduleFormValues } from "../components/create-schedule-form";
+import { ScheduleSummary } from "../components/schedule-summary";
 
 export default function ScheduleDetailsPage() {
 	const { scheduleId } = useParams<{ scheduleId: string }>();

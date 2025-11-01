@@ -27,7 +27,12 @@ const calculateNextRun = (cronExpression: string): number => {
 };
 
 const listSchedules = async () => {
-	const schedules = await db.query.backupSchedulesTable.findMany({});
+	const schedules = await db.query.backupSchedulesTable.findMany({
+		with: {
+			volume: true,
+			repository: true,
+		},
+	});
 	return schedules;
 };
 
@@ -259,6 +264,7 @@ const getSchedulesToExecute = async () => {
 const getScheduleForVolume = async (volumeId: number) => {
 	const schedule = await db.query.backupSchedulesTable.findFirst({
 		where: eq(backupSchedulesTable.volumeId, volumeId),
+		with: { volume: true, repository: true },
 	});
 
 	return schedule ?? null;

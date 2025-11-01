@@ -1,14 +1,34 @@
 import { useQuery } from "@tanstack/react-query";
 import { CalendarClock, Database, HardDrive, Plus } from "lucide-react";
 import { Link } from "react-router";
+import { listBackupSchedules } from "~/api-client";
 import { listBackupSchedulesOptions } from "~/api-client/@tanstack/react-query.gen";
+import { EmptyState } from "~/components/empty-state";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import type { Route } from "./+types/backups";
 
-export default function BackupJobsPage() {
+export function meta(_: Route.MetaArgs) {
+	return [
+		{ title: "Ironmount" },
+		{
+			name: "description",
+			content: "Create, manage, monitor, and automate your Docker volumes with ease.",
+		},
+	];
+}
+
+export const clientLoader = async () => {
+	const jobs = await listBackupSchedules();
+	if (jobs.data) return jobs.data;
+	return [];
+};
+
+export default function Backups({ loaderData }: Route.ComponentProps) {
 	const { data: schedules, isLoading } = useQuery({
 		...listBackupSchedulesOptions(),
+		initialData: loaderData,
 		refetchInterval: 10000,
 		refetchOnWindowFocus: true,
 	});
@@ -23,31 +43,19 @@ export default function BackupJobsPage() {
 
 	if (!schedules || schedules.length === 0) {
 		return (
-			<Card>
-				<CardContent className="py-16">
-					<div className="flex flex-col items-center justify-center text-center">
-						<div className="relative mb-6">
-							<div className="absolute inset-0 animate-pulse">
-								<div className="w-24 h-24 rounded-full bg-primary/10 blur-2xl" />
-							</div>
-							<div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/20">
-								<CalendarClock className="w-16 h-16 text-primary/70" strokeWidth={1.5} />
-							</div>
-						</div>
-						<h3 className="text-xl font-semibold mb-2">No backup job created</h3>
-						<p className="text-muted-foreground text-sm mb-6 max-w-md">
-							Backup jobs allow you to create automated backup schedules for your volumes. Set up your first backup job
-							to ensure your data is securely backed up.
-						</p>
-						<Button>
-							<Link to="/repositories" className="flex items-center">
-								<Plus className="h-4 w-4 mr-2" />
-								Create a backup job
-							</Link>
-						</Button>
-					</div>
-				</CardContent>
-			</Card>
+			<EmptyState
+				icon={CalendarClock}
+				title="No backup job"
+				description="Backup jobs help you automate the process of backing up your volumes on a regular schedule to ensure your data is safe and secure."
+				button={
+					<Button>
+						<Link to="/backups/create" className="flex items-center">
+							<Plus className="h-4 w-4 mr-2" />
+							Create a backup job
+						</Link>
+					</Button>
+				}
+			/>
 		);
 	}
 

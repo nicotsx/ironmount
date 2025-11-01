@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { Database } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useId } from "react";
 import { toast } from "sonner";
 import { createRepositoryMutation } from "~/api-client/@tanstack/react-query.gen";
@@ -34,7 +34,7 @@ export const CreateRepositoryDialog = ({ open, setOpen }: Props) => {
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
 				<Button>
-					<Database size={16} className="mr-2" />
+					<Plus size={16} className="mr-2" />
 					Create Repository
 				</Button>
 			</DialogTrigger>
