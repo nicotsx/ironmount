@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useId, useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link, useParams } from "react-router";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -15,13 +15,13 @@ import { CreateScheduleForm, type BackupScheduleFormValues } from "../components
 import { ScheduleSummary } from "../components/schedule-summary";
 
 export default function ScheduleDetailsPage() {
-	const { scheduleId } = useParams<{ scheduleId: string }>();
-	const queryClient = useQueryClient();
+	const { id } = useParams<{ id: string }>();
 	const [isEditMode, setIsEditMode] = useState(false);
+	const formId = useId();
 
 	const { data: schedule, isLoading: loadingSchedule } = useQuery({
 		...getBackupScheduleOptions({
-			path: { scheduleId: scheduleId || "" },
+			path: { scheduleId: id || "" },
 		}),
 	});
 
@@ -31,8 +31,6 @@ export default function ScheduleDetailsPage() {
 		...upsertBackupScheduleMutation(),
 		onSuccess: () => {
 			toast.success("Backup schedule saved successfully");
-			queryClient.invalidateQueries({ queryKey: ["listBackupSchedules"] });
-			queryClient.invalidateQueries({ queryKey: ["getBackupSchedule", scheduleId] });
 			setIsEditMode(false);
 		},
 		onError: (error) => {
@@ -46,7 +44,6 @@ export default function ScheduleDetailsPage() {
 		...runBackupNowMutation(),
 		onSuccess: () => {
 			toast.success("Backup started successfully");
-			queryClient.invalidateQueries({ queryKey: ["getBackupSchedule", scheduleId] });
 		},
 		onError: (error) => {
 			toast.error("Failed to start backup", {
@@ -117,42 +114,41 @@ export default function ScheduleDetailsPage() {
 
 	if (!schedule) {
 		return (
-			<div className="container mx-auto p-4 sm:p-8">
-				<Card>
-					<CardContent className="py-12 text-center">
-						<p className="text-muted-foreground">Schedule not found</p>
-						<Button asChild className="mt-4">
-							<Link to="/backup-jobs">Back to Backup Jobs</Link>
-						</Button>
-					</CardContent>
-				</Card>
-			</div>
+			<Card>
+				<CardContent className="py-12 text-center">
+					<p className="text-muted-foreground">Not found</p>
+					<Button className="mt-4">
+						<Link to="/backups">Back to backups</Link>
+					</Button>
+				</CardContent>
+			</Card>
 		);
 	}
 
 	if (!isEditMode) {
 		return (
-			<div className="container mx-auto p-4 sm:p-8">
-				<ScheduleSummary
-					handleToggleEnabled={handleToggleEnabled}
-					handleRunBackupNow={handleRunBackupNow}
-					repository={schedule.repository}
-					setIsEditMode={setIsEditMode}
-					schedule={schedule}
-					volume={schedule.volume}
-				/>
-			</div>
+			<ScheduleSummary
+				handleToggleEnabled={handleToggleEnabled}
+				handleRunBackupNow={handleRunBackupNow}
+				repository={schedule.repository}
+				setIsEditMode={setIsEditMode}
+				schedule={schedule}
+				volume={schedule.volume}
+			/>
 		);
 	}
 
 	return (
-		<div className="container mx-auto p-4 sm:p-8 space-y-4">
-			<div className="flex justify-end">
+		<div>
+			<CreateScheduleForm volume={schedule.volume} initialValues={schedule} onSubmit={handleSubmit} formId={formId} />
+			<div className="flex justify-end mt-4 gap-2">
+				<Button type="submit" className="ml-auto" variant="primary" form={formId} loading={upsertSchedule.isPending}>
+					Update schedule
+				</Button>
 				<Button variant="outline" onClick={() => setIsEditMode(false)}>
 					Cancel
 				</Button>
 			</div>
-			<CreateScheduleForm volume={schedule.volume} initialValues={schedule} onSubmit={handleSubmit} />
 		</div>
 	);
 }

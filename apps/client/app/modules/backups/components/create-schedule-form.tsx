@@ -4,8 +4,7 @@ import { type } from "arktype";
 import { useForm } from "react-hook-form";
 import { listRepositoriesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { RepositoryIcon } from "~/components/repository-icon";
-import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
@@ -46,6 +45,7 @@ type Props = {
 	onSubmit: (data: BackupScheduleFormValues) => void;
 	loading?: boolean;
 	summaryContent?: React.ReactNode;
+	formId: string;
 };
 
 const backupScheduleToFormValues = (schedule?: BackupSchedule): BackupScheduleFormValues | undefined => {
@@ -73,7 +73,7 @@ const backupScheduleToFormValues = (schedule?: BackupSchedule): BackupScheduleFo
 	};
 };
 
-export const CreateScheduleForm = ({ initialValues, onSubmit, volume, loading }: Props) => {
+export const CreateScheduleForm = ({ initialValues, formId, onSubmit, volume }: Props) => {
 	const form = useForm<BackupScheduleFormValues>({
 		resolver: arktypeResolver(cleanSchema as unknown as typeof formSchema),
 		defaultValues: backupScheduleToFormValues(initialValues),
@@ -91,6 +91,7 @@ export const CreateScheduleForm = ({ initialValues, onSubmit, volume, loading }:
 			<form
 				onSubmit={form.handleSubmit(onSubmit)}
 				className="grid gap-4 xl:grid-cols-[minmax(0,_2.3fr)_minmax(320px,_1fr)]"
+				id={formId}
 			>
 				<div className="grid gap-4">
 					<Card>
@@ -335,11 +336,6 @@ export const CreateScheduleForm = ({ initialValues, onSubmit, volume, loading }:
 								)}
 							/>
 						</CardContent>
-						<CardFooter className="border-t pt-6">
-							<Button type="submit" className="ml-auto" variant="default" loading={loading}>
-								{initialValues ? "Update schedule" : "Create schedule"}
-							</Button>
-						</CardFooter>
 					</Card>
 				</div>
 				<div className="h-full">

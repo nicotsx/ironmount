@@ -42,14 +42,14 @@ export function generateBreadcrumbs(pathname: string, params: Record<string, str
 		return breadcrumbs;
 	}
 
-	if (pathname.startsWith("/backup-jobs")) {
+	if (pathname.startsWith("/backups")) {
 		breadcrumbs.push({
-			label: "Backup jobs",
-			href: "/backup-jobs",
-			isCurrentPage: pathname === "/backup-jobs",
+			label: "Backups",
+			href: "/backups",
+			isCurrentPage: pathname === "/backups",
 		});
 
-		if (pathname.startsWith("/backup-jobs/") && params.scheduleId) {
+		if (pathname.startsWith("/backups/") && params.scheduleId) {
 			breadcrumbs.push({
 				label: `Schedule #${params.scheduleId}`,
 				isCurrentPage: true,

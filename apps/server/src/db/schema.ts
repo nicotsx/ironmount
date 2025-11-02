@@ -70,7 +70,6 @@ export const backupSchedulesTable = sqliteTable("backup_schedules_table", {
 	id: int().primaryKey({ autoIncrement: true }),
 	volumeId: int("volume_id")
 		.notNull()
-		.unique()
 		.references(() => volumesTable.id, { onDelete: "cascade" }),
 	repositoryId: text("repository_id")
 		.notNull()

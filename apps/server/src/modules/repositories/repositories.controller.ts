@@ -71,8 +71,6 @@ export const repositoriesController = new Hono()
 
 		const response = { snapshots };
 
-		c.header("Cache-Control", "max-age=30, stale-while-revalidate=300");
-
 		return c.json<ListSnapshotsDto>(response, 200);
 	})
 	.get(

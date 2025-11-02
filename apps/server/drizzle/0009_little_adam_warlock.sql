@@ -1,0 +1,1 @@
+DROP INDEX `backup_schedules_table_volume_id_unique`;

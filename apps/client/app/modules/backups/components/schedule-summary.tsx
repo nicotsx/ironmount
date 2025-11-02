@@ -58,7 +58,9 @@ export const ScheduleSummary = (props: Props) => {
 				<CardHeader className="flex flex-row items-center justify-between gap-4">
 					<div>
 						<CardTitle>Backup schedule</CardTitle>
-						<CardDescription>Automated backup configuration for {volume.name}</CardDescription>
+						<CardDescription>
+							Automated backup configuration for volume <strong className="text-strong-accent">{volume.name}</strong>
+						</CardDescription>
 					</div>
 					<div className="flex items-center gap-2">
 						<OnOff isOn={schedule.enabled} toggle={handleToggleEnabled} enabledLabel="Enabled" disabledLabel="Paused" />
@@ -79,7 +81,7 @@ export const ScheduleSummary = (props: Props) => {
 					</div>
 					<div>
 						<p className="text-xs uppercase text-muted-foreground">Repository</p>
-						<p className="font-medium">{summary.repositoryLabel}</p>
+						<p className="font-medium">{repository.name}</p>
 					</div>
 					<div>
 						<p className="text-xs uppercase text-muted-foreground">Last backup</p>
