@@ -1,12 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
-import { Database, Pencil, Play } from "lucide-react";
-import { useMemo } from "react";
+import { Database, Pencil, Play, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
 import { listSnapshotsOptions } from "~/api-client/@tanstack/react-query.gen";
 import { ByteSize } from "~/components/bytes-size";
 import { OnOff } from "~/components/onoff";
 import { SnapshotsTable } from "~/components/snapshots-table";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
 import type { BackupSchedule, Repository, Volume } from "~/lib/types";
 
 type Props = {
@@ -15,11 +24,23 @@ type Props = {
 	repository: Repository;
 	handleToggleEnabled: (enabled: boolean) => void;
 	handleRunBackupNow: () => void;
+	handleDeleteSchedule: () => void;
 	setIsEditMode: (isEdit: boolean) => void;
+	isDeleting?: boolean;
 };
 
 export const ScheduleSummary = (props: Props) => {
-	const { volume, schedule, repository, handleToggleEnabled, handleRunBackupNow, setIsEditMode } = props;
+	const {
+		volume,
+		schedule,
+		repository,
+		handleToggleEnabled,
+		handleRunBackupNow,
+		handleDeleteSchedule,
+		setIsEditMode,
+		isDeleting,
+	} = props;
+	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
 	const { data: snapshots, isLoading: loadingSnapshots } = useQuery({
 		...listSnapshotsOptions({
@@ -52,6 +73,11 @@ export const ScheduleSummary = (props: Props) => {
 		};
 	}, [schedule, volume.name]);
 
+	const handleConfirmDelete = () => {
+		setShowDeleteConfirm(false);
+		handleDeleteSchedule();
+	};
+
 	return (
 		<div className="space-y-4">
 			<Card>
@@ -71,6 +97,16 @@ export const ScheduleSummary = (props: Props) => {
 						<Button variant="outline" size="sm" onClick={() => setIsEditMode(true)}>
 							<Pencil className="h-4 w-4 mr-2" />
 							Edit schedule
+						</Button>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => setShowDeleteConfirm(true)}
+							disabled={isDeleting}
+							className="text-destructive hover:text-destructive"
+						>
+							<Trash2 className="h-4 w-4 mr-2" />
+							Delete
 						</Button>
 					</div>
 				</CardHeader>
@@ -106,6 +142,27 @@ export const ScheduleSummary = (props: Props) => {
 					</div>
 				</CardContent>
 			</Card>
+
+			<AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Delete backup schedule?</AlertDialogTitle>
+						<AlertDialogDescription>
+							Are you sure you want to delete this backup schedule for <strong>{volume.name}</strong>? This action
+							cannot be undone. Existing snapshots will not be deleted.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<div className="flex gap-3 justify-end">
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={handleConfirmDelete}
+							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+						>
+							Delete schedule
+						</AlertDialogAction>
+					</div>
+				</AlertDialogContent>
+			</AlertDialog>
 
 			<Card className="p-0 gap-0">
 				<CardHeader className="p-4 bg-card-header">

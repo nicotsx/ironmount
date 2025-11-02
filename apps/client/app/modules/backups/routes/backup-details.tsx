@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
@@ -8,6 +8,7 @@ import {
 	upsertBackupScheduleMutation,
 	getBackupScheduleOptions,
 	runBackupNowMutation,
+	deleteBackupScheduleMutation,
 } from "~/api-client/@tanstack/react-query.gen";
 import { parseError } from "~/lib/errors";
 import { getCronExpression } from "~/utils/utils";
@@ -15,6 +16,7 @@ import { CreateScheduleForm, type BackupScheduleFormValues } from "../components
 import { ScheduleSummary } from "../components/schedule-summary";
 
 export default function ScheduleDetailsPage() {
+	const navigate = useNavigate();
 	const { id } = useParams<{ id: string }>();
 	const [isEditMode, setIsEditMode] = useState(false);
 	const formId = useId();
@@ -47,6 +49,19 @@ export default function ScheduleDetailsPage() {
 		},
 		onError: (error) => {
 			toast.error("Failed to start backup", {
+				description: parseError(error)?.message,
+			});
+		},
+	});
+
+	const deleteSchedule = useMutation({
+		...deleteBackupScheduleMutation(),
+		onSuccess: () => {
+			toast.success("Backup schedule deleted successfully");
+			navigate("/backups");
+		},
+		onError: (error) => {
+			toast.error("Failed to delete backup schedule", {
 				description: parseError(error)?.message,
 			});
 		},
@@ -100,6 +115,12 @@ export default function ScheduleDetailsPage() {
 		});
 	};
 
+	const handleDeleteSchedule = () => {
+		if (!schedule) return;
+
+		deleteSchedule.mutate({ path: { scheduleId: schedule.id.toString() } });
+	};
+
 	if (loadingSchedule && !schedule) {
 		return (
 			<div className="container mx-auto p-4 sm:p-8">
@@ -130,10 +151,12 @@ export default function ScheduleDetailsPage() {
 			<ScheduleSummary
 				handleToggleEnabled={handleToggleEnabled}
 				handleRunBackupNow={handleRunBackupNow}
+				handleDeleteSchedule={handleDeleteSchedule}
 				repository={schedule.repository}
 				setIsEditMode={setIsEditMode}
 				schedule={schedule}
 				volume={schedule.volume}
+				isDeleting={deleteSchedule.isPending}
 			/>
 		);
 	}
