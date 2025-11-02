@@ -61,10 +61,10 @@ export default function Backups({ loaderData }: Route.ComponentProps) {
 
 	return (
 		<div className="container mx-auto space-y-6">
-			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
 				{schedules.map((schedule) => (
 					<Link key={schedule.id} to={`/backups/${schedule.id}`}>
-						<Card key={schedule.id} className="flex flex-col">
+						<Card key={schedule.id} className="flex flex-col h-full">
 							<CardHeader className="pb-3">
 								<div className="flex items-start justify-between gap-2">
 									<div className="flex items-center gap-2 flex-1 min-w-0">
@@ -109,6 +109,14 @@ export default function Backups({ loaderData }: Route.ComponentProps) {
 						</Card>
 					</Link>
 				))}
+				<Link to="/backups/create">
+					<Card className="flex flex-col items-center justify-center h-full hover:bg-muted/50 transition-colors cursor-pointer">
+						<CardContent className="flex flex-col items-center justify-center gap-2">
+							<Plus className="h-8 w-8 text-muted-foreground" />
+							<span className="text-sm font-medium text-muted-foreground">Create a backup job</span>
+						</CardContent>
+					</Card>
+				</Link>
 			</div>
 		</div>
 	);
