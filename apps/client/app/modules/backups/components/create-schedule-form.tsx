@@ -1,6 +1,7 @@
 import { arktypeResolver } from "@hookform/resolvers/arktype";
 import { useQuery } from "@tanstack/react-query";
 import { type } from "arktype";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { listRepositoriesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { RepositoryIcon } from "~/components/repository-icon";
@@ -8,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/com
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import { VolumeFileBrowser } from "~/components/volume-file-browser";
 import type { BackupSchedule, Volume } from "~/lib/types";
 import { deepClean } from "~/utils/object";
 
@@ -69,6 +71,7 @@ const backupScheduleToFormValues = (schedule?: BackupSchedule): BackupScheduleFo
 		frequency,
 		dailyTime,
 		weeklyDay,
+		includePatterns: schedule.includePatterns || undefined,
 		...schedule.retentionPolicy,
 	};
 };
@@ -85,6 +88,16 @@ export const CreateScheduleForm = ({ initialValues, formId, onSubmit, volume }: 
 
 	const frequency = form.watch("frequency");
 	const formValues = form.watch();
+
+	const [selectedPaths, setSelectedPaths] = useState<Set<string>>(new Set(initialValues?.includePatterns || []));
+
+	const handleSelectionChange = useCallback(
+		(paths: Set<string>) => {
+			setSelectedPaths(paths);
+			form.setValue("includePatterns", Array.from(paths));
+		},
+		[form],
+	);
 
 	return (
 		<Form {...form}>
@@ -200,6 +213,38 @@ export const CreateScheduleForm = ({ initialValues, formId, onSubmit, volume }: 
 										</FormItem>
 									)}
 								/>
+							)}
+						</CardContent>
+					</Card>
+
+					<Card>
+						<CardHeader>
+							<CardTitle>Backup paths</CardTitle>
+							<CardDescription>
+								Select which folders to include in the backup. If no paths are selected, the entire volume will be
+								backed up.
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<VolumeFileBrowser
+								volumeName={volume.name}
+								selectedPaths={selectedPaths}
+								onSelectionChange={handleSelectionChange}
+								withCheckboxes={true}
+								foldersOnly={true}
+								className="overflow-auto flex-1 border rounded-md bg-card p-2 min-h-[300px] max-h-[400px]"
+							/>
+							{selectedPaths.size > 0 && (
+								<div className="mt-4">
+									<p className="text-xs text-muted-foreground mb-2">Selected paths:</p>
+									<div className="flex flex-wrap gap-2">
+										{Array.from(selectedPaths).map((path) => (
+											<span key={path} className="text-xs bg-accent px-2 py-1 rounded-md font-mono">
+												{path}
+											</span>
+										))}
+									</div>
+								</div>
 							)}
 						</CardContent>
 					</Card>

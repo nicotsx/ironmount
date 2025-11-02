@@ -38,7 +38,6 @@ export const clientLoader = async () => {
 
 export default function CreateBackup({ loaderData }: Route.ComponentProps) {
 	const navigate = useNavigate();
-	const queryClient = useQueryClient();
 	const formId = useId();
 	const [selectedVolumeId, setSelectedVolumeId] = useState<number | undefined>();
 
@@ -56,7 +55,6 @@ export default function CreateBackup({ loaderData }: Route.ComponentProps) {
 		...createBackupScheduleMutation(),
 		onSuccess: (data) => {
 			toast.success("Backup job created successfully");
-			queryClient.invalidateQueries({ queryKey: ["listBackupSchedules"] });
 			navigate(`/backups/${data.id}`);
 		},
 		onError: (error) => {
@@ -86,6 +84,8 @@ export default function CreateBackup({ loaderData }: Route.ComponentProps) {
 				enabled: true,
 				cronExpression,
 				retentionPolicy: Object.keys(retentionPolicy).length > 0 ? retentionPolicy : undefined,
+				includePatterns: formValues.includePatterns,
+				excludePatterns: formValues.excludePatterns,
 			},
 		});
 	};

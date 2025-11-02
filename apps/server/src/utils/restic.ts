@@ -8,6 +8,7 @@ import { REPOSITORY_BASE, RESTIC_PASS_FILE } from "../core/constants";
 import { logger } from "./logger";
 import { cryptoUtils } from "./crypto";
 import type { RetentionPolicy } from "../modules/backups/backups.dto";
+import { getVolumePath } from "../modules/volumes/helpers";
 
 const backupOutputSchema = type({
 	message_type: "'summary'",
@@ -119,7 +120,20 @@ const backup = async (
 	const repoUrl = buildRepoUrl(config);
 	const env = await buildEnv(config);
 
-	const args: string[] = ["--repo", repoUrl, "backup", source];
+	const args: string[] = ["--repo", repoUrl, "backup", "--one-file-system"];
+
+	let includeFile: string | null = null;
+	if (options?.include && options.include.length > 0) {
+		const tmp = await fs.mkdtemp("restic-include");
+		includeFile = path.join(tmp, `include.txt`);
+		const includePaths = options.include.map((p) => path.join(source, p));
+
+		await fs.writeFile(includeFile, includePaths.join("\n"), "utf-8");
+
+		args.push("--files-from", includeFile);
+	} else {
+		args.push(source);
+	}
 
 	if (options?.exclude && options.exclude.length > 0) {
 		for (const pattern of options.exclude) {
@@ -127,16 +141,14 @@ const backup = async (
 		}
 	}
 
-	if (options?.include && options.include.length > 0) {
-		for (const pattern of options.include) {
-			args.push("--include", pattern);
-		}
-	}
-
 	args.push("--json");
 
 	await $`restic unlock --repo ${repoUrl}`.env(env).nothrow();
 	const res = await $`restic ${args}`.env(env).nothrow();
+
+	if (includeFile) {
+		await fs.unlink(includeFile).catch(() => {});
+	}
 
 	if (res.exitCode !== 0) {
 		logger.error(`Restic backup failed: ${res.stderr}`);
@@ -186,10 +198,12 @@ const restore = async (
 		args[args.length - 4] = `${snapshotId}:${options.path}`;
 	}
 
+	// Create a temporary file for include patterns if provided
+	let includeFile: string | null = null;
 	if (options?.include && options.include.length > 0) {
-		for (const pattern of options.include) {
-			args.push("--include", pattern);
-		}
+		includeFile = `/tmp/restic-include-${crypto.randomBytes(8).toString("hex")}.txt`;
+		await fs.writeFile(includeFile, options.include.join("\n"), "utf-8");
+		args.push("--include", includeFile);
 	}
 
 	if (options?.exclude && options.exclude.length > 0) {
@@ -201,6 +215,11 @@ const restore = async (
 	args.push("--json");
 
 	const res = await $`restic ${args}`.env(env).nothrow();
+
+	// Clean up the temporary include file
+	if (includeFile) {
+		await fs.unlink(includeFile).catch(() => {});
+	}
 
 	if (res.exitCode !== 0) {
 		logger.error(`Restic restore failed: ${res.stderr}`);

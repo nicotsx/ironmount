@@ -11,6 +11,7 @@
 import { ChevronDown, ChevronRight, File as FileIcon, Folder as FolderIcon, FolderOpen, Loader2 } from "lucide-react";
 import { memo, type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { cn } from "~/lib/utils";
+import { Checkbox } from "~/components/ui/checkbox";
 
 const NODE_PADDING_LEFT = 12;
 
@@ -31,6 +32,10 @@ interface Props {
 	expandedFolders?: Set<string>;
 	loadingFolders?: Set<string>;
 	className?: string;
+	withCheckboxes?: boolean;
+	selectedPaths?: Set<string>;
+	onSelectionChange?: (selectedPaths: Set<string>) => void;
+	foldersOnly?: boolean;
 }
 
 export const FileTree = memo((props: Props) => {
@@ -43,11 +48,15 @@ export const FileTree = memo((props: Props) => {
 		expandedFolders = new Set(),
 		loadingFolders = new Set(),
 		className,
+		withCheckboxes = false,
+		selectedPaths = new Set(),
+		onSelectionChange,
+		foldersOnly = false,
 	} = props;
 
 	const fileList = useMemo(() => {
-		return buildFileList(files);
-	}, [files]);
+		return buildFileList(files, foldersOnly);
+	}, [files, foldersOnly]);
 
 	const [collapsedFolders, setCollapsedFolders] = useState<Set<string>>(new Set());
 
@@ -117,6 +126,122 @@ export const FileTree = memo((props: Props) => {
 		[onFileSelect],
 	);
 
+	const handleSelectionChange = useCallback(
+		(path: string, checked: boolean) => {
+			const newSelection = new Set(selectedPaths);
+
+			if (checked) {
+				// Add the path itself
+				newSelection.add(path);
+
+				// Remove any descendants from selection since parent now covers them
+				for (const item of fileList) {
+					if (item.fullPath.startsWith(`${path}/`)) {
+						newSelection.delete(item.fullPath);
+					}
+				}
+			} else {
+				// Remove the path itself
+				newSelection.delete(path);
+
+				// Check if any parent is selected - if so, we need to add siblings back
+				const pathSegments = path.split("/").filter(Boolean);
+				let parentIsSelected = false;
+				let selectedParentPath = "";
+
+				// Check each parent level to see if any are selected
+				for (let i = pathSegments.length - 1; i > 0; i--) {
+					const parentPath = `/${pathSegments.slice(0, i).join("/")}`;
+					if (newSelection.has(parentPath)) {
+						parentIsSelected = true;
+						selectedParentPath = parentPath;
+						break;
+					}
+				}
+
+				if (parentIsSelected) {
+					// Remove the selected parent
+					newSelection.delete(selectedParentPath);
+
+					// Add all siblings and descendants of the selected parent, except the unchecked path and its descendants
+					for (const item of fileList) {
+						if (
+							item.fullPath.startsWith(`${selectedParentPath}/`) &&
+							!item.fullPath.startsWith(`${path}/`) &&
+							item.fullPath !== path
+						) {
+							newSelection.add(item.fullPath);
+						}
+					}
+				}
+			}
+
+			onSelectionChange?.(newSelection);
+		},
+		[selectedPaths, onSelectionChange, fileList],
+	);
+
+	// Helper to check if a path is selected (either directly or via parent)
+	const isPathSelected = useCallback(
+		(path: string): boolean => {
+			// Check if directly selected
+			if (selectedPaths.has(path)) {
+				return true;
+			}
+
+			// Check if any parent is selected
+			const pathSegments = path.split("/").filter(Boolean);
+			for (let i = pathSegments.length - 1; i > 0; i--) {
+				const parentPath = `/${pathSegments.slice(0, i).join("/")}`;
+				if (selectedPaths.has(parentPath)) {
+					return true;
+				}
+			}
+
+			return false;
+		},
+		[selectedPaths],
+	);
+
+	// Determine if a folder is partially selected (some children selected)
+	const isPartiallySelected = useCallback(
+		(folderPath: string): boolean => {
+			// If the folder itself is selected, it's not partial
+			if (selectedPaths.has(folderPath)) {
+				return false;
+			}
+
+			// Check if this folder is implicitly selected via a parent
+			const pathSegments = folderPath.split("/").filter(Boolean);
+			for (let i = pathSegments.length - 1; i > 0; i--) {
+				const parentPath = `/${pathSegments.slice(0, i).join("/")}`;
+				if (selectedPaths.has(parentPath)) {
+					// Parent is selected, so this folder is fully selected, not partial
+					return false;
+				}
+			}
+
+			// Get all children of this folder
+			const children = fileList.filter((item) => item.fullPath.startsWith(`${folderPath}/`));
+
+			if (children.length === 0) {
+				return false;
+			}
+
+			// Check how many children are selected (directly or via their parents)
+			let selectedCount = 0;
+			for (const child of children) {
+				if (isPathSelected(child.fullPath)) {
+					selectedCount++;
+				}
+			}
+
+			// Partial if some but not all children are selected
+			return selectedCount > 0 && selectedCount < children.length;
+		},
+		[selectedPaths, fileList, isPathSelected],
+	);
+
 	return (
 		<div className={cn("text-sm", className)}>
 			{filteredFileList.map((fileOrFolder) => {
@@ -128,6 +253,9 @@ export const FileTree = memo((props: Props) => {
 								selected={selectedFile === fileOrFolder.fullPath}
 								file={fileOrFolder}
 								onFileSelect={handleFileSelect}
+								withCheckbox={withCheckboxes}
+								checked={isPathSelected(fileOrFolder.fullPath)}
+								onCheckboxChange={handleSelectionChange}
 							/>
 						);
 					}
@@ -140,6 +268,10 @@ export const FileTree = memo((props: Props) => {
 								loading={loadingFolders.has(fileOrFolder.fullPath)}
 								onToggle={toggleCollapseState}
 								onHover={onFolderHover}
+								withCheckbox={withCheckboxes}
+								checked={isPathSelected(fileOrFolder.fullPath) && !isPartiallySelected(fileOrFolder.fullPath)}
+								partiallyChecked={isPartiallySelected(fileOrFolder.fullPath)}
+								onCheckboxChange={handleSelectionChange}
 							/>
 						);
 					}
@@ -158,60 +290,103 @@ interface FolderProps {
 	loading?: boolean;
 	onToggle: (fullPath: string) => void;
 	onHover?: (fullPath: string) => void;
+	withCheckbox?: boolean;
+	checked?: boolean;
+	partiallyChecked?: boolean;
+	onCheckboxChange?: (path: string, checked: boolean) => void;
 }
 
-const Folder = memo(({ folder, collapsed, loading, onToggle, onHover }: FolderProps) => {
-	const { depth, name, fullPath } = folder;
-	const FolderIconComponent = collapsed ? FolderIcon : FolderOpen;
+const Folder = memo(
+	({
+		folder,
+		collapsed,
+		loading,
+		onToggle,
+		onHover,
+		withCheckbox,
+		checked,
+		partiallyChecked,
+		onCheckboxChange,
+	}: FolderProps) => {
+		const { depth, name, fullPath } = folder;
+		const FolderIconComponent = collapsed ? FolderIcon : FolderOpen;
 
-	const handleClick = useCallback(() => {
-		onToggle(fullPath);
-	}, [onToggle, fullPath]);
+		const handleChevronClick = useCallback(
+			(e: React.MouseEvent) => {
+				e.stopPropagation();
+				onToggle(fullPath);
+			},
+			[onToggle, fullPath],
+		);
 
-	const handleMouseEnter = useCallback(() => {
-		if (collapsed) {
-			onHover?.(fullPath);
-		}
-	}, [onHover, fullPath, collapsed]);
-
-	return (
-		<NodeButton
-			className={cn("group hover:bg-accent/50 text-foreground")}
-			depth={depth}
-			icon={
-				loading ? (
-					<Loader2 className="w-4 h-4 shrink-0 animate-spin" />
-				) : collapsed ? (
-					<ChevronRight className="w-4 h-4 shrink-0" />
-				) : (
-					<ChevronDown className="w-4 h-4 shrink-0" />
-				)
+		const handleMouseEnter = useCallback(() => {
+			if (collapsed) {
+				onHover?.(fullPath);
 			}
-			onClick={handleClick}
-			onMouseEnter={handleMouseEnter}
-		>
-			<FolderIconComponent className="w-4 h-4 shrink-0 text-strong-accent" />
-			<span className="truncate">{name}</span>
-		</NodeButton>
-	);
-});
+		}, [onHover, fullPath, collapsed]);
+
+		const handleCheckboxChange = useCallback(
+			(value: boolean) => {
+				onCheckboxChange?.(fullPath, value);
+			},
+			[onCheckboxChange, fullPath],
+		);
+
+		return (
+			<NodeButton
+				className={cn("group hover:bg-accent/50 text-foreground")}
+				depth={depth}
+				icon={
+					loading ? (
+						<Loader2 className="w-4 h-4 shrink-0 animate-spin" />
+					) : collapsed ? (
+						<ChevronRight className="w-4 h-4 shrink-0 cursor-pointer" onClick={handleChevronClick} />
+					) : (
+						<ChevronDown className="w-4 h-4 shrink-0 cursor-pointer" onClick={handleChevronClick} />
+					)
+				}
+				onMouseEnter={handleMouseEnter}
+			>
+				{withCheckbox && (
+					<Checkbox
+						checked={checked ? true : partiallyChecked ? "indeterminate" : false}
+						onCheckedChange={handleCheckboxChange}
+						onClick={(e) => e.stopPropagation()}
+					/>
+				)}
+				<FolderIconComponent className="w-4 h-4 shrink-0 text-strong-accent" />
+				<span className="truncate">{name}</span>
+			</NodeButton>
+		);
+	},
+);
 
 interface FileProps {
 	file: FileNode;
 	selected: boolean;
 	onFileSelect: (filePath: string) => void;
+	withCheckbox?: boolean;
+	checked?: boolean;
+	onCheckboxChange?: (path: string, checked: boolean) => void;
 }
 
-const File = memo(({ file, onFileSelect, selected }: FileProps) => {
+const File = memo(({ file, onFileSelect, selected, withCheckbox, checked, onCheckboxChange }: FileProps) => {
 	const { depth, name, fullPath } = file;
 
 	const handleClick = useCallback(() => {
 		onFileSelect(fullPath);
 	}, [onFileSelect, fullPath]);
 
+	const handleCheckboxChange = useCallback(
+		(value: boolean) => {
+			onCheckboxChange?.(fullPath, value);
+		},
+		[onCheckboxChange, fullPath],
+	);
+
 	return (
 		<NodeButton
-			className={cn("group", {
+			className={cn("group cursor-pointer", {
 				"hover:bg-accent/50 text-foreground": !selected,
 				"bg-accent text-accent-foreground": selected,
 			})}
@@ -219,6 +394,9 @@ const File = memo(({ file, onFileSelect, selected }: FileProps) => {
 			icon={<FileIcon className="w-4 h-4 shrink-0 text-gray-500" />}
 			onClick={handleClick}
 		>
+			{withCheckbox && (
+				<Checkbox checked={checked} onCheckedChange={handleCheckboxChange} onClick={(e) => e.stopPropagation()} />
+			)}
 			<span className="truncate">{name}</span>
 		</NodeButton>
 	);
@@ -267,10 +445,14 @@ interface FolderNode extends BaseNode {
 	kind: "folder";
 }
 
-function buildFileList(files: FileEntry[]): Node[] {
+function buildFileList(files: FileEntry[], foldersOnly = false): Node[] {
 	const fileMap = new Map<string, Node>();
 
 	for (const file of files) {
+		if (foldersOnly && file.type === "file") {
+			continue;
+		}
+
 		const segments = file.path.split("/").filter((segment) => segment);
 		const depth = segments.length - 1;
 		const name = segments[segments.length - 1];

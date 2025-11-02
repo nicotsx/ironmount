@@ -87,6 +87,8 @@ export default function ScheduleDetailsPage() {
 				enabled: schedule.enabled,
 				cronExpression,
 				retentionPolicy: Object.keys(retentionPolicy).length > 0 ? retentionPolicy : undefined,
+				includePatterns: formValues.includePatterns,
+				excludePatterns: formValues.excludePatterns,
 			},
 		});
 	};
@@ -101,6 +103,8 @@ export default function ScheduleDetailsPage() {
 				enabled,
 				cronExpression: schedule.cronExpression,
 				retentionPolicy: schedule.retentionPolicy || undefined,
+				includePatterns: schedule.includePatterns || undefined,
+				excludePatterns: schedule.excludePatterns || undefined,
 			},
 		});
 	};

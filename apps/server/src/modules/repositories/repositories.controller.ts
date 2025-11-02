@@ -83,7 +83,7 @@ export const repositoriesController = new Hono()
 
 			const result = await repositoriesService.listSnapshotFiles(name, snapshotId, path);
 
-			c.header("Cache-Control", "max-age=300, stale-while-revalidate=600");
+			// c.header("Cache-Control", "max-age=300, stale-while-revalidate=600");
 
 			return c.json<ListSnapshotFilesDto>(result, 200);
 		},
