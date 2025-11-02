@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Database, HardDrive } from "lucide-react";
 import { Link, useNavigate } from "react-router";
@@ -39,6 +39,7 @@ export const clientLoader = async () => {
 export default function CreateBackup({ loaderData }: Route.ComponentProps) {
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
+	const formId = useId();
 	const [selectedVolumeId, setSelectedVolumeId] = useState<number | undefined>();
 
 	const { data: volumesData, isLoading: loadingVolumes } = useQuery({
@@ -151,7 +152,14 @@ export default function CreateBackup({ loaderData }: Route.ComponentProps) {
 				</CardContent>
 			</Card>
 			{selectedVolume ? (
-				<CreateScheduleForm volume={selectedVolume} onSubmit={handleSubmit} loading={createSchedule.isPending} />
+				<>
+					<CreateScheduleForm volume={selectedVolume} onSubmit={handleSubmit} formId={formId} />
+					<div className="flex justify-end mt-4 gap-2">
+						<Button type="submit" variant="primary" form={formId} loading={createSchedule.isPending}>
+							Create
+						</Button>
+					</div>
+				</>
 			) : (
 				<Card>
 					<CardContent className="py-16">

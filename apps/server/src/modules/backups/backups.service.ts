@@ -73,14 +73,6 @@ const createSchedule = async (data: CreateBackupScheduleBody) => {
 		throw new NotFoundError("Repository not found");
 	}
 
-	const existingSchedule = await db.query.backupSchedulesTable.findFirst({
-		where: eq(backupSchedulesTable.volumeId, data.volumeId),
-	});
-
-	if (existingSchedule) {
-		throw new BadRequestError("Volume already has a backup schedule");
-	}
-
 	const nextBackupAt = calculateNextRun(data.cronExpression);
 
 	const [newSchedule] = await db
