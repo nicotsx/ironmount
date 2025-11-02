@@ -3,8 +3,8 @@ import { CalendarClock, Database, HardDrive, Plus } from "lucide-react";
 import { Link } from "react-router";
 import { listBackupSchedules } from "~/api-client";
 import { listBackupSchedulesOptions } from "~/api-client/@tanstack/react-query.gen";
+import { BackupStatusDot } from "../components/backup-status-dot";
 import { EmptyState } from "~/components/empty-state";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import type { Route } from "./+types/backups";
@@ -73,9 +73,7 @@ export default function Backups({ loaderData }: Route.ComponentProps) {
 											Volume <span className="text-strong-accent">{schedule.volume.name}</span>
 										</CardTitle>
 									</div>
-									<Badge variant={schedule.enabled ? "default" : "secondary"} className="flex-shrink-0">
-										{schedule.enabled ? "Active" : "Paused"}
-									</Badge>
+									<BackupStatusDot enabled={schedule.enabled} hasError={!!schedule.lastBackupError} />
 								</div>
 								<CardDescription className="flex items-center gap-2 mt-2">
 									<Database className="h-4 w-4" />
@@ -100,15 +98,10 @@ export default function Backups({ loaderData }: Route.ComponentProps) {
 											{schedule.nextBackupAt ? new Date(schedule.nextBackupAt).toLocaleDateString() : "N/A"}
 										</span>
 									</div>
-									{schedule.lastBackupStatus && (
-										<div className="flex items-center justify-between text-sm">
-											<span className="text-muted-foreground">Status</span>
-											<Badge
-												variant={schedule.lastBackupStatus === "success" ? "primary" : "destructive"}
-												className="text-xs"
-											>
-												{schedule.lastBackupStatus}
-											</Badge>
+									{schedule.lastBackupError && (
+										<div className="flex items-start justify-between text-sm gap-2">
+											<span className="text-muted-foreground">Error</span>
+											<span className="text-xs text-red-600 text-right line-clamp-2">{schedule.lastBackupError}</span>
 										</div>
 									)}
 								</div>

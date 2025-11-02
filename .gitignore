@@ -43,3 +43,5 @@ node_modules/
 mutagen.yml.lock
 
 data/
+
+CLAUDE.md
