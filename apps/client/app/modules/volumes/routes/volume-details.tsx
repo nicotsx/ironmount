@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import { toast } from "sonner";
+import { useState } from "react";
 import {
 	deleteVolumeMutation,
 	getVolumeOptions,
@@ -10,6 +11,15 @@ import {
 import { StatusDot } from "~/components/status-dot";
 import { Button } from "~/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
 import { VolumeIcon } from "~/components/volume-icon";
 import { parseError } from "~/lib/errors";
 import { cn } from "~/lib/utils";
@@ -39,6 +49,7 @@ export default function VolumeDetails({ loaderData }: Route.ComponentProps) {
 	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const activeTab = searchParams.get("tab") || "info";
+	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
 	const { data } = useQuery({
 		...getVolumeOptions({ path: { name: name ?? "" } }),
@@ -84,10 +95,9 @@ export default function VolumeDetails({ loaderData }: Route.ComponentProps) {
 		},
 	});
 
-	const handleDeleteConfirm = (name: string) => {
-		if (confirm(`Are you sure you want to delete the volume "${name}"? This action cannot be undone.`)) {
-			deleteVol.mutate({ path: { name } });
-		}
+	const handleConfirmDelete = () => {
+		setShowDeleteConfirm(false);
+		deleteVol.mutate({ path: { name: name ?? "" } });
 	};
 
 	if (!name) {
@@ -127,7 +137,7 @@ export default function VolumeDetails({ loaderData }: Route.ComponentProps) {
 					>
 						Unmount
 					</Button>
-					<Button variant="destructive" onClick={() => handleDeleteConfirm(name)} disabled={deleteVol.isPending}>
+					<Button variant="destructive" onClick={() => setShowDeleteConfirm(true)} disabled={deleteVol.isPending}>
 						Delete
 					</Button>
 				</div>
@@ -148,6 +158,26 @@ export default function VolumeDetails({ loaderData }: Route.ComponentProps) {
 					<DockerTabContent volume={volume} />
 				</TabsContent>
 			</Tabs>
+
+			<AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Delete volume?</AlertDialogTitle>
+						<AlertDialogDescription>
+							Are you sure you want to delete the volume <strong>{name}</strong>? This action cannot be undone.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<div className="flex gap-3 justify-end">
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={handleConfirmDelete}
+							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+						>
+							Delete volume
+						</AlertDialogAction>
+					</div>
+				</AlertDialogContent>
+			</AlertDialog>
 		</>
 	);
 }

@@ -1,12 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import { toast } from "sonner";
+import { useState, useEffect } from "react";
 import {
 	deleteRepositoryMutation,
 	getRepositoryOptions,
 	listSnapshotsOptions,
 } from "~/api-client/@tanstack/react-query.gen";
 import { Button } from "~/components/ui/button";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
 import { parseError } from "~/lib/errors";
 import { getRepository } from "~/api-client/sdk.gen";
 import type { Route } from "./+types/repository-details";
@@ -14,7 +24,6 @@ import { cn } from "~/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { RepositoryInfoTabContent } from "../tabs/info";
 import { RepositorySnapshotsTabContent } from "../tabs/snapshots";
-import { useEffect } from "react";
 
 export function meta({ params }: Route.MetaArgs) {
 	return [
@@ -35,6 +44,7 @@ export default function RepositoryDetailsPage({ loaderData }: Route.ComponentPro
 	const { name } = useParams<{ name: string }>();
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
+	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const activeTab = searchParams.get("tab") || "info";
@@ -65,14 +75,9 @@ export default function RepositoryDetailsPage({ loaderData }: Route.ComponentPro
 		},
 	});
 
-	const handleDeleteConfirm = (name: string) => {
-		if (
-			confirm(
-				`Are you sure you want to delete the repository "${name}"? This action cannot be undone and will remove all backup data.`,
-			)
-		) {
-			deleteRepo.mutate({ path: { name } });
-		}
+	const handleConfirmDelete = () => {
+		setShowDeleteConfirm(false);
+		deleteRepo.mutate({ path: { name: name ?? "" } });
 	};
 
 	if (!name) {
@@ -103,7 +108,7 @@ export default function RepositoryDetailsPage({ loaderData }: Route.ComponentPro
 					</div>
 				</div>
 				<div className="flex gap-4">
-					<Button variant="destructive" onClick={() => handleDeleteConfirm(name)} disabled={deleteRepo.isPending}>
+					<Button variant="destructive" onClick={() => setShowDeleteConfirm(true)} disabled={deleteRepo.isPending}>
 						Delete
 					</Button>
 				</div>
@@ -121,6 +126,27 @@ export default function RepositoryDetailsPage({ loaderData }: Route.ComponentPro
 					<RepositorySnapshotsTabContent repository={data} />
 				</TabsContent>
 			</Tabs>
+
+			<AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Delete repository?</AlertDialogTitle>
+						<AlertDialogDescription>
+							Are you sure you want to delete the repository <strong>{name}</strong>? This action cannot be undone and
+							will remove all backup data.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<div className="flex gap-3 justify-end">
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={handleConfirmDelete}
+							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+						>
+							Delete repository
+						</AlertDialogAction>
+					</div>
+				</AlertDialogContent>
+			</AlertDialog>
 		</>
 	);
 }
