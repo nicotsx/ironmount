@@ -139,9 +139,7 @@ export const snapshotSchema = type({
 	duration: "number",
 });
 
-const listSnapshotsResponse = type({
-	snapshots: snapshotSchema.array(),
-});
+const listSnapshotsResponse = snapshotSchema.array();
 
 export type ListSnapshotsDto = typeof listSnapshotsResponse.infer;
 

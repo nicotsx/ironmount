@@ -791,15 +791,13 @@ export type ListSnapshotsResponses = {
 	/**
 	 * List of snapshots
 	 */
-	200: {
-		snapshots: Array<{
-			duration: number;
-			paths: Array<string>;
-			short_id: string;
-			size: number;
-			time: number;
-		}>;
-	};
+	200: Array<{
+		duration: number;
+		paths: Array<string>;
+		short_id: string;
+		size: number;
+		time: number;
+	}>;
 };
 
 export type ListSnapshotsResponse = ListSnapshotsResponses[keyof ListSnapshotsResponses];

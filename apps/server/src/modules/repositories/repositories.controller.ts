@@ -69,9 +69,7 @@ export const repositoriesController = new Hono()
 			};
 		});
 
-		const response = { snapshots };
-
-		return c.json<ListSnapshotsDto>(response, 200);
+		return c.json<ListSnapshotsDto>(snapshots, 200);
 	})
 	.get(
 		"/:name/snapshots/:snapshotId/files",
