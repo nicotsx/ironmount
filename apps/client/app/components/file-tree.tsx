@@ -15,7 +15,7 @@ import { Checkbox } from "~/components/ui/checkbox";
 
 const NODE_PADDING_LEFT = 12;
 
-interface FileEntry {
+export interface FileEntry {
 	name: string;
 	path: string;
 	type: "file" | "directory";

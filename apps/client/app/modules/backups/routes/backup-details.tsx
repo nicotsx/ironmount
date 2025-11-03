@@ -1,33 +1,58 @@
 import { useId, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Link, useParams, useNavigate } from "react-router";
+import { redirect, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent } from "~/components/ui/card";
 import {
 	upsertBackupScheduleMutation,
 	getBackupScheduleOptions,
 	runBackupNowMutation,
 	deleteBackupScheduleMutation,
+	listSnapshotsOptions,
 } from "~/api-client/@tanstack/react-query.gen";
 import { parseError } from "~/lib/errors";
 import { getCronExpression } from "~/utils/utils";
 import { CreateScheduleForm, type BackupScheduleFormValues } from "../components/create-schedule-form";
 import { ScheduleSummary } from "../components/schedule-summary";
+import { getBackupSchedule, listSnapshots } from "~/api-client";
+import type { Route } from "./+types/backup-details";
+import { SnapshotFileBrowser } from "../components/snapshot-file-browser";
+import { SnapshotTimeline } from "../components/snapshot-timeline";
 
-export default function ScheduleDetailsPage() {
-	const navigate = useNavigate();
-	const { id } = useParams<{ id: string }>();
-	const [isEditMode, setIsEditMode] = useState(false);
-	const formId = useId();
+export const clientLoader = async ({ params }: Route.LoaderArgs) => {
+	const { data } = await getBackupSchedule({ path: { scheduleId: params.id } });
 
-	const { data: schedule, isLoading: loadingSchedule } = useQuery({
-		...getBackupScheduleOptions({
-			path: { scheduleId: id || "" },
-		}),
+	if (!data) return redirect("/backups");
+
+	const snapshots = await listSnapshots({
+		path: { name: data.repository.name },
+		query: { volumeId: data.volumeId.toString() },
 	});
 
-	console.log("Schedule Details:", schedule);
+	if (snapshots.data) return { snapshots: snapshots.data, schedule: data };
+	return { snapshots: [], schedule: data };
+};
+
+export default function ScheduleDetailsPage({ params, loaderData }: Route.ComponentProps) {
+	const navigate = useNavigate();
+	const [isEditMode, setIsEditMode] = useState(false);
+	const formId = useId();
+	const [selectedSnapshotId, setSelectedSnapshotId] = useState<string>(loaderData.snapshots.at(-1)?.short_id ?? "");
+
+	const { data: schedule } = useQuery({
+		...getBackupScheduleOptions({
+			path: { scheduleId: params.id },
+		}),
+		initialData: loaderData.schedule,
+	});
+
+	const { data: snapshots } = useQuery({
+		...listSnapshotsOptions({
+			path: { name: schedule.repository.name },
+			query: { volumeId: schedule.volumeId.toString() },
+		}),
+		initialData: loaderData.snapshots,
+	});
 
 	const upsertSchedule = useMutation({
 		...upsertBackupScheduleMutation(),
@@ -125,57 +150,43 @@ export default function ScheduleDetailsPage() {
 		deleteSchedule.mutate({ path: { scheduleId: schedule.id.toString() } });
 	};
 
-	if (loadingSchedule && !schedule) {
+	if (isEditMode) {
 		return (
-			<div className="container mx-auto p-4 sm:p-8">
-				<Card>
-					<CardContent className="py-12 text-center">
-						<p className="text-muted-foreground">Loading...</p>
-					</CardContent>
-				</Card>
-			</div>
-		);
-	}
-
-	if (!schedule) {
-		return (
-			<Card>
-				<CardContent className="py-12 text-center">
-					<p className="text-muted-foreground">Not found</p>
-					<Button className="mt-4">
-						<Link to="/backups">Back to backups</Link>
+			<div>
+				<CreateScheduleForm volume={schedule.volume} initialValues={schedule} onSubmit={handleSubmit} formId={formId} />
+				<div className="flex justify-end mt-4 gap-2">
+					<Button type="submit" className="ml-auto" variant="primary" form={formId} loading={upsertSchedule.isPending}>
+						Update schedule
 					</Button>
-				</CardContent>
-			</Card>
-		);
-	}
-
-	if (!isEditMode) {
-		return (
-			<ScheduleSummary
-				handleToggleEnabled={handleToggleEnabled}
-				handleRunBackupNow={handleRunBackupNow}
-				handleDeleteSchedule={handleDeleteSchedule}
-				repository={schedule.repository}
-				setIsEditMode={setIsEditMode}
-				schedule={schedule}
-				volume={schedule.volume}
-				isDeleting={deleteSchedule.isPending}
-			/>
+					<Button variant="outline" onClick={() => setIsEditMode(false)}>
+						Cancel
+					</Button>
+				</div>
+			</div>
 		);
 	}
 
 	return (
-		<div>
-			<CreateScheduleForm volume={schedule.volume} initialValues={schedule} onSubmit={handleSubmit} formId={formId} />
-			<div className="flex justify-end mt-4 gap-2">
-				<Button type="submit" className="ml-auto" variant="primary" form={formId} loading={upsertSchedule.isPending}>
-					Update schedule
-				</Button>
-				<Button variant="outline" onClick={() => setIsEditMode(false)}>
-					Cancel
-				</Button>
-			</div>
+		<div className="flex flex-col gap-6">
+			<ScheduleSummary
+				handleToggleEnabled={handleToggleEnabled}
+				handleRunBackupNow={handleRunBackupNow}
+				handleDeleteSchedule={handleDeleteSchedule}
+				setIsEditMode={setIsEditMode}
+				schedule={schedule}
+			/>
+
+			<SnapshotTimeline
+				snapshots={snapshots}
+				snapshotId={selectedSnapshotId}
+				onSnapshotSelect={setSelectedSnapshotId}
+			/>
+
+			<SnapshotFileBrowser
+				snapshots={snapshots}
+				repositoryName={schedule.repository.name}
+				snapshotId={selectedSnapshotId}
+			/>
 		</div>
 	);
 }
