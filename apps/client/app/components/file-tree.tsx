@@ -176,6 +176,43 @@ export const FileTree = memo((props: Props) => {
 				}
 			}
 
+			const childrenByParent = new Map<string, string[]>();
+			for (const selectedPath of newSelection) {
+				const lastSlashIndex = selectedPath.lastIndexOf("/");
+				if (lastSlashIndex > 0) {
+					const parentPath = selectedPath.slice(0, lastSlashIndex);
+					if (!childrenByParent.has(parentPath)) {
+						childrenByParent.set(parentPath, []);
+					}
+					childrenByParent.get(parentPath)?.push(selectedPath);
+				}
+			}
+
+			// For each parent, check if all its children are selected
+			for (const [parentPath, selectedChildren] of childrenByParent.entries()) {
+				// Get all children of this parent from the file list
+				const allChildren = fileList.filter((item) => {
+					const itemParentPath = item.fullPath.slice(0, item.fullPath.lastIndexOf("/"));
+					return itemParentPath === parentPath;
+				});
+
+				// If all children are selected, replace them with the parent
+				if (allChildren.length > 0 && selectedChildren.length === allChildren.length) {
+					// Check that we have every child
+					const allChildrenPaths = new Set(allChildren.map((c) => c.fullPath));
+					const allChildrenSelected = selectedChildren.every((c) => allChildrenPaths.has(c));
+
+					if (allChildrenSelected) {
+						// Remove all children
+						for (const childPath of selectedChildren) {
+							newSelection.delete(childPath);
+						}
+						// Add the parent
+						newSelection.add(parentPath);
+					}
+				}
+			}
+
 			onSelectionChange?.(newSelection);
 		},
 		[selectedPaths, onSelectionChange, fileList],
@@ -221,25 +258,15 @@ export const FileTree = memo((props: Props) => {
 				}
 			}
 
-			// Get all children of this folder
-			const children = fileList.filter((item) => item.fullPath.startsWith(`${folderPath}/`));
-
-			if (children.length === 0) {
-				return false;
-			}
-
-			// Check how many children are selected (directly or via their parents)
-			let selectedCount = 0;
-			for (const child of children) {
-				if (isPathSelected(child.fullPath)) {
-					selectedCount++;
+			for (const selectedPath of selectedPaths) {
+				if (selectedPath.startsWith(`${folderPath}/`)) {
+					return true;
 				}
 			}
 
-			// Partial if some but not all children are selected
-			return selectedCount > 0 && selectedCount < children.length;
+			return false;
 		},
-		[selectedPaths, fileList, isPathSelected],
+		[selectedPaths],
 	);
 
 	return (
