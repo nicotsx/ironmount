@@ -184,7 +184,11 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 						snapshotId={selectedSnapshot.short_id}
 						onSnapshotSelect={setSelectedSnapshotId}
 					/>
-					<SnapshotFileBrowser snapshot={selectedSnapshot} repositoryName={schedule.repository.name} />
+					<SnapshotFileBrowser
+						key={selectedSnapshot.short_id}
+						snapshot={selectedSnapshot}
+						repositoryName={schedule.repository.name}
+					/>
 				</>
 			)}
 		</div>
