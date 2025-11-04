@@ -782,7 +782,7 @@ export type ListSnapshotsData = {
 		name: string;
 	};
 	query?: {
-		volumeId?: string;
+		backupId?: string;
 	};
 	url: "/api/v1/repositories/{name}/snapshots";
 };
@@ -1181,11 +1181,11 @@ export type GetBackupScheduleResponse = GetBackupScheduleResponses[keyof GetBack
 
 export type UpdateBackupScheduleData = {
 	body?: {
-		cronExpression?: string;
+		cronExpression: string;
+		repositoryId: string;
 		enabled?: boolean;
 		excludePatterns?: Array<string>;
 		includePatterns?: Array<string>;
-		repositoryId?: string;
 		retentionPolicy?: {
 			keepDaily?: number;
 			keepHourly?: number;
@@ -1341,62 +1341,6 @@ export type GetBackupScheduleForVolumeResponses = {
 
 export type GetBackupScheduleForVolumeResponse =
 	GetBackupScheduleForVolumeResponses[keyof GetBackupScheduleForVolumeResponses];
-
-export type UpsertBackupScheduleData = {
-	body?: {
-		cronExpression: string;
-		enabled: boolean;
-		repositoryId: string;
-		volumeId: number;
-		excludePatterns?: Array<string>;
-		includePatterns?: Array<string>;
-		retentionPolicy?: {
-			keepDaily?: number;
-			keepHourly?: number;
-			keepLast?: number;
-			keepMonthly?: number;
-			keepWeekly?: number;
-			keepWithinDuration?: string;
-			keepYearly?: number;
-		};
-		tags?: Array<string>;
-	};
-	path?: never;
-	query?: never;
-	url: "/api/v1/backups/upsert";
-};
-
-export type UpsertBackupScheduleResponses = {
-	/**
-	 * Backup schedule upserted successfully
-	 */
-	200: {
-		createdAt: number;
-		cronExpression: string;
-		enabled: boolean;
-		excludePatterns: Array<string> | null;
-		id: number;
-		includePatterns: Array<string> | null;
-		lastBackupAt: number | null;
-		lastBackupError: string | null;
-		lastBackupStatus: "error" | "success" | null;
-		nextBackupAt: number | null;
-		repositoryId: string;
-		retentionPolicy: {
-			keepDaily?: number;
-			keepHourly?: number;
-			keepLast?: number;
-			keepMonthly?: number;
-			keepWeekly?: number;
-			keepWithinDuration?: string;
-			keepYearly?: number;
-		} | null;
-		updatedAt: number;
-		volumeId: number;
-	};
-};
-
-export type UpsertBackupScheduleResponse = UpsertBackupScheduleResponses[keyof UpsertBackupScheduleResponses];
 
 export type RunBackupNowData = {
 	body?: never;

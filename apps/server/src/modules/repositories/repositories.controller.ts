@@ -49,9 +49,9 @@ export const repositoriesController = new Hono()
 	})
 	.get("/:name/snapshots", listSnapshotsDto, validator("query", listSnapshotsFilters), async (c) => {
 		const { name } = c.req.param();
-		const { volumeId } = c.req.valid("query");
+		const { backupId } = c.req.valid("query");
 
-		const res = await repositoriesService.listSnapshots(name, Number(volumeId));
+		const res = await repositoriesService.listSnapshots(name, backupId);
 
 		const snapshots = res.map((snapshot) => {
 			const { summary } = snapshot;

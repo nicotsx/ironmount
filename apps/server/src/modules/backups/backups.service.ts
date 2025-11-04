@@ -7,7 +7,7 @@ import { backupSchedulesTable, repositoriesTable, volumesTable } from "../../db/
 import { restic } from "../../utils/restic";
 import { logger } from "../../utils/logger";
 import { getVolumePath } from "../volumes/helpers";
-import type { CreateBackupScheduleBody, UpdateBackupScheduleBody, UpsertBackupScheduleBody } from "./backups.dto";
+import type { CreateBackupScheduleBody, UpdateBackupScheduleBody } from "./backups.dto";
 import { toMessage } from "../../utils/errors";
 
 const calculateNextRun = (cronExpression: string): number => {
@@ -109,14 +109,12 @@ const updateSchedule = async (scheduleId: number, data: UpdateBackupScheduleBody
 		throw new BadRequestError("Invalid cron expression");
 	}
 
-	if (data.repositoryId) {
-		const repository = await db.query.repositoriesTable.findFirst({
-			where: eq(repositoriesTable.id, data.repositoryId),
-		});
+	const repository = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.id, data.repositoryId),
+	});
 
-		if (!repository) {
-			throw new NotFoundError("Repository not found");
-		}
+	if (!repository) {
+		throw new NotFoundError("Repository not found");
 	}
 
 	const cronExpression = data.cronExpression ?? schedule.cronExpression;
@@ -147,7 +145,7 @@ const deleteSchedule = async (scheduleId: number) => {
 	await db.delete(backupSchedulesTable).where(eq(backupSchedulesTable.id, scheduleId));
 };
 
-const executeBackup = async (scheduleId: number) => {
+const executeBackup = async (scheduleId: number, manual = false) => {
 	const schedule = await db.query.backupSchedulesTable.findFirst({
 		where: eq(backupSchedulesTable.id, scheduleId),
 	});
@@ -156,7 +154,7 @@ const executeBackup = async (scheduleId: number) => {
 		throw new NotFoundError("Backup schedule not found");
 	}
 
-	if (!schedule.enabled) {
+	if (!schedule.enabled && !manual) {
 		logger.info(`Backup schedule ${scheduleId} is disabled. Skipping execution.`);
 		return;
 	}
@@ -190,7 +188,9 @@ const executeBackup = async (scheduleId: number) => {
 			exclude?: string[];
 			include?: string[];
 			tags?: string[];
-		} = {};
+		} = {
+			tags: [schedule.id.toString()],
+		};
 
 		if (schedule.excludePatterns && schedule.excludePatterns.length > 0) {
 			backupOptions.exclude = schedule.excludePatterns;
@@ -203,7 +203,7 @@ const executeBackup = async (scheduleId: number) => {
 		await restic.backup(repository.config, volumePath, backupOptions);
 
 		if (schedule.retentionPolicy) {
-			await restic.forget(repository.config, schedule.retentionPolicy);
+			await restic.forget(repository.config, schedule.retentionPolicy, { tag: schedule.id.toString() });
 		}
 
 		const nextBackupAt = calculateNextRun(schedule.cronExpression);
@@ -262,77 +262,6 @@ const getScheduleForVolume = async (volumeId: number) => {
 	return schedule ?? null;
 };
 
-const upsertSchedule = async (data: UpsertBackupScheduleBody) => {
-	if (!cron.validate(data.cronExpression)) {
-		throw new BadRequestError("Invalid cron expression");
-	}
-
-	const volume = await db.query.volumesTable.findFirst({
-		where: eq(volumesTable.id, data.volumeId),
-	});
-
-	if (!volume) {
-		throw new NotFoundError("Volume not found");
-	}
-
-	const repository = await db.query.repositoriesTable.findFirst({
-		where: eq(repositoriesTable.id, data.repositoryId),
-	});
-
-	if (!repository) {
-		throw new NotFoundError("Repository not found");
-	}
-
-	const existingSchedule = await db.query.backupSchedulesTable.findFirst({
-		where: eq(backupSchedulesTable.volumeId, data.volumeId),
-	});
-
-	const nextBackupAt = calculateNextRun(data.cronExpression);
-
-	if (existingSchedule) {
-		const [updated] = await db
-			.update(backupSchedulesTable)
-			.set({
-				repositoryId: data.repositoryId,
-				enabled: data.enabled,
-				cronExpression: data.cronExpression,
-				retentionPolicy: data.retentionPolicy ?? null,
-				excludePatterns: data.excludePatterns ?? [],
-				includePatterns: data.includePatterns ?? [],
-				nextBackupAt: nextBackupAt,
-				updatedAt: Date.now(),
-			})
-			.where(eq(backupSchedulesTable.id, existingSchedule.id))
-			.returning();
-
-		if (!updated) {
-			throw new Error("Failed to update backup schedule");
-		}
-
-		return updated;
-	}
-
-	const [newSchedule] = await db
-		.insert(backupSchedulesTable)
-		.values({
-			volumeId: data.volumeId,
-			repositoryId: data.repositoryId,
-			enabled: data.enabled,
-			cronExpression: data.cronExpression,
-			retentionPolicy: data.retentionPolicy ?? null,
-			excludePatterns: data.excludePatterns ?? [],
-			includePatterns: data.includePatterns ?? [],
-			nextBackupAt: nextBackupAt,
-		})
-		.returning();
-
-	if (!newSchedule) {
-		throw new Error("Failed to create backup schedule");
-	}
-
-	return newSchedule;
-};
-
 export const backupsService = {
 	listSchedules,
 	getSchedule,
@@ -342,5 +271,4 @@ export const backupsService = {
 	executeBackup,
 	getSchedulesToExecute,
 	getScheduleForVolume,
-	upsertSchedule,
 };

@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
 import { formatSnapshotDuration } from "~/modules/repositories/tabs/snapshots";
 
-type Snapshot = ListSnapshotsResponse["snapshots"][0];
+type Snapshot = ListSnapshotsResponse[number];
 
 type Props = {
 	snapshots: Snapshot[];

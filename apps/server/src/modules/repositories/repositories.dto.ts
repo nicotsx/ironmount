@@ -144,7 +144,7 @@ const listSnapshotsResponse = snapshotSchema.array();
 export type ListSnapshotsDto = typeof listSnapshotsResponse.infer;
 
 export const listSnapshotsFilters = type({
-	volumeId: "string?",
+	backupId: "string?",
 });
 
 export const listSnapshotsDto = describeRoute({

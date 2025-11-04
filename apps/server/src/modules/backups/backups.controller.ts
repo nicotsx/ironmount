@@ -8,10 +8,8 @@ import {
 	getBackupScheduleForVolumeDto,
 	listBackupSchedulesDto,
 	runBackupNowDto,
-	updateBackupScheduleBody,
 	updateBackupScheduleDto,
-	upsertBackupScheduleBody,
-	upsertBackupScheduleDto,
+	updateBackupScheduleBody,
 	type CreateBackupScheduleDto,
 	type DeleteBackupScheduleDto,
 	type GetBackupScheduleDto,
@@ -19,7 +17,6 @@ import {
 	type ListBackupSchedulesResponseDto,
 	type RunBackupNowDto,
 	type UpdateBackupScheduleDto,
-	type UpsertBackupScheduleDto,
 } from "./backups.dto";
 import { backupsService } from "./backups.service";
 
@@ -57,13 +54,6 @@ export const backupScheduleController = new Hono()
 
 		return c.json<UpdateBackupScheduleDto>(schedule, 200);
 	})
-	.put("/upsert", upsertBackupScheduleDto, validator("json", upsertBackupScheduleBody), async (c) => {
-		const body = c.req.valid("json");
-
-		const schedule = await backupsService.upsertSchedule(body);
-
-		return c.json<UpsertBackupScheduleDto>(schedule, 200);
-	})
 	.delete("/:scheduleId", deleteBackupScheduleDto, async (c) => {
 		const scheduleId = c.req.param("scheduleId");
 
@@ -74,7 +64,7 @@ export const backupScheduleController = new Hono()
 	.post("/:scheduleId/run", runBackupNowDto, async (c) => {
 		const scheduleId = c.req.param("scheduleId");
 
-		backupsService.executeBackup(Number(scheduleId)).catch((error) => {
+		backupsService.executeBackup(Number(scheduleId), true).catch((error) => {
 			console.error("Backup execution failed:", error);
 		});
 

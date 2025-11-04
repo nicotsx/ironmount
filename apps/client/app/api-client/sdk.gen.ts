@@ -68,8 +68,6 @@ import type {
 	UpdateBackupScheduleResponses,
 	GetBackupScheduleForVolumeData,
 	GetBackupScheduleForVolumeResponses,
-	UpsertBackupScheduleData,
-	UpsertBackupScheduleResponses,
 	RunBackupNowData,
 	RunBackupNowResponses,
 } from "./types.gen";
@@ -471,22 +469,6 @@ export const getBackupScheduleForVolume = <ThrowOnError extends boolean = false>
 	return (options.client ?? _heyApiClient).get<GetBackupScheduleForVolumeResponses, unknown, ThrowOnError>({
 		url: "/api/v1/backups/volume/{volumeId}",
 		...options,
-	});
-};
-
-/**
- * Create or update a backup schedule for a volume
- */
-export const upsertBackupSchedule = <ThrowOnError extends boolean = false>(
-	options?: Options<UpsertBackupScheduleData, ThrowOnError>,
-) => {
-	return (options?.client ?? _heyApiClient).put<UpsertBackupScheduleResponses, unknown, ThrowOnError>({
-		url: "/api/v1/backups/upsert",
-		...options,
-		headers: {
-			"Content-Type": "application/json",
-			...options?.headers,
-		},
 	});
 };
 

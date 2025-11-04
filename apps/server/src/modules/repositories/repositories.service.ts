@@ -8,7 +8,6 @@ import { repositoriesTable, volumesTable } from "../../db/schema";
 import { toMessage } from "../../utils/errors";
 import { restic } from "../../utils/restic";
 import { cryptoUtils } from "../../utils/crypto";
-import { getVolumePath } from "../volumes/helpers";
 
 const listRepositories = async () => {
 	const repositories = await db.query.repositoriesTable.findMany({});
@@ -106,7 +105,15 @@ const deleteRepository = async (name: string) => {
 	await db.delete(repositoriesTable).where(eq(repositoriesTable.name, name));
 };
 
-const listSnapshots = async (name: string, volumeId?: number) => {
+/**
+ * List snapshots for a given repository
+ * If backupId is provided, filter snapshots by that backup ID (tag)
+ * @param name Repository name
+ * @param backupId Optional backup ID to filter snapshots for a specific backup schedule
+ *
+ * @returns List of snapshots
+ */
+const listSnapshots = async (name: string, backupId?: string) => {
 	const repository = await db.query.repositoriesTable.findFirst({
 		where: eq(repositoriesTable.name, name),
 	});
@@ -115,20 +122,12 @@ const listSnapshots = async (name: string, volumeId?: number) => {
 		throw new NotFoundError("Repository not found");
 	}
 
-	let snapshots = await restic.snapshots(repository.config);
+	let snapshots = [];
 
-	if (volumeId) {
-		const volume = await db.query.volumesTable.findFirst({
-			where: eq(volumesTable.id, volumeId),
-		});
-
-		if (!volume) {
-			throw new NotFoundError("Volume not found");
-		}
-
-		snapshots = snapshots.filter((snapshot) => {
-			return snapshot.paths.some((path) => path.includes(getVolumePath(volume.name)));
-		});
+	if (backupId) {
+		snapshots = await restic.snapshots(repository.config, { tags: [backupId.toString()] });
+	} else {
+		snapshots = await restic.snapshots(repository.config);
 	}
 
 	return snapshots;

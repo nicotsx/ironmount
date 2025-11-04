@@ -4,11 +4,11 @@ import { redirect, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
-	upsertBackupScheduleMutation,
 	getBackupScheduleOptions,
 	runBackupNowMutation,
 	deleteBackupScheduleMutation,
 	listSnapshotsOptions,
+	updateBackupScheduleMutation,
 } from "~/api-client/@tanstack/react-query.gen";
 import { parseError } from "~/lib/errors";
 import { getCronExpression } from "~/utils/utils";
@@ -26,7 +26,7 @@ export const clientLoader = async ({ params }: Route.LoaderArgs) => {
 
 	const snapshots = await listSnapshots({
 		path: { name: data.repository.name },
-		query: { volumeId: data.volumeId.toString() },
+		query: { backupId: params.id },
 	});
 
 	if (snapshots.data) return { snapshots: snapshots.data, schedule: data };
@@ -49,13 +49,13 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 	const { data: snapshots } = useQuery({
 		...listSnapshotsOptions({
 			path: { name: schedule.repository.name },
-			query: { volumeId: schedule.volumeId.toString() },
+			query: { backupId: schedule.id.toString() },
 		}),
 		initialData: loaderData.snapshots,
 	});
 
 	const upsertSchedule = useMutation({
-		...upsertBackupScheduleMutation(),
+		...updateBackupScheduleMutation(),
 		onSuccess: () => {
 			toast.success("Backup schedule saved successfully");
 			setIsEditMode(false);
@@ -106,8 +106,8 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 		if (formValues.keepYearly) retentionPolicy.keepYearly = formValues.keepYearly;
 
 		upsertSchedule.mutate({
+			path: { scheduleId: schedule.id.toString() },
 			body: {
-				volumeId: schedule.volumeId,
 				repositoryId: formValues.repositoryId,
 				enabled: schedule.enabled,
 				cronExpression,
@@ -122,8 +122,8 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 		if (!schedule) return;
 
 		upsertSchedule.mutate({
+			path: { scheduleId: schedule.id.toString() },
 			body: {
-				volumeId: schedule.volumeId,
 				repositoryId: schedule.repositoryId,
 				enabled,
 				cronExpression: schedule.cronExpression,

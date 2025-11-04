@@ -114,12 +114,18 @@ const init = async (config: RepositoryConfig) => {
 const backup = async (
 	config: RepositoryConfig,
 	source: string,
-	options?: { exclude?: string[]; include?: string[] },
+	options?: { exclude?: string[]; include?: string[]; tags?: string[] },
 ) => {
 	const repoUrl = buildRepoUrl(config);
 	const env = await buildEnv(config);
 
 	const args: string[] = ["--repo", repoUrl, "backup", "--one-file-system"];
+
+	if (options?.tags && options.tags.length > 0) {
+		for (const tag of options.tags) {
+			args.push("--tag", tag);
+		}
+	}
 
 	let includeFile: string | null = null;
 	if (options?.include && options.include.length > 0) {
@@ -263,11 +269,23 @@ const restore = async (
 	return result;
 };
 
-const snapshots = async (config: RepositoryConfig) => {
+const snapshots = async (config: RepositoryConfig, options: { tags?: string[] } = {}) => {
+	const { tags } = options;
+
 	const repoUrl = buildRepoUrl(config);
 	const env = await buildEnv(config);
 
-	const res = await $`restic --repo ${repoUrl} snapshots --json`.env(env).nothrow();
+	const args = ["--repo", repoUrl, "snapshots"];
+
+	if (tags && tags.length > 0) {
+		for (const tag of tags) {
+			args.push("--tag", tag);
+		}
+	}
+
+	args.push("--json");
+
+	const res = await $`restic ${args}`.env(env).nothrow();
 
 	if (res.exitCode !== 0) {
 		logger.error(`Restic snapshots retrieval failed: ${res.stderr}`);
@@ -284,11 +302,11 @@ const snapshots = async (config: RepositoryConfig) => {
 	return result;
 };
 
-const forget = async (config: RepositoryConfig, options: RetentionPolicy) => {
+const forget = async (config: RepositoryConfig, options: RetentionPolicy, extra: { tag: string }) => {
 	const repoUrl = buildRepoUrl(config);
 	const env = await buildEnv(config);
 
-	const args: string[] = ["--repo", repoUrl, "forget"];
+	const args: string[] = ["--repo", repoUrl, "forget", "--group-by", "tags", "--tag", extra.tag];
 
 	if (options.keepLast) {
 		args.push("--keep-last", String(options.keepLast));
@@ -322,7 +340,6 @@ const forget = async (config: RepositoryConfig, options: RetentionPolicy) => {
 		throw new Error(`Restic forget failed: ${res.stderr}`);
 	}
 
-	logger.info("Restic forget completed successfully");
 	return { success: true };
 };
 

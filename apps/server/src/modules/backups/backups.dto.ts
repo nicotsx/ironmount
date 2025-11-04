@@ -143,9 +143,9 @@ export const createBackupScheduleDto = describeRoute({
  * Update a backup schedule
  */
 export const updateBackupScheduleBody = type({
-	repositoryId: "string?",
+	repositoryId: "string",
 	enabled: "boolean?",
-	cronExpression: "string?",
+	cronExpression: "string",
 	retentionPolicy: retentionPolicySchema.optional(),
 	excludePatterns: "string[]?",
 	includePatterns: "string[]?",
@@ -168,42 +168,6 @@ export const updateBackupScheduleDto = describeRoute({
 			content: {
 				"application/json": {
 					schema: resolver(updateBackupScheduleResponse),
-				},
-			},
-		},
-	},
-});
-
-/**
- * Upsert a backup schedule (create or update)
- */
-export const upsertBackupScheduleBody = type({
-	volumeId: "number",
-	repositoryId: "string",
-	enabled: "boolean",
-	cronExpression: "string",
-	retentionPolicy: retentionPolicySchema.optional(),
-	excludePatterns: "string[]?",
-	includePatterns: "string[]?",
-	tags: "string[]?",
-});
-
-export type UpsertBackupScheduleBody = typeof upsertBackupScheduleBody.infer;
-
-export const upsertBackupScheduleResponse = backupScheduleSchema.omit("volume", "repository");
-
-export type UpsertBackupScheduleDto = typeof upsertBackupScheduleResponse.infer;
-
-export const upsertBackupScheduleDto = describeRoute({
-	description: "Create or update a backup schedule for a volume",
-	operationId: "upsertBackupSchedule",
-	tags: ["Backups"],
-	responses: {
-		200: {
-			description: "Backup schedule upserted successfully",
-			content: {
-				"application/json": {
-					schema: resolver(upsertBackupScheduleResponse),
 				},
 			},
 		},
