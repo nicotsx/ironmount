@@ -1,7 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FolderOpen } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
-import { listFiles } from "~/api-client";
 import { listFilesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { FileTree } from "~/components/file-tree";
 
@@ -76,16 +75,17 @@ export const VolumeFileBrowser = ({
 				setLoadingFolders((prev) => new Set(prev).add(folderPath));
 
 				try {
-					const result = await listFiles({
-						path: { name: volumeName },
-						query: { path: folderPath },
-						throwOnError: true,
-					});
+					const result = await queryClient.fetchQuery(
+						listFilesOptions({
+							path: { name: volumeName },
+							query: { path: folderPath },
+						}),
+					);
 
-					if (result.data.files) {
+					if (result.files) {
 						setAllFiles((prev) => {
 							const next = new Map(prev);
-							for (const file of result.data.files) {
+							for (const file of result.files) {
 								next.set(file.path, file);
 							}
 							return next;
@@ -104,7 +104,7 @@ export const VolumeFileBrowser = ({
 				}
 			}
 		},
-		[volumeName, fetchedFolders],
+		[volumeName, fetchedFolders, queryClient.fetchQuery],
 	);
 
 	const handleFolderHover = useCallback(

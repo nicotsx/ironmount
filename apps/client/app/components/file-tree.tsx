@@ -18,7 +18,7 @@ const NODE_PADDING_LEFT = 12;
 export interface FileEntry {
 	name: string;
 	path: string;
-	type: "file" | "directory";
+	type: string;
 	size?: number;
 	modifiedAt?: number;
 }

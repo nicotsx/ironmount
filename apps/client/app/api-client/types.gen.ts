@@ -802,6 +802,31 @@ export type ListSnapshotsResponses = {
 
 export type ListSnapshotsResponse = ListSnapshotsResponses[keyof ListSnapshotsResponses];
 
+export type GetSnapshotDetailsData = {
+	body?: never;
+	path: {
+		name: string;
+		snapshotId: string;
+	};
+	query?: never;
+	url: "/api/v1/repositories/{name}/snapshots/{snapshotId}";
+};
+
+export type GetSnapshotDetailsResponses = {
+	/**
+	 * Snapshot details
+	 */
+	200: {
+		duration: number;
+		paths: Array<string>;
+		short_id: string;
+		size: number;
+		time: number;
+	};
+};
+
+export type GetSnapshotDetailsResponse = GetSnapshotDetailsResponses[keyof GetSnapshotDetailsResponses];
+
 export type ListSnapshotFilesData = {
 	body?: never;
 	path: {

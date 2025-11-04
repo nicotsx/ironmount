@@ -5,6 +5,7 @@ import {
 	createRepositoryDto,
 	deleteRepositoryDto,
 	getRepositoryDto,
+	getSnapshotDetailsDto,
 	listRepositoriesDto,
 	listSnapshotFilesDto,
 	listSnapshotFilesQuery,
@@ -14,6 +15,7 @@ import {
 	restoreSnapshotDto,
 	type DeleteRepositoryDto,
 	type GetRepositoryDto,
+	type GetSnapshotDetailsDto,
 	type ListRepositoriesDto,
 	type ListSnapshotFilesDto,
 	type ListSnapshotsDto,
@@ -71,6 +73,27 @@ export const repositoriesController = new Hono()
 
 		return c.json<ListSnapshotsDto>(snapshots, 200);
 	})
+	.get("/:name/snapshots/:snapshotId", getSnapshotDetailsDto, async (c) => {
+		const { name, snapshotId } = c.req.param();
+		const snapshot = await repositoriesService.getSnapshotDetails(name, snapshotId);
+
+		let duration = 0;
+		if (snapshot.summary) {
+			const { backup_start, backup_end } = snapshot.summary;
+			duration = new Date(backup_end).getTime() - new Date(backup_start).getTime();
+		}
+
+		const response = {
+			short_id: snapshot.short_id,
+			duration,
+			time: new Date(snapshot.time).getTime(),
+			paths: snapshot.paths,
+			size: snapshot.summary?.total_bytes_processed || 0,
+			summary: snapshot.summary,
+		};
+
+		return c.json<GetSnapshotDetailsDto>(response, 200);
+	})
 	.get(
 		"/:name/snapshots/:snapshotId/files",
 		listSnapshotFilesDto,
@@ -81,7 +104,7 @@ export const repositoriesController = new Hono()
 
 			const result = await repositoriesService.listSnapshotFiles(name, snapshotId, path);
 
-			// c.header("Cache-Control", "max-age=300, stale-while-revalidate=600");
+			c.header("Cache-Control", "max-age=300, stale-while-revalidate=600");
 
 			return c.json<ListSnapshotFilesDto>(result, 200);
 		},

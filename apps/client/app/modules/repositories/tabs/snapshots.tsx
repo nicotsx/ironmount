@@ -3,20 +3,17 @@ import { intervalToDuration } from "date-fns";
 import { Database } from "lucide-react";
 import { useState } from "react";
 import { listSnapshotsOptions } from "~/api-client/@tanstack/react-query.gen";
-import type { ListSnapshotsResponse } from "~/api-client/types.gen";
 import { ByteSize } from "~/components/bytes-size";
 import { SnapshotsTable } from "~/components/snapshots-table";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Table, TableBody, TableCell, TableRow } from "~/components/ui/table";
-import type { Repository } from "~/lib/types";
+import type { Repository, Snapshot } from "~/lib/types";
 
 type Props = {
 	repository: Repository;
 };
-
-type Snapshot = ListSnapshotsResponse["snapshots"][0];
 
 export const formatSnapshotDuration = (seconds: number) => {
 	const duration = intervalToDuration({ start: 0, end: seconds * 1000 });
@@ -37,11 +34,10 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 		...listSnapshotsOptions({ path: { name: repository.name } }),
 		refetchInterval: 10000,
 		refetchOnWindowFocus: true,
+		initialData: [],
 	});
 
-	const snapshots = data?.snapshots || [];
-
-	const filteredSnapshots = snapshots.filter((snapshot: Snapshot) => {
+	const filteredSnapshots = data.filter((snapshot: Snapshot) => {
 		if (!searchQuery) return true;
 		const searchLower = searchQuery.toLowerCase();
 		return (
@@ -50,8 +46,7 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 		);
 	});
 
-	const hasNoSnapshots = snapshots.length === 0;
-	const hasNoFilteredSnapshots = filteredSnapshots.length === 0 && !hasNoSnapshots;
+	const hasNoFilteredSnapshots = !filteredSnapshots?.length && !data.length;
 
 	if (repository.status === "error") {
 		return (
@@ -72,11 +67,11 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 		);
 	}
 
-	if (isLoading && !data && !failureReason) {
+	if (isLoading && !data.length && !failureReason) {
 		return (
 			<Card>
 				<CardContent className="flex items-center justify-center py-12">
-					<p className="text-muted-foreground">Loading snapshots yo...</p>
+					<p className="text-muted-foreground">Loading snapshots</p>
 				</CardContent>
 			</Card>
 		);
@@ -94,7 +89,8 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 		);
 	}
 
-	if (hasNoSnapshots) {
+	if (!data.length) {
+		console.log("No snapshots found for repository:", repository.name);
 		return (
 			<Card>
 				<CardContent className="flex flex-col items-center justify-center text-center py-16 px-4">
@@ -124,7 +120,7 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 					<div className="flex-1">
 						<CardTitle>Snapshots</CardTitle>
 						<CardDescription className="mt-1">
-							Backup snapshots stored in this repository. Total: {snapshots.length}
+							Backup snapshots stored in this repository. Total: {data.length}
 						</CardDescription>
 					</div>
 					<div className="flex gap-2 items-center">
@@ -159,7 +155,7 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 				<span>
 					{hasNoFilteredSnapshots
 						? "No snapshots match filters."
-						: `Showing ${filteredSnapshots.length} of ${snapshots.length}`}
+						: `Showing ${filteredSnapshots.length} of ${data.length}`}
 				</span>
 				{!hasNoFilteredSnapshots && (
 					<span>

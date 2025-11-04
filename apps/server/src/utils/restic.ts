@@ -8,7 +8,6 @@ import { REPOSITORY_BASE, RESTIC_PASS_FILE } from "../core/constants";
 import { logger } from "./logger";
 import { cryptoUtils } from "./crypto";
 import type { RetentionPolicy } from "../modules/backups/backups.dto";
-import { getVolumePath } from "../modules/volumes/helpers";
 
 const backupOutputSchema = type({
 	message_type: "'summary'",

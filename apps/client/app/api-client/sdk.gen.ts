@@ -50,6 +50,8 @@ import type {
 	GetRepositoryResponses,
 	ListSnapshotsData,
 	ListSnapshotsResponses,
+	GetSnapshotDetailsData,
+	GetSnapshotDetailsResponses,
 	ListSnapshotFilesData,
 	ListSnapshotFilesResponses,
 	RestoreSnapshotData,
@@ -348,6 +350,18 @@ export const listSnapshots = <ThrowOnError extends boolean = false>(
 ) => {
 	return (options.client ?? _heyApiClient).get<ListSnapshotsResponses, unknown, ThrowOnError>({
 		url: "/api/v1/repositories/{name}/snapshots",
+		...options,
+	});
+};
+
+/**
+ * Get details of a specific snapshot
+ */
+export const getSnapshotDetails = <ThrowOnError extends boolean = false>(
+	options: Options<GetSnapshotDetailsData, ThrowOnError>,
+) => {
+	return (options.client ?? _heyApiClient).get<GetSnapshotDetailsResponses, unknown, ThrowOnError>({
+		url: "/api/v1/repositories/{name}/snapshots/{snapshotId}",
 		...options,
 	});
 };

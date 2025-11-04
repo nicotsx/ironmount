@@ -184,6 +184,25 @@ const restoreSnapshot = async (
 	};
 };
 
+const getSnapshotDetails = async (name: string, snapshotId: string) => {
+	const repository = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.name, name),
+	});
+
+	if (!repository) {
+		throw new NotFoundError("Repository not found");
+	}
+
+	const snapshots = await restic.snapshots(repository.config);
+	const snapshot = snapshots.find((snap) => snap.id === snapshotId || snap.short_id === snapshotId);
+
+	if (!snapshot) {
+		throw new NotFoundError("Snapshot not found");
+	}
+
+	return snapshot;
+};
+
 export const repositoriesService = {
 	listRepositories,
 	createRepository,
@@ -192,4 +211,5 @@ export const repositoriesService = {
 	listSnapshots,
 	listSnapshotFiles,
 	restoreSnapshot,
+	getSnapshotDetails,
 };

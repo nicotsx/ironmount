@@ -38,6 +38,7 @@ function Button({
 	variant,
 	size,
 	asChild = false,
+	loading,
 	...props
 }: React.ComponentProps<"button"> &
 	VariantProps<typeof buttonVariants> & {
@@ -47,13 +48,13 @@ function Button({
 
 	return (
 		<Comp
-			disabled={props.loading}
+			disabled={loading}
 			data-slot="button"
 			className={cn(buttonVariants({ variant, size, className }), "transition-all")}
 			{...props}
 		>
-			<Loader2 className={cn("h-4 w-4 animate-spin absolute", { invisible: !props.loading })} />
-			<div className={cn("flex items-center justify-center", { invisible: props.loading })}>{props.children}</div>
+			<Loader2 className={cn("h-4 w-4 animate-spin absolute", { invisible: !loading })} />
+			<div className={cn("flex items-center justify-center", { invisible: loading })}>{props.children}</div>
 		</Comp>
 	);
 }

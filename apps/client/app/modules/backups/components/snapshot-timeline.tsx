@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import type { ListSnapshotsResponse } from "~/api-client/types.gen";
 import { cn } from "~/lib/utils";
 import { Card } from "~/components/ui/card";
@@ -12,10 +11,6 @@ interface Props {
 
 export const SnapshotTimeline = (props: Props) => {
 	const { snapshots, snapshotId, onSnapshotSelect } = props;
-
-	const sortedSnapshots = useMemo(() => {
-		return [...snapshots].sort((a, b) => a.time - b.time);
-	}, [snapshots]);
 
 	if (snapshots.length === 0) {
 		return (
@@ -33,10 +28,10 @@ export const SnapshotTimeline = (props: Props) => {
 				<div className="relative flex items-center">
 					<div className="flex-1 overflow-hidden">
 						<div className="flex gap-4 overflow-x-auto pb-2">
-							{sortedSnapshots.map((snapshot, index) => {
+							{snapshots.map((snapshot, index) => {
 								const date = new Date(snapshot.time);
 								const isSelected = snapshotId === snapshot.short_id;
-								const isLatest = index === sortedSnapshots.length - 1;
+								const isLatest = index === snapshots.length - 1;
 
 								return (
 									<button
@@ -72,10 +67,10 @@ export const SnapshotTimeline = (props: Props) => {
 				</div>
 
 				<div className="px-4 py-2 text-xs text-muted-foreground bg-card-header border-t border-border flex justify-between">
-					<span>{sortedSnapshots.length} snapshots</span>
+					<span>{snapshots.length} snapshots</span>
 					<span>
-						{new Date(sortedSnapshots[0].time).toLocaleDateString()} -{" "}
-						{new Date(sortedSnapshots[sortedSnapshots.length - 1].time).toLocaleDateString()}
+						{new Date(snapshots[0].time).toLocaleDateString()} -{" "}
+						{new Date(snapshots.at(-1)?.time ?? 0).toLocaleDateString()}
 					</span>
 				</div>
 			</div>

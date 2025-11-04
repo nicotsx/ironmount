@@ -1,11 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router";
+import { redirect, useParams } from "react-router";
 import { listSnapshotFilesOptions } from "~/api-client/@tanstack/react-query.gen";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { RestoreSnapshotDialog } from "../components/restore-snapshot-dialog";
-import { SnapshotFilesList } from "../components/snapshot-files";
+import { SnapshotFileBrowser } from "~/modules/backups/components/snapshot-file-browser";
+import { getSnapshotDetails } from "~/api-client";
+import type { Route } from "./+types/snapshot-details";
 
-export default function SnapshotDetailsPage() {
+export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
+	const snapshot = await getSnapshotDetails({ path: { name: params.name, snapshotId: params.snapshotId } });
+	if (snapshot.data) return snapshot.data;
+
+	return redirect("/repositories");
+};
+
+export default function SnapshotDetailsPage({ loaderData }: Route.ComponentProps) {
 	const { name, snapshotId } = useParams<{ name: string; snapshotId: string }>();
 
 	const { data } = useQuery({
@@ -34,15 +43,7 @@ export default function SnapshotDetailsPage() {
 				<RestoreSnapshotDialog name={name} snapshotId={snapshotId} />
 			</div>
 
-			<Card className="h-[600px] flex flex-col">
-				<CardHeader>
-					<CardTitle>File Explorer</CardTitle>
-					<CardDescription>Browse the files and folders in this snapshot.</CardDescription>
-				</CardHeader>
-				<CardContent className="flex-1 overflow-hidden flex flex-col">
-					<SnapshotFilesList name={name} snapshotId={snapshotId} />
-				</CardContent>
-			</Card>
+			<SnapshotFileBrowser repositoryName={name} snapshot={loaderData} />
 
 			{data?.snapshot && (
 				<Card>

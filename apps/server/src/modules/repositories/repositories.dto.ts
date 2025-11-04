@@ -164,6 +164,29 @@ export const listSnapshotsDto = describeRoute({
 });
 
 /**
+ * Get snapshot details
+ */
+export const getSnapshotDetailsResponse = snapshotSchema;
+
+export type GetSnapshotDetailsDto = typeof getSnapshotDetailsResponse.infer;
+
+export const getSnapshotDetailsDto = describeRoute({
+	description: "Get details of a specific snapshot",
+	tags: ["Repositories"],
+	operationId: "getSnapshotDetails",
+	responses: {
+		200: {
+			description: "Snapshot details",
+			content: {
+				"application/json": {
+					schema: resolver(getSnapshotDetailsResponse),
+				},
+			},
+		},
+	},
+});
+
+/**
  * List files in a snapshot
  */
 export const snapshotFileNodeSchema = type({

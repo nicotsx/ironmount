@@ -166,6 +166,8 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 		);
 	}
 
+	const selectedSnapshot = snapshots.find((s) => s.short_id === selectedSnapshotId);
+
 	return (
 		<div className="flex flex-col gap-6">
 			<ScheduleSummary
@@ -175,18 +177,16 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 				setIsEditMode={setIsEditMode}
 				schedule={schedule}
 			/>
-
-			<SnapshotTimeline
-				snapshots={snapshots}
-				snapshotId={selectedSnapshotId}
-				onSnapshotSelect={setSelectedSnapshotId}
-			/>
-
-			<SnapshotFileBrowser
-				snapshots={snapshots}
-				repositoryName={schedule.repository.name}
-				snapshotId={selectedSnapshotId}
-			/>
+			{selectedSnapshot && (
+				<>
+					<SnapshotTimeline
+						snapshots={snapshots}
+						snapshotId={selectedSnapshot.short_id}
+						onSnapshotSelect={setSelectedSnapshotId}
+					/>
+					<SnapshotFileBrowser snapshot={selectedSnapshot} repositoryName={schedule.repository.name} />
+				</>
+			)}
 		</div>
 	);
 }
