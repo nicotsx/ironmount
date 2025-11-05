@@ -29,7 +29,7 @@ export const SnapshotsTable = ({ snapshots, repositoryName }: Props) => {
 						<TableHead className="uppercase">Date & Time</TableHead>
 						<TableHead className="uppercase">Size</TableHead>
 						<TableHead className="uppercase hidden md:table-cell text-right">Duration</TableHead>
-						<TableHead className="uppercase hidden text-right lg:table-cell">Volume</TableHead>
+						<TableHead className="uppercase hidden text-right lg:table-cell">Paths</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
@@ -70,29 +70,22 @@ export const SnapshotsTable = ({ snapshots, repositoryName }: Props) => {
 							<TableCell className="hidden lg:table-cell">
 								<div className="flex items-center justify-end gap-2">
 									<FolderTree className="h-4 w-4 text-muted-foreground" />
-									<div className="flex flex-wrap gap-1">
-										<span className="text-xs bg-primary/10 text-primary rounded-md px-2 py-1" title={snapshot.paths[0]}>
-											{snapshot.paths[0].split("/").filter(Boolean).at(-2) || "/"}
-										</span>
-										<Tooltip>
-											<TooltipTrigger asChild>
-												<span
-													className={`text-xs bg-muted text-muted-foreground rounded-md px-2 py-1 cursor-help ${snapshot.paths.length <= 1 ? "hidden" : ""}`}
-												>
-													+{snapshot.paths.length - 1}
-												</span>
-											</TooltipTrigger>
-											<TooltipContent side="top" className="max-w-md">
-												<div className="flex flex-col gap-1">
-													{snapshot.paths.slice(1).map((path) => (
-														<div key={`${snapshot.short_id}-${path}`} className="text-xs">
-															{path}
-														</div>
-													))}
-												</div>
-											</TooltipContent>
-										</Tooltip>
-									</div>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<span className="text-xs bg-primary/10 text-primary rounded-md px-2 py-1 cursor-help">
+												{snapshot.paths.length} {snapshot.paths.length === 1 ? "path" : "paths"}
+											</span>
+										</TooltipTrigger>
+										<TooltipContent side="top" className="max-w-md">
+											<div className="flex flex-col gap-1">
+												{snapshot.paths.map((path) => (
+													<div key={`${snapshot.short_id}-${path}`} className="text-xs font-mono">
+														{path}
+													</div>
+												))}
+											</div>
+										</TooltipContent>
+									</Tooltip>
 								</div>
 							</TableCell>
 						</TableRow>

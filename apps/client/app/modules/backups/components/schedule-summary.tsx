@@ -56,32 +56,41 @@ export const ScheduleSummary = (props: Props) => {
 	return (
 		<div className="space-y-4">
 			<Card>
-				<CardHeader className="flex flex-row items-center justify-between gap-4">
-					<div>
-						<CardTitle>Backup schedule</CardTitle>
-						<CardDescription>
-							Automated backup configuration for volume{" "}
-							<strong className="text-strong-accent">{schedule.volume.name}</strong>
-						</CardDescription>
+				<CardHeader className="space-y-4">
+					<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+						<div>
+							<CardTitle>Backup schedule</CardTitle>
+							<CardDescription>
+								Automated backup configuration for volume&nbsp;
+								<strong className="text-strong-accent">{schedule.volume.name}</strong>
+							</CardDescription>
+						</div>
+						<div className="flex items-center gap-2 justify-between sm:justify-start">
+							<OnOff
+								isOn={schedule.enabled}
+								toggle={handleToggleEnabled}
+								enabledLabel="Enabled"
+								disabledLabel="Paused"
+							/>
+						</div>
 					</div>
-					<div className="flex items-center gap-2">
-						<OnOff isOn={schedule.enabled} toggle={handleToggleEnabled} enabledLabel="Enabled" disabledLabel="Paused" />
-						<Button variant="default" size="sm" onClick={handleRunBackupNow}>
+					<div className="flex flex-col sm:flex-row gap-2">
+						<Button variant="default" size="sm" onClick={handleRunBackupNow} className="w-full sm:w-auto">
 							<Play className="h-4 w-4 mr-2" />
-							Backup Now
+							<span className="sm:inline">Backup Now</span>
 						</Button>
-						<Button variant="outline" size="sm" onClick={() => setIsEditMode(true)}>
+						<Button variant="outline" size="sm" onClick={() => setIsEditMode(true)} className="w-full sm:w-auto">
 							<Pencil className="h-4 w-4 mr-2" />
-							Edit schedule
+							<span className="sm:inline">Edit schedule</span>
 						</Button>
 						<Button
 							variant="outline"
 							size="sm"
 							onClick={() => setShowDeleteConfirm(true)}
-							className="text-destructive hover:text-destructive"
+							className="text-destructive hover:text-destructive w-full sm:w-auto"
 						>
 							<Trash2 className="h-4 w-4 mr-2" />
-							Delete
+							<span className="sm:inline">Delete</span>
 						</Button>
 					</div>
 				</CardHeader>
