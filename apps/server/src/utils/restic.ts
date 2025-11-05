@@ -194,6 +194,7 @@ const restore = async (
 		include?: string[];
 		exclude?: string[];
 		path?: string;
+		delete?: boolean;
 	},
 ) => {
 	const repoUrl = buildRepoUrl(config);
@@ -205,7 +206,11 @@ const restore = async (
 		args[args.length - 4] = `${snapshotId}:${options.path}`;
 	}
 
-	if (options?.include && options.include.length === 0) {
+	if (options?.delete) {
+		args.push("--delete");
+	}
+
+	if (options?.include?.length) {
 		for (const pattern of options.include) {
 			args.push("--include", pattern);
 		}
@@ -218,6 +223,8 @@ const restore = async (
 	}
 
 	args.push("--json");
+
+	console.log("Restic restore command:", ["restic", ...args].join(" "));
 
 	const res = await $`restic ${args}`.env(env).nothrow();
 

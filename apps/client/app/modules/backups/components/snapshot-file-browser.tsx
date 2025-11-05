@@ -5,6 +5,8 @@ import { listSnapshotFilesOptions, restoreSnapshotMutation } from "~/api-client/
 import { FileTree, type FileEntry } from "~/components/file-tree";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
+import { Label } from "~/components/ui/label";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -33,6 +35,7 @@ export const SnapshotFileBrowser = (props: Props) => {
 	const [allFiles, setAllFiles] = useState<Map<string, FileEntry>>(new Map());
 	const [selectedPaths, setSelectedPaths] = useState<Set<string>>(new Set());
 	const [showRestoreDialog, setShowRestoreDialog] = useState(false);
+	const [deleteExtraFiles, setDeleteExtraFiles] = useState(false);
 
 	const volumeBasePath = snapshot.paths[0]?.match(/^(.*?_data)(\/|$)/)?.[1] || "";
 
@@ -175,10 +178,12 @@ export const SnapshotFileBrowser = (props: Props) => {
 			body: {
 				snapshotId: snapshot.short_id,
 				include: includePaths,
+				delete: deleteExtraFiles,
 			},
 		});
+
 		setShowRestoreDialog(false);
-	}, [selectedPaths, addBasePath, repositoryName, snapshot.short_id, restoreSnapshot]);
+	}, [selectedPaths, addBasePath, repositoryName, snapshot.short_id, restoreSnapshot, deleteExtraFiles]);
 
 	return (
 		<div className="space-y-4">
@@ -235,10 +240,22 @@ export const SnapshotFileBrowser = (props: Props) => {
 					<AlertDialogHeader>
 						<AlertDialogTitle>Confirm Restore</AlertDialogTitle>
 						<AlertDialogDescription>
-							This will restore {selectedPaths.size} selected {selectedPaths.size === 1 ? "item" : "items"} from the
-							snapshot. Existing files will be overwritten by what's in the snapshot. This action cannot be undone.
+							{selectedPaths.size > 0
+								? `This will restore ${selectedPaths.size} selected ${selectedPaths.size === 1 ? "item" : "items"} from the snapshot.`
+								: "This will restore everything from the snapshot."}{" "}
+							Existing files will be overwritten by what's in the snapshot. This action cannot be undone.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
+					<div className="flex items-center space-x-2 py-4">
+						<Checkbox
+							id="delete-extra"
+							checked={deleteExtraFiles}
+							onCheckedChange={(checked) => setDeleteExtraFiles(checked === true)}
+						/>
+						<Label htmlFor="delete-extra" className="text-sm font-normal cursor-pointer">
+							Delete files not present in the snapshot?
+						</Label>
+					</div>
 					<AlertDialogFooter>
 						<AlertDialogCancel>Cancel</AlertDialogCancel>
 						<AlertDialogAction onClick={handleConfirmRestore}>Confirm</AlertDialogAction>

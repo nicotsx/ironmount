@@ -111,9 +111,9 @@ export const repositoriesController = new Hono()
 	)
 	.post("/:name/restore", restoreSnapshotDto, validator("json", restoreSnapshotBody), async (c) => {
 		const { name } = c.req.param();
-		const { snapshotId, include, exclude } = c.req.valid("json");
+		const { snapshotId, ...options } = c.req.valid("json");
 
-		const result = await repositoriesService.restoreSnapshot(name, snapshotId, { include, exclude });
+		const result = await repositoriesService.restoreSnapshot(name, snapshotId, options);
 
 		return c.json<RestoreSnapshotDto>(result, 200);
 	});

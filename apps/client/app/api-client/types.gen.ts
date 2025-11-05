@@ -871,6 +871,7 @@ export type ListSnapshotFilesResponse = ListSnapshotFilesResponses[keyof ListSna
 export type RestoreSnapshotData = {
 	body?: {
 		snapshotId: string;
+		delete?: boolean;
 		exclude?: Array<string>;
 		include?: Array<string>;
 	};

@@ -163,7 +163,7 @@ const listSnapshotFiles = async (name: string, snapshotId: string, path?: string
 const restoreSnapshot = async (
 	name: string,
 	snapshotId: string,
-	options?: { include?: string[]; exclude?: string[] },
+	options?: { include?: string[]; exclude?: string[]; delete?: boolean },
 ) => {
 	const repository = await db.query.repositoriesTable.findFirst({
 		where: eq(repositoriesTable.name, name),

@@ -242,6 +242,7 @@ export const restoreSnapshotBody = type({
 	snapshotId: "string",
 	include: "string[]?",
 	exclude: "string[]?",
+	delete: "boolean?",
 });
 
 export type RestoreSnapshotBody = typeof restoreSnapshotBody.infer;
