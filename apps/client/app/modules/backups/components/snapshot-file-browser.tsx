@@ -5,6 +5,16 @@ import { listSnapshotFilesOptions, restoreSnapshotMutation } from "~/api-client/
 import { FileTree, type FileEntry } from "~/components/file-tree";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
 import type { Snapshot } from "~/lib/types";
 import { toast } from "sonner";
 
@@ -22,6 +32,7 @@ export const SnapshotFileBrowser = (props: Props) => {
 	const [loadingFolders, setLoadingFolders] = useState<Set<string>>(new Set());
 	const [allFiles, setAllFiles] = useState<Map<string, FileEntry>>(new Map());
 	const [selectedPaths, setSelectedPaths] = useState<Set<string>>(new Set());
+	const [showRestoreDialog, setShowRestoreDialog] = useState(false);
 
 	const volumeBasePath = snapshot.paths[0]?.match(/^(.*?_data)(\/|$)/)?.[1] || "";
 
@@ -152,6 +163,10 @@ export const SnapshotFileBrowser = (props: Props) => {
 	});
 
 	const handleRestoreClick = useCallback(() => {
+		setShowRestoreDialog(true);
+	}, []);
+
+	const handleConfirmRestore = useCallback(() => {
 		const pathsArray = Array.from(selectedPaths);
 		const includePaths = pathsArray.map((path) => addBasePath(path));
 
@@ -162,6 +177,7 @@ export const SnapshotFileBrowser = (props: Props) => {
 				include: includePaths,
 			},
 		});
+		setShowRestoreDialog(false);
 	}, [selectedPaths, addBasePath, repositoryName, snapshot.short_id, restoreSnapshot]);
 
 	return (
@@ -213,6 +229,22 @@ export const SnapshotFileBrowser = (props: Props) => {
 					)}
 				</CardContent>
 			</Card>
+
+			<AlertDialog open={showRestoreDialog} onOpenChange={setShowRestoreDialog}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Confirm Restore</AlertDialogTitle>
+						<AlertDialogDescription>
+							This will restore {selectedPaths.size} selected {selectedPaths.size === 1 ? "item" : "items"} from the
+							snapshot. Existing files will be overwritten by what's in the snapshot. This action cannot be undone.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction onClick={handleConfirmRestore}>Confirm</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 };
