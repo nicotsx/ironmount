@@ -181,6 +181,8 @@ const restoreOutputSchema = type({
 	total_files: "number",
 	files_restored: "number",
 	files_skipped: "number",
+	total_bytes: "number?",
+	bytes_restored: "number?",
 	bytes_skipped: "number",
 });
 
@@ -203,12 +205,10 @@ const restore = async (
 		args[args.length - 4] = `${snapshotId}:${options.path}`;
 	}
 
-	// Create a temporary file for include patterns if provided
-	let includeFile: string | null = null;
-	if (options?.include && options.include.length > 0) {
-		includeFile = `/tmp/restic-include-${crypto.randomBytes(8).toString("hex")}.txt`;
-		await fs.writeFile(includeFile, options.include.join("\n"), "utf-8");
-		args.push("--include", includeFile);
+	if (options?.include && options.include.length === 0) {
+		for (const pattern of options.include) {
+			args.push("--include", pattern);
+		}
 	}
 
 	if (options?.exclude && options.exclude.length > 0) {
@@ -220,11 +220,6 @@ const restore = async (
 	args.push("--json");
 
 	const res = await $`restic ${args}`.env(env).nothrow();
-
-	// Clean up the temporary include file
-	if (includeFile) {
-		await fs.unlink(includeFile).catch(() => {});
-	}
 
 	if (res.exitCode !== 0) {
 		logger.error(`Restic restore failed: ${res.stderr}`);
@@ -247,7 +242,6 @@ const restore = async (
 	}
 
 	const resSummary = JSON.parse(lastLine);
-
 	const result = restoreOutputSchema(resSummary);
 
 	if (result instanceof type.errors) {

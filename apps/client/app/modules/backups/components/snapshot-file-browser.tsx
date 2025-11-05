@@ -1,10 +1,12 @@
 import { useCallback, useMemo, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileIcon } from "lucide-react";
-import { listSnapshotFilesOptions } from "~/api-client/@tanstack/react-query.gen";
+import { listSnapshotFilesOptions, restoreSnapshotMutation } from "~/api-client/@tanstack/react-query.gen";
 import { FileTree, type FileEntry } from "~/components/file-tree";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { Button } from "~/components/ui/button";
 import type { Snapshot } from "~/lib/types";
+import { toast } from "sonner";
 
 interface Props {
 	snapshot: Snapshot;
@@ -19,6 +21,7 @@ export const SnapshotFileBrowser = (props: Props) => {
 	const [fetchedFolders, setFetchedFolders] = useState<Set<string>>(new Set());
 	const [loadingFolders, setLoadingFolders] = useState<Set<string>>(new Set());
 	const [allFiles, setAllFiles] = useState<Map<string, FileEntry>>(new Map());
+	const [selectedPaths, setSelectedPaths] = useState<Set<string>>(new Set());
 
 	const volumeBasePath = snapshot.paths[0]?.match(/^(.*?_data)(\/|$)/)?.[1] || "";
 
@@ -135,12 +138,49 @@ export const SnapshotFileBrowser = (props: Props) => {
 		[repositoryName, snapshot, fetchedFolders, loadingFolders, queryClient, addBasePath],
 	);
 
+	const { mutate: restoreSnapshot, isPending: isRestoring } = useMutation({
+		...restoreSnapshotMutation(),
+		onSuccess: (data) => {
+			toast.success("Restore completed", {
+				description: `Successfully restored ${data.filesRestored} file(s). ${data.filesSkipped} file(s) skipped.`,
+			});
+			setSelectedPaths(new Set());
+		},
+		onError: (error) => {
+			toast.error("Restore failed", { description: error.message || "Failed to restore snapshot" });
+		},
+	});
+
+	const handleRestoreClick = useCallback(() => {
+		const pathsArray = Array.from(selectedPaths);
+		const includePaths = pathsArray.map((path) => addBasePath(path));
+
+		restoreSnapshot({
+			path: { name: repositoryName },
+			body: {
+				snapshotId: snapshot.short_id,
+				include: includePaths,
+			},
+		});
+	}, [selectedPaths, addBasePath, repositoryName, snapshot.short_id, restoreSnapshot]);
+
 	return (
 		<div className="space-y-4">
 			<Card className="h-[600px] flex flex-col">
 				<CardHeader>
-					<CardTitle>File Browser</CardTitle>
-					<CardDescription>{`Viewing snapshot from ${new Date(snapshot?.time ?? 0).toLocaleString()}`}</CardDescription>
+					<div className="flex items-start justify-between">
+						<div>
+							<CardTitle>File Browser</CardTitle>
+							<CardDescription>{`Viewing snapshot from ${new Date(snapshot?.time ?? 0).toLocaleString()}`}</CardDescription>
+						</div>
+						{selectedPaths.size > 0 && (
+							<Button onClick={handleRestoreClick} variant="primary" size="sm" disabled={isRestoring}>
+								{isRestoring
+									? "Restoring..."
+									: `Restore ${selectedPaths.size} selected ${selectedPaths.size === 1 ? "item" : "items"}`}
+							</Button>
+						)}
+					</div>
 				</CardHeader>
 				<CardContent className="flex-1 overflow-hidden flex flex-col p-0">
 					{filesLoading && fileArray.length === 0 && (
@@ -165,6 +205,9 @@ export const SnapshotFileBrowser = (props: Props) => {
 								expandedFolders={expandedFolders}
 								loadingFolders={loadingFolders}
 								className="px-2 py-2"
+								withCheckboxes={true}
+								selectedPaths={selectedPaths}
+								onSelectionChange={setSelectedPaths}
 							/>
 						</div>
 					)}
