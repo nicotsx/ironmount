@@ -27,7 +27,7 @@ export const SnapshotTimeline = (props: Props) => {
 			<div className="w-full bg-card">
 				<div className="relative flex items-center">
 					<div className="flex-1 overflow-hidden">
-						<div className="flex gap-4 overflow-x-auto pb-2">
+						<div className="flex gap-4 overflow-x-auto pb-2 [&>:first-child]:ml-2 [&>:last-child]:mr-2">
 							{snapshots.map((snapshot, index) => {
 								const date = new Date(snapshot.time);
 								const isSelected = snapshotId === snapshot.short_id;

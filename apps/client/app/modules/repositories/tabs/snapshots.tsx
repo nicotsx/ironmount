@@ -30,7 +30,7 @@ export const formatSnapshotDuration = (seconds: number) => {
 export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 	const [searchQuery, setSearchQuery] = useState("");
 
-	const { data, isLoading, failureReason } = useQuery({
+	const { data, isFetching, failureReason } = useQuery({
 		...listSnapshotsOptions({ path: { name: repository.name } }),
 		refetchInterval: 10000,
 		refetchOnWindowFocus: true,
@@ -67,7 +67,7 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 		);
 	}
 
-	if (isLoading && !data.length && !failureReason) {
+	if (isFetching && !data.length) {
 		return (
 			<Card>
 				<CardContent className="flex items-center justify-center py-12">
@@ -90,7 +90,6 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 	}
 
 	if (!data.length) {
-		console.log("No snapshots found for repository:", repository.name);
 		return (
 			<Card>
 				<CardContent className="flex flex-col items-center justify-center text-center py-16 px-4">
