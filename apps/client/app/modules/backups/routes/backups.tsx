@@ -98,12 +98,6 @@ export default function Backups({ loaderData }: Route.ComponentProps) {
 											{schedule.nextBackupAt ? new Date(schedule.nextBackupAt).toLocaleDateString() : "N/A"}
 										</span>
 									</div>
-									{schedule.lastBackupError && (
-										<div className="flex items-start justify-between text-sm gap-2">
-											<span className="text-muted-foreground">Error</span>
-											<span className="text-xs text-red-600 text-right line-clamp-2">{schedule.lastBackupError}</span>
-										</div>
-									)}
 								</div>
 							</CardContent>
 						</Card>

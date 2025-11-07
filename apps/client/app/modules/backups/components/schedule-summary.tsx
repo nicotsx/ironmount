@@ -124,6 +124,13 @@ export const ScheduleSummary = (props: Props) => {
 							{!schedule.lastBackupStatus && "—"}
 						</p>
 					</div>
+
+					{schedule.lastBackupError && (
+						<div className="md:col-span-2 lg:col-span-4">
+							<p className="text-xs uppercase text-muted-foreground">Error Details</p>
+							<p className="font-mono text-sm text-red-600 whitespace-pre-wrap break-all">{schedule.lastBackupError}</p>
+						</div>
+					)}
 				</CardContent>
 			</Card>
 
