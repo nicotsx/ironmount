@@ -27,7 +27,7 @@ export function AuthLayout({ title, description, children }: AuthLayoutProps) {
 			</div>
 			<div
 				className="hidden lg:block lg:flex-1 dither-xl bg-cover bg-center"
-				style={{ backgroundImage: "url(/background.jpg)" }}
+				style={{ backgroundImage: "url(/images/background.jpg)" }}
 			/>
 		</div>
 	);
