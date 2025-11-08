@@ -1,12 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { AlertCircle, Unplug } from "lucide-react";
+import { Unplug } from "lucide-react";
 import * as YML from "yaml";
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { CodeBlock } from "~/components/ui/code-block";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
 import type { Volume } from "~/lib/types";
-import { getContainersUsingVolumeOptions, getSystemInfoOptions } from "../../../api-client/@tanstack/react-query.gen";
+import { getContainersUsingVolumeOptions } from "../../../api-client/@tanstack/react-query.gen";
 
 type Props = {
 	volume: Volume;
@@ -29,11 +28,6 @@ export const DockerTabContent = ({ volume }: Props) => {
 
 	const dockerRunCommand = `docker run -v im-${volume.name}:/path/in/container nginx:latest`;
 
-	const { data: systemInfo } = useQuery({
-		...getSystemInfoOptions(),
-		staleTime: 60000, // Cache for 1 minute
-	});
-
 	const {
 		data: containersData,
 		isLoading,
@@ -45,7 +39,6 @@ export const DockerTabContent = ({ volume }: Props) => {
 	});
 
 	const containers = containersData || [];
-	const dockerAvailable = systemInfo?.data?.capabilities?.docker ?? true;
 
 	const getStateClass = (state: string) => {
 		switch (state) {
@@ -60,28 +53,6 @@ export const DockerTabContent = ({ volume }: Props) => {
 
 	return (
 		<div className="grid gap-4 xl:grid-cols-[minmax(0,_1fr)_minmax(0,_1fr)]">
-			{!dockerAvailable && (
-				<div className="xl:col-span-2">
-					<Alert>
-						<AlertCircle className="h-4 w-4" />
-						<AlertTitle>Docker Integration Unavailable</AlertTitle>
-						<AlertDescription>
-							Docker integration features are currently disabled. To enable them, you need to mount the following paths
-							in your docker-compose.yml:
-							<ul className="mt-2 list-inside list-disc space-y-1 text-sm">
-								<li>
-									<code className="rounded bg-muted px-1 py-0.5">/var/run/docker.sock:/var/run/docker.sock</code>
-								</li>
-								<li>
-									<code className="rounded bg-muted px-1 py-0.5">/run/docker/plugins:/run/docker/plugins</code>
-								</li>
-							</ul>
-							<p className="mt-2 text-sm">After adding these mounts, restart the Ironmount container.</p>
-						</AlertDescription>
-					</Alert>
-				</div>
-			)}
-
 			<Card>
 				<CardHeader>
 					<CardTitle>Plug-and-play Docker integration</CardTitle>
@@ -112,31 +83,19 @@ export const DockerTabContent = ({ volume }: Props) => {
 				<Card>
 					<CardHeader>
 						<CardTitle>Containers Using This Volume</CardTitle>
-						<CardDescription>
-							{dockerAvailable
-								? "List of Docker containers mounting this volume."
-								: "Docker integration is unavailable - enable it to see container information."}
-						</CardDescription>
+						<CardDescription>List of Docker containers mounting this volume.</CardDescription>
 					</CardHeader>
 
 					<CardContent className="space-y-4 text-sm h-full">
-						{!dockerAvailable && (
-							<div className="flex flex-col items-center justify-center text-center h-full">
-								<AlertCircle className="mb-4 h-5 w-5 text-muted-foreground" />
-								<p className="text-muted-foreground">Docker integration is not available.</p>
-							</div>
-						)}
-						{dockerAvailable && isLoading && <div>Loading containers...</div>}
-						{dockerAvailable && error && (
-							<div className="text-destructive">Failed to load containers: {String(error)}</div>
-						)}
-						{dockerAvailable && !isLoading && !error && containers.length === 0 && (
+						{isLoading && <div>Loading containers...</div>}
+						{error && <div className="text-destructive">Failed to load containers: {String(error)}</div>}
+						{!isLoading && !error && containers.length === 0 && (
 							<div className="flex flex-col items-center justify-center text-center h-full">
 								<Unplug className="mb-4 h-5 w-5 text-muted-foreground" />
 								<p className="text-muted-foreground">No Docker containers are currently using this volume.</p>
 							</div>
 						)}
-						{dockerAvailable && !isLoading && !error && containers.length > 0 && (
+						{!isLoading && !error && containers.length > 0 && (
 							<div className="max-h-130 overflow-y-auto">
 								<Table>
 									<TableHeader>

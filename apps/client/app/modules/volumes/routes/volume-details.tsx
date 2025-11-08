@@ -5,6 +5,7 @@ import { useState } from "react";
 import {
 	deleteVolumeMutation,
 	getVolumeOptions,
+	getSystemInfoOptions,
 	mountVolumeMutation,
 	unmountVolumeMutation,
 } from "~/api-client/@tanstack/react-query.gen";
@@ -58,6 +59,10 @@ export default function VolumeDetails({ loaderData }: Route.ComponentProps) {
 		refetchOnWindowFocus: true,
 	});
 
+	const { data: systemInfo } = useQuery({
+		...getSystemInfoOptions(),
+	});
+
 	const deleteVol = useMutation({
 		...deleteVolumeMutation(),
 		onSuccess: () => {
@@ -109,6 +114,7 @@ export default function VolumeDetails({ loaderData }: Route.ComponentProps) {
 	}
 
 	const { volume, statfs } = data;
+	const dockerAvailable = systemInfo?.capabilities?.docker ?? false;
 
 	return (
 		<>
@@ -146,7 +152,7 @@ export default function VolumeDetails({ loaderData }: Route.ComponentProps) {
 				<TabsList className="mb-2">
 					<TabsTrigger value="info">Configuration</TabsTrigger>
 					<TabsTrigger value="files">Files</TabsTrigger>
-					<TabsTrigger value="docker">Docker</TabsTrigger>
+					{dockerAvailable && <TabsTrigger value="docker">Docker</TabsTrigger>}
 				</TabsList>
 				<TabsContent value="info">
 					<VolumeInfoTabContent volume={volume} statfs={statfs} />
@@ -154,9 +160,11 @@ export default function VolumeDetails({ loaderData }: Route.ComponentProps) {
 				<TabsContent value="files">
 					<FilesTabContent volume={volume} />
 				</TabsContent>
-				<TabsContent value="docker">
-					<DockerTabContent volume={volume} />
-				</TabsContent>
+				{dockerAvailable && (
+					<TabsContent value="docker">
+						<DockerTabContent volume={volume} />
+					</TabsContent>
+				)}
 			</Tabs>
 
 			<AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
