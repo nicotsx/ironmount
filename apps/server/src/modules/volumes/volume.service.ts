@@ -7,10 +7,12 @@ import { eq } from "drizzle-orm";
 import { ConflictError, InternalServerError, NotFoundError } from "http-errors-enhanced";
 import slugify from "slugify";
 import { getCapabilities } from "../../core/capabilities";
+import { OPERATION_TIMEOUT } from "../../core/constants";
 import { db } from "../../db/db";
 import { volumesTable } from "../../db/schema";
 import { toMessage } from "../../utils/errors";
 import { getStatFs, type StatFs } from "../../utils/mountinfo";
+import { withTimeout } from "../../utils/timeout";
 import { createVolumeBackend } from "../backends/backend";
 import type { UpdateVolumeBody } from "./volume.dto";
 import { getVolumePath } from "./helpers";
@@ -128,7 +130,11 @@ const getVolume = async (name: string) => {
 
 	let statfs: Partial<StatFs> = {};
 	if (volume.status === "mounted") {
-		statfs = await getStatFs(getVolumePath(volume)).catch(() => ({}));
+		statfs = await withTimeout(getStatFs(getVolumePath(volume)), OPERATION_TIMEOUT, "getStatFs")
+			.catch((error) => {
+				logger.warn(`Failed to get statfs for volume ${name}: ${toMessage(error)}`);
+				return {};
+			});
 	}
 
 	return { volume, statfs };
