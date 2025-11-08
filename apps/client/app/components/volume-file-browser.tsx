@@ -15,7 +15,6 @@ interface FileEntry {
 type VolumeFileBrowserProps = {
 	volumeName: string;
 	enabled?: boolean;
-	refetchInterval?: number | false;
 	withCheckboxes?: boolean;
 	selectedPaths?: Set<string>;
 	onSelectionChange?: (paths: Set<string>) => void;
@@ -28,7 +27,6 @@ type VolumeFileBrowserProps = {
 export const VolumeFileBrowser = ({
 	volumeName,
 	enabled = true,
-	refetchInterval,
 	withCheckboxes = false,
 	selectedPaths,
 	onSelectionChange,
@@ -46,7 +44,6 @@ export const VolumeFileBrowser = ({
 	const { data, isLoading, error } = useQuery({
 		...listFilesOptions({ path: { name: volumeName } }),
 		enabled,
-		refetchInterval,
 	});
 
 	useMemo(() => {

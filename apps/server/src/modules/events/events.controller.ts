@@ -75,7 +75,7 @@ export const eventsController = new Hono().get("/", (c) => {
 				data: JSON.stringify({ timestamp: Date.now() }),
 				event: "heartbeat",
 			});
-			await stream.sleep(30000);
+			await stream.sleep(5000);
 		}
 	});
 });

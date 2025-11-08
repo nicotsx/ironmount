@@ -30,7 +30,6 @@ export const FilesTabContent = ({ volume }: Props) => {
 				<VolumeFileBrowser
 					volumeName={volume.name}
 					enabled={volume.status === "mounted"}
-					refetchInterval={10000}
 					className="overflow-auto flex-1 border rounded-md bg-card p-2"
 					emptyMessage="This volume is empty."
 					emptyDescription="Files and folders will appear here once you add them."

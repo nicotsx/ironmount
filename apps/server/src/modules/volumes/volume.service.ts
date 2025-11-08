@@ -224,6 +224,10 @@ const checkHealth = async (name: string) => {
 	const backend = createVolumeBackend(volume);
 	const { error, status } = await backend.checkHealth();
 
+	if (status !== volume.status) {
+		serverEvents.emit("volume:status_changed", { volumeName: name, status });
+	}
+
 	await db
 		.update(volumesTable)
 		.set({ lastHealthCheck: Date.now(), status, lastError: error ?? null })

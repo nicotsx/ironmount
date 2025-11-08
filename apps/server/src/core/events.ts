@@ -6,10 +6,16 @@ import type { TypedEmitter } from "tiny-typed-emitter";
  */
 interface ServerEvents {
 	"backup:started": (data: { scheduleId: number; volumeName: string; repositoryName: string }) => void;
-	"backup:completed": (data: { scheduleId: number; volumeName: string; repositoryName: string; status: "success" | "error" }) => void;
+	"backup:completed": (data: {
+		scheduleId: number;
+		volumeName: string;
+		repositoryName: string;
+		status: "success" | "error";
+	}) => void;
 	"volume:mounted": (data: { volumeName: string }) => void;
 	"volume:unmounted": (data: { volumeName: string }) => void;
 	"volume:updated": (data: { volumeName: string }) => void;
+	"volume:status_changed": (data: { volumeName: string; status: string }) => void;
 }
 
 /**

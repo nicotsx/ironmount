@@ -92,6 +92,17 @@ export function useServerEvents() {
 			});
 		});
 
+		eventSource.addEventListener("volume:status_updated", (e) => {
+			const data = JSON.parse(e.data) as VolumeEvent;
+			console.log("[SSE] Volume status updated:", data);
+
+			queryClient.invalidateQueries();
+
+			handlersRef.current.get("volume:updated")?.forEach((handler) => {
+				handler(data);
+			});
+		});
+
 		eventSource.onerror = (error) => {
 			console.error("[SSE] Connection error:", error);
 		};
