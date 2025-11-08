@@ -25,7 +25,7 @@ const backupScheduleSchema = type({
 	excludePatterns: "string[] | null",
 	includePatterns: "string[] | null",
 	lastBackupAt: "number | null",
-	lastBackupStatus: "'success' | 'error' | null",
+	lastBackupStatus: "'success' | 'error' | 'in_progress' | null",
 	lastBackupError: "string | null",
 	nextBackupAt: "number | null",
 	createdAt: "number",

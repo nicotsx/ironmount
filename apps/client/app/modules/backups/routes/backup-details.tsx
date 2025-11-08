@@ -38,6 +38,8 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 			path: { scheduleId: params.id },
 		}),
 		initialData: loaderData,
+		refetchInterval: 10000,
+		refetchOnWindowFocus: true,
 	});
 
 	const {

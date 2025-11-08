@@ -75,9 +75,15 @@ export const ScheduleSummary = (props: Props) => {
 						</div>
 					</div>
 					<div className="flex flex-col sm:flex-row gap-2">
-						<Button variant="default" size="sm" onClick={handleRunBackupNow} className="w-full sm:w-auto">
+						<Button
+							variant="default"
+							size="sm"
+							onClick={handleRunBackupNow}
+							disabled={schedule.lastBackupStatus === "in_progress"}
+							className="w-full sm:w-auto"
+						>
 							<Play className="h-4 w-4 mr-2" />
-							<span className="sm:inline">Backup Now</span>
+							<span className="sm:inline">Backup now</span>
 						</Button>
 						<Button variant="outline" size="sm" onClick={() => setIsEditMode(true)} className="w-full sm:w-auto">
 							<Pencil className="h-4 w-4 mr-2" />
@@ -121,6 +127,7 @@ export const ScheduleSummary = (props: Props) => {
 						<p className="font-medium">
 							{schedule.lastBackupStatus === "success" && "✓ Success"}
 							{schedule.lastBackupStatus === "error" && "✗ Error"}
+							{schedule.lastBackupStatus === "in_progress" && "⟳  in progress..."}
 							{!schedule.lastBackupStatus && "—"}
 						</p>
 					</div>

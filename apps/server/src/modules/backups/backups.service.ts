@@ -181,6 +181,11 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 
 	logger.info(`Starting backup for volume ${volume.name} to repository ${repository.name}`);
 
+	await db
+		.update(backupSchedulesTable)
+		.set({ lastBackupStatus: "in_progress", updatedAt: Date.now() })
+		.where(eq(backupSchedulesTable.id, scheduleId));
+
 	try {
 		const volumePath = getVolumePath(volume.name);
 

@@ -1,11 +1,17 @@
 import { cn } from "~/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
 
-type BackupStatus = "active" | "paused" | "error";
+type BackupStatus = "active" | "paused" | "error" | "in_progress";
 
-export const BackupStatusDot = ({ enabled, hasError }: { enabled: boolean; hasError?: boolean }) => {
+export const BackupStatusDot = ({
+	enabled,
+	hasError,
+	isInProgress,
+}: { enabled: boolean; hasError?: boolean; isInProgress?: boolean }) => {
 	let status: BackupStatus = "paused";
-	if (hasError) {
+	if (isInProgress) {
+		status = "in_progress";
+	} else if (hasError) {
 		status = "error";
 	} else if (enabled) {
 		status = "active";
@@ -29,6 +35,12 @@ export const BackupStatusDot = ({ enabled, hasError }: { enabled: boolean; hasEr
 			colorLight: "bg-red-400",
 			animated: true,
 			label: "Error",
+		},
+		in_progress: {
+			color: "bg-blue-500",
+			colorLight: "bg-blue-400",
+			animated: true,
+			label: "Backup in progress",
 		},
 	}[status];
 

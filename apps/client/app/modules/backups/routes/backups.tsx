@@ -73,7 +73,11 @@ export default function Backups({ loaderData }: Route.ComponentProps) {
 											Volume <span className="text-strong-accent">{schedule.volume.name}</span>
 										</CardTitle>
 									</div>
-									<BackupStatusDot enabled={schedule.enabled} hasError={!!schedule.lastBackupError} />
+									<BackupStatusDot
+										enabled={schedule.enabled}
+										hasError={!!schedule.lastBackupError}
+										isInProgress={schedule.lastBackupStatus === "in_progress"}
+									/>
 								</div>
 								<CardDescription className="flex items-center gap-2 mt-2">
 									<Database className="h-4 w-4" />
