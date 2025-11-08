@@ -156,14 +156,14 @@ const backup = async (
 		});
 
 		let stdout = "";
-		let stderr = "";
 
 		child.stdout.on("data", (data) => {
-			stdout += data.toString();
+			stdout = data.toString();
+			logger.info(data.toString());
 		});
 
 		child.stderr.on("data", (data) => {
-			stderr += data.toString();
+			logger.error(data.toString());
 		});
 
 		child.on("error", async (error) => {
@@ -186,14 +186,13 @@ const backup = async (
 			}
 
 			if (code !== 0) {
-				logger.error(`Restic backup failed with exit code ${code}: ${stderr}`);
-				reject(new Error(`Restic backup failed: ${stderr}`));
+				logger.error(`Restic backup failed with exit code ${code}`);
+				reject(new Error(`Restic backup failed`));
 				return;
 			}
 
 			try {
-				const outputLines = stdout.trim().split("\n");
-				const lastLine = outputLines[outputLines.length - 1];
+				const lastLine = stdout.trim();
 				const resSummary = JSON.parse(lastLine ?? "{}");
 
 				const result = backupOutputSchema(resSummary);
