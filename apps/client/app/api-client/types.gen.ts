@@ -663,6 +663,36 @@ export type ListFilesResponses = {
 
 export type ListFilesResponse = ListFilesResponses[keyof ListFilesResponses];
 
+export type BrowseFilesystemData = {
+	body?: never;
+	path?: never;
+	query?: {
+		/**
+		 * Directory path to browse (absolute path, defaults to /)
+		 */
+		path?: string;
+	};
+	url: "/api/v1/volumes/filesystem/browse";
+};
+
+export type BrowseFilesystemResponses = {
+	/**
+	 * List of directories in the specified path
+	 */
+	200: {
+		directories: Array<{
+			name: string;
+			path: string;
+			type: "directory" | "file";
+			modifiedAt?: number;
+			size?: number;
+		}>;
+		path: string;
+	};
+};
+
+export type BrowseFilesystemResponse = BrowseFilesystemResponses[keyof BrowseFilesystemResponses];
+
 export type ListRepositoriesData = {
 	body?: never;
 	path?: never;

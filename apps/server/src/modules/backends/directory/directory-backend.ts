@@ -5,10 +5,26 @@ import { toMessage } from "../../../utils/errors";
 import { logger } from "../../../utils/logger";
 import type { VolumeBackend } from "../backend";
 
-const mount = async (_config: BackendConfig, path: string) => {
-	logger.info("Mounting directory volume...", path);
-	await fs.mkdir(path, { recursive: true });
-	return { status: BACKEND_STATUS.mounted };
+const mount = async (config: BackendConfig, _volumePath: string) => {
+	if (config.backend !== "directory") {
+		return { status: BACKEND_STATUS.error, error: "Invalid backend type" };
+	}
+
+	logger.info("Mounting directory volume from:", config.path);
+
+	try {
+		await fs.access(config.path);
+		const stats = await fs.stat(config.path);
+
+		if (!stats.isDirectory()) {
+			return { status: BACKEND_STATUS.error, error: "Path is not a directory" };
+		}
+
+		return { status: BACKEND_STATUS.mounted };
+	} catch (error) {
+		logger.error("Failed to mount directory volume:", error);
+		return { status: BACKEND_STATUS.error, error: toMessage(error) };
+	}
 };
 
 const unmount = async () => {
@@ -16,12 +32,16 @@ const unmount = async () => {
 	return { status: BACKEND_STATUS.unmounted };
 };
 
-const checkHealth = async (path: string) => {
+const checkHealth = async (config: BackendConfig) => {
+	if (config.backend !== "directory") {
+		return { status: BACKEND_STATUS.error, error: "Invalid backend type" };
+	}
+
 	try {
-		await fs.access(path);
+		await fs.access(config.path);
 
 		// Try to create a temporary file to ensure write access
-		const tempFilePath = npath.join(path, `.healthcheck-${Date.now()}`);
+		const tempFilePath = npath.join(config.path, `.healthcheck-${Date.now()}`);
 		await fs.writeFile(tempFilePath, "healthcheck");
 		await fs.unlink(tempFilePath);
 
@@ -32,8 +52,8 @@ const checkHealth = async (path: string) => {
 	}
 };
 
-export const makeDirectoryBackend = (config: BackendConfig, path: string): VolumeBackend => ({
-	mount: () => mount(config, path),
+export const makeDirectoryBackend = (config: BackendConfig, volumePath: string): VolumeBackend => ({
+	mount: () => mount(config, volumePath),
 	unmount,
-	checkHealth: () => checkHealth(path),
+	checkHealth: () => checkHealth(config),
 });

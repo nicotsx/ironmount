@@ -36,6 +36,9 @@ interface Props {
 	selectedPaths?: Set<string>;
 	onSelectionChange?: (selectedPaths: Set<string>) => void;
 	foldersOnly?: boolean;
+	selectableFolders?: boolean;
+	onFolderSelect?: (folderPath: string) => void;
+	selectedFolder?: string;
 }
 
 export const FileTree = memo((props: Props) => {
@@ -52,6 +55,9 @@ export const FileTree = memo((props: Props) => {
 		selectedPaths = new Set(),
 		onSelectionChange,
 		foldersOnly = false,
+		selectableFolders = false,
+		onFolderSelect,
+		selectedFolder,
 	} = props;
 
 	const fileList = useMemo(() => {
@@ -124,6 +130,13 @@ export const FileTree = memo((props: Props) => {
 			onFileSelect?.(filePath);
 		},
 		[onFileSelect],
+	);
+
+	const handleFolderSelect = useCallback(
+		(folderPath: string) => {
+			onFolderSelect?.(folderPath);
+		},
+		[onFolderSelect],
 	);
 
 	const handleSelectionChange = useCallback(
@@ -299,6 +312,9 @@ export const FileTree = memo((props: Props) => {
 								checked={isPathSelected(fileOrFolder.fullPath) && !isPartiallySelected(fileOrFolder.fullPath)}
 								partiallyChecked={isPartiallySelected(fileOrFolder.fullPath)}
 								onCheckboxChange={handleSelectionChange}
+								selectableMode={selectableFolders}
+								onFolderSelect={handleFolderSelect}
+								selected={selectedFolder === fileOrFolder.fullPath}
 							/>
 						);
 					}
@@ -321,6 +337,9 @@ interface FolderProps {
 	checked?: boolean;
 	partiallyChecked?: boolean;
 	onCheckboxChange?: (path: string, checked: boolean) => void;
+	selectableMode?: boolean;
+	onFolderSelect?: (folderPath: string) => void;
+	selected?: boolean;
 }
 
 const Folder = memo(
@@ -334,6 +353,9 @@ const Folder = memo(
 		checked,
 		partiallyChecked,
 		onCheckboxChange,
+		selectableMode,
+		onFolderSelect,
+		selected,
 	}: FolderProps) => {
 		const { depth, name, fullPath } = folder;
 		const FolderIconComponent = collapsed ? FolderIcon : FolderOpen;
@@ -359,9 +381,19 @@ const Folder = memo(
 			[onCheckboxChange, fullPath],
 		);
 
+		const handleFolderClick = useCallback(() => {
+			if (selectableMode) {
+				onFolderSelect?.(fullPath);
+			}
+		}, [selectableMode, onFolderSelect, fullPath]);
+
 		return (
 			<NodeButton
-				className={cn("group hover:bg-accent/50 text-foreground")}
+				className={cn("group", {
+					"hover:bg-accent/50 text-foreground": !selected,
+					"bg-accent text-accent-foreground": selected,
+					"cursor-pointer": selectableMode,
+				})}
 				depth={depth}
 				icon={
 					loading ? (
@@ -372,6 +404,7 @@ const Folder = memo(
 						<ChevronDown className="w-4 h-4 shrink-0 cursor-pointer" onClick={handleChevronClick} />
 					)
 				}
+				onClick={selectableMode ? handleFolderClick : undefined}
 				onMouseEnter={handleMouseEnter}
 			>
 				{withCheckbox && (

@@ -335,3 +335,39 @@ export const listFilesDto = describeRoute({
 		},
 	},
 });
+
+/**
+ * Browse filesystem directories
+ */
+export const browseFilesystemResponse = type({
+	directories: fileEntrySchema.array(),
+	path: "string",
+});
+export type BrowseFilesystemDto = typeof browseFilesystemResponse.infer;
+
+export const browseFilesystemDto = describeRoute({
+	description: "Browse directories on the host filesystem",
+	operationId: "browseFilesystem",
+	tags: ["Volumes"],
+	parameters: [
+		{
+			in: "query",
+			name: "path",
+			required: false,
+			schema: {
+				type: "string",
+			},
+			description: "Directory path to browse (absolute path, defaults to /)",
+		},
+	],
+	responses: {
+		200: {
+			description: "List of directories in the specified path",
+			content: {
+				"application/json": {
+					schema: resolver(browseFilesystemResponse),
+				},
+			},
+		},
+	},
+});

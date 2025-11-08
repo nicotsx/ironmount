@@ -278,13 +278,12 @@ export const restoreSnapshotDto = describeRoute({
 export const doctorStepSchema = type({
 	step: "string",
 	success: "boolean",
-	output: "string?",
-	error: "string?",
+	output: "string | null",
+	error: "string | null",
 });
 
 export const doctorRepositoryResponse = type({
 	success: "boolean",
-	message: "string",
 	steps: doctorStepSchema.array(),
 });
 

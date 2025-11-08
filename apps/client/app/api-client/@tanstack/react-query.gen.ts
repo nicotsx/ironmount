@@ -19,6 +19,7 @@ import {
 	unmountVolume,
 	healthCheckVolume,
 	listFiles,
+	browseFilesystem,
 	listRepositories,
 	createRepository,
 	deleteRepository,
@@ -67,6 +68,7 @@ import type {
 	HealthCheckVolumeData,
 	HealthCheckVolumeResponse,
 	ListFilesData,
+	BrowseFilesystemData,
 	ListRepositoriesData,
 	CreateRepositoryData,
 	CreateRepositoryResponse,
@@ -644,6 +646,27 @@ export const listFilesOptions = (options: Options<ListFilesData>) => {
 			return data;
 		},
 		queryKey: listFilesQueryKey(options),
+	});
+};
+
+export const browseFilesystemQueryKey = (options?: Options<BrowseFilesystemData>) =>
+	createQueryKey("browseFilesystem", options);
+
+/**
+ * Browse directories on the host filesystem
+ */
+export const browseFilesystemOptions = (options?: Options<BrowseFilesystemData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await browseFilesystem({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: browseFilesystemQueryKey(options),
 	});
 };
 

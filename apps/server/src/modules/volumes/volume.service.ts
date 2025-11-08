@@ -276,7 +276,9 @@ const listFiles = async (name: string, subPath?: string) => {
 		throw new InternalServerError("Volume is not mounted");
 	}
 
-	const volumePath = getVolumePath(volume.name);
+	// For directory volumes, use the configured path directly
+	const volumePath =
+		volume.config.backend === "directory" ? volume.config.path : getVolumePath(volume.name);
 
 	const requestedPath = subPath ? path.join(volumePath, subPath) : volumePath;
 
@@ -328,6 +330,48 @@ const listFiles = async (name: string, subPath?: string) => {
 	}
 };
 
+const browseFilesystem = async (browsePath: string) => {
+	const normalizedPath = path.normalize(browsePath);
+
+	try {
+		const entries = await fs.readdir(normalizedPath, { withFileTypes: true });
+
+		const directories = await Promise.all(
+			entries
+				.filter((entry) => entry.isDirectory())
+				.map(async (entry) => {
+					const fullPath = path.join(normalizedPath, entry.name);
+
+					try {
+						const stats = await fs.stat(fullPath);
+						return {
+							name: entry.name,
+							path: fullPath,
+							type: "directory" as const,
+							size: undefined,
+							modifiedAt: stats.mtimeMs,
+						};
+					} catch {
+						return {
+							name: entry.name,
+							path: fullPath,
+							type: "directory" as const,
+							size: undefined,
+							modifiedAt: undefined,
+						};
+					}
+				}),
+		);
+
+		return {
+			directories: directories.sort((a, b) => a.name.localeCompare(b.name)),
+			path: normalizedPath,
+		};
+	} catch (error) {
+		throw new InternalServerError(`Failed to browse filesystem: ${toMessage(error)}`);
+	}
+};
+
 export const volumeService = {
 	listVolumes,
 	createVolume,
@@ -340,4 +384,5 @@ export const volumeService = {
 	checkHealth,
 	getContainersUsingVolume,
 	listFiles,
+	browseFilesystem,
 };

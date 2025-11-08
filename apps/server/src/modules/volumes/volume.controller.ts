@@ -21,6 +21,8 @@ import {
 	type ListContainersDto,
 	type UpdateVolumeDto,
 	type ListFilesDto,
+	browseFilesystemDto,
+	type BrowseFilesystemDto,
 } from "./volume.dto";
 import { volumeService } from "./volume.service";
 import { getVolumePath } from "./helpers";
@@ -121,4 +123,15 @@ export const volumeController = new Hono()
 		c.header("Cache-Control", "public, max-age=10, stale-while-revalidate=60");
 
 		return c.json<ListFilesDto>(response, 200);
+	})
+	.get("/filesystem/browse", browseFilesystemDto, async (c) => {
+		const path = c.req.query("path") || "/";
+		const result = await volumeService.browseFilesystem(path);
+
+		const response = {
+			directories: result.directories,
+			path: result.path,
+		};
+
+		return c.json<BrowseFilesystemDto>(response, 200);
 	});

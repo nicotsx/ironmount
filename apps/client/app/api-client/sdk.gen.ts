@@ -40,6 +40,8 @@ import type {
 	HealthCheckVolumeErrors,
 	ListFilesData,
 	ListFilesResponses,
+	BrowseFilesystemData,
+	BrowseFilesystemResponses,
 	ListRepositoriesData,
 	ListRepositoriesResponses,
 	CreateRepositoryData,
@@ -304,6 +306,18 @@ export const healthCheckVolume = <ThrowOnError extends boolean = false>(
 export const listFiles = <ThrowOnError extends boolean = false>(options: Options<ListFilesData, ThrowOnError>) => {
 	return (options.client ?? _heyApiClient).get<ListFilesResponses, unknown, ThrowOnError>({
 		url: "/api/v1/volumes/{name}/files",
+		...options,
+	});
+};
+
+/**
+ * Browse directories on the host filesystem
+ */
+export const browseFilesystem = <ThrowOnError extends boolean = false>(
+	options?: Options<BrowseFilesystemData, ThrowOnError>,
+) => {
+	return (options?.client ?? _heyApiClient).get<BrowseFilesystemResponses, unknown, ThrowOnError>({
+		url: "/api/v1/volumes/filesystem/browse",
 		...options,
 	});
 };

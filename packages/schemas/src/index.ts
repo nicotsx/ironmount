@@ -32,6 +32,8 @@ export const smbConfigSchema = type({
 
 export const directoryConfigSchema = type({
 	backend: "'directory'",
+	path: "string",
+	readOnly: "false?",
 });
 
 export const webdavConfigSchema = type({
@@ -41,6 +43,7 @@ export const webdavConfigSchema = type({
 	username: "string?",
 	password: "string?",
 	port: type("string.integer").or(type("number")).to("1 <= number <= 65536").default(80),
+	readOnly: "boolean?",
 	ssl: "boolean?",
 });
 

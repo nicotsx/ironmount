@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { testConnectionMutation } from "~/api-client/@tanstack/react-query.gen";
 import { cn, slugify } from "~/lib/utils";
 import { deepClean } from "~/utils/object";
+import { DirectoryBrowser } from "./directory-browser";
 import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
@@ -30,7 +31,7 @@ type Props = {
 };
 
 const defaultValuesForType = {
-	directory: { backend: "directory" as const },
+	directory: { backend: "directory" as const, path: "/" },
 	nfs: { backend: "nfs" as const, port: 2049, version: "4.1" as const },
 	smb: { backend: "smb" as const, port: 445, vers: "3.0" as const },
 	webdav: { backend: "webdav" as const, port: 80, ssl: false },
@@ -52,8 +53,10 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 	const watchedName = watch("name");
 
 	useEffect(() => {
-		form.reset({ name: watchedName, ...defaultValuesForType[watchedBackend as keyof typeof defaultValuesForType] });
-	}, [watchedBackend, watchedName, form.reset]);
+		if (mode === "create") {
+			form.reset({ name: watchedName, ...defaultValuesForType[watchedBackend as keyof typeof defaultValuesForType] });
+		}
+	}, [watchedBackend, watchedName, form.reset, mode]);
 
 	const [testMessage, setTestMessage] = useState<{ success: boolean; message: string } | null>(null);
 
@@ -132,6 +135,39 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 						</FormItem>
 					)}
 				/>
+
+				{watchedBackend === "directory" && (
+					<FormField
+						control={form.control}
+						name="path"
+						render={({ field }) => {
+							const [showBrowser, setShowBrowser] = useState(!field.value || field.value === "/");
+
+							return (
+								<FormItem>
+									<FormLabel>Directory Path</FormLabel>
+									<FormControl>
+										{!showBrowser && field.value ? (
+											<div className="flex items-center gap-2">
+												<div className="flex-1 border rounded-md p-3 bg-muted/50">
+													<div className="text-xs font-medium text-muted-foreground mb-1">Selected path:</div>
+													<div className="text-sm font-mono break-all">{field.value}</div>
+												</div>
+												<Button type="button" variant="outline" size="sm" onClick={() => setShowBrowser(true)}>
+													Change
+												</Button>
+											</div>
+										) : (
+											<DirectoryBrowser onSelectPath={(path) => field.onChange(path)} selectedPath={field.value} />
+										)}
+									</FormControl>
+									<FormDescription>Browse and select a directory on the host filesystem to track.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							);
+						}}
+					/>
+				)}
 
 				{watchedBackend === "nfs" && (
 					<>
