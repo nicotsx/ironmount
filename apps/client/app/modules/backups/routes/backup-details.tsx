@@ -14,7 +14,7 @@ import { parseError } from "~/lib/errors";
 import { getCronExpression } from "~/utils/utils";
 import { CreateScheduleForm, type BackupScheduleFormValues } from "../components/create-schedule-form";
 import { ScheduleSummary } from "../components/schedule-summary";
-import { getBackupSchedule, listSnapshots } from "~/api-client";
+import { getBackupSchedule } from "~/api-client";
 import type { Route } from "./+types/backup-details";
 import { SnapshotFileBrowser } from "../components/snapshot-file-browser";
 import { SnapshotTimeline } from "../components/snapshot-timeline";
@@ -24,34 +24,27 @@ export const clientLoader = async ({ params }: Route.LoaderArgs) => {
 
 	if (!data) return redirect("/backups");
 
-	const snapshots = await listSnapshots({
-		path: { name: data.repository.name },
-		query: { backupId: params.id },
-	});
-
-	if (snapshots.data) return { snapshots: snapshots.data, schedule: data };
-	return { snapshots: [], schedule: data };
+	return data;
 };
 
 export default function ScheduleDetailsPage({ params, loaderData }: Route.ComponentProps) {
 	const navigate = useNavigate();
 	const [isEditMode, setIsEditMode] = useState(false);
 	const formId = useId();
-	const [selectedSnapshotId, setSelectedSnapshotId] = useState<string>(loaderData.snapshots.at(-1)?.short_id ?? "");
+	const [selectedSnapshotId, setSelectedSnapshotId] = useState<string>();
 
 	const { data: schedule } = useQuery({
 		...getBackupScheduleOptions({
 			path: { scheduleId: params.id },
 		}),
-		initialData: loaderData.schedule,
+		initialData: loaderData,
 	});
 
-	const { data: snapshots } = useQuery({
+	const { data: snapshots, isLoading } = useQuery({
 		...listSnapshotsOptions({
 			path: { name: schedule.repository.name },
 			query: { backupId: schedule.id.toString() },
 		}),
-		initialData: loaderData.snapshots,
 	});
 
 	const upsertSchedule = useMutation({
@@ -166,7 +159,7 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 		);
 	}
 
-	const selectedSnapshot = snapshots.find((s) => s.short_id === selectedSnapshotId);
+	const selectedSnapshot = snapshots?.find((s) => s.short_id === selectedSnapshotId);
 
 	return (
 		<div className="flex flex-col gap-6">
@@ -177,19 +170,18 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 				setIsEditMode={setIsEditMode}
 				schedule={schedule}
 			/>
+			<SnapshotTimeline
+				loading={isLoading}
+				snapshots={snapshots ?? []}
+				snapshotId={selectedSnapshot?.short_id}
+				onSnapshotSelect={setSelectedSnapshotId}
+			/>
 			{selectedSnapshot && (
-				<>
-					<SnapshotTimeline
-						snapshots={snapshots}
-						snapshotId={selectedSnapshot.short_id}
-						onSnapshotSelect={setSelectedSnapshotId}
-					/>
-					<SnapshotFileBrowser
-						key={selectedSnapshot.short_id}
-						snapshot={selectedSnapshot}
-						repositoryName={schedule.repository.name}
-					/>
-				</>
+				<SnapshotFileBrowser
+					key={selectedSnapshot?.short_id}
+					snapshot={selectedSnapshot}
+					repositoryName={schedule.repository.name}
+				/>
 			)}
 		</div>
 	);

@@ -2,23 +2,41 @@ import type { ListSnapshotsResponse } from "~/api-client/types.gen";
 import { cn } from "~/lib/utils";
 import { Card } from "~/components/ui/card";
 import { ByteSize } from "~/components/bytes-size";
+import { useEffect } from "react";
 
 interface Props {
 	snapshots: ListSnapshotsResponse;
-	snapshotId: string;
+	snapshotId?: string;
+	loading?: boolean;
 	onSnapshotSelect: (snapshotId: string) => void;
 }
 
 export const SnapshotTimeline = (props: Props) => {
-	const { snapshots, snapshotId, onSnapshotSelect } = props;
+	const { snapshots, snapshotId, loading, onSnapshotSelect } = props;
+
+	useEffect(() => {
+		if (!snapshotId && snapshots.length > 0) {
+			onSnapshotSelect(snapshots[snapshots.length - 1].short_id);
+		}
+	}, [snapshotId, snapshots, onSnapshotSelect]);
+
+	if (loading) {
+		return (
+			<Card>
+				<div className="flex items-center justify-center h-24">
+					<p className="text-muted-foreground">Loading snapshots...</p>
+				</div>
+			</Card>
+		);
+	}
 
 	if (snapshots.length === 0) {
 		return (
-			<div className="w-full bg-card border-t border-border py-4 px-4">
+			<Card>
 				<div className="flex items-center justify-center h-24">
 					<p className="text-muted-foreground">No snapshots available</p>
 				</div>
-			</div>
+			</Card>
 		);
 	}
 
