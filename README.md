@@ -1,6 +1,6 @@
 <div align="center">
   <h1>Ironmount</h1>
-  <h3>Keep your volumes in check!<br />One interface to manage all your storage</h3>
+  <h3>Powerful backup automation for your remote storage<br />Encrypt, compress, and protect your data with ease</h3>
   <a href="https://github.com/nicotsx/ironmount/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/nicotsx/ironmount" />
   </a>
@@ -9,27 +9,28 @@
     <img src="https://github.com/nicotsx/ironmount/blob/main/screenshots/volume-details.png?raw=true" alt="Demo" />
     <figcaption>
       <p align="center">
-        Volume details view with usage statistics and health check status
+        Backup management with scheduling and monitoring
       </p>
     </figcaption>
   </figure>
 </div>
 
-> [!WARNING]  
+> [!WARNING]
 > Ironmount is still in version 0.x.x and is subject to major changes from version to version. I am developing the core features and collecting feedbacks. Expect bugs! Please open issues or feature requests
 
 ## Intro
 
-Ironmount is an easy to use web interface to manage your remote storage and mount them as local volumes on your server. Docker as a first class citizen, Ironmount allows you to easily mount your remote storage directly into your containers with few lines of code.
+Ironmount is a backup automation platform that helps you protect your data across multiple storage backends. Built on top of Restic, it provides an intuitive web interface to schedule, manage, and monitor encrypted backups of your remote storage. With support for Docker integration, Ironmount makes it easy to backup your container volumes automatically.
 
 ### Features
 
-- ✅&nbsp; Support for multiple protocols: NFS, SMB, WebDAV, Directory
-- 💾&nbsp; Automated backups with encryption, compression and retention policies backed by Restic
-- 🔍&nbsp; Keep an eye on your mounts with health checks and automatic remounting on error
-- 📊&nbsp; Monitor your mounts usage with detailed statistics and graphs
-- 📡&nbsp; Mount your remote storage as local folders
-- 🐳&nbsp; Docker integration: mount your remote storage directly into your containers via a docker volume syntax
+- 💾&nbsp; **Automated backups** with encryption, compression and retention policies powered by Restic
+- 📅&nbsp; **Flexible scheduling** using cron expressions for automated backup jobs
+- 🔐&nbsp; **End-to-end encryption** ensuring your data is always protected
+- 📦&nbsp; **Snapshot management** with retention policies to optimize storage usage
+- 📊&nbsp; **Monitoring and statistics** to track backup health and storage usage
+- ✅&nbsp; **Multi-protocol support**: Backup from NFS, SMB, WebDAV, or local directories
+- 🔍&nbsp; **Health checks** and automatic recovery to ensure backup reliability
 
 ## Installation
 
@@ -58,9 +59,9 @@ docker compose up -d
 
 Once the container is running, you can access the web interface at `http://<your-server-ip>:4096`.
 
-## Docker volume usage
+## Backups
 
-![Preview](https://github.com/nicotsx/ironmount/blob/main/screenshots/docker-instructions.png?raw=true)
+![Preview](https://github.com/nicotsx/ironmount/blob/main/screenshots/backups.png?raw=true)
 
 ## Third-Party Software
 
