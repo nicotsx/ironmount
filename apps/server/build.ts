@@ -3,11 +3,12 @@ await Bun.build({
 	outdir: "./dist",
 	target: "bun",
 	env: "disable",
-	// sourcemap: "linked",
+	sourcemap: true,
 	minify: {
 		whitespace: true,
 		identifiers: true,
 		syntax: true,
+		keepNames: true,
 	},
 	external: ["ssh2"],
 });

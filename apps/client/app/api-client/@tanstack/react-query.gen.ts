@@ -35,6 +35,7 @@ import {
 	updateBackupSchedule,
 	getBackupScheduleForVolume,
 	runBackupNow,
+	getSystemInfo,
 } from "../sdk.gen";
 import { queryOptions, type UseMutationOptions, type DefaultError } from "@tanstack/react-query";
 import type {
@@ -90,6 +91,7 @@ import type {
 	GetBackupScheduleForVolumeData,
 	RunBackupNowData,
 	RunBackupNowResponse,
+	GetSystemInfoData,
 } from "../types.gen";
 import { client as _heyApiClient } from "../client.gen";
 
@@ -1077,4 +1079,24 @@ export const runBackupNowMutation = (
 		},
 	};
 	return mutationOptions;
+};
+
+export const getSystemInfoQueryKey = (options?: Options<GetSystemInfoData>) => createQueryKey("getSystemInfo", options);
+
+/**
+ * Get system information including available capabilities
+ */
+export const getSystemInfoOptions = (options?: Options<GetSystemInfoData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await getSystemInfo({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: getSystemInfoQueryKey(options),
+	});
 };

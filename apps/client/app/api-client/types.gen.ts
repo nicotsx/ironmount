@@ -1418,6 +1418,26 @@ export type RunBackupNowResponses = {
 
 export type RunBackupNowResponse = RunBackupNowResponses[keyof RunBackupNowResponses];
 
+export type GetSystemInfoData = {
+	body?: never;
+	path?: never;
+	query?: never;
+	url: "/api/v1/system/info";
+};
+
+export type GetSystemInfoResponses = {
+	/**
+	 * System information with enabled capabilities
+	 */
+	200: {
+		capabilities: {
+			docker: boolean;
+		};
+	};
+};
+
+export type GetSystemInfoResponse = GetSystemInfoResponses[keyof GetSystemInfoResponses];
+
 export type ClientOptions = {
 	baseUrl: "http://192.168.2.42:4096" | (string & {});
 };

@@ -6,6 +6,7 @@ import Docker from "dockerode";
 import { eq } from "drizzle-orm";
 import { ConflictError, InternalServerError, NotFoundError } from "http-errors-enhanced";
 import slugify from "slugify";
+import { getCapabilities } from "../../core/capabilities";
 import { db } from "../../db/db";
 import { volumesTable } from "../../db/schema";
 import { toMessage } from "../../utils/errors";
@@ -229,26 +230,37 @@ const getContainersUsingVolume = async (name: string) => {
 		throw new NotFoundError("Volume not found");
 	}
 
-	const docker = new Docker();
-	const containers = await docker.listContainers({ all: true });
-
-	const usingContainers = [];
-	for (const info of containers) {
-		const container = docker.getContainer(info.Id);
-		const inspect = await container.inspect();
-		const mounts = inspect.Mounts || [];
-		const usesVolume = mounts.some((mount) => mount.Type === "volume" && mount.Name === `im-${volume.name}`);
-		if (usesVolume) {
-			usingContainers.push({
-				id: inspect.Id,
-				name: inspect.Name,
-				state: inspect.State.Status,
-				image: inspect.Config.Image,
-			});
-		}
+	const { docker } = await getCapabilities();
+	if (!docker) {
+		logger.debug("Docker capability not available, returning empty containers list");
+		return { containers: [] };
 	}
 
-	return { containers: usingContainers };
+	try {
+		const docker = new Docker();
+		const containers = await docker.listContainers({ all: true });
+
+		const usingContainers = [];
+		for (const info of containers) {
+			const container = docker.getContainer(info.Id);
+			const inspect = await container.inspect();
+			const mounts = inspect.Mounts || [];
+			const usesVolume = mounts.some((mount) => mount.Type === "volume" && mount.Name === `im-${volume.name}`);
+			if (usesVolume) {
+				usingContainers.push({
+					id: inspect.Id,
+					name: inspect.Name,
+					state: inspect.State.Status,
+					image: inspect.Config.Image,
+				});
+			}
+		}
+
+		return { containers: usingContainers };
+	} catch (error) {
+		logger.error(`Failed to get containers using volume: ${toMessage(error)}`);
+		return { containers: [] };
+	}
 };
 
 const listFiles = async (name: string, subPath?: string) => {

@@ -4,12 +4,14 @@ import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { logger as honoLogger } from "hono/logger";
 import { openAPIRouteHandler } from "hono-openapi";
+import { getCapabilities } from "./core/capabilities";
 import { runDbMigrations } from "./db/db";
 import { authController } from "./modules/auth/auth.controller";
 import { requireAuth } from "./modules/auth/auth.middleware";
 import { driverController } from "./modules/driver/driver.controller";
 import { startup } from "./modules/lifecycle/startup";
 import { repositoriesController } from "./modules/repositories/repositories.controller";
+import { systemController } from "./modules/system/system.controller";
 import { volumeController } from "./modules/volumes/volume.controller";
 import { backupScheduleController } from "./modules/backups/backups.controller";
 import { handleServiceError } from "./utils/errors";
@@ -41,6 +43,7 @@ const app = new Hono()
 	.route("/api/v1/volumes", volumeController.use(requireAuth))
 	.route("/api/v1/repositories", repositoriesController.use(requireAuth))
 	.route("/api/v1/backups", backupScheduleController.use(requireAuth))
+	.route("/api/v1/system", systemController.use(requireAuth))
 	.get("/assets/*", serveStatic({ root: "./assets/frontend" }))
 	.get("/images/*", serveStatic({ root: "./assets/frontend" }))
 	.get("*", serveStatic({ path: "./assets/frontend/index.html" }));
@@ -60,15 +63,26 @@ app.onError((err, c) => {
 	return c.json({ message }, status);
 });
 
-const socketPath = "/run/docker/plugins/ironmount.sock";
-
-await fs.mkdir("/run/docker/plugins", { recursive: true });
 runDbMigrations();
 
-Bun.serve({
-	unix: socketPath,
-	fetch: driver.fetch,
-});
+const { docker } = await getCapabilities();
+
+if (docker) {
+	const socketPath = "/run/docker/plugins/ironmount.sock";
+
+	try {
+		await fs.mkdir("/run/docker/plugins", { recursive: true });
+
+		Bun.serve({
+			unix: socketPath,
+			fetch: driver.fetch,
+		});
+
+		logger.info(`Docker volume plugin server running at ${socketPath}`);
+	} catch (error) {
+		logger.error(`Failed to start Docker volume plugin server: ${error}`);
+	}
+}
 
 Bun.serve({
 	port: 4096,
@@ -77,6 +91,6 @@ Bun.serve({
 
 startup();
 
-logger.info(`Server is running at http://localhost:4096 and unix socket at ${socketPath}`);
+logger.info(`Server is running at http://localhost:4096`);
 
 export type AppType = typeof app;

@@ -72,6 +72,8 @@ import type {
 	GetBackupScheduleForVolumeResponses,
 	RunBackupNowData,
 	RunBackupNowResponses,
+	GetSystemInfoData,
+	GetSystemInfoResponses,
 } from "./types.gen";
 import { client as _heyApiClient } from "./client.gen";
 
@@ -510,6 +512,18 @@ export const runBackupNow = <ThrowOnError extends boolean = false>(
 ) => {
 	return (options.client ?? _heyApiClient).post<RunBackupNowResponses, unknown, ThrowOnError>({
 		url: "/api/v1/backups/{scheduleId}/run",
+		...options,
+	});
+};
+
+/**
+ * Get system information including available capabilities
+ */
+export const getSystemInfo = <ThrowOnError extends boolean = false>(
+	options?: Options<GetSystemInfoData, ThrowOnError>,
+) => {
+	return (options?.client ?? _heyApiClient).get<GetSystemInfoResponses, unknown, ThrowOnError>({
+		url: "/api/v1/system/info",
 		...options,
 	});
 };
