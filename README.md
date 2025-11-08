@@ -62,7 +62,7 @@ Ironmount supports multiple volume backends including NFS, SMB, WebDAV, and loca
 
 To add your first volume, navigate to the "Volumes" section in the web interface and click on "Create volume". Fill in the required details such as volume name, type, and connection settings.
 
-If you want to track a local directory on the same server where Ironmount is running, you'll first need to mount that directory into the Ironmount container. You can do this by adding a volume mapping in your `docker-compose.yml` file. For example, to mount `/path/to/your/directory` from the host to `/data` in the container, you would add the following line under the `volumes` section:
+If you want to track a local directory on the same server where Ironmount is running, you'll first need to mount that directory into the Ironmount container. You can do this by adding a volume mapping in your `docker-compose.yml` file. For example, to mount `/path/to/your/directory` from the host to `/mydata` in the container, you would add the following line under the `volumes` section:
 
 ```diff
 services:
@@ -70,7 +70,8 @@ services:
     image: ghcr.io/nicotsx/ironmount:v0.5.0
     container_name: ironmount
     restart: unless-stopped
-    privileged: true
+    cap_add:
+      - SYS_ADMIN
     ports:
       - "4096:4096"
     devices:
@@ -87,7 +88,7 @@ docker compose down
 docker compose up -d
 ```
 
-Now, when adding a new volume in the Ironmount web interface, you can select "Directory" as the volume type and specify search for your mounted path (e.g., `/mydata`) as the source path.
+Now, when adding a new volume in the Ironmount web interface, you can select "Directory" as the volume type and search for your mounted path (e.g., `/mydata`) as the source path.
 
 ![Preview](https://github.com/nicotsx/ironmount/blob/main/screenshots/add-volume.png?raw=true)
 
@@ -118,6 +119,89 @@ You can monitor the progress and status of your backup jobs in the "Backups" sec
 Ironmount allows you to easily restore your data from backups. To restore data, navigate to the "Backups" section and select the backup job from which you want to restore data. You can then choose a specific backup snapshot and select the files or directories you wish to restore. The data you select will be restored to their original location.
 
 ![Preview](https://github.com/nicotsx/ironmount/blob/main/screenshots/restoring.png?raw=true)
+
+## Propagating mounts to host
+
+Ironmount is capable of propagating mounted volumes from within the container to the host system. This is particularly useful when you want to access the mounted data directly from the host to use it with other applications or services.
+
+In order to enable this feature, you need to run Ironmount with privileged mode and mount /proc from the host. Here is an example of how to set this up in your `docker-compose.yml` file:
+
+```diff
+services:
+  ironmount:
+    image: ghcr.io/nicotsx/ironmount:v0.5.0
+    container_name: ironmount
+    restart: unless-stopped
+-   cap_add:
+-     - SYS_ADMIN
++   privileged: true
+    ports:
+      - "4096:4096"
+    devices:
+      - /dev/fuse:/dev/fuse
+    volumes:
+      - /var/lib/ironmount:/var/lib/ironmount
++     - /proc:/host/proc
+```
+
+
+## Docker plugin
+
+Ironmount can also be used as a Docker volume plugin, allowing you to mount your volumes directly into other Docker containers. This enables seamless integration with your containerized applications.
+
+In order to enable this feature, you need to run Ironmount with privileged modek and mount several items from the host. Here is an example of how to set this up in your `docker-compose.yml` file:
+
+```diff
+services:
+  ironmount:
+    image: ghcr.io/nicotsx/ironmount:v0.5.0
+    container_name: ironmount
+    restart: unless-stopped
+-   cap_add:
+-     - SYS_ADMIN
++   privileged: true
+    ports:
+      - "4096:4096"
+    devices:
+      - /dev/fuse:/dev/fuse
+    volumes:
+      - /var/lib/ironmount:/var/lib/ironmount
++     - /proc:/host/proc
++     - /run/docker/plugins:/run/docker/plugins
++     - /var/run/docker.sock:/var/run/docker.sock
+```
+
+Restart the Ironmount container to apply the changes:
+
+```bash
+docker compose down
+docker compose up -d
+```
+
+Your Ironmount volumes will now be available as Docker volumes that you can mount into other containers using the `--volume` flag:
+
+```bash
+docker run -v im-nfs:/path/in/container nginx:latest
+```
+
+Or using Docker Compose:
+
+```yaml
+services:
+  myservice:
+    image: nginx:latest
+    volumes:
+      - im-nfs:/path/in/container
+volumes:
+  im-nfs:
+    external: true
+```
+
+The volume name format is `im-<volume-name>` where `<volume-name>` is the name you assigned to the volume in Ironmount. You can verify that the volume is available by running:
+
+```bash
+docker volume ls
+```
 
 ## Third-Party Software
 
