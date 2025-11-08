@@ -181,6 +181,7 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 					key={selectedSnapshot?.short_id}
 					snapshot={selectedSnapshot}
 					repositoryName={schedule.repository.name}
+					volume={schedule.volume}
 				/>
 			)}
 		</div>

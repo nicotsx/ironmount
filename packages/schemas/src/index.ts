@@ -15,6 +15,7 @@ export const nfsConfigSchema = type({
 	exportPath: "string",
 	port: type("string.integer").or(type("number")).to("1 <= number <= 65536").default(2049),
 	version: "'3' | '4' | '4.1'",
+	readOnly: "boolean?",
 });
 
 export const smbConfigSchema = type({
@@ -26,6 +27,7 @@ export const smbConfigSchema = type({
 	vers: type("'1.0' | '2.0' | '2.1' | '3.0'").default("3.0"),
 	domain: "string?",
 	port: type("string.integer").or(type("number")).to("1 <= number <= 65535").default(445),
+	readOnly: "boolean?",
 });
 
 export const directoryConfigSchema = type({

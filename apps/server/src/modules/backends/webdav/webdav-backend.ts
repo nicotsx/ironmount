@@ -26,7 +26,7 @@ const mount = async (config: BackendConfig, path: string) => {
 		return { status: BACKEND_STATUS.error, error: "WebDAV mounting is only supported on Linux hosts." };
 	}
 
-	const { status } = await checkHealth(path);
+	const { status } = await checkHealth(path, config.readOnly);
 	if (status === "mounted") {
 		return { status: BACKEND_STATUS.mounted };
 	}
@@ -44,7 +44,9 @@ const mount = async (config: BackendConfig, path: string) => {
 		const port = config.port !== defaultPort ? `:${config.port}` : "";
 		const source = `${protocol}://${config.server}${port}${config.path}`;
 
-		const options = ["uid=1000", "gid=1000", "file_mode=0664", "dir_mode=0775"];
+		const options = config.readOnly
+			? ["uid=1000", "gid=1000", "file_mode=0444", "dir_mode=0555", "ro"]
+			: ["uid=1000", "gid=1000", "file_mode=0664", "dir_mode=0775"];
 
 		if (config.username && config.password) {
 			const secretsFile = "/etc/davfs2/secrets";
@@ -132,7 +134,7 @@ const unmount = async (path: string) => {
 	}
 };
 
-const checkHealth = async (path: string) => {
+const checkHealth = async (path: string, readOnly: boolean) => {
 	const run = async () => {
 		logger.debug(`Checking health of WebDAV volume at ${path}...`);
 		await fs.access(path);
@@ -143,7 +145,9 @@ const checkHealth = async (path: string) => {
 			throw new Error(`Path ${path} is not mounted as WebDAV.`);
 		}
 
-		await createTestFile(path);
+		if (!readOnly) {
+			await createTestFile(path);
+		}
 
 		logger.debug(`WebDAV volume at ${path} is healthy and mounted.`);
 		return { status: BACKEND_STATUS.mounted };
@@ -160,5 +164,5 @@ const checkHealth = async (path: string) => {
 export const makeWebdavBackend = (config: BackendConfig, path: string): VolumeBackend => ({
 	mount: () => mount(config, path),
 	unmount: () => unmount(path),
-	checkHealth: () => checkHealth(path),
+	checkHealth: () => checkHealth(path, config.readOnly),
 });

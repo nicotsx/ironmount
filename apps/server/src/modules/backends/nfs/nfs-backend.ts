@@ -22,7 +22,7 @@ const mount = async (config: BackendConfig, path: string) => {
 		return { status: BACKEND_STATUS.error, error: "NFS mounting is only supported on Linux hosts." };
 	}
 
-	const { status } = await checkHealth(path);
+	const { status } = await checkHealth(path, config.readOnly);
 	if (status === "mounted") {
 		return { status: BACKEND_STATUS.mounted };
 	}
@@ -35,6 +35,9 @@ const mount = async (config: BackendConfig, path: string) => {
 
 		const source = `${config.server}:${config.exportPath}`;
 		const options = [`vers=${config.version}`, `port=${config.port}`];
+		if (config.readOnly) {
+			options.push("ro");
+		}
 		const args = ["-t", "nfs", "-o", options.join(","), source, path];
 
 		logger.debug(`Mounting volume ${path}...`);
@@ -84,7 +87,7 @@ const unmount = async (path: string) => {
 	}
 };
 
-const checkHealth = async (path: string) => {
+const checkHealth = async (path: string, readOnly: boolean) => {
 	const run = async () => {
 		logger.debug(`Checking health of NFS volume at ${path}...`);
 		await fs.access(path);
@@ -95,7 +98,9 @@ const checkHealth = async (path: string) => {
 			throw new Error(`Path ${path} is not mounted as NFS.`);
 		}
 
-		await createTestFile(path);
+		if (!readOnly) {
+			await createTestFile(path);
+		}
 
 		logger.debug(`NFS volume at ${path} is healthy and mounted.`);
 		return { status: BACKEND_STATUS.mounted };
@@ -112,5 +117,5 @@ const checkHealth = async (path: string) => {
 export const makeNfsBackend = (config: BackendConfig, path: string): VolumeBackend => ({
 	mount: () => mount(config, path),
 	unmount: () => unmount(path),
-	checkHealth: () => checkHealth(path),
+	checkHealth: () => checkHealth(path, config.readOnly),
 });

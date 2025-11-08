@@ -10,13 +10,6 @@ export type RegisterData = {
 	url: "/api/v1/auth/register";
 };
 
-export type RegisterErrors = {
-	/**
-	 * Invalid request or username already exists
-	 */
-	400: unknown;
-};
-
 export type RegisterResponses = {
 	/**
 	 * User created successfully
@@ -41,13 +34,6 @@ export type LoginData = {
 	path?: never;
 	query?: never;
 	url: "/api/v1/auth/login";
-};
-
-export type LoginErrors = {
-	/**
-	 * Invalid credentials
-	 */
-	401: unknown;
 };
 
 export type LoginResponses = {
@@ -133,17 +119,6 @@ export type ChangePasswordData = {
 	path?: never;
 	query?: never;
 	url: "/api/v1/auth/change-password";
-};
-
-export type ChangePasswordErrors = {
-	/**
-	 * Invalid current password or validation error
-	 */
-	400: unknown;
-	/**
-	 * Not authenticated
-	 */
-	401: unknown;
 };
 
 export type ChangePasswordResponses = {

@@ -4,10 +4,8 @@ import type { Options as ClientOptions, TDataShape, Client } from "./client";
 import type {
 	RegisterData,
 	RegisterResponses,
-	RegisterErrors,
 	LoginData,
 	LoginResponses,
-	LoginErrors,
 	LogoutData,
 	LogoutResponses,
 	GetMeData,
@@ -16,7 +14,6 @@ import type {
 	GetStatusResponses,
 	ChangePasswordData,
 	ChangePasswordResponses,
-	ChangePasswordErrors,
 	ListVolumesData,
 	ListVolumesResponses,
 	CreateVolumeData,
@@ -97,7 +94,7 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  * Register a new user
  */
 export const register = <ThrowOnError extends boolean = false>(options?: Options<RegisterData, ThrowOnError>) => {
-	return (options?.client ?? _heyApiClient).post<RegisterResponses, RegisterErrors, ThrowOnError>({
+	return (options?.client ?? _heyApiClient).post<RegisterResponses, unknown, ThrowOnError>({
 		url: "/api/v1/auth/register",
 		...options,
 		headers: {
@@ -111,7 +108,7 @@ export const register = <ThrowOnError extends boolean = false>(options?: Options
  * Login with username and password
  */
 export const login = <ThrowOnError extends boolean = false>(options?: Options<LoginData, ThrowOnError>) => {
-	return (options?.client ?? _heyApiClient).post<LoginResponses, LoginErrors, ThrowOnError>({
+	return (options?.client ?? _heyApiClient).post<LoginResponses, unknown, ThrowOnError>({
 		url: "/api/v1/auth/login",
 		...options,
 		headers: {
@@ -157,7 +154,7 @@ export const getStatus = <ThrowOnError extends boolean = false>(options?: Option
 export const changePassword = <ThrowOnError extends boolean = false>(
 	options?: Options<ChangePasswordData, ThrowOnError>,
 ) => {
-	return (options?.client ?? _heyApiClient).post<ChangePasswordResponses, ChangePasswordErrors, ThrowOnError>({
+	return (options?.client ?? _heyApiClient).post<ChangePasswordResponses, unknown, ThrowOnError>({
 		url: "/api/v1/auth/change-password",
 		...options,
 		headers: {

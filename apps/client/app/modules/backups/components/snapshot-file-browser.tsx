@@ -17,16 +17,20 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
-import type { Snapshot } from "~/lib/types";
+import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
+import type { Snapshot, Volume } from "~/lib/types";
 import { toast } from "sonner";
 
 interface Props {
 	snapshot: Snapshot;
 	repositoryName: string;
+	volume?: Volume;
 }
 
 export const SnapshotFileBrowser = (props: Props) => {
-	const { snapshot, repositoryName } = props;
+	const { snapshot, repositoryName, volume } = props;
+
+	const isReadOnly = volume?.config && "readOnly" in volume.config && volume.config.readOnly === true;
 
 	const queryClient = useQueryClient();
 	const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
@@ -195,11 +199,28 @@ export const SnapshotFileBrowser = (props: Props) => {
 							<CardDescription>{`Viewing snapshot from ${new Date(snapshot?.time ?? 0).toLocaleString()}`}</CardDescription>
 						</div>
 						{selectedPaths.size > 0 && (
-							<Button onClick={handleRestoreClick} variant="primary" size="sm" disabled={isRestoring}>
-								{isRestoring
-									? "Restoring..."
-									: `Restore ${selectedPaths.size} selected ${selectedPaths.size === 1 ? "item" : "items"}`}
-							</Button>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<span tabIndex={isReadOnly ? 0 : undefined}>
+										<Button
+											onClick={handleRestoreClick}
+											variant="primary"
+											size="sm"
+											disabled={isRestoring || isReadOnly}
+										>
+											{isRestoring
+												? "Restoring..."
+												: `Restore ${selectedPaths.size} selected ${selectedPaths.size === 1 ? "item" : "items"}`}
+										</Button>
+									</span>
+								</TooltipTrigger>
+								{isReadOnly && (
+									<TooltipContent className="text-center">
+										<p>Volume is mounted as read-only.</p>
+										<p>Please remount with read-only disabled to restore files.</p>
+									</TooltipContent>
+								)}
+							</Tooltip>
 						)}
 					</div>
 				</CardHeader>

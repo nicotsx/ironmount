@@ -22,7 +22,7 @@ const mount = async (config: BackendConfig, path: string) => {
 		return { status: BACKEND_STATUS.error, error: "SMB mounting is only supported on Linux hosts." };
 	}
 
-	const { status } = await checkHealth(path);
+	const { status } = await checkHealth(path, config.readOnly);
 	if (status === "mounted") {
 		return { status: BACKEND_STATUS.mounted };
 	}
@@ -45,6 +45,10 @@ const mount = async (config: BackendConfig, path: string) => {
 
 		if (config.domain) {
 			options.push(`domain=${config.domain}`);
+		}
+
+		if (config.readOnly) {
+			options.push("ro");
 		}
 
 		const args = ["-t", "cifs", "-o", options.join(","), source, path];
@@ -96,7 +100,7 @@ const unmount = async (path: string) => {
 	}
 };
 
-const checkHealth = async (path: string) => {
+const checkHealth = async (path: string, readOnly: boolean) => {
 	const run = async () => {
 		logger.debug(`Checking health of SMB volume at ${path}...`);
 		await fs.access(path);
@@ -107,7 +111,9 @@ const checkHealth = async (path: string) => {
 			throw new Error(`Path ${path} is not mounted as CIFS/SMB.`);
 		}
 
-		await createTestFile(path);
+		if (!readOnly) {
+			await createTestFile(path);
+		}
 
 		logger.debug(`SMB volume at ${path} is healthy and mounted.`);
 		return { status: BACKEND_STATUS.mounted };
@@ -124,5 +130,5 @@ const checkHealth = async (path: string) => {
 export const makeSmbBackend = (config: BackendConfig, path: string): VolumeBackend => ({
 	mount: () => mount(config, path),
 	unmount: () => unmount(path),
-	checkHealth: () => checkHealth(path),
+	checkHealth: () => checkHealth(path, config.readOnly),
 });

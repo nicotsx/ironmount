@@ -202,6 +202,31 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 								</FormItem>
 							)}
 						/>
+						<FormField
+							control={form.control}
+							name="readOnly"
+							defaultValue={false}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Read-only Mode</FormLabel>
+									<FormControl>
+										<div className="flex items-center space-x-2">
+											<input
+												type="checkbox"
+												checked={field.value ?? false}
+												onChange={(e) => field.onChange(e.target.checked)}
+												className="rounded border-gray-300"
+											/>
+											<span className="text-sm">Mount volume as read-only</span>
+										</div>
+									</FormControl>
+									<FormDescription>
+										Prevent any modifications to the volume. Recommended for backup sources and sensitive data.
+									</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 					</>
 				)}
 
@@ -297,6 +322,31 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 										</div>
 									</FormControl>
 									<FormDescription>Use HTTPS instead of HTTP for secure connections.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="readOnly"
+							defaultValue={false}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Read-only Mode</FormLabel>
+									<FormControl>
+										<div className="flex items-center space-x-2">
+											<input
+												type="checkbox"
+												checked={field.value ?? false}
+												onChange={(e) => field.onChange(e.target.checked)}
+												className="rounded border-gray-300"
+											/>
+											<span className="text-sm">Mount volume as read-only</span>
+										</div>
+									</FormControl>
+									<FormDescription>
+										Prevent any modifications to the volume. Recommended for backup sources and sensitive data.
+									</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}
@@ -418,6 +468,31 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 										/>
 									</FormControl>
 									<FormDescription>SMB server port (default: 445).</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="readOnly"
+							defaultValue={false}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Read-only Mode</FormLabel>
+									<FormControl>
+										<div className="flex items-center space-x-2">
+											<input
+												type="checkbox"
+												checked={field.value ?? false}
+												onChange={(e) => field.onChange(e.target.checked)}
+												className="rounded border-gray-300"
+											/>
+											<span className="text-sm">Mount volume as read-only</span>
+										</div>
+									</FormControl>
+									<FormDescription>
+										Prevent any modifications to the volume. Recommended for backup sources and sensitive data.
+									</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}
