@@ -223,3 +223,31 @@ export const runBackupNowDto = describeRoute({
 		},
 	},
 });
+
+/**
+ * Stop a running backup
+ */
+export const stopBackupResponse = type({
+	success: "boolean",
+});
+
+export type StopBackupDto = typeof stopBackupResponse.infer;
+
+export const stopBackupDto = describeRoute({
+	description: "Stop a backup that is currently in progress",
+	operationId: "stopBackup",
+	tags: ["Backups"],
+	responses: {
+		200: {
+			description: "Backup stopped successfully",
+			content: {
+				"application/json": {
+					schema: resolver(stopBackupResponse),
+				},
+			},
+		},
+		409: {
+			description: "No backup is currently running for this schedule",
+		},
+	},
+});

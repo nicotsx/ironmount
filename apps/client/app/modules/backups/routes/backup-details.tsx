@@ -9,6 +9,7 @@ import {
 	deleteBackupScheduleMutation,
 	listSnapshotsOptions,
 	updateBackupScheduleMutation,
+	stopBackupMutation,
 } from "~/api-client/@tanstack/react-query.gen";
 import { parseError } from "~/lib/errors";
 import { getCronExpression } from "~/utils/utils";
@@ -44,9 +45,7 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 	const [selectedSnapshotId, setSelectedSnapshotId] = useState<string>();
 
 	const { data: schedule } = useQuery({
-		...getBackupScheduleOptions({
-			path: { scheduleId: params.id },
-		}),
+		...getBackupScheduleOptions({ path: { scheduleId: params.id } }),
 		initialData: loaderData,
 		refetchInterval: 10000,
 		refetchOnWindowFocus: true,
@@ -57,13 +56,10 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 		isLoading,
 		failureReason,
 	} = useQuery({
-		...listSnapshotsOptions({
-			path: { name: schedule.repository.name },
-			query: { backupId: schedule.id.toString() },
-		}),
+		...listSnapshotsOptions({ path: { name: schedule.repository.name }, query: { backupId: schedule.id.toString() } }),
 	});
 
-	const upsertSchedule = useMutation({
+	const updateSchedule = useMutation({
 		...updateBackupScheduleMutation(),
 		onSuccess: () => {
 			toast.success("Backup schedule saved successfully");
@@ -82,9 +78,17 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 			toast.success("Backup started successfully");
 		},
 		onError: (error) => {
-			toast.error("Failed to start backup", {
-				description: parseError(error)?.message,
-			});
+			toast.error("Failed to start backup", { description: parseError(error)?.message });
+		},
+	});
+
+	const stopBackup = useMutation({
+		...stopBackupMutation(),
+		onSuccess: () => {
+			toast.success("Backup stopped successfully");
+		},
+		onError: (error) => {
+			toast.error("Failed to stop backup", { description: parseError(error)?.message });
 		},
 	});
 
@@ -95,9 +99,7 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 			navigate("/backups");
 		},
 		onError: (error) => {
-			toast.error("Failed to delete backup schedule", {
-				description: parseError(error)?.message,
-			});
+			toast.error("Failed to delete backup schedule", { description: parseError(error)?.message });
 		},
 	});
 
@@ -114,7 +116,7 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 		if (formValues.keepMonthly) retentionPolicy.keepMonthly = formValues.keepMonthly;
 		if (formValues.keepYearly) retentionPolicy.keepYearly = formValues.keepYearly;
 
-		upsertSchedule.mutate({
+		updateSchedule.mutate({
 			path: { scheduleId: schedule.id.toString() },
 			body: {
 				repositoryId: formValues.repositoryId,
@@ -128,9 +130,7 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 	};
 
 	const handleToggleEnabled = (enabled: boolean) => {
-		if (!schedule) return;
-
-		upsertSchedule.mutate({
+		updateSchedule.mutate({
 			path: { scheduleId: schedule.id.toString() },
 			body: {
 				repositoryId: schedule.repositoryId,
@@ -143,28 +143,12 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 		});
 	};
 
-	const handleRunBackupNow = () => {
-		if (!schedule) return;
-
-		runBackupNow.mutate({
-			path: {
-				scheduleId: schedule.id.toString(),
-			},
-		});
-	};
-
-	const handleDeleteSchedule = () => {
-		if (!schedule) return;
-
-		deleteSchedule.mutate({ path: { scheduleId: schedule.id.toString() } });
-	};
-
 	if (isEditMode) {
 		return (
 			<div>
 				<CreateScheduleForm volume={schedule.volume} initialValues={schedule} onSubmit={handleSubmit} formId={formId} />
 				<div className="flex justify-end mt-4 gap-2">
-					<Button type="submit" className="ml-auto" variant="primary" form={formId} loading={upsertSchedule.isPending}>
+					<Button type="submit" className="ml-auto" variant="primary" form={formId} loading={updateSchedule.isPending}>
 						Update schedule
 					</Button>
 					<Button variant="outline" onClick={() => setIsEditMode(false)}>
@@ -181,8 +165,9 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 		<div className="flex flex-col gap-6">
 			<ScheduleSummary
 				handleToggleEnabled={handleToggleEnabled}
-				handleRunBackupNow={handleRunBackupNow}
-				handleDeleteSchedule={handleDeleteSchedule}
+				handleRunBackupNow={() => runBackupNow.mutate({ path: { scheduleId: schedule.id.toString() } })}
+				handleStopBackup={() => stopBackup.mutate({ path: { scheduleId: schedule.id.toString() } })}
+				handleDeleteSchedule={() => deleteSchedule.mutate({ path: { scheduleId: schedule.id.toString() } })}
 				setIsEditMode={setIsEditMode}
 				schedule={schedule}
 			/>

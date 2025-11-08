@@ -8,6 +8,7 @@ import {
 	getBackupScheduleForVolumeDto,
 	listBackupSchedulesDto,
 	runBackupNowDto,
+	stopBackupDto,
 	updateBackupScheduleDto,
 	updateBackupScheduleBody,
 	type CreateBackupScheduleDto,
@@ -16,6 +17,7 @@ import {
 	type GetBackupScheduleForVolumeResponseDto,
 	type ListBackupSchedulesResponseDto,
 	type RunBackupNowDto,
+	type StopBackupDto,
 	type UpdateBackupScheduleDto,
 } from "./backups.dto";
 import { backupsService } from "./backups.service";
@@ -69,4 +71,11 @@ export const backupScheduleController = new Hono()
 		});
 
 		return c.json<RunBackupNowDto>({ success: true }, 200);
+	})
+	.post("/:scheduleId/stop", stopBackupDto, async (c) => {
+		const scheduleId = c.req.param("scheduleId");
+
+		await backupsService.stopBackup(Number(scheduleId));
+
+		return c.json<StopBackupDto>({ success: true }, 200);
 	});

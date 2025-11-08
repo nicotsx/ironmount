@@ -1,4 +1,4 @@
-import { Pencil, Play, Trash2 } from "lucide-react";
+import { Pencil, Play, Square, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { OnOff } from "~/components/onoff";
 import { Button } from "~/components/ui/button";
@@ -18,12 +18,14 @@ type Props = {
 	schedule: BackupSchedule;
 	handleToggleEnabled: (enabled: boolean) => void;
 	handleRunBackupNow: () => void;
+	handleStopBackup: () => void;
 	handleDeleteSchedule: () => void;
 	setIsEditMode: (isEdit: boolean) => void;
 };
 
 export const ScheduleSummary = (props: Props) => {
-	const { schedule, handleToggleEnabled, handleRunBackupNow, handleDeleteSchedule, setIsEditMode } = props;
+	const { schedule, handleToggleEnabled, handleRunBackupNow, handleStopBackup, handleDeleteSchedule, setIsEditMode } =
+		props;
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
 	const summary = useMemo(() => {
@@ -75,16 +77,17 @@ export const ScheduleSummary = (props: Props) => {
 						</div>
 					</div>
 					<div className="flex flex-col sm:flex-row gap-2">
-						<Button
-							variant="default"
-							size="sm"
-							onClick={handleRunBackupNow}
-							disabled={schedule.lastBackupStatus === "in_progress"}
-							className="w-full sm:w-auto"
-						>
-							<Play className="h-4 w-4 mr-2" />
-							<span className="sm:inline">Backup now</span>
-						</Button>
+						{schedule.lastBackupStatus === "in_progress" ? (
+							<Button variant="destructive" size="sm" onClick={handleStopBackup} className="w-full sm:w-auto">
+								<Square className="h-4 w-4 mr-2" />
+								<span className="sm:inline">Stop backup</span>
+							</Button>
+						) : (
+							<Button variant="default" size="sm" onClick={handleRunBackupNow} className="w-full sm:w-auto">
+								<Play className="h-4 w-4 mr-2" />
+								<span className="sm:inline">Backup now</span>
+							</Button>
+						)}
 						<Button variant="outline" size="sm" onClick={() => setIsEditMode(true)} className="w-full sm:w-auto">
 							<Pencil className="h-4 w-4 mr-2" />
 							<span className="sm:inline">Edit schedule</span>

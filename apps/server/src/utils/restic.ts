@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { spawn } from "node:child_process";
 import type { RepositoryConfig } from "@ironmount/schemas/restic";
 import { type } from "arktype";
 import { $ } from "bun";
@@ -114,7 +115,7 @@ const init = async (config: RepositoryConfig) => {
 const backup = async (
 	config: RepositoryConfig,
 	source: string,
-	options?: { exclude?: string[]; include?: string[]; tags?: string[] },
+	options?: { exclude?: string[]; include?: string[]; tags?: string[]; signal?: AbortSignal },
 ) => {
 	const repoUrl = buildRepoUrl(config);
 	const env = await buildEnv(config);
@@ -148,32 +149,68 @@ const backup = async (
 
 	args.push("--json");
 
-	// await $`restic unlock --repo ${repoUrl}`.env(env).nothrow();
-	const res = await $`restic ${args}`.env(env).nothrow();
+	return new Promise((resolve, reject) => {
+		const child = spawn("restic", args, {
+			env: { ...process.env, ...env },
+			signal: options?.signal,
+		});
 
-	if (includeFile) {
-		await fs.unlink(includeFile).catch(() => {});
-	}
+		let stdout = "";
+		let stderr = "";
 
-	if (res.exitCode !== 0) {
-		logger.error(`Restic backup failed: ${res.stderr}`);
-		throw new Error(`Restic backup failed: ${res.stderr}`);
-	}
+		child.stdout.on("data", (data) => {
+			stdout += data.toString();
+		});
 
-	// res is a succession of JSON objects, we need to parse the last one which contains the summary
-	const stdout = res.text();
-	const outputLines = stdout.trim().split("\n");
-	const lastLine = outputLines[outputLines.length - 1];
-	const resSummary = JSON.parse(lastLine ?? "{}");
+		child.stderr.on("data", (data) => {
+			stderr += data.toString();
+		});
 
-	const result = backupOutputSchema(resSummary);
+		child.on("error", async (error) => {
+			if (includeFile) {
+				await fs.unlink(includeFile).catch(() => {});
+			}
 
-	if (result instanceof type.errors) {
-		logger.error(`Restic backup output validation failed: ${result}`);
-		throw new Error(`Restic backup output validation failed: ${result}`);
-	}
+			if (error.name === "AbortError") {
+				logger.info("Restic backup process was aborted");
+				reject(error);
+			} else {
+				logger.error(`Restic backup process error: ${error.message}`);
+				reject(new Error(`Restic backup process error: ${error.message}`));
+			}
+		});
 
-	return result;
+		child.on("close", async (code) => {
+			if (includeFile) {
+				await fs.unlink(includeFile).catch(() => {});
+			}
+
+			if (code !== 0) {
+				logger.error(`Restic backup failed with exit code ${code}: ${stderr}`);
+				reject(new Error(`Restic backup failed: ${stderr}`));
+				return;
+			}
+
+			try {
+				const outputLines = stdout.trim().split("\n");
+				const lastLine = outputLines[outputLines.length - 1];
+				const resSummary = JSON.parse(lastLine ?? "{}");
+
+				const result = backupOutputSchema(resSummary);
+
+				if (result instanceof type.errors) {
+					logger.error(`Restic backup output validation failed: ${result}`);
+					reject(new Error(`Restic backup output validation failed: ${result}`));
+					return;
+				}
+
+				resolve(result);
+			} catch (error) {
+				logger.error(`Failed to parse restic backup output: ${error}`);
+				reject(new Error(`Failed to parse restic backup output: ${error}`));
+			}
+		});
+	});
 };
 
 const restoreOutputSchema = type({

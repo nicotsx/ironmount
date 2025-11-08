@@ -1480,6 +1480,33 @@ export type RunBackupNowResponses = {
 
 export type RunBackupNowResponse = RunBackupNowResponses[keyof RunBackupNowResponses];
 
+export type StopBackupData = {
+	body?: never;
+	path: {
+		scheduleId: string;
+	};
+	query?: never;
+	url: "/api/v1/backups/{scheduleId}/stop";
+};
+
+export type StopBackupErrors = {
+	/**
+	 * No backup is currently running for this schedule
+	 */
+	409: unknown;
+};
+
+export type StopBackupResponses = {
+	/**
+	 * Backup stopped successfully
+	 */
+	200: {
+		success: boolean;
+	};
+};
+
+export type StopBackupResponse = StopBackupResponses[keyof StopBackupResponses];
+
 export type GetSystemInfoData = {
 	body?: never;
 	path?: never;
@@ -1508,17 +1535,6 @@ export type DownloadResticPasswordData = {
 	query?: never;
 	url: "/api/v1/system/restic-password";
 };
-
-export type DownloadResticPasswordErrors = {
-	/**
-	 * Authentication required or incorrect password
-	 */
-	401: {
-		message?: string;
-	};
-};
-
-export type DownloadResticPasswordError = DownloadResticPasswordErrors[keyof DownloadResticPasswordErrors];
 
 export type DownloadResticPasswordResponses = {
 	/**

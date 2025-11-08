@@ -36,6 +36,7 @@ import {
 	updateBackupSchedule,
 	getBackupScheduleForVolume,
 	runBackupNow,
+	stopBackup,
 	getSystemInfo,
 	downloadResticPassword,
 } from "../sdk.gen";
@@ -94,9 +95,10 @@ import type {
 	GetBackupScheduleForVolumeData,
 	RunBackupNowData,
 	RunBackupNowResponse,
+	StopBackupData,
+	StopBackupResponse,
 	GetSystemInfoData,
 	DownloadResticPasswordData,
-	DownloadResticPasswordError,
 	DownloadResticPasswordResponse,
 } from "../types.gen";
 import { client as _heyApiClient } from "../client.gen";
@@ -1108,6 +1110,45 @@ export const runBackupNowMutation = (
 	return mutationOptions;
 };
 
+export const stopBackupQueryKey = (options: Options<StopBackupData>) => createQueryKey("stopBackup", options);
+
+/**
+ * Stop a backup that is currently in progress
+ */
+export const stopBackupOptions = (options: Options<StopBackupData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await stopBackup({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: stopBackupQueryKey(options),
+	});
+};
+
+/**
+ * Stop a backup that is currently in progress
+ */
+export const stopBackupMutation = (
+	options?: Partial<Options<StopBackupData>>,
+): UseMutationOptions<StopBackupResponse, DefaultError, Options<StopBackupData>> => {
+	const mutationOptions: UseMutationOptions<StopBackupResponse, DefaultError, Options<StopBackupData>> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await stopBackup({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
+};
+
 export const getSystemInfoQueryKey = (options?: Options<GetSystemInfoData>) => createQueryKey("getSystemInfo", options);
 
 /**
@@ -1154,14 +1195,10 @@ export const downloadResticPasswordOptions = (options?: Options<DownloadResticPa
  */
 export const downloadResticPasswordMutation = (
 	options?: Partial<Options<DownloadResticPasswordData>>,
-): UseMutationOptions<
-	DownloadResticPasswordResponse,
-	DownloadResticPasswordError,
-	Options<DownloadResticPasswordData>
-> => {
+): UseMutationOptions<DownloadResticPasswordResponse, DefaultError, Options<DownloadResticPasswordData>> => {
 	const mutationOptions: UseMutationOptions<
 		DownloadResticPasswordResponse,
-		DownloadResticPasswordError,
+		DefaultError,
 		Options<DownloadResticPasswordData>
 	> = {
 		mutationFn: async (localOptions) => {

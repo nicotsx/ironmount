@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import cron from "node-cron";
 import { CronExpressionParser } from "cron-parser";
-import { NotFoundError, BadRequestError } from "http-errors-enhanced";
+import { NotFoundError, BadRequestError, ConflictError } from "http-errors-enhanced";
 import { db } from "../../db/db";
 import { backupSchedulesTable, repositoriesTable, volumesTable } from "../../db/schema";
 import { restic } from "../../utils/restic";
@@ -10,6 +10,8 @@ import { getVolumePath } from "../volumes/helpers";
 import type { CreateBackupScheduleBody, UpdateBackupScheduleBody } from "./backups.dto";
 import { toMessage } from "../../utils/errors";
 import { serverEvents } from "../../core/events";
+
+const runningBackups = new Map<number, AbortController>();
 
 const calculateNextRun = (cronExpression: string): number => {
 	try {
@@ -198,6 +200,9 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 		.set({ lastBackupStatus: "in_progress", updatedAt: Date.now() })
 		.where(eq(backupSchedulesTable.id, scheduleId));
 
+	const abortController = new AbortController();
+	runningBackups.set(scheduleId, abortController);
+
 	try {
 		const volumePath = getVolumePath(volume);
 
@@ -205,8 +210,10 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 			exclude?: string[];
 			include?: string[];
 			tags?: string[];
+			signal?: AbortSignal;
 		} = {
 			tags: [schedule.id.toString()],
+			signal: abortController.signal,
 		};
 
 		if (schedule.excludePatterns && schedule.excludePatterns.length > 0) {
@@ -264,6 +271,8 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 		});
 
 		throw error;
+	} finally {
+		runningBackups.delete(scheduleId);
 	}
 };
 
@@ -293,6 +302,34 @@ const getScheduleForVolume = async (volumeId: number) => {
 	return schedule ?? null;
 };
 
+const stopBackup = async (scheduleId: number) => {
+	const schedule = await db.query.backupSchedulesTable.findFirst({
+		where: eq(backupSchedulesTable.id, scheduleId),
+	});
+
+	if (!schedule) {
+		throw new NotFoundError("Backup schedule not found");
+	}
+
+	await db
+		.update(backupSchedulesTable)
+		.set({
+			lastBackupStatus: "error",
+			lastBackupError: "Backup was stopped by user",
+			updatedAt: Date.now(),
+		})
+		.where(eq(backupSchedulesTable.id, scheduleId));
+
+	const abortController = runningBackups.get(scheduleId);
+	if (!abortController) {
+		throw new ConflictError("No backup is currently running for this schedule");
+	}
+
+	logger.info(`Stopping backup for schedule ${scheduleId}`);
+
+	abortController.abort();
+};
+
 export const backupsService = {
 	listSchedules,
 	getSchedule,
@@ -302,4 +339,5 @@ export const backupsService = {
 	executeBackup,
 	getSchedulesToExecute,
 	getScheduleForVolume,
+	stopBackup,
 };

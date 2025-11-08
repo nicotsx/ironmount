@@ -10,7 +10,7 @@ interface ServerEvents {
 		scheduleId: number;
 		volumeName: string;
 		repositoryName: string;
-		status: "success" | "error";
+		status: "success" | "error" | "stopped";
 	}) => void;
 	"volume:mounted": (data: { volumeName: string }) => void;
 	"volume:unmounted": (data: { volumeName: string }) => void;

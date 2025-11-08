@@ -74,11 +74,13 @@ import type {
 	GetBackupScheduleForVolumeResponses,
 	RunBackupNowData,
 	RunBackupNowResponses,
+	StopBackupData,
+	StopBackupResponses,
+	StopBackupErrors,
 	GetSystemInfoData,
 	GetSystemInfoResponses,
 	DownloadResticPasswordData,
 	DownloadResticPasswordResponses,
-	DownloadResticPasswordErrors,
 } from "./types.gen";
 import { client as _heyApiClient } from "./client.gen";
 
@@ -534,6 +536,16 @@ export const runBackupNow = <ThrowOnError extends boolean = false>(
 };
 
 /**
+ * Stop a backup that is currently in progress
+ */
+export const stopBackup = <ThrowOnError extends boolean = false>(options: Options<StopBackupData, ThrowOnError>) => {
+	return (options.client ?? _heyApiClient).post<StopBackupResponses, StopBackupErrors, ThrowOnError>({
+		url: "/api/v1/backups/{scheduleId}/stop",
+		...options,
+	});
+};
+
+/**
  * Get system information including available capabilities
  */
 export const getSystemInfo = <ThrowOnError extends boolean = false>(
@@ -551,11 +563,7 @@ export const getSystemInfo = <ThrowOnError extends boolean = false>(
 export const downloadResticPassword = <ThrowOnError extends boolean = false>(
 	options?: Options<DownloadResticPasswordData, ThrowOnError>,
 ) => {
-	return (options?.client ?? _heyApiClient).post<
-		DownloadResticPasswordResponses,
-		DownloadResticPasswordErrors,
-		ThrowOnError
-	>({
+	return (options?.client ?? _heyApiClient).post<DownloadResticPasswordResponses, unknown, ThrowOnError>({
 		url: "/api/v1/system/restic-password",
 		...options,
 		headers: {
