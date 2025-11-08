@@ -160,6 +160,11 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 		return;
 	}
 
+	if (schedule.lastBackupStatus === "in_progress") {
+		logger.info(`Backup schedule ${scheduleId} is already in progress. Skipping execution.`);
+		return;
+	}
+
 	const volume = await db.query.volumesTable.findFirst({
 		where: eq(volumesTable.id, schedule.volumeId),
 	});
