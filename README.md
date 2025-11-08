@@ -25,15 +25,11 @@ Ironmount is an easy to use web interface to manage your remote storage and moun
 ### Features
 
 - ✅&nbsp; Support for multiple protocols: NFS, SMB, WebDAV, Directory
-- 📡&nbsp; Mount your remote storage as local folders
-- 🐳&nbsp; Docker integration: mount your remote storage directly into your containers via a docker volume syntax
+- 💾&nbsp; Automated backups with encryption, compression and retention policies backed by Restic
 - 🔍&nbsp; Keep an eye on your mounts with health checks and automatic remounting on error
 - 📊&nbsp; Monitor your mounts usage with detailed statistics and graphs
-
-### Coming soon
-
-- Automated backups with encryption and retention policies
-- Integration with cloud storage providers (e.g. AWS S3, Google Drive, Dropbox)
+- 📡&nbsp; Mount your remote storage as local folders
+- 🐳&nbsp; Docker integration: mount your remote storage directly into your containers via a docker volume syntax
 
 ## Installation
 
@@ -51,16 +47,7 @@ services:
     devices:
       - /dev/fuse:/dev/fuse
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /run/docker/plugins:/run/docker/plugins
-      - /var/lib/ironmount/volumes/:/var/lib/ironmount/volumes:rslave
-      - /var/lib/repositories/:/var/lib/repositories
-      - /proc:/host/proc:ro
-      - ironmount_data:/data
-
-volumes:
-  ironmount_data:
-    driver: local
+      - /var/lib/ironmount/:/var/lib/ironmount/
 ```
 
 Then, run the following command to start Ironmount:

@@ -1,5 +1,5 @@
 export const OPERATION_TIMEOUT = 5000;
-export const VOLUME_MOUNT_BASE = "/var/lib/ironmount";
-export const REPOSITORY_BASE = "/var/lib/repositories";
-export const DATABASE_URL = "/data/ironmount.db";
-export const RESTIC_PASS_FILE = "/data/secrets/restic.pass";
+export const VOLUME_MOUNT_BASE = "/var/lib/ironmount/volumes";
+export const REPOSITORY_BASE = "/var/lib/ironmount/repositories";
+export const DATABASE_URL = "/var/lib/ironmount/data/ironmount.db";
+export const RESTIC_PASS_FILE = "/var/lib/ironmount/data/restic.pass";
