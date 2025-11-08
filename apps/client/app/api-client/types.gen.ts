@@ -18,6 +18,7 @@ export type RegisterResponses = {
 		message: string;
 		success: boolean;
 		user?: {
+			hasDownloadedResticPassword: boolean;
 			id: number;
 			username: string;
 		};
@@ -44,6 +45,7 @@ export type LoginResponses = {
 		message: string;
 		success: boolean;
 		user?: {
+			hasDownloadedResticPassword: boolean;
 			id: number;
 			username: string;
 		};
@@ -85,6 +87,7 @@ export type GetMeResponses = {
 		message: string;
 		success: boolean;
 		user?: {
+			hasDownloadedResticPassword: boolean;
 			id: number;
 			username: string;
 		};
@@ -149,6 +152,8 @@ export type ListVolumesResponses = {
 		config:
 			| {
 					backend: "directory";
+					path: string;
+					readOnly?: false;
 			  }
 			| {
 					backend: "nfs";
@@ -175,6 +180,7 @@ export type ListVolumesResponses = {
 					server: string;
 					port?: number;
 					password?: string;
+					readOnly?: boolean;
 					ssl?: boolean;
 					username?: string;
 			  };
@@ -196,6 +202,8 @@ export type CreateVolumeData = {
 		config:
 			| {
 					backend: "directory";
+					path: string;
+					readOnly?: false;
 			  }
 			| {
 					backend: "nfs";
@@ -222,6 +230,7 @@ export type CreateVolumeData = {
 					server: string;
 					port?: number;
 					password?: string;
+					readOnly?: boolean;
 					ssl?: boolean;
 					username?: string;
 			  };
@@ -241,6 +250,8 @@ export type CreateVolumeResponses = {
 		config:
 			| {
 					backend: "directory";
+					path: string;
+					readOnly?: false;
 			  }
 			| {
 					backend: "nfs";
@@ -267,6 +278,7 @@ export type CreateVolumeResponses = {
 					server: string;
 					port?: number;
 					password?: string;
+					readOnly?: boolean;
 					ssl?: boolean;
 					username?: string;
 			  };
@@ -288,6 +300,8 @@ export type TestConnectionData = {
 		config:
 			| {
 					backend: "directory";
+					path: string;
+					readOnly?: false;
 			  }
 			| {
 					backend: "nfs";
@@ -314,6 +328,7 @@ export type TestConnectionData = {
 					server: string;
 					port?: number;
 					password?: string;
+					readOnly?: boolean;
 					ssl?: boolean;
 					username?: string;
 			  };
@@ -386,6 +401,8 @@ export type GetVolumeResponses = {
 			config:
 				| {
 						backend: "directory";
+						path: string;
+						readOnly?: false;
 				  }
 				| {
 						backend: "nfs";
@@ -412,6 +429,7 @@ export type GetVolumeResponses = {
 						server: string;
 						port?: number;
 						password?: string;
+						readOnly?: boolean;
 						ssl?: boolean;
 						username?: string;
 				  };
@@ -435,6 +453,8 @@ export type UpdateVolumeData = {
 		config?:
 			| {
 					backend: "directory";
+					path: string;
+					readOnly?: false;
 			  }
 			| {
 					backend: "nfs";
@@ -461,6 +481,7 @@ export type UpdateVolumeData = {
 					server: string;
 					port?: number;
 					password?: string;
+					readOnly?: boolean;
 					ssl?: boolean;
 					username?: string;
 			  };
@@ -488,6 +509,8 @@ export type UpdateVolumeResponses = {
 		config:
 			| {
 					backend: "directory";
+					path: string;
+					readOnly?: false;
 			  }
 			| {
 					backend: "nfs";
@@ -514,6 +537,7 @@ export type UpdateVolumeResponses = {
 					server: string;
 					port?: number;
 					password?: string;
+					readOnly?: boolean;
 					ssl?: boolean;
 					username?: string;
 			  };
@@ -962,12 +986,11 @@ export type DoctorRepositoryResponses = {
 	 * Doctor operation completed
 	 */
 	200: {
-		message: string;
 		steps: Array<{
+			error: string | null;
+			output: string | null;
 			step: string;
 			success: boolean;
-			error?: string;
-			output?: string;
 		}>;
 		success: boolean;
 	};
@@ -1036,6 +1059,8 @@ export type ListBackupSchedulesResponses = {
 			config:
 				| {
 						backend: "directory";
+						path: string;
+						readOnly?: false;
 				  }
 				| {
 						backend: "nfs";
@@ -1062,6 +1087,7 @@ export type ListBackupSchedulesResponses = {
 						server: string;
 						port?: number;
 						password?: string;
+						readOnly?: boolean;
 						ssl?: boolean;
 						username?: string;
 				  };
@@ -1219,6 +1245,8 @@ export type GetBackupScheduleResponses = {
 			config:
 				| {
 						backend: "directory";
+						path: string;
+						readOnly?: false;
 				  }
 				| {
 						backend: "nfs";
@@ -1245,6 +1273,7 @@ export type GetBackupScheduleResponses = {
 						server: string;
 						port?: number;
 						password?: string;
+						readOnly?: boolean;
 						ssl?: boolean;
 						username?: string;
 				  };
@@ -1383,6 +1412,8 @@ export type GetBackupScheduleForVolumeResponses = {
 			config:
 				| {
 						backend: "directory";
+						path: string;
+						readOnly?: false;
 				  }
 				| {
 						backend: "nfs";
@@ -1409,6 +1440,7 @@ export type GetBackupScheduleForVolumeResponses = {
 						server: string;
 						port?: number;
 						password?: string;
+						readOnly?: boolean;
 						ssl?: boolean;
 						username?: string;
 				  };
@@ -1467,6 +1499,35 @@ export type GetSystemInfoResponses = {
 };
 
 export type GetSystemInfoResponse = GetSystemInfoResponses[keyof GetSystemInfoResponses];
+
+export type DownloadResticPasswordData = {
+	body?: {
+		password: string;
+	};
+	path?: never;
+	query?: never;
+	url: "/api/v1/system/restic-password";
+};
+
+export type DownloadResticPasswordErrors = {
+	/**
+	 * Authentication required or incorrect password
+	 */
+	401: {
+		message?: string;
+	};
+};
+
+export type DownloadResticPasswordError = DownloadResticPasswordErrors[keyof DownloadResticPasswordErrors];
+
+export type DownloadResticPasswordResponses = {
+	/**
+	 * Restic password file content
+	 */
+	200: string;
+};
+
+export type DownloadResticPasswordResponse = DownloadResticPasswordResponses[keyof DownloadResticPasswordResponses];
 
 export type ClientOptions = {
 	baseUrl: "http://192.168.2.42:4096" | (string & {});

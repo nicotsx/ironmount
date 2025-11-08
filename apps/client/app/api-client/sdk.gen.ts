@@ -76,6 +76,9 @@ import type {
 	RunBackupNowResponses,
 	GetSystemInfoData,
 	GetSystemInfoResponses,
+	DownloadResticPasswordData,
+	DownloadResticPasswordResponses,
+	DownloadResticPasswordErrors,
 } from "./types.gen";
 import { client as _heyApiClient } from "./client.gen";
 
@@ -539,5 +542,25 @@ export const getSystemInfo = <ThrowOnError extends boolean = false>(
 	return (options?.client ?? _heyApiClient).get<GetSystemInfoResponses, unknown, ThrowOnError>({
 		url: "/api/v1/system/info",
 		...options,
+	});
+};
+
+/**
+ * Download the Restic password file for backup recovery. Requires password re-authentication.
+ */
+export const downloadResticPassword = <ThrowOnError extends boolean = false>(
+	options?: Options<DownloadResticPasswordData, ThrowOnError>,
+) => {
+	return (options?.client ?? _heyApiClient).post<
+		DownloadResticPasswordResponses,
+		DownloadResticPasswordErrors,
+		ThrowOnError
+	>({
+		url: "/api/v1/system/restic-password",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options?.headers,
+		},
 	});
 };

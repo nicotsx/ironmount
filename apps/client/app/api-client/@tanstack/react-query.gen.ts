@@ -37,6 +37,7 @@ import {
 	getBackupScheduleForVolume,
 	runBackupNow,
 	getSystemInfo,
+	downloadResticPassword,
 } from "../sdk.gen";
 import { queryOptions, type UseMutationOptions, type DefaultError } from "@tanstack/react-query";
 import type {
@@ -94,6 +95,9 @@ import type {
 	RunBackupNowData,
 	RunBackupNowResponse,
 	GetSystemInfoData,
+	DownloadResticPasswordData,
+	DownloadResticPasswordError,
+	DownloadResticPasswordResponse,
 } from "../types.gen";
 import { client as _heyApiClient } from "../client.gen";
 
@@ -1122,4 +1126,52 @@ export const getSystemInfoOptions = (options?: Options<GetSystemInfoData>) => {
 		},
 		queryKey: getSystemInfoQueryKey(options),
 	});
+};
+
+export const downloadResticPasswordQueryKey = (options?: Options<DownloadResticPasswordData>) =>
+	createQueryKey("downloadResticPassword", options);
+
+/**
+ * Download the Restic password file for backup recovery. Requires password re-authentication.
+ */
+export const downloadResticPasswordOptions = (options?: Options<DownloadResticPasswordData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await downloadResticPassword({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: downloadResticPasswordQueryKey(options),
+	});
+};
+
+/**
+ * Download the Restic password file for backup recovery. Requires password re-authentication.
+ */
+export const downloadResticPasswordMutation = (
+	options?: Partial<Options<DownloadResticPasswordData>>,
+): UseMutationOptions<
+	DownloadResticPasswordResponse,
+	DownloadResticPasswordError,
+	Options<DownloadResticPasswordData>
+> => {
+	const mutationOptions: UseMutationOptions<
+		DownloadResticPasswordResponse,
+		DownloadResticPasswordError,
+		Options<DownloadResticPasswordData>
+	> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await downloadResticPassword({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
 };

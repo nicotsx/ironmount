@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { LifeBuoy } from "lucide-react";
-import { Outlet, useNavigate } from "react-router";
+import { Outlet, redirect, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { logoutMutation } from "~/api-client/@tanstack/react-query.gen";
 import { appContext } from "~/context";
@@ -16,6 +16,11 @@ export const clientMiddleware = [authMiddleware];
 
 export async function clientLoader({ context }: Route.LoaderArgs) {
 	const ctx = context.get(appContext);
+
+	if (ctx.user && !ctx.user.hasDownloadedResticPassword) {
+		throw redirect("/download-recovery-key");
+	}
+
 	return ctx;
 }
 

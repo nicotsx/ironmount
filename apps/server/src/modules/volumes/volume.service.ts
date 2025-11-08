@@ -130,11 +130,10 @@ const getVolume = async (name: string) => {
 
 	let statfs: Partial<StatFs> = {};
 	if (volume.status === "mounted") {
-		statfs = await withTimeout(getStatFs(getVolumePath(volume)), OPERATION_TIMEOUT, "getStatFs")
-			.catch((error) => {
-				logger.warn(`Failed to get statfs for volume ${name}: ${toMessage(error)}`);
-				return {};
-			});
+		statfs = await withTimeout(getStatFs(getVolumePath(volume)), 1000, "getStatFs").catch((error) => {
+			logger.warn(`Failed to get statfs for volume ${name}: ${toMessage(error)}`);
+			return {};
+		});
 	}
 
 	return { volume, statfs };

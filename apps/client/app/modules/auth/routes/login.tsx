@@ -44,8 +44,12 @@ export default function LoginPage() {
 
 	const login = useMutation({
 		...loginMutation(),
-		onSuccess: async () => {
-			navigate("/volumes");
+		onSuccess: async (data) => {
+			if (data.user && !data.user.hasDownloadedResticPassword) {
+				navigate("/download-recovery-key");
+			} else {
+				navigate("/volumes");
+			}
 		},
 		onError: (error) => {
 			console.error(error);

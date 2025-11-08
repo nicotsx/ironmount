@@ -18,6 +18,7 @@ const loginResponseSchema = type({
 	user: type({
 		id: "number",
 		username: "string",
+		hasDownloadedResticPassword: "boolean",
 	}).optional(),
 });
 

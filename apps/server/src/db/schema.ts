@@ -32,6 +32,7 @@ export const usersTable = sqliteTable("users_table", {
 	id: int().primaryKey({ autoIncrement: true }),
 	username: text().notNull().unique(),
 	passwordHash: text("password_hash").notNull(),
+	hasDownloadedResticPassword: int("has_downloaded_restic_password", { mode: "boolean" }).notNull().default(false),
 	createdAt: int("created_at", { mode: "number" }).notNull().default(sql`(unixepoch())`),
 	updatedAt: int("updated_at", { mode: "number" }).notNull().default(sql`(unixepoch())`),
 });

@@ -1,0 +1,1 @@
+ALTER TABLE `users_table` ADD `has_downloaded_restic_password` integer DEFAULT false NOT NULL;

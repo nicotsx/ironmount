@@ -26,3 +26,23 @@ export const systemInfoDto = describeRoute({
 		},
 	},
 });
+
+export const downloadResticPasswordBodySchema = type({
+	password: "string",
+});
+
+export const downloadResticPasswordDto = describeRoute({
+	description: "Download the Restic password file for backup recovery. Requires password re-authentication.",
+	tags: ["System"],
+	operationId: "downloadResticPassword",
+	responses: {
+		200: {
+			description: "Restic password file content",
+			content: {
+				"text/plain": {
+					schema: { type: "string" },
+				},
+			},
+		},
+	},
+});

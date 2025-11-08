@@ -71,6 +71,13 @@
       "when": 1762095226041,
       "tag": "0009_little_adam_warlock",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1762610065889,
+      "tag": "0010_perfect_proemial_gods",
+      "breakpoints": true
     }
   ]
 }

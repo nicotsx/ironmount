@@ -43,7 +43,15 @@ export const authController = new Hono()
 			});
 
 			return c.json<RegisterDto>(
-				{ success: true, message: "User registered successfully", user: { id: user.id, username: user.username } },
+				{
+					success: true,
+					message: "User registered successfully",
+					user: {
+						id: user.id,
+						username: user.username,
+						hasDownloadedResticPassword: user.hasDownloadedResticPassword,
+					},
+				},
 				201,
 			);
 		} catch (error) {
@@ -64,7 +72,11 @@ export const authController = new Hono()
 			return c.json<LoginDto>({
 				success: true,
 				message: "Login successful",
-				user: { id: user.id, username: user.username },
+				user: {
+					id: user.id,
+					username: user.username,
+					hasDownloadedResticPassword: user.hasDownloadedResticPassword,
+				},
 			});
 		} catch (error) {
 			return c.json<LoginDto>({ success: false, message: toMessage(error) }, 401);

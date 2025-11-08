@@ -15,6 +15,7 @@ declare module "hono" {
 		user: {
 			id: number;
 			username: string;
+			hasDownloadedResticPassword: boolean;
 		};
 	}
 }

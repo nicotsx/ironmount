@@ -135,9 +135,7 @@ export const RepositoryInfoTabContent = ({ repository }: Props) => {
 				<AlertDialogContent className="max-w-2xl">
 					<AlertDialogHeader>
 						<AlertDialogTitle>Doctor Results</AlertDialogTitle>
-						<AlertDialogDescription>
-							{doctorMutation.data?.message || "Repository doctor operation completed"}
-						</AlertDialogDescription>
+						<AlertDialogDescription>Repository doctor operation completed</AlertDialogDescription>
 					</AlertDialogHeader>
 
 					{doctorMutation.data && (

@@ -38,7 +38,15 @@ export class AuthService {
 			expiresAt,
 		});
 
-		return { user: { id: user.id, username: user.username, createdAt: user.createdAt }, sessionId };
+		return {
+			user: {
+				id: user.id,
+				username: user.username,
+				createdAt: user.createdAt,
+				hasDownloadedResticPassword: user.hasDownloadedResticPassword,
+			},
+			sessionId,
+		};
 	}
 
 	/**
@@ -70,7 +78,11 @@ export class AuthService {
 
 		return {
 			sessionId,
-			user: { id: user.id, username: user.username },
+			user: {
+				id: user.id,
+				username: user.username,
+				hasDownloadedResticPassword: user.hasDownloadedResticPassword,
+			},
 			expiresAt,
 		};
 	}
@@ -109,6 +121,7 @@ export class AuthService {
 			user: {
 				id: session.user.id,
 				username: session.user.username,
+				hasDownloadedResticPassword: session.user.hasDownloadedResticPassword,
 			},
 			session: {
 				id: session.session.id,
