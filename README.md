@@ -144,6 +144,12 @@ services:
 +     - /proc:/host/proc
 ```
 
+Restart the Ironmount container to apply the changes:
+
+```bash
+docker compose down
+docker compose up -d
+```
 
 ## Docker plugin
 
