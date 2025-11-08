@@ -5,6 +5,7 @@ import { Toaster } from "~/components/ui/sonner";
 import type { Route } from "./+types/root";
 import "./app.css";
 import { client } from "./api-client/client.gen";
+import { useServerEvents } from "./hooks/use-server-events";
 
 client.setConfig({
 	baseUrl: "/",
@@ -63,6 +64,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+	useServerEvents();
+
 	return <Outlet />;
 }
 

@@ -15,6 +15,7 @@ import { createVolumeBackend } from "../backends/backend";
 import type { UpdateVolumeBody } from "./volume.dto";
 import { getVolumePath } from "./helpers";
 import { logger } from "../../utils/logger";
+import { serverEvents } from "../../core/events";
 
 const listVolumes = async () => {
 	const volumes = await db.query.volumesTable.findMany({});
@@ -88,6 +89,10 @@ const mountVolume = async (name: string) => {
 		.set({ status, lastError: error ?? null, lastHealthCheck: Date.now() })
 		.where(eq(volumesTable.name, name));
 
+	if (status === "mounted") {
+		serverEvents.emit("volume:mounted", { volumeName: name });
+	}
+
 	return { error, status };
 };
 
@@ -104,6 +109,10 @@ const unmountVolume = async (name: string) => {
 	const { status, error } = await backend.unmount();
 
 	await db.update(volumesTable).set({ status }).where(eq(volumesTable.name, name));
+
+	if (status === "unmounted") {
+		serverEvents.emit("volume:unmounted", { volumeName: name });
+	}
 
 	return { error, status };
 };
@@ -165,6 +174,8 @@ const updateVolume = async (name: string, volumeData: UpdateVolumeBody) => {
 			.update(volumesTable)
 			.set({ status, lastError: error ?? null, lastHealthCheck: Date.now() })
 			.where(eq(volumesTable.name, name));
+
+		serverEvents.emit("volume:updated", { volumeName: name });
 	}
 
 	return { volume: updated };
@@ -277,8 +288,7 @@ const listFiles = async (name: string, subPath?: string) => {
 	}
 
 	// For directory volumes, use the configured path directly
-	const volumePath =
-		volume.config.backend === "directory" ? volume.config.path : getVolumePath(volume.name);
+	const volumePath = volume.config.backend === "directory" ? volume.config.path : getVolumePath(volume.name);
 
 	const requestedPath = subPath ? path.join(volumePath, subPath) : volumePath;
 

@@ -14,6 +14,7 @@ import { repositoriesController } from "./modules/repositories/repositories.cont
 import { systemController } from "./modules/system/system.controller";
 import { volumeController } from "./modules/volumes/volume.controller";
 import { backupScheduleController } from "./modules/backups/backups.controller";
+import { eventsController } from "./modules/events/events.controller";
 import { handleServiceError } from "./utils/errors";
 import { logger } from "./utils/logger";
 
@@ -44,6 +45,7 @@ const app = new Hono()
 	.route("/api/v1/repositories", repositoriesController.use(requireAuth))
 	.route("/api/v1/backups", backupScheduleController.use(requireAuth))
 	.route("/api/v1/system", systemController.use(requireAuth))
+	.route("/api/v1/events", eventsController.use(requireAuth))
 	.get("/assets/*", serveStatic({ root: "./assets/frontend" }))
 	.get("/images/*", serveStatic({ root: "./assets/frontend" }))
 	.get("*", serveStatic({ path: "./assets/frontend/index.html" }));

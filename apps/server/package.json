@@ -20,6 +20,7 @@
 		"http-errors-enhanced": "^3.0.2",
 		"node-cron": "^4.2.1",
 		"slugify": "^1.6.6",
+		"tiny-typed-emitter": "^2.1.0",
 		"winston": "^3.17.0"
 	},
 	"devDependencies": {

@@ -9,6 +9,7 @@ import { logger } from "../../utils/logger";
 import { getVolumePath } from "../volumes/helpers";
 import type { CreateBackupScheduleBody, UpdateBackupScheduleBody } from "./backups.dto";
 import { toMessage } from "../../utils/errors";
+import { serverEvents } from "../../core/events";
 
 const calculateNextRun = (cronExpression: string): number => {
 	try {
@@ -181,6 +182,12 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 
 	logger.info(`Starting backup for volume ${volume.name} to repository ${repository.name}`);
 
+	serverEvents.emit("backup:started", {
+		scheduleId,
+		volumeName: volume.name,
+		repositoryName: repository.name,
+	});
+
 	await db
 		.update(backupSchedulesTable)
 		.set({ lastBackupStatus: "in_progress", updatedAt: Date.now() })
@@ -224,6 +231,13 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 			.where(eq(backupSchedulesTable.id, scheduleId));
 
 		logger.info(`Backup completed successfully for volume ${volume.name} to repository ${repository.name}`);
+
+		serverEvents.emit("backup:completed", {
+			scheduleId,
+			volumeName: volume.name,
+			repositoryName: repository.name,
+			status: "success",
+		});
 	} catch (error) {
 		logger.error(`Backup failed for volume ${volume.name} to repository ${repository.name}: ${toMessage(error)}`);
 
@@ -236,6 +250,13 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 				updatedAt: Date.now(),
 			})
 			.where(eq(backupSchedulesTable.id, scheduleId));
+
+		serverEvents.emit("backup:completed", {
+			scheduleId,
+			volumeName: volume.name,
+			repositoryName: repository.name,
+			status: "error",
+		});
 
 		throw error;
 	}
