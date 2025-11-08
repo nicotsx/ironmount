@@ -39,7 +39,7 @@ export const volumeController = new Hono()
 
 		const response = {
 			...res.volume,
-			path: getVolumePath(res.volume.name),
+			path: getVolumePath(res.volume),
 		};
 
 		return c.json<CreateVolumeDto>(response, 201);
@@ -63,7 +63,7 @@ export const volumeController = new Hono()
 		const response = {
 			volume: {
 				...res.volume,
-				path: getVolumePath(res.volume.name),
+				path: getVolumePath(res.volume),
 			},
 			statfs: {
 				total: res.statfs.total ?? 0,
@@ -87,7 +87,7 @@ export const volumeController = new Hono()
 
 		const response = {
 			...res.volume,
-			path: getVolumePath(res.volume.name),
+			path: getVolumePath(res.volume),
 		};
 
 		return c.json<UpdateVolumeDto>(response, 200);

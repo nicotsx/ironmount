@@ -51,7 +51,7 @@ export const driverController = new Hono()
 		const { volume } = await volumeService.getVolume(body.Name.replace(/^im-/, ""));
 
 		return c.json({
-			Mountpoint: getVolumePath(volume.name),
+			Mountpoint: getVolumePath(volume),
 		});
 	})
 	.post("/VolumeDriver.Get", async (c) => {
@@ -66,7 +66,7 @@ export const driverController = new Hono()
 		return c.json({
 			Volume: {
 				Name: `im-${volume.name}`,
-				Mountpoint: getVolumePath(volume.name),
+				Mountpoint: getVolumePath(volume),
 				Status: {},
 			},
 			Err: "",
@@ -77,7 +77,7 @@ export const driverController = new Hono()
 
 		const res = volumes.map((volume) => ({
 			Name: `im-${volume.name}`,
-			Mountpoint: getVolumePath(volume.name),
+			Mountpoint: getVolumePath(volume),
 			Status: {},
 		}));
 

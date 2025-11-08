@@ -128,7 +128,7 @@ const getVolume = async (name: string) => {
 
 	let statfs: Partial<StatFs> = {};
 	if (volume.status === "mounted") {
-		statfs = await getStatFs(getVolumePath(name)).catch(() => ({}));
+		statfs = await getStatFs(getVolumePath(volume)).catch(() => ({}));
 	}
 
 	return { volume, statfs };
@@ -292,7 +292,7 @@ const listFiles = async (name: string, subPath?: string) => {
 	}
 
 	// For directory volumes, use the configured path directly
-	const volumePath = volume.config.backend === "directory" ? volume.config.path : getVolumePath(volume.name);
+	const volumePath = getVolumePath(volume);
 
 	const requestedPath = subPath ? path.join(volumePath, subPath) : volumePath;
 

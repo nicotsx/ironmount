@@ -1,5 +1,10 @@
 import { VOLUME_MOUNT_BASE } from "../../core/constants";
+import type { Volume } from "../../db/schema";
 
-export const getVolumePath = (name: string) => {
-	return `${VOLUME_MOUNT_BASE}/${name}/_data`;
+export const getVolumePath = (volume: Volume) => {
+	if (volume.config.backend === "directory") {
+		return volume.config.path;
+	}
+
+	return `${VOLUME_MOUNT_BASE}/${volume.name}/_data`;
 };

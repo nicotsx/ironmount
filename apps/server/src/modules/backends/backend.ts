@@ -18,7 +18,7 @@ export type VolumeBackend = {
 };
 
 export const createVolumeBackend = (volume: Volume): VolumeBackend => {
-	const path = getVolumePath(volume.name);
+	const path = getVolumePath(volume);
 
 	switch (volume.config.backend) {
 		case "nfs": {

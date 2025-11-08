@@ -194,7 +194,7 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 		.where(eq(backupSchedulesTable.id, scheduleId));
 
 	try {
-		const volumePath = getVolumePath(volume.name);
+		const volumePath = getVolumePath(volume);
 
 		const backupOptions: {
 			exclude?: string[];

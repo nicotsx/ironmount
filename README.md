@@ -38,7 +38,7 @@ In order to run Ironmount, you need to have Docker and Docker Compose installed 
 ```yaml
 services:
   ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.4.0
+    image: ghcr.io/nicotsx/ironmount:v0.5.0
     container_name: ironmount
     restart: unless-stopped
     privileged: true
