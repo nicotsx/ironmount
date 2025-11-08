@@ -56,6 +56,8 @@ import type {
 	ListSnapshotFilesResponses,
 	RestoreSnapshotData,
 	RestoreSnapshotResponses,
+	DoctorRepositoryData,
+	DoctorRepositoryResponses,
 	ListBackupSchedulesData,
 	ListBackupSchedulesResponses,
 	CreateBackupScheduleData,
@@ -405,6 +407,18 @@ export const restoreSnapshot = <ThrowOnError extends boolean = false>(
 			"Content-Type": "application/json",
 			...options.headers,
 		},
+	});
+};
+
+/**
+ * Run doctor operations on a repository to fix common issues (unlock, check, repair index). Use this when the repository is locked or has errors.
+ */
+export const doctorRepository = <ThrowOnError extends boolean = false>(
+	options: Options<DoctorRepositoryData, ThrowOnError>,
+) => {
+	return (options.client ?? _heyApiClient).post<DoctorRepositoryResponses, unknown, ThrowOnError>({
+		url: "/api/v1/repositories/{name}/doctor",
+		...options,
 	});
 };
 

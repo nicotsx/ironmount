@@ -271,3 +271,38 @@ export const restoreSnapshotDto = describeRoute({
 		},
 	},
 });
+
+/**
+ * Doctor a repository (unlock, check, repair)
+ */
+export const doctorStepSchema = type({
+	step: "string",
+	success: "boolean",
+	output: "string?",
+	error: "string?",
+});
+
+export const doctorRepositoryResponse = type({
+	success: "boolean",
+	message: "string",
+	steps: doctorStepSchema.array(),
+});
+
+export type DoctorRepositoryDto = typeof doctorRepositoryResponse.infer;
+
+export const doctorRepositoryDto = describeRoute({
+	description:
+		"Run doctor operations on a repository to fix common issues (unlock, check, repair index). Use this when the repository is locked or has errors.",
+	tags: ["Repositories"],
+	operationId: "doctorRepository",
+	responses: {
+		200: {
+			description: "Doctor operation completed",
+			content: {
+				"application/json": {
+					schema: resolver(doctorRepositoryResponse),
+				},
+			},
+		},
+	},
+});

@@ -4,6 +4,7 @@ import {
 	createRepositoryBody,
 	createRepositoryDto,
 	deleteRepositoryDto,
+	doctorRepositoryDto,
 	getRepositoryDto,
 	getSnapshotDetailsDto,
 	listRepositoriesDto,
@@ -14,6 +15,7 @@ import {
 	restoreSnapshotBody,
 	restoreSnapshotDto,
 	type DeleteRepositoryDto,
+	type DoctorRepositoryDto,
 	type GetRepositoryDto,
 	type GetSnapshotDetailsDto,
 	type ListRepositoriesDto,
@@ -71,6 +73,8 @@ export const repositoriesController = new Hono()
 			};
 		});
 
+		c.header("Cache-Control", "public, max-age=10, stale-while-revalidate=60");
+
 		return c.json<ListSnapshotsDto>(snapshots, 200);
 	})
 	.get("/:name/snapshots/:snapshotId", getSnapshotDetailsDto, async (c) => {
@@ -116,4 +120,11 @@ export const repositoriesController = new Hono()
 		const result = await repositoriesService.restoreSnapshot(name, snapshotId, options);
 
 		return c.json<RestoreSnapshotDto>(result, 200);
+	})
+	.post("/:name/doctor", doctorRepositoryDto, async (c) => {
+		const { name } = c.req.param();
+
+		const result = await repositoriesService.doctorRepository(name);
+
+		return c.json<DoctorRepositoryDto>(result, 200);
 	});

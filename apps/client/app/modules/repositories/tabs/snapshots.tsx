@@ -67,16 +67,6 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 		);
 	}
 
-	if (isFetching && !data.length) {
-		return (
-			<Card>
-				<CardContent className="flex items-center justify-center py-12">
-					<p className="text-muted-foreground">Loading snapshots</p>
-				</CardContent>
-			</Card>
-		);
-	}
-
 	if (failureReason) {
 		return (
 			<Card>
@@ -84,6 +74,16 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 					<Database className="mb-4 h-12 w-12 text-destructive" />
 					<p className="text-destructive font-semibold">Failed to Load Snapshots</p>
 					<p className="text-sm text-muted-foreground mt-2">{failureReason.message}</p>
+				</CardContent>
+			</Card>
+		);
+	}
+
+	if (isFetching && !data.length) {
+		return (
+			<Card>
+				<CardContent className="flex items-center justify-center py-12">
+					<p className="text-muted-foreground">Loading snapshots</p>
 				</CardContent>
 			</Card>
 		);

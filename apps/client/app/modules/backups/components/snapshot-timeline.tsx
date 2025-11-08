@@ -8,17 +8,28 @@ interface Props {
 	snapshots: ListSnapshotsResponse;
 	snapshotId?: string;
 	loading?: boolean;
+	error?: string;
 	onSnapshotSelect: (snapshotId: string) => void;
 }
 
 export const SnapshotTimeline = (props: Props) => {
-	const { snapshots, snapshotId, loading, onSnapshotSelect } = props;
+	const { snapshots, snapshotId, loading, onSnapshotSelect, error } = props;
 
 	useEffect(() => {
 		if (!snapshotId && snapshots.length > 0) {
 			onSnapshotSelect(snapshots[snapshots.length - 1].short_id);
 		}
 	}, [snapshotId, snapshots, onSnapshotSelect]);
+
+	if (error) {
+		return (
+			<Card>
+				<div className="flex items-center justify-center h-24 p-4 text-center">
+					<p className="text-destructive">Error loading snapshots: {error}</p>
+				</div>
+			</Card>
+		);
+	}
 
 	if (loading) {
 		return (

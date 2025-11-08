@@ -27,6 +27,7 @@ import {
 	getSnapshotDetails,
 	listSnapshotFiles,
 	restoreSnapshot,
+	doctorRepository,
 	listBackupSchedules,
 	createBackupSchedule,
 	deleteBackupSchedule,
@@ -76,6 +77,8 @@ import type {
 	ListSnapshotFilesData,
 	RestoreSnapshotData,
 	RestoreSnapshotResponse,
+	DoctorRepositoryData,
+	DoctorRepositoryResponse,
 	ListBackupSchedulesData,
 	CreateBackupScheduleData,
 	CreateBackupScheduleResponse,
@@ -834,6 +837,46 @@ export const restoreSnapshotMutation = (
 	const mutationOptions: UseMutationOptions<RestoreSnapshotResponse, DefaultError, Options<RestoreSnapshotData>> = {
 		mutationFn: async (localOptions) => {
 			const { data } = await restoreSnapshot({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
+};
+
+export const doctorRepositoryQueryKey = (options: Options<DoctorRepositoryData>) =>
+	createQueryKey("doctorRepository", options);
+
+/**
+ * Run doctor operations on a repository to fix common issues (unlock, check, repair index). Use this when the repository is locked or has errors.
+ */
+export const doctorRepositoryOptions = (options: Options<DoctorRepositoryData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await doctorRepository({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: doctorRepositoryQueryKey(options),
+	});
+};
+
+/**
+ * Run doctor operations on a repository to fix common issues (unlock, check, repair index). Use this when the repository is locked or has errors.
+ */
+export const doctorRepositoryMutation = (
+	options?: Partial<Options<DoctorRepositoryData>>,
+): UseMutationOptions<DoctorRepositoryResponse, DefaultError, Options<DoctorRepositoryData>> => {
+	const mutationOptions: UseMutationOptions<DoctorRepositoryResponse, DefaultError, Options<DoctorRepositoryData>> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await doctorRepository({
 				...options,
 				...localOptions,
 				throwOnError: true,

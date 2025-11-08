@@ -7,6 +7,7 @@ import { restic } from "../../utils/restic";
 import { volumeService } from "../volumes/volume.service";
 import { CleanupDanglingMountsJob } from "../../jobs/cleanup-dangling";
 import { VolumeHealthCheckJob } from "../../jobs/healthchecks";
+import { RepositoryHealthCheckJob } from "../../jobs/repository-healthchecks";
 import { BackupExecutionJob } from "../../jobs/backup-execution";
 import { CleanupSessionsJob } from "../../jobs/cleanup-sessions";
 
@@ -32,6 +33,7 @@ export const startup = async () => {
 
 	Scheduler.build(CleanupDanglingMountsJob).schedule("0 * * * *");
 	Scheduler.build(VolumeHealthCheckJob).schedule("*/5 * * * *");
+	Scheduler.build(RepositoryHealthCheckJob).schedule("*/10 * * * *");
 	Scheduler.build(BackupExecutionJob).schedule("* * * * *");
 	Scheduler.build(CleanupSessionsJob).schedule("0 0 * * *");
 };

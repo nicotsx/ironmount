@@ -40,7 +40,11 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 		initialData: loaderData,
 	});
 
-	const { data: snapshots, isLoading } = useQuery({
+	const {
+		data: snapshots,
+		isLoading,
+		failureReason,
+	} = useQuery({
 		...listSnapshotsOptions({
 			path: { name: schedule.repository.name },
 			query: { backupId: schedule.id.toString() },
@@ -174,6 +178,7 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 				loading={isLoading}
 				snapshots={snapshots ?? []}
 				snapshotId={selectedSnapshot?.short_id}
+				error={failureReason?.message}
 				onSnapshotSelect={setSelectedSnapshotId}
 			/>
 			{selectedSnapshot && (

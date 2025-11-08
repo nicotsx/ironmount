@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { ConflictError, InternalServerError, NotFoundError } from "http-errors-enhanced";
 import slugify from "slugify";
 import { db } from "../../db/db";
-import { repositoriesTable, volumesTable } from "../../db/schema";
+import { repositoriesTable } from "../../db/schema";
 import { toMessage } from "../../utils/errors";
 import { restic } from "../../utils/restic";
 import { cryptoUtils } from "../../utils/crypto";
@@ -202,6 +202,112 @@ const getSnapshotDetails = async (name: string, snapshotId: string) => {
 	return snapshot;
 };
 
+const checkHealth = async (repositoryId: string) => {
+	const repository = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.id, repositoryId),
+	});
+
+	if (!repository) {
+		throw new NotFoundError("Repository not found");
+	}
+
+	const { error, status } = await restic
+		.snapshots(repository.config)
+		.then(() => ({ error: null, status: "healthy" as const }))
+		.catch((error) => ({ error: toMessage(error), status: "error" as const }));
+
+	await db
+		.update(repositoriesTable)
+		.set({
+			status,
+			lastChecked: Date.now(),
+			lastError: error,
+		})
+		.where(eq(repositoriesTable.id, repository.id));
+
+	return { status, lastError: error };
+};
+
+const doctorRepository = async (name: string) => {
+	const repository = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.name, name),
+	});
+
+	if (!repository) {
+		throw new NotFoundError("Repository not found");
+	}
+
+	const steps: Array<{ step: string; success: boolean; output: string | null; error: string | null }> = [];
+
+	const unlockResult = await restic.unlock(repository.config).then(
+		(result) => ({ success: true, message: result.message, error: null }),
+		(error) => ({ success: false, message: null, error: toMessage(error) }),
+	);
+
+	steps.push({
+		step: "unlock",
+		success: unlockResult.success,
+		output: unlockResult.message,
+		error: unlockResult.error,
+	});
+
+	const checkResult = await restic.check(repository.config, { readData: false }).then(
+		(result) => result,
+		(error) => ({ success: false, output: null, error: toMessage(error), hasErrors: true }),
+	);
+
+	steps.push({
+		step: "check",
+		success: checkResult.success,
+		output: checkResult.output,
+		error: checkResult.error,
+	});
+
+	if (checkResult.hasErrors) {
+		const repairResult = await restic.repairIndex(repository.config).then(
+			(result) => ({ success: true, output: result.output, error: null }),
+			(error) => ({ success: false, output: null, error: toMessage(error) }),
+		);
+
+		steps.push({
+			step: "repair_index",
+			success: repairResult.success,
+			output: repairResult.output,
+			error: repairResult.error,
+		});
+
+		const recheckResult = await restic.check(repository.config, { readData: false }).then(
+			(result) => result,
+			(error) => ({ success: false, output: null, error: toMessage(error), hasErrors: true }),
+		);
+
+		steps.push({
+			step: "recheck",
+			success: recheckResult.success,
+			output: recheckResult.output,
+			error: recheckResult.error,
+		});
+	}
+
+	const allSuccessful = steps.every((s) => s.success);
+
+	console.log("Doctor steps:", steps);
+
+	await db
+		.update(repositoriesTable)
+		.set({
+			status: allSuccessful ? "healthy" : "error",
+			lastChecked: Date.now(),
+			lastError: allSuccessful ? null : steps.find((s) => !s.success)?.error,
+		})
+		.where(eq(repositoriesTable.id, repository.id));
+
+	return {
+		success: allSuccessful,
+		steps,
+	};
+};
+
 export const repositoriesService = {
 	listRepositories,
 	createRepository,
@@ -211,4 +317,6 @@ export const repositoriesService = {
 	listSnapshotFiles,
 	restoreSnapshot,
 	getSnapshotDetails,
+	checkHealth,
+	doctorRepository,
 };

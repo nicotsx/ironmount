@@ -148,7 +148,7 @@ const backup = async (
 
 	args.push("--json");
 
-	await $`restic unlock --repo ${repoUrl}`.env(env).nothrow();
+	// await $`restic unlock --repo ${repoUrl}`.env(env).nothrow();
 	const res = await $`restic ${args}`.env(env).nothrow();
 
 	if (includeFile) {
@@ -334,7 +334,7 @@ const forget = async (config: RepositoryConfig, options: RetentionPolicy, extra:
 	args.push("--prune");
 	args.push("--json");
 
-	await $`restic unlock --repo ${repoUrl}`.env(env).nothrow();
+	// await $`restic unlock --repo ${repoUrl}`.env(env).nothrow();
 	const res = await $`restic ${args}`.env(env).nothrow();
 
 	if (res.exitCode !== 0) {
@@ -425,6 +425,79 @@ const ls = async (config: RepositoryConfig, snapshotId: string, path?: string) =
 	return { snapshot, nodes };
 };
 
+const unlock = async (config: RepositoryConfig) => {
+	const repoUrl = buildRepoUrl(config);
+	const env = await buildEnv(config);
+
+	const res = await $`restic unlock --repo ${repoUrl} --json`.env(env).nothrow();
+
+	if (res.exitCode !== 0) {
+		logger.error(`Restic unlock failed: ${res.stderr}`);
+		throw new Error(`Restic unlock failed: ${res.stderr}`);
+	}
+
+	logger.info(`Restic unlock succeeded for repository: ${repoUrl}`);
+	return { success: true, message: "Repository unlocked successfully" };
+};
+
+const check = async (config: RepositoryConfig, options?: { readData?: boolean }) => {
+	const repoUrl = buildRepoUrl(config);
+	const env = await buildEnv(config);
+
+	const args: string[] = ["--repo", repoUrl, "check"];
+
+	if (options?.readData) {
+		args.push("--read-data");
+	}
+
+	const res = await $`restic ${args}`.env(env).nothrow();
+
+	const stdout = res.text();
+	const stderr = res.stderr.toString();
+
+	if (res.exitCode !== 0) {
+		logger.error(`Restic check failed: ${stderr}`);
+		return {
+			success: false,
+			hasErrors: true,
+			output: stdout,
+			error: stderr,
+		};
+	}
+
+	const hasErrors = stdout.includes("error") || stdout.includes("Fatal");
+
+	logger.info(`Restic check completed for repository: ${repoUrl}`);
+	return {
+		success: !hasErrors,
+		hasErrors,
+		output: stdout,
+		error: hasErrors ? "Repository contains errors" : null,
+	};
+};
+
+const repairIndex = async (config: RepositoryConfig) => {
+	const repoUrl = buildRepoUrl(config);
+	const env = await buildEnv(config);
+
+	const res = await $`restic repair index --repo ${repoUrl}`.env(env).nothrow();
+
+	const stdout = res.text();
+	const stderr = res.stderr.toString();
+
+	if (res.exitCode !== 0) {
+		logger.error(`Restic repair index failed: ${stderr}`);
+		throw new Error(`Restic repair index failed: ${stderr}`);
+	}
+
+	logger.info(`Restic repair index completed for repository: ${repoUrl}`);
+	return {
+		success: true,
+		output: stdout,
+		message: "Index repaired successfully",
+	};
+};
+
 export const restic = {
 	ensurePassfile,
 	init,
@@ -432,5 +505,8 @@ export const restic = {
 	restore,
 	snapshots,
 	forget,
+	unlock,
 	ls,
+	check,
+	repairIndex,
 };

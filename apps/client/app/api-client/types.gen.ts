@@ -156,6 +156,7 @@ export type ListVolumesResponses = {
 					server: string;
 					version: "3" | "4" | "4.1";
 					port?: number;
+					readOnly?: boolean;
 			  }
 			| {
 					backend: "smb";
@@ -166,6 +167,7 @@ export type ListVolumesResponses = {
 					vers?: "1.0" | "2.0" | "2.1" | "3.0";
 					port?: number;
 					domain?: string;
+					readOnly?: boolean;
 			  }
 			| {
 					backend: "webdav";
@@ -201,6 +203,7 @@ export type CreateVolumeData = {
 					server: string;
 					version: "3" | "4" | "4.1";
 					port?: number;
+					readOnly?: boolean;
 			  }
 			| {
 					backend: "smb";
@@ -211,6 +214,7 @@ export type CreateVolumeData = {
 					vers?: "1.0" | "2.0" | "2.1" | "3.0";
 					port?: number;
 					domain?: string;
+					readOnly?: boolean;
 			  }
 			| {
 					backend: "webdav";
@@ -244,6 +248,7 @@ export type CreateVolumeResponses = {
 					server: string;
 					version: "3" | "4" | "4.1";
 					port?: number;
+					readOnly?: boolean;
 			  }
 			| {
 					backend: "smb";
@@ -254,6 +259,7 @@ export type CreateVolumeResponses = {
 					vers?: "1.0" | "2.0" | "2.1" | "3.0";
 					port?: number;
 					domain?: string;
+					readOnly?: boolean;
 			  }
 			| {
 					backend: "webdav";
@@ -289,6 +295,7 @@ export type TestConnectionData = {
 					server: string;
 					version: "3" | "4" | "4.1";
 					port?: number;
+					readOnly?: boolean;
 			  }
 			| {
 					backend: "smb";
@@ -299,6 +306,7 @@ export type TestConnectionData = {
 					vers?: "1.0" | "2.0" | "2.1" | "3.0";
 					port?: number;
 					domain?: string;
+					readOnly?: boolean;
 			  }
 			| {
 					backend: "webdav";
@@ -385,6 +393,7 @@ export type GetVolumeResponses = {
 						server: string;
 						version: "3" | "4" | "4.1";
 						port?: number;
+						readOnly?: boolean;
 				  }
 				| {
 						backend: "smb";
@@ -395,6 +404,7 @@ export type GetVolumeResponses = {
 						vers?: "1.0" | "2.0" | "2.1" | "3.0";
 						port?: number;
 						domain?: string;
+						readOnly?: boolean;
 				  }
 				| {
 						backend: "webdav";
@@ -432,6 +442,7 @@ export type UpdateVolumeData = {
 					server: string;
 					version: "3" | "4" | "4.1";
 					port?: number;
+					readOnly?: boolean;
 			  }
 			| {
 					backend: "smb";
@@ -442,6 +453,7 @@ export type UpdateVolumeData = {
 					vers?: "1.0" | "2.0" | "2.1" | "3.0";
 					port?: number;
 					domain?: string;
+					readOnly?: boolean;
 			  }
 			| {
 					backend: "webdav";
@@ -483,6 +495,7 @@ export type UpdateVolumeResponses = {
 					server: string;
 					version: "3" | "4" | "4.1";
 					port?: number;
+					readOnly?: boolean;
 			  }
 			| {
 					backend: "smb";
@@ -493,6 +506,7 @@ export type UpdateVolumeResponses = {
 					vers?: "1.0" | "2.0" | "2.1" | "3.0";
 					port?: number;
 					domain?: string;
+					readOnly?: boolean;
 			  }
 			| {
 					backend: "webdav";
@@ -904,6 +918,33 @@ export type RestoreSnapshotResponses = {
 
 export type RestoreSnapshotResponse = RestoreSnapshotResponses[keyof RestoreSnapshotResponses];
 
+export type DoctorRepositoryData = {
+	body?: never;
+	path: {
+		name: string;
+	};
+	query?: never;
+	url: "/api/v1/repositories/{name}/doctor";
+};
+
+export type DoctorRepositoryResponses = {
+	/**
+	 * Doctor operation completed
+	 */
+	200: {
+		message: string;
+		steps: Array<{
+			step: string;
+			success: boolean;
+			error?: string;
+			output?: string;
+		}>;
+		success: boolean;
+	};
+};
+
+export type DoctorRepositoryResponse = DoctorRepositoryResponses[keyof DoctorRepositoryResponses];
+
 export type ListBackupSchedulesData = {
 	body?: never;
 	path?: never;
@@ -972,6 +1013,7 @@ export type ListBackupSchedulesResponses = {
 						server: string;
 						version: "3" | "4" | "4.1";
 						port?: number;
+						readOnly?: boolean;
 				  }
 				| {
 						backend: "smb";
@@ -982,6 +1024,7 @@ export type ListBackupSchedulesResponses = {
 						vers?: "1.0" | "2.0" | "2.1" | "3.0";
 						port?: number;
 						domain?: string;
+						readOnly?: boolean;
 				  }
 				| {
 						backend: "webdav";
@@ -1153,6 +1196,7 @@ export type GetBackupScheduleResponses = {
 						server: string;
 						version: "3" | "4" | "4.1";
 						port?: number;
+						readOnly?: boolean;
 				  }
 				| {
 						backend: "smb";
@@ -1163,6 +1207,7 @@ export type GetBackupScheduleResponses = {
 						vers?: "1.0" | "2.0" | "2.1" | "3.0";
 						port?: number;
 						domain?: string;
+						readOnly?: boolean;
 				  }
 				| {
 						backend: "webdav";
@@ -1315,6 +1360,7 @@ export type GetBackupScheduleForVolumeResponses = {
 						server: string;
 						version: "3" | "4" | "4.1";
 						port?: number;
+						readOnly?: boolean;
 				  }
 				| {
 						backend: "smb";
@@ -1325,6 +1371,7 @@ export type GetBackupScheduleForVolumeResponses = {
 						vers?: "1.0" | "2.0" | "2.1" | "3.0";
 						port?: number;
 						domain?: string;
+						readOnly?: boolean;
 				  }
 				| {
 						backend: "webdav";
