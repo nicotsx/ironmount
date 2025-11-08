@@ -11,10 +11,10 @@ import type { Route } from "./+types/backups";
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Ironmount" },
+		{ title: "Backup Jobs" },
 		{
 			name: "description",
-			content: "Create, manage, monitor, and automate your Docker volumes with ease.",
+			content: "Automate volume backups with scheduled jobs and retention policies.",
 		},
 	];
 }

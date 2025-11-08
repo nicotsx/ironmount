@@ -19,6 +19,16 @@ import type { Route } from "./+types/backup-details";
 import { SnapshotFileBrowser } from "../components/snapshot-file-browser";
 import { SnapshotTimeline } from "../components/snapshot-timeline";
 
+export function meta(_: Route.MetaArgs) {
+	return [
+		{ title: "Backup Job Details" },
+		{
+			name: "description",
+			content: "View and manage backup job configuration, schedule, and snapshots.",
+		},
+	];
+}
+
 export const clientLoader = async ({ params }: Route.LoaderArgs) => {
 	const { data } = await getBackupSchedule({ path: { scheduleId: params.id } });
 

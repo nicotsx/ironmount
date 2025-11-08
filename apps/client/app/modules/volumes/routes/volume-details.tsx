@@ -32,10 +32,10 @@ import { DockerTabContent } from "../tabs/docker";
 
 export function meta({ params }: Route.MetaArgs) {
 	return [
-		{ title: `Ironmount - ${params.name}` },
+		{ title: params.name },
 		{
 			name: "description",
-			content: "Create, manage, monitor, and automate your Docker volumes with ease.",
+			content: "View and manage volume details, configuration, and files.",
 		},
 	];
 }

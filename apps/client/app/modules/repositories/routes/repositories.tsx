@@ -17,10 +17,10 @@ import { EmptyState } from "~/components/empty-state";
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Ironmount - Repositories" },
+		{ title: "Repositories" },
 		{
 			name: "description",
-			content: "Manage your backup repositories",
+			content: "Manage your backup repositories with encryption and compression.",
 		},
 	];
 }

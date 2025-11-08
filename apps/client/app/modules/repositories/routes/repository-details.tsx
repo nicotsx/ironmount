@@ -27,10 +27,10 @@ import { RepositorySnapshotsTabContent } from "../tabs/snapshots";
 
 export function meta({ params }: Route.MetaArgs) {
 	return [
-		{ title: `Ironmount - ${params.name}` },
+		{ title: params.name },
 		{
 			name: "description",
-			content: "Manage your restic backup repositories with ease.",
+			content: "View repository configuration, status, and snapshots.",
 		},
 	];
 }

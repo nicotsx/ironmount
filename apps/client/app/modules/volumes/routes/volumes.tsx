@@ -17,7 +17,7 @@ import type { Route } from "./+types/volumes";
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Ironmount" },
+		{ title: "Volumes" },
 		{
 			name: "description",
 			content: "Create, manage, monitor, and automate your Docker volumes with ease.",

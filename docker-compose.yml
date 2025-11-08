@@ -15,7 +15,7 @@ services:
     ports:
       - "4096:4097"
     volumes:
-      - /var/lib/ironmount/:/var/lib/ironmount/
+      - /var/lib/ironmount:/var/lib/ironmount
 
       - ./apps/client/app:/app/apps/client/app
       - ./apps/server/src:/app/apps/server/src

@@ -10,8 +10,19 @@ import { Button } from "~/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { authMiddleware } from "~/middleware/auth";
+import type { Route } from "./+types/onboarding";
 
 export const clientMiddleware = [authMiddleware];
+
+export function meta(_: Route.MetaArgs) {
+	return [
+		{ title: "Onboarding" },
+		{
+			name: "description",
+			content: "Welcome to Ironmount. Create your admin account to get started.",
+		},
+	];
+}
 
 const onboardingSchema = type({
 	username: "2<=string<=50",

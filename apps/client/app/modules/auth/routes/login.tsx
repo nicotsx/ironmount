@@ -10,8 +10,19 @@ import { Button } from "~/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { authMiddleware } from "~/middleware/auth";
+import type { Route } from "./+types/login";
 
 export const clientMiddleware = [authMiddleware];
+
+export function meta(_: Route.MetaArgs) {
+	return [
+		{ title: "Login" },
+		{
+			name: "description",
+			content: "Sign in to your Ironmount account.",
+		},
+	];
+}
 
 const loginSchema = type({
 	username: "2<=string<=50",

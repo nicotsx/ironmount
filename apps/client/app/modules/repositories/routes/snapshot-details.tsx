@@ -7,6 +7,16 @@ import { SnapshotFileBrowser } from "~/modules/backups/components/snapshot-file-
 import { getSnapshotDetails } from "~/api-client";
 import type { Route } from "./+types/snapshot-details";
 
+export function meta({ params }: Route.MetaArgs) {
+	return [
+		{ title: `Snapshot ${params.snapshotId}` },
+		{
+			name: "description",
+			content: "Browse and restore files from a backup snapshot.",
+		},
+	];
+}
+
 export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
 	const snapshot = await getSnapshotDetails({ path: { name: params.name, snapshotId: params.snapshotId } });
 	if (snapshot.data) return snapshot.data;

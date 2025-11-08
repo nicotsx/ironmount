@@ -13,7 +13,7 @@ import type { Route } from "./+types/settings";
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Settings - Ironmount" },
+		{ title: "Settings" },
 		{
 			name: "description",
 			content: "Manage your account settings and preferences.",

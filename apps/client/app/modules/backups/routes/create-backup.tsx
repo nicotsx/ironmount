@@ -20,10 +20,10 @@ import { listRepositories, listVolumes } from "~/api-client";
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Ironmount" },
+		{ title: "Create Backup Job" },
 		{
 			name: "description",
-			content: "Create, manage, monitor, and automate your Docker volumes with ease.",
+			content: "Create a new automated backup job for your volumes.",
 		},
 	];
 }

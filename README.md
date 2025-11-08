@@ -155,7 +155,7 @@ docker compose up -d
 
 Ironmount can also be used as a Docker volume plugin, allowing you to mount your volumes directly into other Docker containers. This enables seamless integration with your containerized applications.
 
-In order to enable this feature, you need to run Ironmount with privileged modek and mount several items from the host. Here is an example of how to set this up in your `docker-compose.yml` file:
+In order to enable this feature, you need to run Ironmount with privileged mode and mount several items from the host. Here is an example of how to set this up in your `docker-compose.yml` file:
 
 ```diff
 services:
