@@ -34,9 +34,6 @@ export const loginDto = describeRoute({
 				},
 			},
 		},
-		401: {
-			description: "Invalid credentials",
-		},
 	},
 });
 
@@ -54,9 +51,6 @@ export const registerDto = describeRoute({
 					schema: resolver(loginResponseSchema),
 				},
 			},
-		},
-		400: {
-			description: "Invalid request or username already exists",
 		},
 	},
 });
@@ -125,5 +119,34 @@ export const getStatusDto = describeRoute({
 
 export type GetStatusDto = typeof statusResponseSchema.infer;
 
+export const changePasswordBodySchema = type({
+	currentPassword: "string>0",
+	newPassword: "string>7",
+});
+
+const changePasswordResponseSchema = type({
+	success: "boolean",
+	message: "string",
+});
+
+export const changePasswordDto = describeRoute({
+	description: "Change current user password",
+	operationId: "changePassword",
+	tags: ["Auth"],
+	responses: {
+		200: {
+			description: "Password changed successfully",
+			content: {
+				"application/json": {
+					schema: resolver(changePasswordResponseSchema),
+				},
+			},
+		},
+	},
+});
+
+export type ChangePasswordDto = typeof changePasswordResponseSchema.infer;
+
 export type LoginBody = typeof loginBodySchema.infer;
 export type RegisterBody = typeof registerBodySchema.infer;
+export type ChangePasswordBody = typeof changePasswordBodySchema.infer;

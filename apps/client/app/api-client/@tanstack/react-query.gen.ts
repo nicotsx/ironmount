@@ -7,6 +7,7 @@ import {
 	logout,
 	getMe,
 	getStatus,
+	changePassword,
 	listVolumes,
 	createVolume,
 	testConnection,
@@ -44,6 +45,8 @@ import type {
 	LogoutResponse,
 	GetMeData,
 	GetStatusData,
+	ChangePasswordData,
+	ChangePasswordResponse,
 	ListVolumesData,
 	CreateVolumeData,
 	CreateVolumeResponse,
@@ -281,6 +284,46 @@ export const getStatusOptions = (options?: Options<GetStatusData>) => {
 		},
 		queryKey: getStatusQueryKey(options),
 	});
+};
+
+export const changePasswordQueryKey = (options?: Options<ChangePasswordData>) =>
+	createQueryKey("changePassword", options);
+
+/**
+ * Change current user password
+ */
+export const changePasswordOptions = (options?: Options<ChangePasswordData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await changePassword({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: changePasswordQueryKey(options),
+	});
+};
+
+/**
+ * Change current user password
+ */
+export const changePasswordMutation = (
+	options?: Partial<Options<ChangePasswordData>>,
+): UseMutationOptions<ChangePasswordResponse, DefaultError, Options<ChangePasswordData>> => {
+	const mutationOptions: UseMutationOptions<ChangePasswordResponse, DefaultError, Options<ChangePasswordData>> = {
+		mutationFn: async (localOptions) => {
+			const { data } = await changePassword({
+				...options,
+				...localOptions,
+				throwOnError: true,
+			});
+			return data;
+		},
+	};
+	return mutationOptions;
 };
 
 export const listVolumesQueryKey = (options?: Options<ListVolumesData>) => createQueryKey("listVolumes", options);

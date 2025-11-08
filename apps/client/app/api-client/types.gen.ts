@@ -125,6 +125,39 @@ export type GetStatusResponses = {
 
 export type GetStatusResponse = GetStatusResponses[keyof GetStatusResponses];
 
+export type ChangePasswordData = {
+	body?: {
+		currentPassword: string;
+		newPassword: string;
+	};
+	path?: never;
+	query?: never;
+	url: "/api/v1/auth/change-password";
+};
+
+export type ChangePasswordErrors = {
+	/**
+	 * Invalid current password or validation error
+	 */
+	400: unknown;
+	/**
+	 * Not authenticated
+	 */
+	401: unknown;
+};
+
+export type ChangePasswordResponses = {
+	/**
+	 * Password changed successfully
+	 */
+	200: {
+		message: string;
+		success: boolean;
+	};
+};
+
+export type ChangePasswordResponse = ChangePasswordResponses[keyof ChangePasswordResponses];
+
 export type ListVolumesData = {
 	body?: never;
 	path?: never;

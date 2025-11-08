@@ -14,6 +14,9 @@ import type {
 	GetMeResponses,
 	GetStatusData,
 	GetStatusResponses,
+	ChangePasswordData,
+	ChangePasswordResponses,
+	ChangePasswordErrors,
 	ListVolumesData,
 	ListVolumesResponses,
 	CreateVolumeData,
@@ -145,6 +148,22 @@ export const getStatus = <ThrowOnError extends boolean = false>(options?: Option
 	return (options?.client ?? _heyApiClient).get<GetStatusResponses, unknown, ThrowOnError>({
 		url: "/api/v1/auth/status",
 		...options,
+	});
+};
+
+/**
+ * Change current user password
+ */
+export const changePassword = <ThrowOnError extends boolean = false>(
+	options?: Options<ChangePasswordData, ThrowOnError>,
+) => {
+	return (options?.client ?? _heyApiClient).post<ChangePasswordResponses, ChangePasswordErrors, ThrowOnError>({
+		url: "/api/v1/auth/change-password",
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			...options?.headers,
+		},
 	});
 };
 

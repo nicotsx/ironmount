@@ -134,6 +134,33 @@ export class AuthService {
 		const [user] = await db.select({ id: usersTable.id }).from(usersTable).limit(1);
 		return !!user;
 	}
+
+	/**
+	 * Change password for a user
+	 */
+	async changePassword(userId: number, currentPassword: string, newPassword: string) {
+		const [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId));
+
+		if (!user) {
+			throw new Error("User not found");
+		}
+
+		const isValid = await Bun.password.verify(currentPassword, user.passwordHash);
+
+		if (!isValid) {
+			throw new Error("Current password is incorrect");
+		}
+
+		const newPasswordHash = await Bun.password.hash(newPassword, {
+			algorithm: "argon2id",
+			memoryCost: 19456,
+			timeCost: 2,
+		});
+
+		await db.update(usersTable).set({ passwordHash: newPasswordHash }).where(eq(usersTable.id, userId));
+
+		logger.info(`Password changed for user: ${user.username}`);
+	}
 }
 
 export const authService = new AuthService();

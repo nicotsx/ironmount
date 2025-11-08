@@ -3,6 +3,8 @@ import { validator } from "hono-openapi";
 import { Hono } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import {
+	changePasswordBodySchema,
+	changePasswordDto,
 	getMeDto,
 	getStatusDto,
 	loginBodySchema,
@@ -10,6 +12,7 @@ import {
 	logoutDto,
 	registerBodySchema,
 	registerDto,
+	type ChangePasswordDto,
 	type GetMeDto,
 	type GetStatusDto,
 	type LoginDto,
@@ -100,4 +103,27 @@ export const authController = new Hono()
 	.get("/status", getStatusDto, async (c) => {
 		const hasUsers = await authService.hasUsers();
 		return c.json<GetStatusDto>({ hasUsers });
+	})
+	.post("/change-password", changePasswordDto, validator("json", changePasswordBodySchema), async (c) => {
+		const sessionId = getCookie(c, COOKIE_NAME);
+
+		if (!sessionId) {
+			return c.json<ChangePasswordDto>({ success: false, message: "Not authenticated" }, 401);
+		}
+
+		const session = await authService.verifySession(sessionId);
+
+		if (!session) {
+			deleteCookie(c, COOKIE_NAME, COOKIE_OPTIONS);
+			return c.json<ChangePasswordDto>({ success: false, message: "Not authenticated" }, 401);
+		}
+
+		const body = c.req.valid("json");
+
+		try {
+			await authService.changePassword(session.user.id, body.currentPassword, body.newPassword);
+			return c.json<ChangePasswordDto>({ success: true, message: "Password changed successfully" });
+		} catch (error) {
+			return c.json<ChangePasswordDto>({ success: false, message: toMessage(error) }, 400);
+		}
 	});

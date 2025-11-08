@@ -334,6 +334,7 @@ const forget = async (config: RepositoryConfig, options: RetentionPolicy, extra:
 	args.push("--prune");
 	args.push("--json");
 
+	await $`restic unlock --repo ${repoUrl}`.env(env).nothrow();
 	const res = await $`restic ${args}`.env(env).nothrow();
 
 	if (res.exitCode !== 0) {
