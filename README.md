@@ -36,7 +36,7 @@ In order to run Ironmount, you need to have Docker and Docker Compose installed 
 ```yaml
 services:
   ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.5.0
+    image: ghcr.io/nicotsx/ironmount:v0.6
     container_name: ironmount
     restart: unless-stopped
     privileged: true
@@ -67,7 +67,7 @@ If you want to track a local directory on the same server where Ironmount is run
 ```diff
 services:
   ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.5.0
+    image: ghcr.io/nicotsx/ironmount:v0.6
     container_name: ironmount
     restart: unless-stopped
     cap_add:
@@ -129,7 +129,7 @@ In order to enable this feature, you need to run Ironmount with privileged mode 
 ```diff
 services:
   ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.5.0
+    image: ghcr.io/nicotsx/ironmount:v0.6
     container_name: ironmount
     restart: unless-stopped
 -   cap_add:
@@ -160,7 +160,7 @@ In order to enable this feature, you need to run Ironmount with privileged mode 
 ```diff
 services:
   ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.5.0
+    image: ghcr.io/nicotsx/ironmount:v0.6
     container_name: ironmount
     restart: unless-stopped
 -   cap_add:
