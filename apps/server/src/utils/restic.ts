@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { spawn } from "node:child_process";
+import { throttle } from "es-toolkit";
 import type { RepositoryConfig } from "@ironmount/schemas/restic";
 import { type } from "arktype";
 import { $ } from "bun";
@@ -9,6 +9,7 @@ import { REPOSITORY_BASE, RESTIC_PASS_FILE } from "../core/constants";
 import { logger } from "./logger";
 import { cryptoUtils } from "./crypto";
 import type { RetentionPolicy } from "../modules/backups/backups.dto";
+import { safeSpawn } from "./spawn";
 
 const backupOutputSchema = type({
 	message_type: "'summary'",
@@ -149,67 +150,41 @@ const backup = async (
 
 	args.push("--json");
 
-	return new Promise((resolve, reject) => {
-		const child = spawn("restic", args, {
-			env: { ...process.env, ...env },
-			signal: options?.signal,
-		});
+	const logData = throttle((data: string) => {
+		logger.info(data.trim());
+	}, 5000);
 
-		let stdout = "";
+	let stdout = "";
 
-		child.stdout.on("data", (data) => {
-			stdout = data.toString();
-			logger.info(data.toString());
-		});
-
-		child.stderr.on("data", (data) => {
-			logger.error(data.toString());
-		});
-
-		child.on("error", async (error) => {
-			if (includeFile) {
-				await fs.unlink(includeFile).catch(() => {});
-			}
-
-			if (error.name === "AbortError") {
-				logger.info("Restic backup process was aborted");
-				reject(error);
-			} else {
-				logger.error(`Restic backup process error: ${error.message}`);
-				reject(new Error(`Restic backup process error: ${error.message}`));
-			}
-		});
-
-		child.on("close", async (code) => {
-			if (includeFile) {
-				await fs.unlink(includeFile).catch(() => {});
-			}
-
-			if (code !== 0) {
-				logger.error(`Restic backup failed with exit code ${code}`);
-				reject(new Error(`Restic backup failed`));
-				return;
-			}
-
-			try {
-				const lastLine = stdout.trim();
-				const resSummary = JSON.parse(lastLine ?? "{}");
-
-				const result = backupOutputSchema(resSummary);
-
-				if (result instanceof type.errors) {
-					logger.error(`Restic backup output validation failed: ${result}`);
-					reject(new Error(`Restic backup output validation failed: ${result}`));
-					return;
-				}
-
-				resolve(result);
-			} catch (error) {
-				logger.error(`Failed to parse restic backup output: ${error}`);
-				reject(new Error(`Failed to parse restic backup output: ${error}`));
-			}
-		});
+	await safeSpawn({
+		command: "restic",
+		args,
+		env,
+		signal: options?.signal,
+		onStdout: (data) => {
+			stdout = data;
+			logData(data);
+		},
+		onStderr: (error) => {
+			logger.error(error.trim());
+		},
+		finally: async () => {
+			includeFile && (await fs.unlink(includeFile).catch(() => {}));
+		},
 	});
+
+	const lastLine = stdout.trim();
+	const resSummary = JSON.parse(lastLine ?? "{}");
+
+	const result = backupOutputSchema(resSummary);
+
+	if (result instanceof type.errors) {
+		logger.error(`Restic backup output validation failed: ${result}`);
+
+		throw new Error(`Restic backup output validation failed: ${result}`);
+	}
+
+	return result;
 };
 
 const restoreOutputSchema = type({
@@ -370,7 +345,6 @@ const forget = async (config: RepositoryConfig, options: RetentionPolicy, extra:
 	args.push("--prune");
 	args.push("--json");
 
-	// await $`restic unlock --repo ${repoUrl}`.env(env).nothrow();
 	const res = await $`restic ${args}`.env(env).nothrow();
 
 	if (res.exitCode !== 0) {
@@ -465,7 +439,7 @@ const unlock = async (config: RepositoryConfig) => {
 	const repoUrl = buildRepoUrl(config);
 	const env = await buildEnv(config);
 
-	const res = await $`restic unlock --repo ${repoUrl} --json`.env(env).nothrow();
+	const res = await $`restic unlock --repo ${repoUrl} --remove-all --json`.env(env).nothrow();
 
 	if (res.exitCode !== 0) {
 		logger.error(`Restic unlock failed: ${res.stderr}`);
@@ -501,7 +475,7 @@ const check = async (config: RepositoryConfig, options?: { readData?: boolean })
 		};
 	}
 
-	const hasErrors = stdout.includes("error") || stdout.includes("Fatal");
+	const hasErrors = stdout.includes("Fatal");
 
 	logger.info(`Restic check completed for repository: ${repoUrl}`);
 	return {
