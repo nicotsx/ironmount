@@ -73,7 +73,7 @@ export default function SnapshotDetailsPage({ loaderData }: Route.ComponentProps
 							</div>
 							<div>
 								<span className="text-muted-foreground">Short ID:</span>
-								<p className="font-mono break-al">{data.snapshot.short_id}</p>
+								<p className="font-mono break-all">{data.snapshot.short_id}</p>
 							</div>
 							<div>
 								<span className="text-muted-foreground">Hostname:</span>
@@ -87,7 +87,7 @@ export default function SnapshotDetailsPage({ loaderData }: Route.ComponentProps
 								<span className="text-muted-foreground">Paths:</span>
 								<div className="space-y-1 mt-1">
 									{data.snapshot.paths.map((path) => (
-										<p key={path} className="font-mono text-xs bg-muted px-2 py-1 rounded">
+										<p key={path} className="font-mono text-xs bg-muted px-2 py-1 rounded break-all">
 											{path}
 										</p>
 									))}
