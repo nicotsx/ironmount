@@ -13,6 +13,7 @@ import {
 	AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import type { BackupSchedule } from "~/lib/types";
+import { BackupProgressCard } from "./backup-progress-card";
 
 type Props = {
 	schedule: BackupSchedule;
@@ -143,6 +144,8 @@ export const ScheduleSummary = (props: Props) => {
 					)}
 				</CardContent>
 			</Card>
+
+			{schedule.lastBackupStatus === "in_progress" && <BackupProgressCard scheduleId={schedule.id} />}
 
 			<AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
 				<AlertDialogContent>

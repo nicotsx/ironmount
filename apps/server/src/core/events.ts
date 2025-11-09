@@ -6,6 +6,18 @@ import type { TypedEmitter } from "tiny-typed-emitter";
  */
 interface ServerEvents {
 	"backup:started": (data: { scheduleId: number; volumeName: string; repositoryName: string }) => void;
+	"backup:progress": (data: {
+		scheduleId: number;
+		volumeName: string;
+		repositoryName: string;
+		seconds_elapsed: number;
+		percent_done: number;
+		total_files: number;
+		files_done: number;
+		total_bytes: number;
+		bytes_done: number;
+		current_files: string[];
+	}) => void;
 	"backup:completed": (data: {
 		scheduleId: number;
 		volumeName: string;

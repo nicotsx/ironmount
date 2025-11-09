@@ -224,7 +224,17 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 			backupOptions.include = schedule.includePatterns;
 		}
 
-		await restic.backup(repository.config, volumePath, backupOptions);
+		await restic.backup(repository.config, volumePath, {
+			...backupOptions,
+			onProgress: (progress) => {
+				serverEvents.emit("backup:progress", {
+					scheduleId,
+					volumeName: volume.name,
+					repositoryName: repository.name,
+					...progress,
+				});
+			},
+		});
 
 		if (schedule.retentionPolicy) {
 			await restic.forget(repository.config, schedule.retentionPolicy, { tag: schedule.id.toString() });

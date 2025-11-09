@@ -5,19 +5,33 @@ type ServerEventType =
 	| "connected"
 	| "heartbeat"
 	| "backup:started"
+	| "backup:progress"
 	| "backup:completed"
 	| "volume:mounted"
 	| "volume:unmounted"
 	| "volume:updated";
 
-interface BackupEvent {
+export interface BackupEvent {
 	scheduleId: number;
 	volumeName: string;
 	repositoryName: string;
 	status?: "success" | "error";
 }
 
-interface VolumeEvent {
+export interface BackupProgressEvent {
+	scheduleId: number;
+	volumeName: string;
+	repositoryName: string;
+	seconds_elapsed: number;
+	percent_done: number;
+	total_files: number;
+	files_done: number;
+	total_bytes: number;
+	bytes_done: number;
+	current_files: string[];
+}
+
+export interface VolumeEvent {
 	volumeName: string;
 }
 
@@ -47,6 +61,14 @@ export function useServerEvents() {
 			console.log("[SSE] Backup started:", data);
 
 			handlersRef.current.get("backup:started")?.forEach((handler) => {
+				handler(data);
+			});
+		});
+
+		eventSource.addEventListener("backup:progress", (e) => {
+			const data = JSON.parse(e.data) as BackupProgressEvent;
+
+			handlersRef.current.get("backup:progress")?.forEach((handler) => {
 				handler(data);
 			});
 		});

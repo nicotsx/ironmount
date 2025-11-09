@@ -19,6 +19,24 @@ export const eventsController = new Hono().get("/", (c) => {
 			});
 		};
 
+		const onBackupProgress = (data: {
+			scheduleId: number;
+			volumeName: string;
+			repositoryName: string;
+			secondsElapsed: number;
+			percentDone: number;
+			totalFiles: number;
+			filesDone: number;
+			totalBytes: number;
+			bytesDone: number;
+			currentFiles: string[];
+		}) => {
+			stream.writeSSE({
+				data: JSON.stringify(data),
+				event: "backup:progress",
+			});
+		};
+
 		const onBackupCompleted = (data: {
 			scheduleId: number;
 			volumeName: string;
@@ -53,6 +71,7 @@ export const eventsController = new Hono().get("/", (c) => {
 		};
 
 		serverEvents.on("backup:started", onBackupStarted);
+		serverEvents.on("backup:progress", onBackupProgress);
 		serverEvents.on("backup:completed", onBackupCompleted);
 		serverEvents.on("volume:mounted", onVolumeMounted);
 		serverEvents.on("volume:unmounted", onVolumeUnmounted);
@@ -64,6 +83,7 @@ export const eventsController = new Hono().get("/", (c) => {
 			logger.info("Client disconnected from SSE endpoint");
 			keepAlive = false;
 			serverEvents.off("backup:started", onBackupStarted);
+			serverEvents.off("backup:progress", onBackupProgress);
 			serverEvents.off("backup:completed", onBackupCompleted);
 			serverEvents.off("volume:mounted", onVolumeMounted);
 			serverEvents.off("volume:unmounted", onVolumeUnmounted);

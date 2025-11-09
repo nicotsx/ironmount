@@ -4,7 +4,7 @@ import type { ListSnapshotsResponse } from "~/api-client/types.gen";
 import { ByteSize } from "~/components/bytes-size";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
-import { formatSnapshotDuration } from "~/modules/repositories/tabs/snapshots";
+import { formatDuration } from "~/utils/utils";
 
 type Snapshot = ListSnapshotsResponse[number];
 
@@ -62,9 +62,7 @@ export const SnapshotsTable = ({ snapshots, repositoryName }: Props) => {
 							<TableCell className="hidden md:table-cell">
 								<div className="flex items-center justify-end gap-2">
 									<Clock className="h-4 w-4 text-muted-foreground" />
-									<span className="text-sm text-muted-foreground">
-										{formatSnapshotDuration(snapshot.duration / 1000)}
-									</span>
+									<span className="text-sm text-muted-foreground">{formatDuration(snapshot.duration / 1000)}</span>
 								</div>
 							</TableCell>
 							<TableCell className="hidden lg:table-cell">
