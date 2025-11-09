@@ -36,12 +36,12 @@ export const BackupProgressCard = ({ scheduleId }: Props) => {
 
 	if (!progress) {
 		return (
-			<div className="rounded-lg border border-border bg-card p-4">
+			<Card className="p-4">
 				<div className="flex items-center gap-2">
 					<div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-					<span className="text-sm text-muted-foreground">Starting backup...</span>
+					<span className="font-medium">Backup in progress</span>
 				</div>
-			</div>
+			</Card>
 		);
 	}
 
