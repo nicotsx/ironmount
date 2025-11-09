@@ -118,14 +118,12 @@ export default function VolumeDetails({ loaderData }: Route.ComponentProps) {
 
 	return (
 		<>
-			<div className="flex items-center justify-between">
-				<div>
-					<div className="text-sm font-semibold mb-2 text-muted-foreground flex items-center gap-2">
-						<span className="flex items-center gap-2">
-							<StatusDot status={volume.status} /> {volume.status[0].toUpperCase() + volume.status.slice(1)}
-						</span>
-						<VolumeIcon size={14} backend={volume?.config.backend} />
-					</div>
+			<div className="flex flex-col items-start xs:items-center xs:flex-row xs:justify-between">
+				<div className="text-sm font-semibold mb-2 xs:mb-0 text-muted-foreground flex items-center gap-2">
+					<span className="flex items-center gap-2">
+						<StatusDot status={volume.status} /> {volume.status[0].toUpperCase() + volume.status.slice(1)}
+					</span>
+					<VolumeIcon size={14} backend={volume?.config.backend} />
 				</div>
 				<div className="flex gap-4">
 					<Button

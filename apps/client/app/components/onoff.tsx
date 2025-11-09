@@ -20,7 +20,12 @@ export const OnOff = ({ isOn, toggle, enabledLabel, disabledLabel, disabled }: P
 			)}
 		>
 			<span>{isOn ? enabledLabel : disabledLabel}</span>
-			<Switch disabled={disabled} checked={isOn} onCheckedChange={toggle} />
+			<Switch
+				disabled={disabled}
+				checked={isOn}
+				onCheckedChange={toggle}
+				aria-label={isOn ? `Toggle ${enabledLabel}` : `Toggle ${disabledLabel}`}
+			/>
 		</div>
 	);
 };

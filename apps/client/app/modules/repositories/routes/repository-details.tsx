@@ -124,21 +124,16 @@ export default function RepositoryDetailsPage({ loaderData }: Route.ComponentPro
 	return (
 		<>
 			<div className="flex items-center justify-between mb-4">
-				<div>
-					<div className="text-sm font-semibold mb-2 text-muted-foreground flex items-center gap-2">
-						<span
-							className={cn(
-								"inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs bg-gray-500/10 text-gray-500",
-								{
-									"bg-green-500/10 text-green-500": data.status === "healthy",
-									"bg-red-500/10 text-red-500": data.status === "error",
-								},
-							)}
-						>
-							{data.status || "unknown"}
-						</span>
-						<span className="text-xs bg-primary/10 rounded-md px-2 py-1">{data.type}</span>
-					</div>
+				<div className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+					<span
+						className={cn("inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs bg-gray-500/10 text-gray-500", {
+							"bg-green-500/10 text-green-500": data.status === "healthy",
+							"bg-red-500/10 text-red-500": data.status === "error",
+						})}
+					>
+						{data.status || "unknown"}
+					</span>
+					<span className="text-xs bg-primary/10 rounded-md px-2 py-1">{data.type}</span>
 				</div>
 				<div className="flex gap-4">
 					<Button

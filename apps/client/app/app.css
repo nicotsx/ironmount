@@ -5,6 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+	--breakpoint-xs: 32rem;
 	--font-sans:
 		"Google Sans Code", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
 		"Noto Color Emoji";
@@ -12,16 +13,16 @@
 
 html,
 body {
-	@apply bg-white dark:bg-[#131313];
 	overflow-x: hidden;
 	width: 100%;
 	position: relative;
 	overscroll-behavior: none;
 	scrollbar-width: thin;
+}
 
-	@media (prefers-color-scheme: dark) {
-		color-scheme: dark;
-	}
+body {
+	@apply bg-[#131313];
+	min-height: 100dvh;
 }
 
 .main-content {
@@ -70,8 +71,6 @@ body {
 }
 
 :root {
-	color-scheme: dark;
-
 	--radius: 0.625rem;
 	--background: oklch(1 0 0);
 	--foreground: oklch(0.145 0 0);
@@ -109,6 +108,8 @@ body {
 }
 
 .dark {
+	color-scheme: dark;
+
 	--background: #131313;
 	--foreground: oklch(0.985 0 0);
 	--card: #131313;

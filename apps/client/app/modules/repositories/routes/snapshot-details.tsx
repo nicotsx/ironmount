@@ -18,14 +18,19 @@ export function meta({ params }: Route.MetaArgs) {
 }
 
 export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
-	const snapshot = await getSnapshotDetails({ path: { name: params.name, snapshotId: params.snapshotId } });
+	const snapshot = await getSnapshotDetails({
+		path: { name: params.name, snapshotId: params.snapshotId },
+	});
 	if (snapshot.data) return snapshot.data;
 
 	return redirect("/repositories");
 };
 
 export default function SnapshotDetailsPage({ loaderData }: Route.ComponentProps) {
-	const { name, snapshotId } = useParams<{ name: string; snapshotId: string }>();
+	const { name, snapshotId } = useParams<{
+		name: string;
+		snapshotId: string;
+	}>();
 
 	const { data } = useQuery({
 		...listSnapshotFilesOptions({
@@ -64,11 +69,11 @@ export default function SnapshotDetailsPage({ loaderData }: Route.ComponentProps
 						<div className="grid grid-cols-2 gap-4">
 							<div>
 								<span className="text-muted-foreground">Snapshot ID:</span>
-								<p className="font-mono">{data.snapshot.id}</p>
+								<p className="font-mono break-all">{data.snapshot.id}</p>
 							</div>
 							<div>
 								<span className="text-muted-foreground">Short ID:</span>
-								<p className="font-mono">{data.snapshot.short_id}</p>
+								<p className="font-mono break-all">{data.snapshot.short_id}</p>
 							</div>
 							<div>
 								<span className="text-muted-foreground">Hostname:</span>
@@ -82,7 +87,7 @@ export default function SnapshotDetailsPage({ loaderData }: Route.ComponentProps
 								<span className="text-muted-foreground">Paths:</span>
 								<div className="space-y-1 mt-1">
 									{data.snapshot.paths.map((path) => (
-										<p key={path} className="font-mono text-xs bg-muted px-2 py-1 rounded">
+										<p key={path} className="font-mono text-xs bg-muted px-2 py-1 rounded break-all">
 											{path}
 										</p>
 									))}

@@ -232,7 +232,7 @@ export const CreateScheduleForm = ({ initialValues, formId, onSubmit, volume }: 
 								onSelectionChange={handleSelectionChange}
 								withCheckboxes={true}
 								foldersOnly={true}
-								className="overflow-auto flex-1 border rounded-md bg-card p-2 min-h-[300px] max-h-[400px]"
+								className="max-w-2xs xs:max-w-screen flex-1 border rounded-md bg-card p-2 min-h-[300px] max-h-[400px]"
 							/>
 							{selectedPaths.size > 0 && (
 								<div className="mt-4">

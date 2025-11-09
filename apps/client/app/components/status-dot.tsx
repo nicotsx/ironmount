@@ -38,7 +38,10 @@ export const StatusDot = ({ status }: { status: VolumeStatus }) => {
 							)}
 						/>
 					)}
-					<span className={cn("relative inline-flex size-3 rounded-full", `${statusMapping.color}`)} />
+					<span
+						aria-label={status}
+						className={cn("relative inline-flex size-3 rounded-full", `${statusMapping.color}`)}
+					/>
 				</span>
 			</TooltipTrigger>
 			<TooltipContent>
