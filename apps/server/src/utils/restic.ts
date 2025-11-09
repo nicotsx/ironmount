@@ -113,10 +113,29 @@ const init = async (config: RepositoryConfig) => {
 	return { success: true, error: null };
 };
 
+const backupProgressSchema = type({
+	message_type: "'status'",
+	seconds_elapsed: "number",
+	percent_done: "number",
+	total_files: "number",
+	files_done: "number",
+	total_bytes: "number",
+	bytes_done: "number",
+	current_files: "string[]",
+});
+
+export type BackupProgress = typeof backupProgressSchema.infer;
+
 const backup = async (
 	config: RepositoryConfig,
 	source: string,
-	options?: { exclude?: string[]; include?: string[]; tags?: string[]; signal?: AbortSignal },
+	options?: {
+		exclude?: string[];
+		include?: string[];
+		tags?: string[];
+		signal?: AbortSignal;
+		onProgress?: (progress: BackupProgress) => void;
+	},
 ) => {
 	const repoUrl = buildRepoUrl(config);
 	const env = await buildEnv(config);
@@ -154,6 +173,20 @@ const backup = async (
 		logger.info(data.trim());
 	}, 5000);
 
+	const streamProgress = throttle((data: string) => {
+		if (options?.onProgress) {
+			try {
+				const jsonData = JSON.parse(data);
+				const progress = backupProgressSchema(jsonData);
+				if (!(progress instanceof type.errors)) {
+					options.onProgress(progress);
+				}
+			} catch (_) {
+				// Ignore JSON parse errors for non-JSON lines
+			}
+		}
+	}, 1000);
+
 	let stdout = "";
 
 	await safeSpawn({
@@ -164,6 +197,10 @@ const backup = async (
 		onStdout: (data) => {
 			stdout = data;
 			logData(data);
+
+			if (options?.onProgress) {
+				streamProgress(data);
+			}
 		},
 		onStderr: (error) => {
 			logger.error(error.trim());

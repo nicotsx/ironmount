@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { intervalToDuration } from "date-fns";
 import { Database } from "lucide-react";
 import { useState } from "react";
 import { listSnapshotsOptions } from "~/api-client/@tanstack/react-query.gen";
@@ -13,18 +12,6 @@ import type { Repository, Snapshot } from "~/lib/types";
 
 type Props = {
 	repository: Repository;
-};
-
-export const formatSnapshotDuration = (seconds: number) => {
-	const duration = intervalToDuration({ start: 0, end: seconds * 1000 });
-	const parts: string[] = [];
-
-	if (duration.days) parts.push(`${duration.days}d`);
-	if (duration.hours) parts.push(`${duration.hours}h`);
-	if (duration.minutes) parts.push(`${duration.minutes}m`);
-	if (duration.seconds || parts.length === 0) parts.push(`${duration.seconds || 0}s`);
-
-	return parts.join(" ");
 };
 
 export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
