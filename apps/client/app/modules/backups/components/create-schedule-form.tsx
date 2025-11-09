@@ -9,13 +9,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/com
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import { Textarea } from "~/components/ui/textarea";
 import { VolumeFileBrowser } from "~/components/volume-file-browser";
 import type { BackupSchedule, Volume } from "~/lib/types";
 import { deepClean } from "~/utils/object";
 
-const formSchema = type({
+const internalFormSchema = type({
 	repositoryId: "string",
-	excludePatterns: "string[]?",
+	excludePatternsText: "string?",
 	includePatterns: "string[]?",
 	frequency: "string",
 	dailyTime: "string?",
@@ -27,7 +28,7 @@ const formSchema = type({
 	keepMonthly: "number?",
 	keepYearly: "number?",
 });
-const cleanSchema = type.pipe((d) => formSchema(deepClean(d)));
+const cleanSchema = type.pipe((d) => internalFormSchema(deepClean(d)));
 
 export const weeklyDays = [
 	{ label: "Monday", value: "1" },
@@ -39,7 +40,11 @@ export const weeklyDays = [
 	{ label: "Sunday", value: "0" },
 ];
 
-export type BackupScheduleFormValues = typeof formSchema.infer;
+type InternalFormValues = typeof internalFormSchema.infer;
+
+export type BackupScheduleFormValues = Omit<InternalFormValues, "excludePatternsText"> & {
+	excludePatterns?: string[];
+};
 
 type Props = {
 	volume: Volume;
@@ -50,7 +55,7 @@ type Props = {
 	formId: string;
 };
 
-const backupScheduleToFormValues = (schedule?: BackupSchedule): BackupScheduleFormValues | undefined => {
+const backupScheduleToFormValues = (schedule?: BackupSchedule): InternalFormValues | undefined => {
 	if (!schedule) {
 		return undefined;
 	}
@@ -72,15 +77,35 @@ const backupScheduleToFormValues = (schedule?: BackupSchedule): BackupScheduleFo
 		dailyTime,
 		weeklyDay,
 		includePatterns: schedule.includePatterns || undefined,
+		excludePatternsText: schedule.excludePatterns?.join("\n") || undefined,
 		...schedule.retentionPolicy,
 	};
 };
 
 export const CreateScheduleForm = ({ initialValues, formId, onSubmit, volume }: Props) => {
-	const form = useForm<BackupScheduleFormValues>({
-		resolver: arktypeResolver(cleanSchema as unknown as typeof formSchema),
+	const form = useForm<InternalFormValues>({
+		resolver: arktypeResolver(cleanSchema as unknown as typeof internalFormSchema),
 		defaultValues: backupScheduleToFormValues(initialValues),
 	});
+
+	const handleSubmit = useCallback(
+		(data: InternalFormValues) => {
+			// Convert excludePatternsText string to excludePatterns array
+			const { excludePatternsText, ...rest } = data;
+			const excludePatterns = excludePatternsText
+				? excludePatternsText
+						.split("\n")
+						.map((p) => p.trim())
+						.filter(Boolean)
+				: undefined;
+
+			onSubmit({
+				...rest,
+				excludePatterns,
+			});
+		},
+		[onSubmit],
+	);
 
 	const { data: repositoriesData } = useQuery({
 		...listRepositoriesOptions(),
@@ -102,7 +127,7 @@ export const CreateScheduleForm = ({ initialValues, formId, onSubmit, volume }: 
 	return (
 		<Form {...form}>
 			<form
-				onSubmit={form.handleSubmit(onSubmit)}
+				onSubmit={form.handleSubmit(handleSubmit)}
 				className="grid gap-4 xl:grid-cols-[minmax(0,_2.3fr)_minmax(320px,_1fr)]"
 				id={formId}
 			>
@@ -246,6 +271,47 @@ export const CreateScheduleForm = ({ initialValues, formId, onSubmit, volume }: 
 									</div>
 								</div>
 							)}
+						</CardContent>
+					</Card>
+
+					<Card>
+						<CardHeader>
+							<CardTitle>Exclude patterns</CardTitle>
+							<CardDescription>
+								Optionally specify patterns to exclude from backups. Enter one pattern per line (e.g., *.tmp,
+								node_modules/**, .cache/).
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<FormField
+								control={form.control}
+								name="excludePatternsText"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Exclusion patterns</FormLabel>
+										<FormControl>
+											<Textarea
+												{...field}
+												placeholder="*.tmp&#10;node_modules/**&#10;.cache/&#10;*.log"
+												className="font-mono text-sm min-h-[120px]"
+											/>
+										</FormControl>
+										<FormDescription>
+											Patterns support glob syntax. See&nbsp;
+											<a
+												href="https://restic.readthedocs.io/en/stable/040_backup.html#excluding-files"
+												target="_blank"
+												rel="noopener noreferrer"
+												className="underline hover:text-foreground"
+											>
+												Restic documentation
+											</a>
+											&nbsp;for more details.
+										</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 						</CardContent>
 					</Card>
 
@@ -408,6 +474,33 @@ export const CreateScheduleForm = ({ initialValues, formId, onSubmit, volume }: 
 									{repositoriesData?.find((r) => r.id === formValues.repositoryId)?.name || "—"}
 								</p>
 							</div>
+							{formValues.includePatterns && formValues.includePatterns.length > 0 && (
+								<div>
+									<p className="text-xs uppercase text-muted-foreground">Include paths</p>
+									<div className="flex flex-col gap-1">
+										{formValues.includePatterns.map((path) => (
+											<span key={path} className="text-xs font-mono bg-accent px-1.5 py-0.5 rounded">
+												{path}
+											</span>
+										))}
+									</div>
+								</div>
+							)}
+							{formValues.excludePatternsText && (
+								<div>
+									<p className="text-xs uppercase text-muted-foreground">Exclude patterns</p>
+									<div className="flex flex-col gap-1">
+										{formValues.excludePatternsText
+											.split("\n")
+											.filter(Boolean)
+											.map((pattern) => (
+												<span key={pattern} className="text-xs font-mono bg-accent px-1.5 py-0.5 rounded">
+													{pattern.trim()}
+												</span>
+											))}
+									</div>
+								</div>
+							)}
 							<div>
 								<p className="text-xs uppercase text-muted-foreground">Retention</p>
 								<p className="font-medium">

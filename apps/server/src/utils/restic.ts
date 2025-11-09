@@ -82,7 +82,7 @@ const buildRepoUrl = (config: RepositoryConfig): string => {
 
 const buildEnv = async (config: RepositoryConfig) => {
 	const env: Record<string, string> = {
-		RESTIC_CACHE_DIR: "/tmp/restic-cache",
+		RESTIC_CACHE_DIR: "/var/lib/ironmount/restic/cache",
 		RESTIC_PASSWORD_FILE: RESTIC_PASS_FILE,
 	};
 
