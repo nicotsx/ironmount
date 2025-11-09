@@ -1,4 +1,4 @@
-*
+**
 
 !turbo.json
 !bun.lock
@@ -20,6 +20,11 @@
 !packages/**/src/**
 
 # License files and attributions
+
 !LICENSE
 !NOTICES.md
 !LICENSES/**
+
+# Node modules
+
+**/node_modules/**

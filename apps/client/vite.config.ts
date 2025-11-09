@@ -7,27 +7,28 @@ const alias = {};
 
 const { NODE_ENV } = process.env;
 if (NODE_ENV === "production") {
-	// @ts-expect-error
-	alias["react-dom/server"] = "react-dom/server.node";
+  // @ts-expect-error
+  alias["react-dom/server"] = "react-dom/server.node";
 }
 
 export default defineConfig({
-	plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
-	resolve: {
-		alias,
-	},
-	build: {
-		outDir: "dist",
-		// sourcemap: true,
-	},
-	server: {
-		host: true,
-		port: 4097,
-		proxy: {
-			"/api": {
-				target: "http://localhost:4096",
-				changeOrigin: true,
-			},
-		},
-	},
+  plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+  resolve: {
+    alias,
+  },
+  build: {
+    outDir: "dist",
+    // sourcemap: true,
+  },
+  server: {
+    host: true,
+    port: 4097,
+    proxy: {
+      "/api": {
+        target: "http://localhost:4096",
+        changeOrigin: true,
+      },
+    },
+    allowedHosts: true,
+  },
 });
