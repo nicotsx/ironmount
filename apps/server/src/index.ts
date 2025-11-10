@@ -17,6 +17,8 @@ import { backupScheduleController } from "./modules/backups/backups.controller";
 import { eventsController } from "./modules/events/events.controller";
 import { handleServiceError } from "./utils/errors";
 import { logger } from "./utils/logger";
+import { shutdown } from "./modules/lifecycle/shutdown";
+import { SOCKET_PATH } from "./core/constants";
 
 export const generalDescriptor = (app: Hono) =>
 	openAPIRouteHandler(app, {
@@ -70,17 +72,15 @@ runDbMigrations();
 const { docker } = await getCapabilities();
 
 if (docker) {
-	const socketPath = "/run/docker/plugins/ironmount.sock";
-
 	try {
 		await fs.mkdir("/run/docker/plugins", { recursive: true });
 
 		Bun.serve({
-			unix: socketPath,
+			unix: SOCKET_PATH,
 			fetch: driver.fetch,
 		});
 
-		logger.info(`Docker volume plugin server running at ${socketPath}`);
+		logger.info(`Docker volume plugin server running at ${SOCKET_PATH}`);
 	} catch (error) {
 		logger.error(`Failed to start Docker volume plugin server: ${error}`);
 	}
@@ -96,3 +96,16 @@ startup();
 logger.info(`Server is running at http://localhost:4096`);
 
 export type AppType = typeof app;
+
+process.on("SIGTERM", async () => {
+	logger.info("SIGTERM received, starting graceful shutdown...");
+
+	await shutdown();
+	process.exit(0);
+});
+
+process.on("SIGINT", async () => {
+	logger.info("SIGINT received, starting graceful shutdown...");
+	await shutdown();
+	process.exit(0);
+});
