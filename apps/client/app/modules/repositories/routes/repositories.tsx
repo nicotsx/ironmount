@@ -102,6 +102,7 @@ export default function Repositories({ loaderData }: Route.ComponentProps) {
 							<SelectItem value="local">Local</SelectItem>
 							<SelectItem value="sftp">SFTP</SelectItem>
 							<SelectItem value="s3">S3</SelectItem>
+							<SelectItem value="gcs">Google Cloud Storage</SelectItem>
 						</SelectContent>
 					</Select>
 					{(searchQuery || statusFilter || backendFilter) && (

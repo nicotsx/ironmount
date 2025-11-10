@@ -3,6 +3,7 @@ import { type } from "arktype";
 export const REPOSITORY_BACKENDS = {
 	local: "local",
 	s3: "s3",
+	gcs: "gcs",
 } as const;
 
 export type RepositoryBackend = keyof typeof REPOSITORY_BACKENDS;
@@ -20,7 +21,14 @@ export const localRepositoryConfigSchema = type({
 	name: "string",
 });
 
-export const repositoryConfigSchema = s3RepositoryConfigSchema.or(localRepositoryConfigSchema);
+export const gcsRepositoryConfigSchema = type({
+	backend: "'gcs'",
+	bucket: "string",
+	projectId: "string",
+	credentialsJson: "string",
+});
+
+export const repositoryConfigSchema = s3RepositoryConfigSchema.or(localRepositoryConfigSchema).or(gcsRepositoryConfigSchema);
 
 export type RepositoryConfig = typeof repositoryConfigSchema.infer;
 

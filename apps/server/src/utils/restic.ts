@@ -74,6 +74,8 @@ const buildRepoUrl = (config: RepositoryConfig): string => {
 			return `${REPOSITORY_BASE}/${config.name}`;
 		case "s3":
 			return `s3:${config.endpoint}/${config.bucket}`;
+		case "gcs":
+			return `gs:${config.bucket}:/`;
 		default: {
 			throw new Error(`Unsupported repository backend: ${JSON.stringify(config)}`);
 		}
@@ -91,6 +93,14 @@ const buildEnv = async (config: RepositoryConfig) => {
 			env.AWS_ACCESS_KEY_ID = await cryptoUtils.decrypt(config.accessKeyId);
 			env.AWS_SECRET_ACCESS_KEY = await cryptoUtils.decrypt(config.secretAccessKey);
 			break;
+		case "gcs": {
+			const decryptedCredentials = await cryptoUtils.decrypt(config.credentialsJson);
+			const credentialsPath = path.join("/tmp", `gcs-credentials-${crypto.randomBytes(8).toString("hex")}.json`);
+			await fs.writeFile(credentialsPath, decryptedCredentials, { mode: 0o600 });
+			env.GOOGLE_PROJECT_ID = config.projectId;
+			env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath;
+			break;
+		}
 	}
 
 	return env;

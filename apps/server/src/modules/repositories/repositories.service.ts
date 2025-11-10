@@ -22,6 +22,9 @@ const encryptConfig = async (config: RepositoryConfig): Promise<RepositoryConfig
 			encryptedConfig.accessKeyId = await cryptoUtils.encrypt(config.accessKeyId);
 			encryptedConfig.secretAccessKey = await cryptoUtils.encrypt(config.secretAccessKey);
 			break;
+		case "gcs":
+			encryptedConfig.credentialsJson = await cryptoUtils.encrypt(config.credentialsJson);
+			break;
 	}
 
 	return encryptedConfig as RepositoryConfig;

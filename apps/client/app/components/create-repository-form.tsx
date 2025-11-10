@@ -30,6 +30,7 @@ type Props = {
 const defaultValuesForType = {
 	local: { backend: "local" as const, compressionMode: "auto" as const },
 	s3: { backend: "s3" as const, compressionMode: "auto" as const },
+	gcs: { backend: "gcs" as const, compressionMode: "auto" as const },
 };
 
 export const CreateRepositoryForm = ({
@@ -100,6 +101,7 @@ export const CreateRepositoryForm = ({
 								<SelectContent>
 									<SelectItem value="local">Local</SelectItem>
 									<SelectItem value="s3">S3</SelectItem>
+									<SelectItem value="gcs">Google Cloud Storage</SelectItem>
 								</SelectContent>
 							</Select>
 							<FormDescription>Choose the storage backend for this repository.</FormDescription>
@@ -188,6 +190,53 @@ export const CreateRepositoryForm = ({
 										<Input type="password" placeholder="••••••••" {...field} />
 									</FormControl>
 									<FormDescription>S3 secret access key for authentication.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
+
+				{watchedBackend === "gcs" && (
+					<>
+						<FormField
+							control={form.control}
+							name="bucket"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Bucket</FormLabel>
+									<FormControl>
+										<Input placeholder="my-backup-bucket" {...field} />
+									</FormControl>
+									<FormDescription>GCS bucket name for storing backups.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="projectId"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Project ID</FormLabel>
+									<FormControl>
+										<Input placeholder="my-gcp-project-123" {...field} />
+									</FormControl>
+									<FormDescription>Google Cloud project ID.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="credentialsJson"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Service Account JSON</FormLabel>
+									<FormControl>
+										<Input type="password" placeholder="Paste service account JSON key..." {...field} />
+									</FormControl>
+									<FormDescription>Service account JSON credentials for authentication.</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}
