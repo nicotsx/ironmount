@@ -4,6 +4,7 @@ export const REPOSITORY_BACKENDS = {
 	local: "local",
 	s3: "s3",
 	gcs: "gcs",
+	azure: "azure",
 } as const;
 
 export type RepositoryBackend = keyof typeof REPOSITORY_BACKENDS;
@@ -28,7 +29,18 @@ export const gcsRepositoryConfigSchema = type({
 	credentialsJson: "string",
 });
 
-export const repositoryConfigSchema = s3RepositoryConfigSchema.or(localRepositoryConfigSchema).or(gcsRepositoryConfigSchema);
+export const azureRepositoryConfigSchema = type({
+	backend: "'azure'",
+	container: "string",
+	accountName: "string",
+	accountKey: "string",
+	endpointSuffix: "string?",
+});
+
+export const repositoryConfigSchema = s3RepositoryConfigSchema
+	.or(localRepositoryConfigSchema)
+	.or(gcsRepositoryConfigSchema)
+	.or(azureRepositoryConfigSchema);
 
 export type RepositoryConfig = typeof repositoryConfigSchema.infer;
 

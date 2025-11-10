@@ -76,6 +76,8 @@ const buildRepoUrl = (config: RepositoryConfig): string => {
 			return `s3:${config.endpoint}/${config.bucket}`;
 		case "gcs":
 			return `gs:${config.bucket}:/`;
+		case "azure":
+			return `azure:${config.container}:/`;
 		default: {
 			throw new Error(`Unsupported repository backend: ${JSON.stringify(config)}`);
 		}
@@ -99,6 +101,14 @@ const buildEnv = async (config: RepositoryConfig) => {
 			await fs.writeFile(credentialsPath, decryptedCredentials, { mode: 0o600 });
 			env.GOOGLE_PROJECT_ID = config.projectId;
 			env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath;
+			break;
+		}
+		case "azure": {
+			env.AZURE_ACCOUNT_NAME = config.accountName;
+			env.AZURE_ACCOUNT_KEY = await cryptoUtils.decrypt(config.accountKey);
+			if (config.endpointSuffix) {
+				env.AZURE_ENDPOINT_SUFFIX = config.endpointSuffix;
+			}
 			break;
 		}
 	}

@@ -25,6 +25,9 @@ const encryptConfig = async (config: RepositoryConfig): Promise<RepositoryConfig
 		case "gcs":
 			encryptedConfig.credentialsJson = await cryptoUtils.encrypt(config.credentialsJson);
 			break;
+		case "azure":
+			encryptedConfig.accountKey = await cryptoUtils.encrypt(config.accountKey);
+			break;
 	}
 
 	return encryptedConfig as RepositoryConfig;

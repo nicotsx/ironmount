@@ -739,6 +739,19 @@ export type ListRepositoriesResponses = {
 					secretAccessKey: string;
 			  }
 			| {
+					accountKey: string;
+					accountName: string;
+					backend: "azure";
+					container: string;
+					endpointSuffix?: string;
+			  }
+			| {
+					backend: "gcs";
+					bucket: string;
+					credentialsJson: string;
+					projectId: string;
+			  }
+			| {
 					backend: "local";
 					name: string;
 			  };
@@ -748,7 +761,7 @@ export type ListRepositoriesResponses = {
 		lastError: string | null;
 		name: string;
 		status: "error" | "healthy" | "unknown" | null;
-		type: "local" | "s3";
+		type: "azure" | "gcs" | "local" | "s3";
 		updatedAt: number;
 	}>;
 };
@@ -764,6 +777,19 @@ export type CreateRepositoryData = {
 					bucket: string;
 					endpoint: string;
 					secretAccessKey: string;
+			  }
+			| {
+					accountKey: string;
+					accountName: string;
+					backend: "azure";
+					container: string;
+					endpointSuffix?: string;
+			  }
+			| {
+					backend: "gcs";
+					bucket: string;
+					credentialsJson: string;
+					projectId: string;
 			  }
 			| {
 					backend: "local";
@@ -836,6 +862,19 @@ export type GetRepositoryResponses = {
 					secretAccessKey: string;
 			  }
 			| {
+					accountKey: string;
+					accountName: string;
+					backend: "azure";
+					container: string;
+					endpointSuffix?: string;
+			  }
+			| {
+					backend: "gcs";
+					bucket: string;
+					credentialsJson: string;
+					projectId: string;
+			  }
+			| {
 					backend: "local";
 					name: string;
 			  };
@@ -845,7 +884,7 @@ export type GetRepositoryResponses = {
 		lastError: string | null;
 		name: string;
 		status: "error" | "healthy" | "unknown" | null;
-		type: "local" | "s3";
+		type: "azure" | "gcs" | "local" | "s3";
 		updatedAt: number;
 	};
 };
@@ -1031,6 +1070,19 @@ export type ListBackupSchedulesResponses = {
 						secretAccessKey: string;
 				  }
 				| {
+						accountKey: string;
+						accountName: string;
+						backend: "azure";
+						container: string;
+						endpointSuffix?: string;
+				  }
+				| {
+						backend: "gcs";
+						bucket: string;
+						credentialsJson: string;
+						projectId: string;
+				  }
+				| {
 						backend: "local";
 						name: string;
 				  };
@@ -1040,7 +1092,7 @@ export type ListBackupSchedulesResponses = {
 			lastError: string | null;
 			name: string;
 			status: "error" | "healthy" | "unknown" | null;
-			type: "local" | "s3";
+			type: "azure" | "gcs" | "local" | "s3";
 			updatedAt: number;
 		};
 		repositoryId: string;
@@ -1217,6 +1269,19 @@ export type GetBackupScheduleResponses = {
 						secretAccessKey: string;
 				  }
 				| {
+						accountKey: string;
+						accountName: string;
+						backend: "azure";
+						container: string;
+						endpointSuffix?: string;
+				  }
+				| {
+						backend: "gcs";
+						bucket: string;
+						credentialsJson: string;
+						projectId: string;
+				  }
+				| {
 						backend: "local";
 						name: string;
 				  };
@@ -1226,7 +1291,7 @@ export type GetBackupScheduleResponses = {
 			lastError: string | null;
 			name: string;
 			status: "error" | "healthy" | "unknown" | null;
-			type: "local" | "s3";
+			type: "azure" | "gcs" | "local" | "s3";
 			updatedAt: number;
 		};
 		repositoryId: string;
@@ -1384,6 +1449,19 @@ export type GetBackupScheduleForVolumeResponses = {
 						secretAccessKey: string;
 				  }
 				| {
+						accountKey: string;
+						accountName: string;
+						backend: "azure";
+						container: string;
+						endpointSuffix?: string;
+				  }
+				| {
+						backend: "gcs";
+						bucket: string;
+						credentialsJson: string;
+						projectId: string;
+				  }
+				| {
 						backend: "local";
 						name: string;
 				  };
@@ -1393,7 +1471,7 @@ export type GetBackupScheduleForVolumeResponses = {
 			lastError: string | null;
 			name: string;
 			status: "error" | "healthy" | "unknown" | null;
-			type: "local" | "s3";
+			type: "azure" | "gcs" | "local" | "s3";
 			updatedAt: number;
 		};
 		repositoryId: string;

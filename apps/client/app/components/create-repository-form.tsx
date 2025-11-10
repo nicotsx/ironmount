@@ -31,6 +31,7 @@ const defaultValuesForType = {
 	local: { backend: "local" as const, compressionMode: "auto" as const },
 	s3: { backend: "s3" as const, compressionMode: "auto" as const },
 	gcs: { backend: "gcs" as const, compressionMode: "auto" as const },
+	azure: { backend: "azure" as const, compressionMode: "auto" as const },
 };
 
 export const CreateRepositoryForm = ({
@@ -102,6 +103,7 @@ export const CreateRepositoryForm = ({
 									<SelectItem value="local">Local</SelectItem>
 									<SelectItem value="s3">S3</SelectItem>
 									<SelectItem value="gcs">Google Cloud Storage</SelectItem>
+									<SelectItem value="azure">Azure Blob Storage</SelectItem>
 								</SelectContent>
 							</Select>
 							<FormDescription>Choose the storage backend for this repository.</FormDescription>
@@ -237,6 +239,67 @@ export const CreateRepositoryForm = ({
 										<Input type="password" placeholder="Paste service account JSON key..." {...field} />
 									</FormControl>
 									<FormDescription>Service account JSON credentials for authentication.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
+
+				{watchedBackend === "azure" && (
+					<>
+						<FormField
+							control={form.control}
+							name="container"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Container</FormLabel>
+									<FormControl>
+										<Input placeholder="my-backup-container" {...field} />
+									</FormControl>
+									<FormDescription>Azure Blob Storage container name for storing backups.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="accountName"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Account Name</FormLabel>
+									<FormControl>
+										<Input placeholder="mystorageaccount" {...field} />
+									</FormControl>
+									<FormDescription>Azure Storage account name.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="accountKey"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Account Key</FormLabel>
+									<FormControl>
+										<Input type="password" placeholder="••••••••" {...field} />
+									</FormControl>
+									<FormDescription>Azure Storage account key for authentication.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="endpointSuffix"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Endpoint Suffix (Optional)</FormLabel>
+									<FormControl>
+										<Input placeholder="core.windows.net" {...field} />
+									</FormControl>
+									<FormDescription>Custom Azure endpoint suffix (defaults to core.windows.net).</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}
