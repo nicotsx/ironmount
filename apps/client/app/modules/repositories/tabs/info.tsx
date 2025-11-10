@@ -30,7 +30,7 @@ export const RepositoryInfoTabContent = ({ repository }: Props) => {
 						</div>
 						<div>
 							<div className="text-sm font-medium text-muted-foreground">Created At</div>
-							<p className="mt-1 text-sm">{new Date(repository.createdAt).toLocaleString()}</p>
+							<p className="mt-1 text-sm">{new Date(repository.createdAt * 1000).toLocaleString()}</p>
 						</div>
 						<div>
 							<div className="text-sm font-medium text-muted-foreground">Last Checked</div>

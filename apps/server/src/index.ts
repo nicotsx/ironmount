@@ -99,7 +99,6 @@ export type AppType = typeof app;
 
 process.on("SIGTERM", async () => {
 	logger.info("SIGTERM received, starting graceful shutdown...");
-
 	await shutdown();
 	process.exit(0);
 });

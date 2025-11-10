@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Database } from "lucide-react";
 import { useState } from "react";
 import { listSnapshotsOptions } from "~/api-client/@tanstack/react-query.gen";
-import { ByteSize } from "~/components/bytes-size";
 import { SnapshotsTable } from "~/components/snapshots-table";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
@@ -33,7 +32,7 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 		);
 	});
 
-	const hasNoFilteredSnapshots = !filteredSnapshots?.length && !data.length;
+	const hasNoFilteredSnapshots = !filteredSnapshots?.length;
 
 	if (repository.status === "error") {
 		return (
@@ -143,18 +142,6 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 						? "No snapshots match filters."
 						: `Showing ${filteredSnapshots.length} of ${data.length}`}
 				</span>
-				{!hasNoFilteredSnapshots && (
-					<span>
-						Total size:&nbsp;
-						<span className="text-strong-accent font-medium">
-							<ByteSize
-								bytes={filteredSnapshots.reduce((sum, s) => sum + s.size, 0)}
-								base={1024}
-								maximumFractionDigits={1}
-							/>
-						</span>
-					</span>
-				)}
 			</div>
 		</Card>
 	);
