@@ -12,10 +12,19 @@ interface Params {
 	finally?: () => Promise<void> | void;
 }
 
+type SpawnResult = {
+	exitCode: number;
+	stdout: string;
+	stderr: string;
+};
+
 export const safeSpawn = (params: Params) => {
 	const { command, args, env = {}, signal, ...callbacks } = params;
 
-	return new Promise((resolve, reject) => {
+	return new Promise<SpawnResult>((resolve) => {
+		let stdoutData = "";
+		let stderrData = "";
+
 		const child = spawn(command, args, {
 			env: { ...process.env, ...env },
 			signal: signal,
@@ -24,12 +33,16 @@ export const safeSpawn = (params: Params) => {
 		child.stdout.on("data", (data) => {
 			if (callbacks.onStdout) {
 				callbacks.onStdout(data.toString());
+			} else {
+				stdoutData += data.toString();
 			}
 		});
 
 		child.stderr.on("data", (data) => {
 			if (callbacks.onStderr) {
 				callbacks.onStderr(data.toString());
+			} else {
+				stderrData += data.toString();
 			}
 		});
 
@@ -40,7 +53,12 @@ export const safeSpawn = (params: Params) => {
 			if (callbacks.finally) {
 				await callbacks.finally();
 			}
-			reject(error);
+
+			resolve({
+				exitCode: -1,
+				stdout: stdoutData,
+				stderr: stderrData,
+			});
 		});
 
 		child.on("close", async (code) => {
@@ -50,7 +68,12 @@ export const safeSpawn = (params: Params) => {
 			if (callbacks.finally) {
 				await callbacks.finally();
 			}
-			resolve(code);
+
+			resolve({
+				exitCode: code === null ? -1 : code,
+				stdout: stdoutData,
+				stderr: stderrData,
+			});
 		});
 	});
 };

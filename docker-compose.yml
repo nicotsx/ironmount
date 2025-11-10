@@ -34,4 +34,6 @@ services:
     ports:
       - "4096:4096"
     volumes:
-      - /var/lib/ironmount/:/var/lib/ironmount/
+      - /var/lib/ironmount:/var/lib/ironmount:rshared
+      - /run/docker/plugins:/run/docker/plugins
+      - /var/run/docker.sock:/var/run/docker.sock

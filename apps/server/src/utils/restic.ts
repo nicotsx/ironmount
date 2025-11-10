@@ -189,7 +189,7 @@ const backup = async (
 
 	let stdout = "";
 
-	await safeSpawn({
+	const res = await safeSpawn({
 		command: "restic",
 		args,
 		env,
@@ -209,6 +209,11 @@ const backup = async (
 			includeFile && (await fs.unlink(includeFile).catch(() => {}));
 		},
 	});
+
+	if (res.exitCode !== 0) {
+		logger.error(`Restic backup failed: ${res.stderr}`);
+		throw new Error(`Restic backup failed: ${res.stderr}`);
+	}
 
 	const lastLine = stdout.trim();
 	const resSummary = JSON.parse(lastLine ?? "{}");

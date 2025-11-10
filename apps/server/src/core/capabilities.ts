@@ -4,7 +4,6 @@ import { logger } from "../utils/logger";
 
 export type SystemCapabilities = {
 	docker: boolean;
-	hostProc: boolean;
 };
 
 let capabilitiesPromise: Promise<SystemCapabilities> | null = null;
@@ -29,7 +28,6 @@ export async function getCapabilities(): Promise<SystemCapabilities> {
 async function detectCapabilities(): Promise<SystemCapabilities> {
 	return {
 		docker: await detectDocker(),
-		hostProc: await detectHostProc(),
 	};
 }
 
@@ -51,26 +49,6 @@ async function detectDocker(): Promise<boolean> {
 		logger.warn(
 			"Docker capability: disabled. " +
 				"To enable: mount /var/run/docker.sock and /run/docker/plugins in docker-compose.yml",
-		);
-		return false;
-	}
-}
-
-/**
- * Checks if host proc is available by attempting to access /host/proc/1/ns/mnt
- * This allows using nsenter to execute mount commands in the host namespace
- */
-async function detectHostProc(): Promise<boolean> {
-	try {
-		await fs.access("/host/proc/1/ns/mnt");
-
-		logger.info("Host proc capability: enabled");
-		return true;
-	} catch (_) {
-		logger.warn(
-			"Host proc capability: disabled. " +
-				"To enable: mount /proc:/host/proc:ro in docker-compose.yml. " +
-				"Mounts will be executed in container namespace instead of host namespace.",
 		);
 		return false;
 	}

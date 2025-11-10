@@ -1,31 +1,14 @@
-import { execFile as execFileCb } from "node:child_process";
 import * as fs from "node:fs/promises";
 import * as npath from "node:path";
-import { promisify } from "node:util";
-import { getCapabilities } from "../../../core/capabilities";
-import { OPERATION_TIMEOUT } from "../../../core/constants";
 import { toMessage } from "../../../utils/errors";
 import { logger } from "../../../utils/logger";
-
-const execFile = promisify(execFileCb);
+import { $ } from "bun";
 
 export const executeMount = async (args: string[]): Promise<void> => {
-	const capabilities = await getCapabilities();
 	let stderr: string | undefined;
 
-	if (capabilities.hostProc) {
-		const result = await execFile("nsenter", ["--mount=/host/proc/1/ns/mnt", "mount", ...args], {
-			timeout: OPERATION_TIMEOUT,
-			maxBuffer: 1024 * 1024,
-		});
-		stderr = result.stderr;
-	} else {
-		const result = await execFile("mount", args, {
-			timeout: OPERATION_TIMEOUT,
-			maxBuffer: 1024 * 1024,
-		});
-		stderr = result.stderr;
-	}
+	const result = await $`mount ${args}`.nothrow();
+	stderr = result.stderr.toString();
 
 	if (stderr?.trim()) {
 		logger.warn(stderr.trim());
@@ -33,22 +16,10 @@ export const executeMount = async (args: string[]): Promise<void> => {
 };
 
 export const executeUnmount = async (path: string): Promise<void> => {
-	const capabilities = await getCapabilities();
 	let stderr: string | undefined;
 
-	if (capabilities.hostProc) {
-		const result = await execFile("nsenter", ["--mount=/host/proc/1/ns/mnt", "umount", "-l", "-f", path], {
-			timeout: OPERATION_TIMEOUT,
-			maxBuffer: 1024 * 1024,
-		});
-		stderr = result.stderr;
-	} else {
-		const result = await execFile("umount", ["-l", "-f", path], {
-			timeout: OPERATION_TIMEOUT,
-			maxBuffer: 1024 * 1024,
-		});
-		stderr = result.stderr;
-	}
+	const result = await $`umount -l -f ${path}`.nothrow();
+	stderr = result.stderr.toString();
 
 	if (stderr?.trim()) {
 		logger.warn(stderr.trim());

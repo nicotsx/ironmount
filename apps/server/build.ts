@@ -6,9 +6,8 @@ await Bun.build({
 	sourcemap: true,
 	minify: {
 		whitespace: true,
-		identifiers: true,
+		identifiers: false,
 		syntax: true,
-		keepNames: true,
 	},
 	external: ["ssh2"],
 });

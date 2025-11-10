@@ -124,7 +124,7 @@ Ironmount allows you to easily restore your data from backups. To restore data, 
 
 Ironmount is capable of propagating mounted volumes from within the container to the host system. This is particularly useful when you want to access the mounted data directly from the host to use it with other applications or services.
 
-In order to enable this feature, you need to run Ironmount with privileged mode and mount /proc from the host. Here is an example of how to set this up in your `docker-compose.yml` file:
+In order to enable this feature, you need to change your bind mount `/var/lib/ironmount` to use the `:rshared` flag. Here is an example of how to set this up in your `docker-compose.yml` file:
 
 ```diff
 services:
@@ -132,16 +132,13 @@ services:
     image: ghcr.io/nicotsx/ironmount:v0.6
     container_name: ironmount
     restart: unless-stopped
--   cap_add:
--     - SYS_ADMIN
-+   privileged: true
     ports:
       - "4096:4096"
     devices:
       - /dev/fuse:/dev/fuse
     volumes:
-      - /var/lib/ironmount:/var/lib/ironmount
-+     - /proc:/host/proc
+-     - /var/lib/ironmount:/var/lib/ironmount
++     - /var/lib/ironmount:/var/lib/ironmount:rshared
 ```
 
 Restart the Ironmount container to apply the changes:
@@ -155,7 +152,7 @@ docker compose up -d
 
 Ironmount can also be used as a Docker volume plugin, allowing you to mount your volumes directly into other Docker containers. This enables seamless integration with your containerized applications.
 
-In order to enable this feature, you need to run Ironmount with privileged mode and mount several items from the host. Here is an example of how to set this up in your `docker-compose.yml` file:
+In order to enable this feature, you need to run Ironmount with several items shared from the host. Here is an example of how to set this up in your `docker-compose.yml` file:
 
 ```diff
 services:
@@ -163,16 +160,15 @@ services:
     image: ghcr.io/nicotsx/ironmount:v0.6
     container_name: ironmount
     restart: unless-stopped
--   cap_add:
--     - SYS_ADMIN
-+   privileged: true
+    cap_add:
+      - SYS_ADMIN
     ports:
       - "4096:4096"
     devices:
       - /dev/fuse:/dev/fuse
     volumes:
-      - /var/lib/ironmount:/var/lib/ironmount
-+     - /proc:/host/proc
+-     - /var/lib/ironmount:/var/lib/ironmount
++     - /var/lib/ironmount:/var/lib/ironmount:rshared
 +     - /run/docker/plugins:/run/docker/plugins
 +     - /var/run/docker.sock:/var/run/docker.sock
 ```
