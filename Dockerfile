@@ -21,11 +21,17 @@ RUN apk add --no-cache curl bzip2
 RUN echo "Building for ${TARGETARCH}"
 RUN if [ "${TARGETARCH}" = "arm64" ]; then \
       curl -L -o restic.bz2 "https://github.com/restic/restic/releases/download/v$RESTIC_VERSION/restic_$RESTIC_VERSION"_linux_arm64.bz2; \
+      curl -O https://downloads.rclone.org/rclone-current-linux-arm64.zip; \
+      unzip rclone-current-linux-arm64.zip; \
       elif [ "${TARGETARCH}" = "amd64" ]; then \
       curl -L -o restic.bz2 "https://github.com/restic/restic/releases/download/v$RESTIC_VERSION/restic_$RESTIC_VERSION"_linux_amd64.bz2; \
+      curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip; \
+      unzip rclone-current-linux-amd64.zip; \
       fi
 
 RUN bzip2 -d restic.bz2 && chmod +x restic
+RUN mv rclone-*-linux-*/rclone /deps/rclone && chmod +x /deps/rclone
+
 
 # ------------------------------
 # DEVELOPMENT
@@ -37,6 +43,7 @@ ENV NODE_ENV="development"
 WORKDIR /app
 
 COPY --from=deps /deps/restic /usr/local/bin/restic
+COPY --from=deps /deps/rclone /usr/local/bin/rclone
 COPY ./package.json ./bun.lock ./
 COPY ./packages/schemas/package.json ./packages/schemas/package.json
 COPY ./apps/client/package.json ./apps/client/package.json
@@ -76,6 +83,7 @@ ENV NODE_ENV="production"
 WORKDIR /app
 
 COPY --from=deps /deps/restic /usr/local/bin/restic
+COPY --from=deps /deps/rclone /usr/local/bin/rclone
 COPY --from=builder /app/apps/server/dist ./
 COPY --from=builder /app/apps/server/drizzle ./assets/migrations
 COPY --from=builder /app/apps/client/dist/client ./assets/frontend

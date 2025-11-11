@@ -5,6 +5,7 @@ export const REPOSITORY_BACKENDS = {
 	s3: "s3",
 	gcs: "gcs",
 	azure: "azure",
+	rclone: "rclone",
 } as const;
 
 export type RepositoryBackend = keyof typeof REPOSITORY_BACKENDS;
@@ -37,10 +38,17 @@ export const azureRepositoryConfigSchema = type({
 	endpointSuffix: "string?",
 });
 
+export const rcloneRepositoryConfigSchema = type({
+	backend: "'rclone'",
+	remote: "string",
+	path: "string",
+});
+
 export const repositoryConfigSchema = s3RepositoryConfigSchema
 	.or(localRepositoryConfigSchema)
 	.or(gcsRepositoryConfigSchema)
-	.or(azureRepositoryConfigSchema);
+	.or(azureRepositoryConfigSchema)
+	.or(rcloneRepositoryConfigSchema);
 
 export type RepositoryConfig = typeof repositoryConfigSchema.infer;
 

@@ -78,6 +78,8 @@ const buildRepoUrl = (config: RepositoryConfig): string => {
 			return `gs:${config.bucket}:/`;
 		case "azure":
 			return `azure:${config.container}:/`;
+		case "rclone":
+			return `rclone:${config.remote}:${config.path}`;
 		default: {
 			throw new Error(`Unsupported repository backend: ${JSON.stringify(config)}`);
 		}

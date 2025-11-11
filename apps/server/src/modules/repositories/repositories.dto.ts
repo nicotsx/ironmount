@@ -305,3 +305,29 @@ export const doctorRepositoryDto = describeRoute({
 		},
 	},
 });
+
+/**
+ * List rclone available remotes
+ */
+const rcloneRemoteSchema = type({
+	name: "string",
+	type: "string",
+});
+
+const listRcloneRemotesResponse = rcloneRemoteSchema.array();
+
+export const listRcloneRemotesDto = describeRoute({
+	description: "List all configured rclone remotes on the host system",
+	tags: ["Rclone"],
+	operationId: "listRcloneRemotes",
+	responses: {
+		200: {
+			description: "List of rclone remotes",
+			content: {
+				"application/json": {
+					schema: resolver(listRcloneRemotesResponse),
+				},
+			},
+		},
+	},
+});

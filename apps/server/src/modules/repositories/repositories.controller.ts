@@ -7,6 +7,7 @@ import {
 	doctorRepositoryDto,
 	getRepositoryDto,
 	getSnapshotDetailsDto,
+	listRcloneRemotesDto,
 	listRepositoriesDto,
 	listSnapshotFilesDto,
 	listSnapshotFilesQuery,
@@ -24,6 +25,7 @@ import {
 	type RestoreSnapshotDto,
 } from "./repositories.dto";
 import { repositoriesService } from "./repositories.service";
+import { getRcloneRemoteInfo, listRcloneRemotes } from "../../utils/rclone";
 
 export const repositoriesController = new Hono()
 	.get("/", listRepositoriesDto, async (c) => {
@@ -125,4 +127,19 @@ export const repositoriesController = new Hono()
 		const result = await repositoriesService.doctorRepository(name);
 
 		return c.json<DoctorRepositoryDto>(result, 200);
+	})
+	.get("/rclone-remotes", listRcloneRemotesDto, async (c) => {
+		const remoteNames = await listRcloneRemotes();
+
+		const remotes = await Promise.all(
+			remoteNames.map(async (name) => {
+				const info = await getRcloneRemoteInfo(name);
+				return {
+					name,
+					type: info?.type ?? "unknown",
+				};
+			}),
+		);
+
+		return c.json(remotes);
 	});
