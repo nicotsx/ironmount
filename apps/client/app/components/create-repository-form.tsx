@@ -9,10 +9,11 @@ import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { listRcloneRemotesOptions } from "~/api-client/@tanstack/react-query.gen";
+import { getSystemInfoOptions, listRcloneRemotesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "./ui/alert";
 import { ExternalLink } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export const formSchema = type({
 	name: "2<=string<=32",
@@ -71,6 +72,10 @@ export const CreateRepositoryForm = ({
 		}
 	}, [watchedBackend, watchedName, form]);
 
+	const { data: systemInfo } = useQuery({
+		...getSystemInfoOptions(),
+	});
+
 	return (
 		<Form {...form}>
 			<form id={formId} onSubmit={form.handleSubmit(onSubmit)} className={cn("space-y-4", className)}>
@@ -113,7 +118,16 @@ export const CreateRepositoryForm = ({
 									<SelectItem value="s3">S3</SelectItem>
 									<SelectItem value="gcs">Google Cloud Storage</SelectItem>
 									<SelectItem value="azure">Azure Blob Storage</SelectItem>
-									<SelectItem value="rclone">rclone (40+ cloud providers)</SelectItem>
+									<Tooltip>
+										<TooltipTrigger>
+											<SelectItem disabled={!systemInfo?.capabilities.rclone} value="rclone">
+												rclone (40+ cloud providers)
+											</SelectItem>
+										</TooltipTrigger>
+										<TooltipContent className={cn({ hidden: systemInfo?.capabilities.rclone })}>
+											<p>Setup rclone to use this backend</p>
+										</TooltipContent>
+									</Tooltip>
 								</SelectContent>
 							</Select>
 							<FormDescription>Choose the storage backend for this repository.</FormDescription>

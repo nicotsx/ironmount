@@ -22,6 +22,7 @@ import {
 	browseFilesystem,
 	listRepositories,
 	createRepository,
+	listRcloneRemotes,
 	deleteRepository,
 	getRepository,
 	listSnapshots,
@@ -29,7 +30,6 @@ import {
 	listSnapshotFiles,
 	restoreSnapshot,
 	doctorRepository,
-	listRcloneRemotes,
 	listBackupSchedules,
 	createBackupSchedule,
 	deleteBackupSchedule,
@@ -75,6 +75,7 @@ import type {
 	ListRepositoriesData,
 	CreateRepositoryData,
 	CreateRepositoryResponse,
+	ListRcloneRemotesData,
 	DeleteRepositoryData,
 	DeleteRepositoryResponse,
 	GetRepositoryData,
@@ -85,7 +86,6 @@ import type {
 	RestoreSnapshotResponse,
 	DoctorRepositoryData,
 	DoctorRepositoryResponse,
-	ListRcloneRemotesData,
 	ListBackupSchedulesData,
 	CreateBackupScheduleData,
 	CreateBackupScheduleResponse,
@@ -739,6 +739,27 @@ export const createRepositoryMutation = (
 	return mutationOptions;
 };
 
+export const listRcloneRemotesQueryKey = (options?: Options<ListRcloneRemotesData>) =>
+	createQueryKey("listRcloneRemotes", options);
+
+/**
+ * List all configured rclone remotes on the host system
+ */
+export const listRcloneRemotesOptions = (options?: Options<ListRcloneRemotesData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await listRcloneRemotes({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: listRcloneRemotesQueryKey(options),
+	});
+};
+
 /**
  * Delete a repository
  */
@@ -918,27 +939,6 @@ export const doctorRepositoryMutation = (
 		},
 	};
 	return mutationOptions;
-};
-
-export const listRcloneRemotesQueryKey = (options?: Options<ListRcloneRemotesData>) =>
-	createQueryKey("listRcloneRemotes", options);
-
-/**
- * List all configured rclone remotes on the host system
- */
-export const listRcloneRemotesOptions = (options?: Options<ListRcloneRemotesData>) => {
-	return queryOptions({
-		queryFn: async ({ queryKey, signal }) => {
-			const { data } = await listRcloneRemotes({
-				...options,
-				...queryKey[0],
-				signal,
-				throwOnError: true,
-			});
-			return data;
-		},
-		queryKey: listRcloneRemotesQueryKey(options),
-	});
 };
 
 export const listBackupSchedulesQueryKey = (options?: Options<ListBackupSchedulesData>) =>

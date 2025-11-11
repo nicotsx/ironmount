@@ -828,6 +828,25 @@ export type CreateRepositoryResponses = {
 
 export type CreateRepositoryResponse = CreateRepositoryResponses[keyof CreateRepositoryResponses];
 
+export type ListRcloneRemotesData = {
+	body?: never;
+	path?: never;
+	query?: never;
+	url: "/api/v1/repositories/rclone-remotes";
+};
+
+export type ListRcloneRemotesResponses = {
+	/**
+	 * List of rclone remotes
+	 */
+	200: Array<{
+		name: string;
+		type: string;
+	}>;
+};
+
+export type ListRcloneRemotesResponse = ListRcloneRemotesResponses[keyof ListRcloneRemotesResponses];
+
 export type DeleteRepositoryData = {
 	body?: never;
 	path: {
@@ -1051,25 +1070,6 @@ export type DoctorRepositoryResponses = {
 };
 
 export type DoctorRepositoryResponse = DoctorRepositoryResponses[keyof DoctorRepositoryResponses];
-
-export type ListRcloneRemotesData = {
-	body?: never;
-	path?: never;
-	query?: never;
-	url: "/api/v1/repositories/rclone-remotes";
-};
-
-export type ListRcloneRemotesResponses = {
-	/**
-	 * List of rclone remotes
-	 */
-	200: Array<{
-		name: string;
-		type: string;
-	}>;
-};
-
-export type ListRcloneRemotesResponse = ListRcloneRemotesResponses[keyof ListRcloneRemotesResponses];
 
 export type ListBackupSchedulesData = {
 	body?: never;
@@ -1648,6 +1648,7 @@ export type GetSystemInfoResponses = {
 	200: {
 		capabilities: {
 			docker: boolean;
+			rclone: boolean;
 		};
 	};
 };

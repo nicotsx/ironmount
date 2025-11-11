@@ -46,6 +46,8 @@ import type {
 	ListRepositoriesResponses,
 	CreateRepositoryData,
 	CreateRepositoryResponses,
+	ListRcloneRemotesData,
+	ListRcloneRemotesResponses,
 	DeleteRepositoryData,
 	DeleteRepositoryResponses,
 	GetRepositoryData,
@@ -60,8 +62,6 @@ import type {
 	RestoreSnapshotResponses,
 	DoctorRepositoryData,
 	DoctorRepositoryResponses,
-	ListRcloneRemotesData,
-	ListRcloneRemotesResponses,
 	ListBackupSchedulesData,
 	ListBackupSchedulesResponses,
 	CreateBackupScheduleData,
@@ -358,6 +358,18 @@ export const createRepository = <ThrowOnError extends boolean = false>(
 };
 
 /**
+ * List all configured rclone remotes on the host system
+ */
+export const listRcloneRemotes = <ThrowOnError extends boolean = false>(
+	options?: Options<ListRcloneRemotesData, ThrowOnError>,
+) => {
+	return (options?.client ?? _heyApiClient).get<ListRcloneRemotesResponses, unknown, ThrowOnError>({
+		url: "/api/v1/repositories/rclone-remotes",
+		...options,
+	});
+};
+
+/**
  * Delete a repository
  */
 export const deleteRepository = <ThrowOnError extends boolean = false>(
@@ -441,18 +453,6 @@ export const doctorRepository = <ThrowOnError extends boolean = false>(
 ) => {
 	return (options.client ?? _heyApiClient).post<DoctorRepositoryResponses, unknown, ThrowOnError>({
 		url: "/api/v1/repositories/{name}/doctor",
-		...options,
-	});
-};
-
-/**
- * List all configured rclone remotes on the host system
- */
-export const listRcloneRemotes = <ThrowOnError extends boolean = false>(
-	options?: Options<ListRcloneRemotesData, ThrowOnError>,
-) => {
-	return (options?.client ?? _heyApiClient).get<ListRcloneRemotesResponses, unknown, ThrowOnError>({
-		url: "/api/v1/repositories/rclone-remotes",
 		...options,
 	});
 };

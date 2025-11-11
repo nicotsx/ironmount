@@ -23,13 +23,13 @@ export const eventsController = new Hono().get("/", (c) => {
 			scheduleId: number;
 			volumeName: string;
 			repositoryName: string;
-			secondsElapsed: number;
-			percentDone: number;
-			totalFiles: number;
-			filesDone: number;
-			totalBytes: number;
-			bytesDone: number;
-			currentFiles: string[];
+			seconds_elapsed: number;
+			percent_done: number;
+			total_files: number;
+			files_done: number;
+			total_bytes: number;
+			bytes_done: number;
+			current_files: string[];
 		}) => {
 			stream.writeSSE({
 				data: JSON.stringify(data),

@@ -19,7 +19,7 @@ services:
 
       - ./apps/client/app:/app/apps/client/app
       - ./apps/server/src:/app/apps/server/src
-      - ~/.config/rclone:/root/.config/rclone
+      # - ~/.config/rclone:/root/.config/rclone
 
   ironmount-prod:
     build:

@@ -4,6 +4,7 @@ import { logger } from "../utils/logger";
 
 export type SystemCapabilities = {
 	docker: boolean;
+	rclone: boolean;
 };
 
 let capabilitiesPromise: Promise<SystemCapabilities> | null = null;
@@ -28,6 +29,7 @@ export async function getCapabilities(): Promise<SystemCapabilities> {
 async function detectCapabilities(): Promise<SystemCapabilities> {
 	return {
 		docker: await detectDocker(),
+		rclone: await detectRclone(),
 	};
 }
 
@@ -49,6 +51,25 @@ async function detectDocker(): Promise<boolean> {
 		logger.warn(
 			"Docker capability: disabled. " +
 				"To enable: mount /var/run/docker.sock and /run/docker/plugins in docker-compose.yml",
+		);
+		return false;
+	}
+}
+
+/**
+ * Checks if rclone is available by:
+ * 1. Checking if /root/.config/rclone directory exists and is accessible
+ */
+async function detectRclone(): Promise<boolean> {
+	try {
+		await fs.access("/root/.config/rclone");
+
+		logger.info("rclone capability: enabled");
+		return true;
+	} catch (_) {
+		logger.warn(
+			"rclone capability: disabled. " +
+				"To enable: mount /root/.config/rclone in docker-compose.yml",
 		);
 		return false;
 	}

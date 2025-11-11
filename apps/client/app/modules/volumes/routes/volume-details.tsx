@@ -29,6 +29,7 @@ import { getVolume } from "~/api-client";
 import { VolumeInfoTabContent } from "../tabs/info";
 import { FilesTabContent } from "../tabs/files";
 import { DockerTabContent } from "../tabs/docker";
+import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
 
 export function meta({ params }: Route.MetaArgs) {
 	return [
@@ -150,7 +151,16 @@ export default function VolumeDetails({ loaderData }: Route.ComponentProps) {
 				<TabsList className="mb-2">
 					<TabsTrigger value="info">Configuration</TabsTrigger>
 					<TabsTrigger value="files">Files</TabsTrigger>
-					{dockerAvailable && <TabsTrigger value="docker">Docker</TabsTrigger>}
+					<Tooltip>
+						<TooltipTrigger>
+							<TabsTrigger disabled={!dockerAvailable} value="docker">
+								Docker
+							</TabsTrigger>
+						</TooltipTrigger>
+						<TooltipContent className={cn({ hidden: dockerAvailable })}>
+							<p>Enable Docker support to access this tab.</p>
+						</TooltipContent>
+					</Tooltip>
 				</TabsList>
 				<TabsContent value="info">
 					<VolumeInfoTabContent volume={volume} statfs={statfs} />
