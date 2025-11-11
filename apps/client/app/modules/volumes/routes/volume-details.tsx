@@ -5,7 +5,6 @@ import { useState } from "react";
 import {
 	deleteVolumeMutation,
 	getVolumeOptions,
-	getSystemInfoOptions,
 	mountVolumeMutation,
 	unmountVolumeMutation,
 } from "~/api-client/@tanstack/react-query.gen";
@@ -30,6 +29,7 @@ import { VolumeInfoTabContent } from "../tabs/info";
 import { FilesTabContent } from "../tabs/files";
 import { DockerTabContent } from "../tabs/docker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
+import { useSystemInfo } from "~/hooks/use-system-info";
 
 export function meta({ params }: Route.MetaArgs) {
 	return [
@@ -60,9 +60,7 @@ export default function VolumeDetails({ loaderData }: Route.ComponentProps) {
 		refetchOnWindowFocus: true,
 	});
 
-	const { data: systemInfo } = useQuery({
-		...getSystemInfoOptions(),
-	});
+	const { capabilities } = useSystemInfo();
 
 	const deleteVol = useMutation({
 		...deleteVolumeMutation(),
@@ -115,7 +113,7 @@ export default function VolumeDetails({ loaderData }: Route.ComponentProps) {
 	}
 
 	const { volume, statfs } = data;
-	const dockerAvailable = systemInfo?.capabilities?.docker ?? false;
+	const dockerAvailable = capabilities.docker;
 
 	return (
 		<>

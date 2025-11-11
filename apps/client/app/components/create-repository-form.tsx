@@ -9,11 +9,12 @@ import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { getSystemInfoOptions, listRcloneRemotesOptions } from "~/api-client/@tanstack/react-query.gen";
+import { listRcloneRemotesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "./ui/alert";
 import { ExternalLink } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { useSystemInfo } from "~/hooks/use-system-info";
 
 export const formSchema = type({
 	name: "2<=string<=32",
@@ -72,9 +73,7 @@ export const CreateRepositoryForm = ({
 		}
 	}, [watchedBackend, watchedName, form]);
 
-	const { data: systemInfo } = useQuery({
-		...getSystemInfoOptions(),
-	});
+	const { capabilities } = useSystemInfo();
 
 	return (
 		<Form {...form}>
@@ -120,11 +119,11 @@ export const CreateRepositoryForm = ({
 									<SelectItem value="azure">Azure Blob Storage</SelectItem>
 									<Tooltip>
 										<TooltipTrigger>
-											<SelectItem disabled={!systemInfo?.capabilities.rclone} value="rclone">
+											<SelectItem disabled={!capabilities.rclone} value="rclone">
 												rclone (40+ cloud providers)
 											</SelectItem>
 										</TooltipTrigger>
-										<TooltipContent className={cn({ hidden: systemInfo?.capabilities.rclone })}>
+										<TooltipContent className={cn({ hidden: capabilities.rclone })}>
 											<p>Setup rclone to use this backend</p>
 										</TooltipContent>
 									</Tooltip>
