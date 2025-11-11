@@ -72,7 +72,7 @@ export const VolumeFileBrowser = ({
 				setLoadingFolders((prev) => new Set(prev).add(folderPath));
 
 				try {
-					const result = await queryClient.fetchQuery(
+					const result = await queryClient.ensureQueryData(
 						listFilesOptions({
 							path: { name: volumeName },
 							query: { path: folderPath },
@@ -101,7 +101,7 @@ export const VolumeFileBrowser = ({
 				}
 			}
 		},
-		[volumeName, fetchedFolders, queryClient.fetchQuery],
+		[volumeName, fetchedFolders, queryClient.ensureQueryData],
 	);
 
 	const handleFolderHover = useCallback(

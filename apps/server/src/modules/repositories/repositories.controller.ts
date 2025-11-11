@@ -73,8 +73,6 @@ export const repositoriesController = new Hono()
 			};
 		});
 
-		// c.header("Cache-Control", "public, max-age=10, stale-while-revalidate=60");
-
 		return c.json<ListSnapshotsDto>(snapshots, 200);
 	})
 	.get("/:name/snapshots/:snapshotId", getSnapshotDetailsDto, async (c) => {
@@ -108,7 +106,7 @@ export const repositoriesController = new Hono()
 
 			const result = await repositoriesService.listSnapshotFiles(name, snapshotId, path);
 
-			// c.header("Cache-Control", "max-age=300, stale-while-revalidate=600");
+			c.header("Cache-Control", "max-age=300, stale-while-revalidate=600");
 
 			return c.json<ListSnapshotFilesDto>(result, 200);
 		},

@@ -120,7 +120,7 @@ export const volumeController = new Hono()
 			path: result.path,
 		};
 
-		// c.header("Cache-Control", "public, max-age=10, stale-while-revalidate=60");
+		c.header("Cache-Control", "public, max-age=10, stale-while-revalidate=60");
 
 		return c.json<ListFilesDto>(response, 200);
 	})

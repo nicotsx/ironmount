@@ -46,7 +46,7 @@ export const DirectoryBrowser = ({ onSelectPath, selectedPath }: Props) => {
 				setLoadingFolders((prev) => new Set(prev).add(folderPath));
 
 				try {
-					const result = await queryClient.fetchQuery(
+					const result = await queryClient.ensureQueryData(
 						browseFilesystemOptions({
 							query: { path: folderPath },
 						}),

@@ -104,7 +104,7 @@ export const SnapshotFileBrowser = (props: Props) => {
 				try {
 					const fullPath = addBasePath(folderPath);
 
-					const result = await queryClient.fetchQuery(
+					const result = await queryClient.ensureQueryData(
 						listSnapshotFilesOptions({
 							path: { name: repositoryName, snapshotId: snapshot.short_id },
 							query: { path: fullPath },
@@ -145,12 +145,12 @@ export const SnapshotFileBrowser = (props: Props) => {
 			if (!fetchedFolders.has(folderPath) && !loadingFolders.has(folderPath)) {
 				const fullPath = addBasePath(folderPath);
 
-				queryClient.prefetchQuery(
-					listSnapshotFilesOptions({
+				queryClient.prefetchQuery({
+					...listSnapshotFilesOptions({
 						path: { name: repositoryName, snapshotId: snapshot.short_id },
 						query: { path: fullPath },
 					}),
-				);
+				});
 			}
 		},
 		[repositoryName, snapshot, fetchedFolders, loadingFolders, queryClient, addBasePath],
