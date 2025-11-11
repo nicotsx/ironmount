@@ -94,11 +94,69 @@ Now, when adding a new volume in the Ironmount web interface, you can select "Di
 
 ## Creating a repository
 
-A repository is where your backups will be securely stored encrypted. Ironmount currently supports S3-compatible storage backends and local directories for storing your backup repositories.
+A repository is where your backups will be securely stored encrypted. Ironmount supports multiple storage backends for your backup repositories:
+
+- **Local directories** - Store backups on local disk at `/var/lib/ironmount/repositories/<repository-name>`
+- **S3-compatible storage** - Amazon S3, MinIO, Wasabi, DigitalOcean Spaces, etc.
+- **Google Cloud Storage** - Google's cloud storage service
+- **Azure Blob Storage** - Microsoft Azure storage
+- **rclone remotes** - 40+ cloud storage providers via rclone (see below)
 
 Repositories are optimized for storage efficiency and data integrity, leveraging Restic's deduplication and encryption features.
 
-To create a repository, navigate to the "Repositories" section in the web interface and click on "Create repository". Fill in the required details such as repository name, type, and connection settings. If you choose a local directory as the repository type, your backups will be stored at `/var/lib/ironmount/repositories/<repository-name>`.
+To create a repository, navigate to the "Repositories" section in the web interface and click on "Create repository". Fill in the required details such as repository name, type, and connection settings.
+
+### Using rclone for cloud storage
+
+Ironmount can use [rclone](https://rclone.org/) to support 40+ cloud storage providers including Google Drive, Dropbox, OneDrive, Box, pCloud, Mega, and many more. This gives you the flexibility to store your backups on virtually any cloud storage service.
+
+**Setup instructions:**
+
+1. **Install rclone on your host system** (if not already installed):
+   ```bash
+   curl https://rclone.org/install.sh | sudo bash
+   ```
+
+2. **Configure your cloud storage remote** using rclone's interactive config:
+   ```bash
+   rclone config
+   ```
+   Follow the prompts to set up your cloud storage provider. For OAuth providers (Google Drive, Dropbox, etc.), rclone will guide you through the authentication flow.
+
+3. **Verify your remote is configured**:
+   ```bash
+   rclone listremotes
+   ```
+
+4. **Mount the rclone config into the Ironmount container** by updating your `docker-compose.yml`:
+   ```diff
+   services:
+     ironmount:
+       image: ghcr.io/nicotsx/ironmount:v0.6
+       container_name: ironmount
+       restart: unless-stopped
+       privileged: true
+       ports:
+         - "4096:4096"
+       devices:
+         - /dev/fuse:/dev/fuse
+       volumes:
+         - /var/lib/ironmount:/var/lib/ironmount
+   +     - ~/.config/rclone:/root/.config/rclone
+   ```
+
+5. **Restart the Ironmount container**:
+   ```bash
+   docker compose down
+   docker compose up -d
+   ```
+
+6. **Create a repository** in Ironmount:
+   - Select "rclone" as the repository type
+   - Choose your configured remote from the dropdown
+   - Specify the path within your remote (e.g., `backups/ironmount`)
+
+For a complete list of supported providers, see the [rclone documentation](https://rclone.org/).
 
 ## Your first backup job
 

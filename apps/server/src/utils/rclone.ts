@@ -6,27 +6,22 @@ import { logger } from "./logger";
  * @returns Array of remote names
  */
 export async function listRcloneRemotes(): Promise<string[]> {
-	try {
-		const result = await $`rclone listremotes`.quiet();
+	const result = await $`rclone listremotes`.nothrow();
 
-		if (result.exitCode !== 0) {
-			logger.error(`Failed to list rclone remotes: ${result.stderr}`);
-			return [];
-		}
-
-		// Parse output - each line is a remote name ending with ":"
-		const remotes = result.stdout
-			.toString()
-			.split("\n")
-			.map((line) => line.trim())
-			.filter((line) => line.endsWith(":"))
-			.map((line) => line.slice(0, -1)); // Remove trailing ":"
-
-		return remotes;
-	} catch (error) {
-		logger.error(`Error listing rclone remotes: ${error}`);
+	if (result.exitCode !== 0) {
+		logger.error(`Failed to list rclone remotes: ${result.stderr}`);
 		return [];
 	}
+
+	// Parse output - each line is a remote name ending with ":"
+	const remotes = result.stdout
+		.toString()
+		.split("\n")
+		.map((line) => line.trim())
+		.filter((line) => line.endsWith(":"))
+		.map((line) => line.slice(0, -1)); // Remove trailing ":"
+
+	return remotes;
 }
 
 /**

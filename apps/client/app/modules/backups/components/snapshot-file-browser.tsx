@@ -41,7 +41,7 @@ export const SnapshotFileBrowser = (props: Props) => {
 	const [showRestoreDialog, setShowRestoreDialog] = useState(false);
 	const [deleteExtraFiles, setDeleteExtraFiles] = useState(false);
 
-	const volumeBasePath = snapshot.paths[0]?.match(/^(.*?_data)(\/|$)/)?.[1] || "";
+	const volumeBasePath = snapshot.paths[0]?.match(/^(.*?_data)(\/|$)/)?.[1] || "/";
 
 	const { data: filesData, isLoading: filesLoading } = useQuery({
 		...listSnapshotFilesOptions({

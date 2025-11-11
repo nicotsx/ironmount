@@ -29,6 +29,7 @@ import {
 	listSnapshotFiles,
 	restoreSnapshot,
 	doctorRepository,
+	listRcloneRemotes,
 	listBackupSchedules,
 	createBackupSchedule,
 	deleteBackupSchedule,
@@ -84,6 +85,7 @@ import type {
 	RestoreSnapshotResponse,
 	DoctorRepositoryData,
 	DoctorRepositoryResponse,
+	ListRcloneRemotesData,
 	ListBackupSchedulesData,
 	CreateBackupScheduleData,
 	CreateBackupScheduleResponse,
@@ -916,6 +918,27 @@ export const doctorRepositoryMutation = (
 		},
 	};
 	return mutationOptions;
+};
+
+export const listRcloneRemotesQueryKey = (options?: Options<ListRcloneRemotesData>) =>
+	createQueryKey("listRcloneRemotes", options);
+
+/**
+ * List all configured rclone remotes on the host system
+ */
+export const listRcloneRemotesOptions = (options?: Options<ListRcloneRemotesData>) => {
+	return queryOptions({
+		queryFn: async ({ queryKey, signal }) => {
+			const { data } = await listRcloneRemotes({
+				...options,
+				...queryKey[0],
+				signal,
+				throwOnError: true,
+			});
+			return data;
+		},
+		queryKey: listRcloneRemotesQueryKey(options),
+	});
 };
 
 export const listBackupSchedulesQueryKey = (options?: Options<ListBackupSchedulesData>) =>

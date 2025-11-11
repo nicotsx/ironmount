@@ -9,6 +9,10 @@ import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { listRcloneRemotesOptions } from "~/api-client/@tanstack/react-query.gen";
+import { useQuery } from "@tanstack/react-query";
+import { Alert, AlertDescription } from "./ui/alert";
+import { ExternalLink } from "lucide-react";
 
 export const formSchema = type({
 	name: "2<=string<=32",
@@ -32,6 +36,7 @@ const defaultValuesForType = {
 	s3: { backend: "s3" as const, compressionMode: "auto" as const },
 	gcs: { backend: "gcs" as const, compressionMode: "auto" as const },
 	azure: { backend: "azure" as const, compressionMode: "auto" as const },
+	rclone: { backend: "rclone" as const, compressionMode: "auto" as const },
 };
 
 export const CreateRepositoryForm = ({
@@ -55,6 +60,10 @@ export const CreateRepositoryForm = ({
 
 	const watchedBackend = watch("backend");
 	const watchedName = watch("name");
+
+	const { data: rcloneRemotes, isLoading: isLoadingRemotes } = useQuery({
+		...listRcloneRemotesOptions(),
+	});
 
 	useEffect(() => {
 		if (watchedBackend && watchedBackend in defaultValuesForType) {
@@ -104,6 +113,7 @@ export const CreateRepositoryForm = ({
 									<SelectItem value="s3">S3</SelectItem>
 									<SelectItem value="gcs">Google Cloud Storage</SelectItem>
 									<SelectItem value="azure">Azure Blob Storage</SelectItem>
+									<SelectItem value="rclone">rclone (40+ cloud providers)</SelectItem>
 								</SelectContent>
 							</Select>
 							<FormDescription>Choose the storage backend for this repository.</FormDescription>
@@ -306,6 +316,75 @@ export const CreateRepositoryForm = ({
 						/>
 					</>
 				)}
+
+				{watchedBackend === "rclone" &&
+					(!rcloneRemotes || rcloneRemotes.length === 0 ? (
+						<Alert>
+							<AlertDescription className="space-y-2">
+								<p className="font-medium">No rclone remotes configured</p>
+								<p className="text-sm text-muted-foreground">
+									To use rclone, you need to configure remotes on your host system
+								</p>
+								<a
+									href="https://rclone.org/docs/"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-sm text-strong-accent inline-flex items-center gap-1"
+								>
+									View rclone documentation
+									<ExternalLink className="w-3 h-3" />
+								</a>
+							</AlertDescription>
+						</Alert>
+					) : (
+						<>
+							<FormField
+								control={form.control}
+								name="remote"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Remote</FormLabel>
+										<Select onValueChange={(v) => field.onChange(v)} defaultValue={field.value} value={field.value}>
+											<FormControl>
+												<SelectTrigger>
+													<SelectValue placeholder="Select an rclone remote" />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												{isLoadingRemotes ? (
+													<SelectItem value="loading" disabled>
+														Loading remotes...
+													</SelectItem>
+												) : (
+													rcloneRemotes.map((remote: { name: string; type: string }) => (
+														<SelectItem key={remote.name} value={remote.name}>
+															{remote.name} ({remote.type})
+														</SelectItem>
+													))
+												)}
+											</SelectContent>
+										</Select>
+										<FormDescription>Select the rclone remote configured on your host system.</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="path"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Path</FormLabel>
+										<FormControl>
+											<Input placeholder="backups/ironmount" {...field} />
+										</FormControl>
+										<FormDescription>Path within the remote where backups will be stored.</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</>
+					))}
 
 				{mode === "update" && (
 					<Button type="submit" className="w-full" loading={loading}>

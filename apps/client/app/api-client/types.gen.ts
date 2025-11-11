@@ -754,6 +754,11 @@ export type ListRepositoriesResponses = {
 			| {
 					backend: "local";
 					name: string;
+			  }
+			| {
+					backend: "rclone";
+					path: string;
+					remote: string;
 			  };
 		createdAt: number;
 		id: string;
@@ -761,7 +766,7 @@ export type ListRepositoriesResponses = {
 		lastError: string | null;
 		name: string;
 		status: "error" | "healthy" | "unknown" | null;
-		type: "azure" | "gcs" | "local" | "s3";
+		type: "azure" | "gcs" | "local" | "rclone" | "s3";
 		updatedAt: number;
 	}>;
 };
@@ -794,6 +799,11 @@ export type CreateRepositoryData = {
 			| {
 					backend: "local";
 					name: string;
+			  }
+			| {
+					backend: "rclone";
+					path: string;
+					remote: string;
 			  };
 		name: string;
 		compressionMode?: "auto" | "better" | "fastest" | "max" | "off";
@@ -877,6 +887,11 @@ export type GetRepositoryResponses = {
 			| {
 					backend: "local";
 					name: string;
+			  }
+			| {
+					backend: "rclone";
+					path: string;
+					remote: string;
 			  };
 		createdAt: number;
 		id: string;
@@ -884,7 +899,7 @@ export type GetRepositoryResponses = {
 		lastError: string | null;
 		name: string;
 		status: "error" | "healthy" | "unknown" | null;
-		type: "azure" | "gcs" | "local" | "s3";
+		type: "azure" | "gcs" | "local" | "rclone" | "s3";
 		updatedAt: number;
 	};
 };
@@ -1037,6 +1052,25 @@ export type DoctorRepositoryResponses = {
 
 export type DoctorRepositoryResponse = DoctorRepositoryResponses[keyof DoctorRepositoryResponses];
 
+export type ListRcloneRemotesData = {
+	body?: never;
+	path?: never;
+	query?: never;
+	url: "/api/v1/repositories/rclone-remotes";
+};
+
+export type ListRcloneRemotesResponses = {
+	/**
+	 * List of rclone remotes
+	 */
+	200: Array<{
+		name: string;
+		type: string;
+	}>;
+};
+
+export type ListRcloneRemotesResponse = ListRcloneRemotesResponses[keyof ListRcloneRemotesResponses];
+
 export type ListBackupSchedulesData = {
 	body?: never;
 	path?: never;
@@ -1085,6 +1119,11 @@ export type ListBackupSchedulesResponses = {
 				| {
 						backend: "local";
 						name: string;
+				  }
+				| {
+						backend: "rclone";
+						path: string;
+						remote: string;
 				  };
 			createdAt: number;
 			id: string;
@@ -1092,7 +1131,7 @@ export type ListBackupSchedulesResponses = {
 			lastError: string | null;
 			name: string;
 			status: "error" | "healthy" | "unknown" | null;
-			type: "azure" | "gcs" | "local" | "s3";
+			type: "azure" | "gcs" | "local" | "rclone" | "s3";
 			updatedAt: number;
 		};
 		repositoryId: string;
@@ -1284,6 +1323,11 @@ export type GetBackupScheduleResponses = {
 				| {
 						backend: "local";
 						name: string;
+				  }
+				| {
+						backend: "rclone";
+						path: string;
+						remote: string;
 				  };
 			createdAt: number;
 			id: string;
@@ -1291,7 +1335,7 @@ export type GetBackupScheduleResponses = {
 			lastError: string | null;
 			name: string;
 			status: "error" | "healthy" | "unknown" | null;
-			type: "azure" | "gcs" | "local" | "s3";
+			type: "azure" | "gcs" | "local" | "rclone" | "s3";
 			updatedAt: number;
 		};
 		repositoryId: string;
@@ -1464,6 +1508,11 @@ export type GetBackupScheduleForVolumeResponses = {
 				| {
 						backend: "local";
 						name: string;
+				  }
+				| {
+						backend: "rclone";
+						path: string;
+						remote: string;
 				  };
 			createdAt: number;
 			id: string;
@@ -1471,7 +1520,7 @@ export type GetBackupScheduleForVolumeResponses = {
 			lastError: string | null;
 			name: string;
 			status: "error" | "healthy" | "unknown" | null;
-			type: "azure" | "gcs" | "local" | "s3";
+			type: "azure" | "gcs" | "local" | "rclone" | "s3";
 			updatedAt: number;
 		};
 		repositoryId: string;

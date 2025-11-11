@@ -39,6 +39,21 @@ export const repositoriesController = new Hono()
 
 		return c.json({ message: "Repository created", repository: res.repository }, 201);
 	})
+	.get("/rclone-remotes", listRcloneRemotesDto, async (c) => {
+		const remoteNames = await listRcloneRemotes();
+
+		const remotes = await Promise.all(
+			remoteNames.map(async (name) => {
+				const info = await getRcloneRemoteInfo(name);
+				return {
+					name,
+					type: info?.type ?? "unknown",
+				};
+			}),
+		);
+
+		return c.json(remotes);
+	})
 	.get("/:name", getRepositoryDto, async (c) => {
 		const { name } = c.req.param();
 		const res = await repositoriesService.getRepository(name);
@@ -127,19 +142,4 @@ export const repositoriesController = new Hono()
 		const result = await repositoriesService.doctorRepository(name);
 
 		return c.json<DoctorRepositoryDto>(result, 200);
-	})
-	.get("/rclone-remotes", listRcloneRemotesDto, async (c) => {
-		const remoteNames = await listRcloneRemotes();
-
-		const remotes = await Promise.all(
-			remoteNames.map(async (name) => {
-				const info = await getRcloneRemoteInfo(name);
-				return {
-					name,
-					type: info?.type ?? "unknown",
-				};
-			}),
-		);
-
-		return c.json(remotes);
 	});

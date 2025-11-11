@@ -90,6 +90,7 @@ const buildEnv = async (config: RepositoryConfig) => {
 	const env: Record<string, string> = {
 		RESTIC_CACHE_DIR: "/var/lib/ironmount/restic/cache",
 		RESTIC_PASSWORD_FILE: RESTIC_PASS_FILE,
+		PATH: process.env.PATH || "/usr/local/bin:/usr/bin:/bin",
 	};
 
 	switch (config.backend) {
@@ -234,6 +235,8 @@ const backup = async (
 
 	if (res.exitCode !== 0) {
 		logger.error(`Restic backup failed: ${res.stderr}`);
+		logger.error(`Command executed: restic ${args.join(" ")}`);
+
 		throw new Error(`Restic backup failed: ${res.stderr}`);
 	}
 
@@ -361,7 +364,7 @@ const snapshots = async (config: RepositoryConfig, options: { tags?: string[] } 
 
 	args.push("--json");
 
-	const res = await $`restic ${args}`.env(env).nothrow();
+	const res = await $`restic ${args}`.env(env).nothrow().quiet();
 
 	if (res.exitCode !== 0) {
 		logger.error(`Restic snapshots retrieval failed: ${res.stderr}`);
@@ -456,7 +459,7 @@ const ls = async (config: RepositoryConfig, snapshotId: string, path?: string) =
 		args.push(path);
 	}
 
-	const res = await $`restic ${args}`.env(env).nothrow();
+	const res = await $`restic ${args}`.env(env).nothrow().quiet();
 
 	if (res.exitCode !== 0) {
 		logger.error(`Restic ls failed: ${res.stderr}`);
