@@ -50,7 +50,7 @@ RUN bun install --frozen-lockfile
 
 COPY . .
 
-EXPOSE 3000
+EXPOSE 4096
 
 CMD ["bun", "run", "dev"]
 
@@ -62,12 +62,11 @@ FROM oven/bun:${BUN_VERSION} AS builder
 WORKDIR /app
 
 COPY ./package.json ./bun.lock ./
+RUN bun install --frozen-lockfile
 
 COPY ./packages/schemas/package.json ./packages/schemas/package.json
 COPY ./apps/client/package.json ./apps/client/package.json
 COPY ./apps/server/package.json ./apps/server/package.json
-
-RUN bun install --frozen-lockfile
 
 COPY . .
 
@@ -85,6 +84,8 @@ COPY --from=builder /app/dist/client ./dist/client
 COPY --from=builder /app/dist/server ./dist/server
 COPY --from=builder /app/drizzle ./assets/migrations
 COPY --from=builder /app/package.json ./
+
+RUN bun install --production --frozen-lockfile
 
 # Include third-party licenses and attribution
 COPY ./LICENSES ./LICENSES

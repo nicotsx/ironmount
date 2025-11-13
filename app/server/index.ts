@@ -105,4 +105,4 @@ process.on("SIGINT", async () => {
 	process.exit(0);
 });
 
-export default await createHonoServer({ app });
+export default await createHonoServer({ app, port: 4096 });
