@@ -64,10 +64,6 @@ WORKDIR /app
 COPY ./package.json ./bun.lock ./
 RUN bun install --frozen-lockfile
 
-COPY ./packages/schemas/package.json ./packages/schemas/package.json
-COPY ./apps/client/package.json ./apps/client/package.json
-COPY ./apps/server/package.json ./apps/server/package.json
-
 COPY . .
 
 RUN bun run build
@@ -91,6 +87,8 @@ COPY --from=builder /app/app/drizzle ./assets/migrations
 COPY ./LICENSES ./LICENSES
 COPY ./NOTICES.md ./NOTICES.md
 COPY ./LICENSE ./LICENSE.md
+
+EXPOSE 4096
 
 CMD ["bun", "run", "start"]
 
