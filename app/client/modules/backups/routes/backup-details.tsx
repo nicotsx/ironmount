@@ -20,6 +20,13 @@ import { SnapshotFileBrowser } from "../components/snapshot-file-browser";
 import { SnapshotTimeline } from "../components/snapshot-timeline";
 import { getBackupSchedule } from "~/client/api-client";
 
+export const handle = {
+	breadcrumb: (match: Route.MetaArgs) => [
+		{ label: "Backups", href: "/backups" },
+		{ label: `Schedule #${match.params.id}` },
+	],
+};
+
 export function meta(_: Route.MetaArgs) {
 	return [
 		{ title: "Backup Job Details" },

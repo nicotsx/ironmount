@@ -13,6 +13,7 @@ import { CleanupSessionsJob } from "../../jobs/cleanup-sessions";
 
 export const startup = async () => {
 	await Scheduler.start();
+	await Scheduler.clear();
 
 	await restic.ensurePassfile().catch((err) => {
 		logger.error(`Error ensuring restic passfile exists: ${err.message}`);

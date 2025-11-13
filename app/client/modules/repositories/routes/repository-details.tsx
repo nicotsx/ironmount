@@ -27,6 +27,13 @@ import { RepositoryInfoTabContent } from "../tabs/info";
 import { RepositorySnapshotsTabContent } from "../tabs/snapshots";
 import { Loader2 } from "lucide-react";
 
+export const handle = {
+	breadcrumb: (match: Route.MetaArgs) => [
+		{ label: "Repositories", href: "/repositories" },
+		{ label: match.params.name },
+	],
+};
+
 export function meta({ params }: Route.MetaArgs) {
 	return [
 		{ title: params.name },

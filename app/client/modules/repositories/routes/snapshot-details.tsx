@@ -7,6 +7,14 @@ import { SnapshotFileBrowser } from "~/client/modules/backups/components/snapsho
 import { getSnapshotDetails } from "~/client/api-client";
 import type { Route } from "./+types/snapshot-details";
 
+export const handle = {
+	breadcrumb: (match: Route.MetaArgs) => [
+		{ label: "Repositories", href: "/repositories" },
+		{ label: match.params.name, href: `/repositories/${match.params.name}` },
+		{ label: match.params.snapshotId },
+	],
+};
+
 export function meta({ params }: Route.MetaArgs) {
 	return [
 		{ title: `Snapshot ${params.snapshotId}` },

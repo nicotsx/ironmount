@@ -15,6 +15,10 @@ import type { Route } from "./+types/repositories";
 import { cn } from "~/client/lib/utils";
 import { EmptyState } from "~/client/components/empty-state";
 
+export const handle = {
+	breadcrumb: () => [{ label: "Repositories" }],
+};
+
 export function meta(_: Route.MetaArgs) {
 	return [
 		{ title: "Repositories" },

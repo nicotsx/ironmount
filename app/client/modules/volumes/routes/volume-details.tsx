@@ -31,6 +31,10 @@ import {
 	unmountVolumeMutation,
 } from "~/client/api-client/@tanstack/react-query.gen";
 
+export const handle = {
+	breadcrumb: (match: Route.MetaArgs) => [{ label: "Volumes", href: "/volumes" }, { label: match.params.name }],
+};
+
 export function meta({ params }: Route.MetaArgs) {
 	return [
 		{ title: params.name },

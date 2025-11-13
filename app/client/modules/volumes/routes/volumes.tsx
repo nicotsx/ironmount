@@ -15,6 +15,10 @@ import type { Route } from "./+types/volumes";
 import { listVolumes } from "~/client/api-client";
 import { listVolumesOptions } from "~/client/api-client/@tanstack/react-query.gen";
 
+export const handle = {
+	breadcrumb: () => [{ label: "Volumes" }],
+};
+
 export function meta(_: Route.MetaArgs) {
 	return [
 		{ title: "Volumes" },

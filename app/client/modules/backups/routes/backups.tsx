@@ -9,6 +9,10 @@ import type { Route } from "./+types/backups";
 import { listBackupSchedules } from "~/client/api-client";
 import { listBackupSchedulesOptions } from "~/client/api-client/@tanstack/react-query.gen";
 
+export const handle = {
+	breadcrumb: () => [{ label: "Backups" }],
+};
+
 export function meta(_: Route.MetaArgs) {
 	return [
 		{ title: "Backup Jobs" },

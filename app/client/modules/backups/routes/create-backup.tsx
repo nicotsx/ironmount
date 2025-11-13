@@ -18,6 +18,10 @@ import { CreateScheduleForm, type BackupScheduleFormValues } from "../components
 import type { Route } from "./+types/create-backup";
 import { listRepositories, listVolumes } from "~/client/api-client";
 
+export const handle = {
+	breadcrumb: () => [{ label: "Backups", href: "/backups" }, { label: "Create" }],
+};
+
 export function meta(_: Route.MetaArgs) {
 	return [
 		{ title: "Create Backup Job" },

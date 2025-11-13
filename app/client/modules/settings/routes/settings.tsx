@@ -24,6 +24,10 @@ import {
 	logoutMutation,
 } from "~/client/api-client/@tanstack/react-query.gen";
 
+export const handle = {
+	breadcrumb: () => [{ label: "Settings" }],
+};
+
 export function meta(_: Route.MetaArgs) {
 	return [
 		{ title: "Settings" },

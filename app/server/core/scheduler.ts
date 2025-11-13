@@ -39,6 +39,14 @@ class SchedulerClass {
 		this.tasks = [];
 		logger.info("Scheduler stopped");
 	}
+
+	async clear() {
+		for (const task of this.tasks) {
+			task.destroy();
+		}
+		this.tasks = [];
+		logger.info("Scheduler cleared all tasks");
+	}
 }
 
 export const Scheduler = new SchedulerClass();
