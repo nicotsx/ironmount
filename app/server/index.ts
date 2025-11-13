@@ -2,7 +2,6 @@ import { createHonoServer } from "react-router-hono-server/bun";
 import * as fs from "node:fs/promises";
 import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
-import { serveStatic } from "hono/bun";
 import { logger as honoLogger } from "hono/logger";
 import { openAPIRouteHandler } from "hono-openapi";
 import { getCapabilities } from "./core/capabilities";
@@ -49,9 +48,6 @@ const app = new Hono()
 	.route("/api/v1/backups", backupScheduleController.use(requireAuth))
 	.route("/api/v1/system", systemController.use(requireAuth))
 	.route("/api/v1/events", eventsController.use(requireAuth));
-// .get("/assets/*", serveStatic({ root: "./assets/frontend" }))
-// .get("/images/*", serveStatic({ root: "./assets/frontend" }))
-// .get("*", serveStatic({ path: "./assets/frontend/index.html" }));
 
 app.get("/api/v1/openapi.json", generalDescriptor(app));
 app.get("/api/v1/docs", scalarDescriptor);

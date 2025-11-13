@@ -1,11 +1,12 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.3.0/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.3.5/schema.json",
 	"vcs": {
-		"enabled": false,
+		"enabled": true,
 		"clientKind": "git",
-		"useIgnoreFile": false
+		"useIgnoreFile": true
 	},
 	"files": {
+		"includes": ["**/*.{ts,tsx,json}", "!**/api-client", "!**/components/ui"],
 		"ignoreUnknown": false
 	},
 	"formatter": {

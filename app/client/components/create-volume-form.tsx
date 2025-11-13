@@ -141,19 +141,17 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 						control={form.control}
 						name="path"
 						render={({ field }) => {
-							const [showBrowser, setShowBrowser] = useState(!field.value || field.value === "/");
-
 							return (
 								<FormItem>
 									<FormLabel>Directory Path</FormLabel>
 									<FormControl>
-										{!showBrowser && field.value ? (
+										{field.value ? (
 											<div className="flex items-center gap-2">
 												<div className="flex-1 border rounded-md p-3 bg-muted/50">
 													<div className="text-xs font-medium text-muted-foreground mb-1">Selected path:</div>
 													<div className="text-sm font-mono break-all">{field.value}</div>
 												</div>
-												<Button type="button" variant="outline" size="sm" onClick={() => setShowBrowser(true)}>
+												<Button type="button" variant="outline" size="sm" onClick={() => field.onChange("")}>
 													Change
 												</Button>
 											</div>

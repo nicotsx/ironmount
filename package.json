@@ -8,6 +8,8 @@
 		"dev": "bunx --bun vite",
 		"start": "bun ./dist/server/index.js",
 		"tsc": "react-router typegen && tsc",
+		"lint": "biome check .",
+		"lint:ci": "biome check . --ci",
 		"start:dev": "docker compose down && docker compose up --build ironmount-dev",
 		"start:prod": "docker compose down && docker compose up --build ironmount-prod",
 		"gen:api-client": "openapi-ts",
@@ -67,6 +69,7 @@
 		"yaml": "^2.8.1"
 	},
 	"devDependencies": {
+		"@biomejs/biome": "^2.3.5",
 		"@hey-api/openapi-ts": "^0.87.4",
 		"@react-router/dev": "^7.9.3",
 		"@tailwindcss/vite": "^4.1.14",
