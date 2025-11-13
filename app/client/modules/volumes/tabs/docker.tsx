@@ -52,7 +52,7 @@ export const DockerTabContent = ({ volume }: Props) => {
 	};
 
 	return (
-		<div className="grid gap-4 xl:grid-cols-[minmax(0,_1fr)_minmax(0,_1fr)]">
+		<div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
 			<Card>
 				<CardHeader>
 					<CardTitle>Plug-and-play Docker integration</CardTitle>

@@ -78,14 +78,14 @@ ENV NODE_ENV="production"
 
 WORKDIR /app
 
+COPY --from=builder /app/package.json ./
+RUN bun install --production --frozen-lockfile
+
 COPY --from=deps /deps/restic /usr/local/bin/restic
 COPY --from=deps /deps/rclone /usr/local/bin/rclone
 COPY --from=builder /app/dist/client ./dist/client
 COPY --from=builder /app/dist/server ./dist/server
-COPY --from=builder /app/drizzle ./assets/migrations
-COPY --from=builder /app/package.json ./
-
-RUN bun install --production --frozen-lockfile
+COPY --from=builder /app/app/drizzle ./assets/migrations
 
 # Include third-party licenses and attribution
 COPY ./LICENSES ./LICENSES

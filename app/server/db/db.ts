@@ -19,7 +19,7 @@ export const runDbMigrations = () => {
 
 	const { NODE_ENV } = process.env;
 	if (NODE_ENV !== "production") {
-		migrationsFolder = path.join("/app", "drizzle");
+		migrationsFolder = path.join("/app", "app", "drizzle");
 	}
 
 	migrate(db, { migrationsFolder });
