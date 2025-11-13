@@ -1,0 +1,328 @@
+import crypto from "node:crypto";
+import { eq } from "drizzle-orm";
+import { ConflictError, InternalServerError, NotFoundError } from "http-errors-enhanced";
+import slugify from "slugify";
+import { db } from "../../db/db";
+import { repositoriesTable } from "../../db/schema";
+import { toMessage } from "../../utils/errors";
+import { restic } from "../../utils/restic";
+import { cryptoUtils } from "../../utils/crypto";
+import type { CompressionMode, RepositoryConfig } from "~/schemas/restic";
+
+const listRepositories = async () => {
+	const repositories = await db.query.repositoriesTable.findMany({});
+	return repositories;
+};
+
+const encryptConfig = async (config: RepositoryConfig): Promise<RepositoryConfig> => {
+	const encryptedConfig: Record<string, string> = { ...config };
+
+	switch (config.backend) {
+		case "s3":
+			encryptedConfig.accessKeyId = await cryptoUtils.encrypt(config.accessKeyId);
+			encryptedConfig.secretAccessKey = await cryptoUtils.encrypt(config.secretAccessKey);
+			break;
+		case "gcs":
+			encryptedConfig.credentialsJson = await cryptoUtils.encrypt(config.credentialsJson);
+			break;
+		case "azure":
+			encryptedConfig.accountKey = await cryptoUtils.encrypt(config.accountKey);
+			break;
+	}
+
+	return encryptedConfig as RepositoryConfig;
+};
+
+const createRepository = async (name: string, config: RepositoryConfig, compressionMode?: CompressionMode) => {
+	const slug = slugify(name, { lower: true, strict: true });
+
+	const existing = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.name, slug),
+	});
+
+	if (existing) {
+		throw new ConflictError("Repository with this name already exists");
+	}
+
+	const id = crypto.randomUUID();
+
+	const encryptedConfig = await encryptConfig(config);
+
+	const [created] = await db
+		.insert(repositoriesTable)
+		.values({
+			id,
+			name: slug,
+			type: config.backend,
+			config: encryptedConfig,
+			compressionMode: compressionMode ?? "auto",
+			status: "unknown",
+		})
+		.returning();
+
+	if (!created) {
+		throw new InternalServerError("Failed to create repository");
+	}
+
+	const { success, error } = await restic.init(encryptedConfig);
+
+	if (success) {
+		await db
+			.update(repositoriesTable)
+			.set({
+				status: "healthy",
+				lastChecked: Date.now(),
+				lastError: null,
+			})
+			.where(eq(repositoriesTable.id, id));
+
+		return { repository: created, status: 201 };
+	}
+
+	const errorMessage = toMessage(error);
+	await db.delete(repositoriesTable).where(eq(repositoriesTable.id, id));
+
+	throw new InternalServerError(`Failed to initialize repository: ${errorMessage}`);
+};
+
+const getRepository = async (name: string) => {
+	const repository = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.name, name),
+	});
+
+	if (!repository) {
+		throw new NotFoundError("Repository not found");
+	}
+
+	return { repository };
+};
+
+const deleteRepository = async (name: string) => {
+	const repository = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.name, name),
+	});
+
+	if (!repository) {
+		throw new NotFoundError("Repository not found");
+	}
+
+	// TODO: Add cleanup logic for the actual restic repository files
+
+	await db.delete(repositoriesTable).where(eq(repositoriesTable.name, name));
+};
+
+/**
+ * List snapshots for a given repository
+ * If backupId is provided, filter snapshots by that backup ID (tag)
+ * @param name Repository name
+ * @param backupId Optional backup ID to filter snapshots for a specific backup schedule
+ *
+ * @returns List of snapshots
+ */
+const listSnapshots = async (name: string, backupId?: string) => {
+	const repository = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.name, name),
+	});
+
+	if (!repository) {
+		throw new NotFoundError("Repository not found");
+	}
+
+	let snapshots = [];
+
+	if (backupId) {
+		snapshots = await restic.snapshots(repository.config, { tags: [backupId.toString()] });
+	} else {
+		snapshots = await restic.snapshots(repository.config);
+	}
+
+	return snapshots;
+};
+
+const listSnapshotFiles = async (name: string, snapshotId: string, path?: string) => {
+	const repository = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.name, name),
+	});
+
+	if (!repository) {
+		throw new NotFoundError("Repository not found");
+	}
+
+	const result = await restic.ls(repository.config, snapshotId, path);
+
+	if (!result.snapshot) {
+		throw new NotFoundError("Snapshot not found or empty");
+	}
+
+	return {
+		snapshot: {
+			id: result.snapshot.id,
+			short_id: result.snapshot.short_id,
+			time: result.snapshot.time,
+			hostname: result.snapshot.hostname,
+			paths: result.snapshot.paths,
+		},
+		files: result.nodes,
+	};
+};
+
+const restoreSnapshot = async (
+	name: string,
+	snapshotId: string,
+	options?: { include?: string[]; exclude?: string[]; delete?: boolean },
+) => {
+	const repository = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.name, name),
+	});
+
+	if (!repository) {
+		throw new NotFoundError("Repository not found");
+	}
+
+	const result = await restic.restore(repository.config, snapshotId, "/", options);
+
+	return {
+		success: true,
+		message: "Snapshot restored successfully",
+		filesRestored: result.files_restored,
+		filesSkipped: result.files_skipped,
+	};
+};
+
+const getSnapshotDetails = async (name: string, snapshotId: string) => {
+	const repository = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.name, name),
+	});
+
+	if (!repository) {
+		throw new NotFoundError("Repository not found");
+	}
+
+	const snapshots = await restic.snapshots(repository.config);
+	const snapshot = snapshots.find((snap) => snap.id === snapshotId || snap.short_id === snapshotId);
+
+	if (!snapshot) {
+		throw new NotFoundError("Snapshot not found");
+	}
+
+	return snapshot;
+};
+
+const checkHealth = async (repositoryId: string) => {
+	const repository = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.id, repositoryId),
+	});
+
+	if (!repository) {
+		throw new NotFoundError("Repository not found");
+	}
+
+	const { error, status } = await restic
+		.snapshots(repository.config)
+		.then(() => ({ error: null, status: "healthy" as const }))
+		.catch((error) => ({ error: toMessage(error), status: "error" as const }));
+
+	await db
+		.update(repositoriesTable)
+		.set({
+			status,
+			lastChecked: Date.now(),
+			lastError: error,
+		})
+		.where(eq(repositoriesTable.id, repository.id));
+
+	return { status, lastError: error };
+};
+
+const doctorRepository = async (name: string) => {
+	const repository = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.name, name),
+	});
+
+	if (!repository) {
+		throw new NotFoundError("Repository not found");
+	}
+
+	const steps: Array<{ step: string; success: boolean; output: string | null; error: string | null }> = [];
+
+	const unlockResult = await restic.unlock(repository.config).then(
+		(result) => ({ success: true, message: result.message, error: null }),
+		(error) => ({ success: false, message: null, error: toMessage(error) }),
+	);
+
+	steps.push({
+		step: "unlock",
+		success: unlockResult.success,
+		output: unlockResult.message,
+		error: unlockResult.error,
+	});
+
+	const checkResult = await restic.check(repository.config, { readData: false }).then(
+		(result) => result,
+		(error) => ({ success: false, output: null, error: toMessage(error), hasErrors: true }),
+	);
+
+	steps.push({
+		step: "check",
+		success: checkResult.success,
+		output: checkResult.output,
+		error: checkResult.error,
+	});
+
+	if (checkResult.hasErrors) {
+		const repairResult = await restic.repairIndex(repository.config).then(
+			(result) => ({ success: true, output: result.output, error: null }),
+			(error) => ({ success: false, output: null, error: toMessage(error) }),
+		);
+
+		steps.push({
+			step: "repair_index",
+			success: repairResult.success,
+			output: repairResult.output,
+			error: repairResult.error,
+		});
+
+		const recheckResult = await restic.check(repository.config, { readData: false }).then(
+			(result) => result,
+			(error) => ({ success: false, output: null, error: toMessage(error), hasErrors: true }),
+		);
+
+		steps.push({
+			step: "recheck",
+			success: recheckResult.success,
+			output: recheckResult.output,
+			error: recheckResult.error,
+		});
+	}
+
+	const allSuccessful = steps.every((s) => s.success);
+
+	console.log("Doctor steps:", steps);
+
+	await db
+		.update(repositoriesTable)
+		.set({
+			status: allSuccessful ? "healthy" : "error",
+			lastChecked: Date.now(),
+			lastError: allSuccessful ? null : steps.find((s) => !s.success)?.error,
+		})
+		.where(eq(repositoriesTable.id, repository.id));
+
+	return {
+		success: allSuccessful,
+		steps,
+	};
+};
+
+export const repositoriesService = {
+	listRepositories,
+	createRepository,
+	getRepository,
+	deleteRepository,
+	listSnapshots,
+	listSnapshotFiles,
+	restoreSnapshot,
+	getSnapshotDetails,
+	checkHealth,
+	doctorRepository,
+};

@@ -1,0 +1,191 @@
+import { useId, useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { redirect, useNavigate } from "react-router";
+import { toast } from "sonner";
+import { Button } from "~/client/components/ui/button";
+import {
+	getBackupScheduleOptions,
+	runBackupNowMutation,
+	deleteBackupScheduleMutation,
+	listSnapshotsOptions,
+	updateBackupScheduleMutation,
+	stopBackupMutation,
+} from "~/api-client/@tanstack/react-query.gen";
+import { parseError } from "~/client/lib/errors";
+import { getCronExpression } from "~/utils/utils";
+import { CreateScheduleForm, type BackupScheduleFormValues } from "../components/create-schedule-form";
+import { ScheduleSummary } from "../components/schedule-summary";
+import { getBackupSchedule } from "~/api-client";
+import type { Route } from "./+types/backup-details";
+import { SnapshotFileBrowser } from "../components/snapshot-file-browser";
+import { SnapshotTimeline } from "../components/snapshot-timeline";
+
+export function meta(_: Route.MetaArgs) {
+	return [
+		{ title: "Backup Job Details" },
+		{
+			name: "description",
+			content: "View and manage backup job configuration, schedule, and snapshots.",
+		},
+	];
+}
+
+export const clientLoader = async ({ params }: Route.LoaderArgs) => {
+	const { data } = await getBackupSchedule({ path: { scheduleId: params.id } });
+
+	if (!data) return redirect("/backups");
+
+	return data;
+};
+
+export default function ScheduleDetailsPage({ params, loaderData }: Route.ComponentProps) {
+	const navigate = useNavigate();
+	const [isEditMode, setIsEditMode] = useState(false);
+	const formId = useId();
+	const [selectedSnapshotId, setSelectedSnapshotId] = useState<string>();
+
+	const { data: schedule } = useQuery({
+		...getBackupScheduleOptions({ path: { scheduleId: params.id } }),
+		initialData: loaderData,
+		refetchInterval: 10000,
+		refetchOnWindowFocus: true,
+	});
+
+	const {
+		data: snapshots,
+		isLoading,
+		failureReason,
+	} = useQuery({
+		...listSnapshotsOptions({ path: { name: schedule.repository.name }, query: { backupId: schedule.id.toString() } }),
+	});
+
+	const updateSchedule = useMutation({
+		...updateBackupScheduleMutation(),
+		onSuccess: () => {
+			toast.success("Backup schedule saved successfully");
+			setIsEditMode(false);
+		},
+		onError: (error) => {
+			toast.error("Failed to save backup schedule", {
+				description: parseError(error)?.message,
+			});
+		},
+	});
+
+	const runBackupNow = useMutation({
+		...runBackupNowMutation(),
+		onSuccess: () => {
+			toast.success("Backup started successfully");
+		},
+		onError: (error) => {
+			toast.error("Failed to start backup", { description: parseError(error)?.message });
+		},
+	});
+
+	const stopBackup = useMutation({
+		...stopBackupMutation(),
+		onSuccess: () => {
+			toast.success("Backup stopped successfully");
+		},
+		onError: (error) => {
+			toast.error("Failed to stop backup", { description: parseError(error)?.message });
+		},
+	});
+
+	const deleteSchedule = useMutation({
+		...deleteBackupScheduleMutation(),
+		onSuccess: () => {
+			toast.success("Backup schedule deleted successfully");
+			navigate("/backups");
+		},
+		onError: (error) => {
+			toast.error("Failed to delete backup schedule", { description: parseError(error)?.message });
+		},
+	});
+
+	const handleSubmit = (formValues: BackupScheduleFormValues) => {
+		if (!schedule) return;
+
+		const cronExpression = getCronExpression(formValues.frequency, formValues.dailyTime, formValues.weeklyDay);
+
+		const retentionPolicy: Record<string, number> = {};
+		if (formValues.keepLast) retentionPolicy.keepLast = formValues.keepLast;
+		if (formValues.keepHourly) retentionPolicy.keepHourly = formValues.keepHourly;
+		if (formValues.keepDaily) retentionPolicy.keepDaily = formValues.keepDaily;
+		if (formValues.keepWeekly) retentionPolicy.keepWeekly = formValues.keepWeekly;
+		if (formValues.keepMonthly) retentionPolicy.keepMonthly = formValues.keepMonthly;
+		if (formValues.keepYearly) retentionPolicy.keepYearly = formValues.keepYearly;
+
+		updateSchedule.mutate({
+			path: { scheduleId: schedule.id.toString() },
+			body: {
+				repositoryId: formValues.repositoryId,
+				enabled: schedule.enabled,
+				cronExpression,
+				retentionPolicy: Object.keys(retentionPolicy).length > 0 ? retentionPolicy : undefined,
+				includePatterns: formValues.includePatterns,
+				excludePatterns: formValues.excludePatterns,
+			},
+		});
+	};
+
+	const handleToggleEnabled = (enabled: boolean) => {
+		updateSchedule.mutate({
+			path: { scheduleId: schedule.id.toString() },
+			body: {
+				repositoryId: schedule.repositoryId,
+				enabled,
+				cronExpression: schedule.cronExpression,
+				retentionPolicy: schedule.retentionPolicy || undefined,
+				includePatterns: schedule.includePatterns || undefined,
+				excludePatterns: schedule.excludePatterns || undefined,
+			},
+		});
+	};
+
+	if (isEditMode) {
+		return (
+			<div>
+				<CreateScheduleForm volume={schedule.volume} initialValues={schedule} onSubmit={handleSubmit} formId={formId} />
+				<div className="flex justify-end mt-4 gap-2">
+					<Button type="submit" className="ml-auto" variant="primary" form={formId} loading={updateSchedule.isPending}>
+						Update schedule
+					</Button>
+					<Button variant="outline" onClick={() => setIsEditMode(false)}>
+						Cancel
+					</Button>
+				</div>
+			</div>
+		);
+	}
+
+	const selectedSnapshot = snapshots?.find((s) => s.short_id === selectedSnapshotId);
+
+	return (
+		<div className="flex flex-col gap-6">
+			<ScheduleSummary
+				handleToggleEnabled={handleToggleEnabled}
+				handleRunBackupNow={() => runBackupNow.mutate({ path: { scheduleId: schedule.id.toString() } })}
+				handleStopBackup={() => stopBackup.mutate({ path: { scheduleId: schedule.id.toString() } })}
+				handleDeleteSchedule={() => deleteSchedule.mutate({ path: { scheduleId: schedule.id.toString() } })}
+				setIsEditMode={setIsEditMode}
+				schedule={schedule}
+			/>
+			<SnapshotTimeline
+				loading={isLoading}
+				snapshots={snapshots ?? []}
+				snapshotId={selectedSnapshot?.short_id}
+				error={failureReason?.message}
+				onSnapshotSelect={setSelectedSnapshotId}
+			/>
+			{selectedSnapshot && (
+				<SnapshotFileBrowser
+					key={selectedSnapshot?.short_id}
+					snapshot={selectedSnapshot}
+					repositoryName={schedule.repository.name}
+					volume={schedule.volume}
+				/>
+			)}
+		</div>
+	);
+}

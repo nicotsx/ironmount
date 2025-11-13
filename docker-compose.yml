@@ -13,12 +13,11 @@ services:
     environment:
       - NODE_ENV=development
     ports:
-      - "4096:4097"
+      - "4096:4096"
     volumes:
       - /var/lib/ironmount:/var/lib/ironmount
 
-      - ./apps/client/app:/app/apps/client/app
-      - ./apps/server/src:/app/apps/server/src
+      - ./app:/app/app
       # - ~/.config/rclone:/root/.config/rclone
 
   ironmount-prod:

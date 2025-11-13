@@ -45,9 +45,6 @@ WORKDIR /app
 COPY --from=deps /deps/restic /usr/local/bin/restic
 COPY --from=deps /deps/rclone /usr/local/bin/rclone
 COPY ./package.json ./bun.lock ./
-COPY ./packages/schemas/package.json ./packages/schemas/package.json
-COPY ./apps/client/package.json ./apps/client/package.json
-COPY ./apps/server/package.json ./apps/server/package.json
 
 RUN bun install --frozen-lockfile
 
@@ -84,14 +81,15 @@ WORKDIR /app
 
 COPY --from=deps /deps/restic /usr/local/bin/restic
 COPY --from=deps /deps/rclone /usr/local/bin/rclone
-COPY --from=builder /app/apps/server/dist ./
-COPY --from=builder /app/apps/server/drizzle ./assets/migrations
-COPY --from=builder /app/apps/client/dist/client ./assets/frontend
+COPY --from=builder /app/dist/client ./dist/client
+COPY --from=builder /app/dist/server ./dist/server
+COPY --from=builder /app/drizzle ./assets/migrations
+COPY --from=builder /app/package.json ./
 
 # Include third-party licenses and attribution
 COPY ./LICENSES ./LICENSES
 COPY ./NOTICES.md ./NOTICES.md
 COPY ./LICENSE ./LICENSE.md
 
-CMD ["bun", "./index.js"]
+CMD ["bun", "run", "start"]
 
