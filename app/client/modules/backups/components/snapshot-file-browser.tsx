@@ -1,0 +1,288 @@
+import { useCallback, useMemo, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { FileIcon } from "lucide-react";
+import { FileTree, type FileEntry } from "~/client/components/file-tree";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/client/components/ui/card";
+import { Button } from "~/client/components/ui/button";
+import { Checkbox } from "~/client/components/ui/checkbox";
+import { Label } from "~/client/components/ui/label";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "~/client/components/ui/alert-dialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "~/client/components/ui/tooltip";
+import type { Snapshot, Volume } from "~/client/lib/types";
+import { toast } from "sonner";
+import { listSnapshotFilesOptions, restoreSnapshotMutation } from "~/client/api-client/@tanstack/react-query.gen";
+
+interface Props {
+	snapshot: Snapshot;
+	repositoryName: string;
+	volume?: Volume;
+}
+
+export const SnapshotFileBrowser = (props: Props) => {
+	const { snapshot, repositoryName, volume } = props;
+
+	const isReadOnly = volume?.config && "readOnly" in volume.config && volume.config.readOnly === true;
+
+	const queryClient = useQueryClient();
+	const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
+	const [fetchedFolders, setFetchedFolders] = useState<Set<string>>(new Set());
+	const [loadingFolders, setLoadingFolders] = useState<Set<string>>(new Set());
+	const [allFiles, setAllFiles] = useState<Map<string, FileEntry>>(new Map());
+	const [selectedPaths, setSelectedPaths] = useState<Set<string>>(new Set());
+	const [showRestoreDialog, setShowRestoreDialog] = useState(false);
+	const [deleteExtraFiles, setDeleteExtraFiles] = useState(false);
+
+	const volumeBasePath = snapshot.paths[0]?.match(/^(.*?_data)(\/|$)/)?.[1] || "/";
+
+	const { data: filesData, isLoading: filesLoading } = useQuery({
+		...listSnapshotFilesOptions({
+			path: { name: repositoryName, snapshotId: snapshot.short_id },
+			query: { path: volumeBasePath },
+		}),
+	});
+
+	const stripBasePath = useCallback(
+		(path: string): string => {
+			if (!volumeBasePath) return path;
+			if (path === volumeBasePath) return "/";
+			if (path.startsWith(`${volumeBasePath}/`)) {
+				const stripped = path.slice(volumeBasePath.length);
+				return stripped;
+			}
+			return path;
+		},
+		[volumeBasePath],
+	);
+
+	const addBasePath = useCallback(
+		(displayPath: string): string => {
+			if (!volumeBasePath) return displayPath;
+			if (displayPath === "/") return volumeBasePath;
+			return `${volumeBasePath}${displayPath}`;
+		},
+		[volumeBasePath],
+	);
+
+	useMemo(() => {
+		if (filesData?.files) {
+			setAllFiles((prev) => {
+				const next = new Map(prev);
+				for (const file of filesData.files) {
+					const strippedPath = stripBasePath(file.path);
+					if (strippedPath !== "/") {
+						next.set(strippedPath, { ...file, path: strippedPath });
+					}
+				}
+				return next;
+			});
+			setFetchedFolders((prev) => new Set(prev).add("/"));
+		}
+	}, [filesData, stripBasePath]);
+
+	const fileArray = useMemo(() => Array.from(allFiles.values()), [allFiles]);
+
+	const handleFolderExpand = useCallback(
+		async (folderPath: string) => {
+			setExpandedFolders((prev) => {
+				const next = new Set(prev);
+				next.add(folderPath);
+				return next;
+			});
+
+			if (!fetchedFolders.has(folderPath)) {
+				setLoadingFolders((prev) => new Set(prev).add(folderPath));
+
+				try {
+					const fullPath = addBasePath(folderPath);
+
+					const result = await queryClient.ensureQueryData(
+						listSnapshotFilesOptions({
+							path: { name: repositoryName, snapshotId: snapshot.short_id },
+							query: { path: fullPath },
+						}),
+					);
+
+					if (result.files) {
+						setAllFiles((prev) => {
+							const next = new Map(prev);
+							for (const file of result.files) {
+								const strippedPath = stripBasePath(file.path);
+								// Skip the directory itself
+								if (strippedPath !== folderPath) {
+									next.set(strippedPath, { ...file, path: strippedPath });
+								}
+							}
+							return next;
+						});
+
+						setFetchedFolders((prev) => new Set(prev).add(folderPath));
+					}
+				} catch (error) {
+					console.error("Failed to fetch folder contents:", error);
+				} finally {
+					setLoadingFolders((prev) => {
+						const next = new Set(prev);
+						next.delete(folderPath);
+						return next;
+					});
+				}
+			}
+		},
+		[repositoryName, snapshot, fetchedFolders, queryClient, stripBasePath, addBasePath],
+	);
+
+	const handleFolderHover = useCallback(
+		(folderPath: string) => {
+			if (!fetchedFolders.has(folderPath) && !loadingFolders.has(folderPath)) {
+				const fullPath = addBasePath(folderPath);
+
+				queryClient.prefetchQuery({
+					...listSnapshotFilesOptions({
+						path: { name: repositoryName, snapshotId: snapshot.short_id },
+						query: { path: fullPath },
+					}),
+				});
+			}
+		},
+		[repositoryName, snapshot, fetchedFolders, loadingFolders, queryClient, addBasePath],
+	);
+
+	const { mutate: restoreSnapshot, isPending: isRestoring } = useMutation({
+		...restoreSnapshotMutation(),
+		onSuccess: (data) => {
+			toast.success("Restore completed", {
+				description: `Successfully restored ${data.filesRestored} file(s). ${data.filesSkipped} file(s) skipped.`,
+			});
+			setSelectedPaths(new Set());
+		},
+		onError: (error) => {
+			toast.error("Restore failed", { description: error.message || "Failed to restore snapshot" });
+		},
+	});
+
+	const handleRestoreClick = useCallback(() => {
+		setShowRestoreDialog(true);
+	}, []);
+
+	const handleConfirmRestore = useCallback(() => {
+		const pathsArray = Array.from(selectedPaths);
+		const includePaths = pathsArray.map((path) => addBasePath(path));
+
+		restoreSnapshot({
+			path: { name: repositoryName },
+			body: {
+				snapshotId: snapshot.short_id,
+				include: includePaths,
+				delete: deleteExtraFiles,
+			},
+		});
+
+		setShowRestoreDialog(false);
+	}, [selectedPaths, addBasePath, repositoryName, snapshot.short_id, restoreSnapshot, deleteExtraFiles]);
+
+	return (
+		<div className="space-y-4">
+			<Card className="h-[600px] flex flex-col">
+				<CardHeader>
+					<div className="flex items-start justify-between">
+						<div>
+							<CardTitle>File Browser</CardTitle>
+							<CardDescription>{`Viewing snapshot from ${new Date(snapshot?.time ?? 0).toLocaleString()}`}</CardDescription>
+						</div>
+						{selectedPaths.size > 0 && (
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<span tabIndex={isReadOnly ? 0 : undefined}>
+										<Button
+											onClick={handleRestoreClick}
+											variant="primary"
+											size="sm"
+											disabled={isRestoring || isReadOnly}
+										>
+											{isRestoring
+												? "Restoring..."
+												: `Restore ${selectedPaths.size} selected ${selectedPaths.size === 1 ? "item" : "items"}`}
+										</Button>
+									</span>
+								</TooltipTrigger>
+								{isReadOnly && (
+									<TooltipContent className="text-center">
+										<p>Volume is mounted as read-only.</p>
+										<p>Please remount with read-only disabled to restore files.</p>
+									</TooltipContent>
+								)}
+							</Tooltip>
+						)}
+					</div>
+				</CardHeader>
+				<CardContent className="flex-1 overflow-hidden flex flex-col p-0">
+					{filesLoading && fileArray.length === 0 && (
+						<div className="flex items-center justify-center flex-1">
+							<p className="text-muted-foreground">Loading files...</p>
+						</div>
+					)}
+
+					{fileArray.length === 0 && !filesLoading && (
+						<div className="flex flex-col items-center justify-center flex-1 text-center p-8">
+							<FileIcon className="w-12 h-12 text-muted-foreground/50 mb-4" />
+							<p className="text-muted-foreground">No files in this snapshot</p>
+						</div>
+					)}
+
+					{fileArray.length > 0 && (
+						<div className="overflow-auto flex-1 border border-border rounded-md bg-card m-4">
+							<FileTree
+								files={fileArray}
+								onFolderExpand={handleFolderExpand}
+								onFolderHover={handleFolderHover}
+								expandedFolders={expandedFolders}
+								loadingFolders={loadingFolders}
+								className="px-2 py-2"
+								withCheckboxes={true}
+								selectedPaths={selectedPaths}
+								onSelectionChange={setSelectedPaths}
+							/>
+						</div>
+					)}
+				</CardContent>
+			</Card>
+
+			<AlertDialog open={showRestoreDialog} onOpenChange={setShowRestoreDialog}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Confirm Restore</AlertDialogTitle>
+						<AlertDialogDescription>
+							{selectedPaths.size > 0
+								? `This will restore ${selectedPaths.size} selected ${selectedPaths.size === 1 ? "item" : "items"} from the snapshot.`
+								: "This will restore everything from the snapshot."}{" "}
+							Existing files will be overwritten by what's in the snapshot. This action cannot be undone.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<div className="flex items-center space-x-2 py-4">
+						<Checkbox
+							id="delete-extra"
+							checked={deleteExtraFiles}
+							onCheckedChange={(checked) => setDeleteExtraFiles(checked === true)}
+						/>
+						<Label htmlFor="delete-extra" className="text-sm font-normal cursor-pointer">
+							Delete files not present in the snapshot?
+						</Label>
+					</div>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction onClick={handleConfirmRestore}>Confirm</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+		</div>
+	);
+};

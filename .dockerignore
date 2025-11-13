@@ -12,12 +12,9 @@
 !**/build.ts
 !**/components.json
 
-!apps/**/src/**
-!apps/**/drizzle/**
-!apps/**/app/**
-!apps/**/public/**
-
-!packages/**/src/**
+!src/**
+!app/**
+!public/**
 
 # License files and attributions
 !LICENSE
