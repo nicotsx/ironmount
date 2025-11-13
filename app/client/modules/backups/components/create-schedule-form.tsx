@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { type } from "arktype";
 import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
-import { listRepositoriesOptions } from "~/api-client/@tanstack/react-query.gen";
+import { listRepositoriesOptions } from "~/client/api-client/@tanstack/react-query.gen";
 import { RepositoryIcon } from "~/client/components/repository-icon";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/client/components/ui/card";
 import {
@@ -136,7 +136,7 @@ export const CreateScheduleForm = ({ initialValues, formId, onSubmit, volume }: 
 		<Form {...form}>
 			<form
 				onSubmit={form.handleSubmit(handleSubmit)}
-				className="grid gap-4 xl:grid-cols-[minmax(0,_2.3fr)_minmax(320px,_1fr)]"
+				className="grid gap-4 xl:grid-cols-[minmax(0,2.3fr)_minmax(320px,1fr)]"
 				id={formId}
 			>
 				<div className="grid gap-4">

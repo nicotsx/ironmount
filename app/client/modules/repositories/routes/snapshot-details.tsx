@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { redirect, useParams } from "react-router";
-import { listSnapshotFilesOptions } from "~/api-client/@tanstack/react-query.gen";
+import { listSnapshotFilesOptions } from "~/client/api-client/@tanstack/react-query.gen";
 import { Card, CardContent, CardHeader, CardTitle } from "~/client/components/ui/card";
 import { RestoreSnapshotDialog } from "../components/restore-snapshot-dialog";
 import { SnapshotFileBrowser } from "~/client/modules/backups/components/snapshot-file-browser";
-import { getSnapshotDetails } from "~/api-client";
+import { getSnapshotDetails } from "~/client/api-client";
 import type { Route } from "./+types/snapshot-details";
 
 export function meta({ params }: Route.MetaArgs) {

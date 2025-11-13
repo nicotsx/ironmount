@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
-import { browseFilesystemOptions } from "~/api-client/@tanstack/react-query.gen";
 import { FileTree, type FileEntry } from "./file-tree";
 import { ScrollArea } from "./ui/scroll-area";
+import { browseFilesystemOptions } from "../api-client/@tanstack/react-query.gen";
 
 type Props = {
 	onSelectPath: (path: string) => void;

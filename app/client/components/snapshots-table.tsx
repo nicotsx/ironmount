@@ -1,10 +1,10 @@
 import { Calendar, Clock, Database, FolderTree, HardDrive } from "lucide-react";
 import { useNavigate } from "react-router";
-import type { ListSnapshotsResponse } from "~/api-client/types.gen";
 import { ByteSize } from "~/client/components/bytes-size";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/client/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/client/components/ui/tooltip";
 import { formatDuration } from "~/utils/utils";
+import type { ListSnapshotsResponse } from "../api-client";
 
 type Snapshot = ListSnapshotsResponse[number];
 

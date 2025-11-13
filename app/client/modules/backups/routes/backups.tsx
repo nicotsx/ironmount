@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { CalendarClock, Database, HardDrive, Plus } from "lucide-react";
 import { Link } from "react-router";
-import { listBackupSchedules } from "~/api-client";
-import { listBackupSchedulesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { BackupStatusDot } from "../components/backup-status-dot";
 import { EmptyState } from "~/client/components/empty-state";
 import { Button } from "~/client/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/client/components/ui/card";
 import type { Route } from "./+types/backups";
+import { listBackupSchedules } from "~/client/api-client";
+import { listBackupSchedulesOptions } from "~/client/api-client/@tanstack/react-query.gen";
 
 export function meta(_: Route.MetaArgs) {
 	return [
@@ -68,7 +68,7 @@ export default function Backups({ loaderData }: Route.ComponentProps) {
 							<CardHeader className="pb-3">
 								<div className="flex items-start justify-between gap-2">
 									<div className="flex items-center gap-2 flex-1 min-w-0">
-										<HardDrive className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+										<HardDrive className="h-5 w-5 text-muted-foreground shrink-0" />
 										<CardTitle className="text-lg truncate">
 											Volume <span className="text-strong-accent">{schedule.volume.name}</span>
 										</CardTitle>

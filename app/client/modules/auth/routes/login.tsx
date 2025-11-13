@@ -4,13 +4,13 @@ import { type } from "arktype";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { loginMutation } from "~/api-client/@tanstack/react-query.gen";
 import { AuthLayout } from "~/client/components/auth-layout";
 import { Button } from "~/client/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/client/components/ui/form";
 import { Input } from "~/client/components/ui/input";
 import { authMiddleware } from "~/middleware/auth";
 import type { Route } from "./+types/login";
+import { loginMutation } from "~/client/api-client/@tanstack/react-query.gen";
 
 export const clientMiddleware = [authMiddleware];
 

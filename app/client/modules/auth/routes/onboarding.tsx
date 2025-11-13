@@ -4,7 +4,6 @@ import { type } from "arktype";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { registerMutation } from "~/api-client/@tanstack/react-query.gen";
 import {
 	Form,
 	FormControl,
@@ -19,6 +18,7 @@ import type { Route } from "./+types/onboarding";
 import { AuthLayout } from "~/client/components/auth-layout";
 import { Input } from "~/client/components/ui/input";
 import { Button } from "~/client/components/ui/button";
+import { registerMutation } from "~/client/api-client/@tanstack/react-query.gen";
 
 export const clientMiddleware = [authMiddleware];
 

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Database } from "lucide-react";
 import { useState } from "react";
-import { listSnapshotsOptions } from "~/api-client/@tanstack/react-query.gen";
+import { listSnapshotsOptions } from "~/client/api-client/@tanstack/react-query.gen";
 import { SnapshotsTable } from "~/client/components/snapshots-table";
 import { Button } from "~/client/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/client/components/ui/card";
@@ -83,7 +83,7 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 						<div className="absolute inset-0 animate-pulse">
 							<div className="w-32 h-32 rounded-full bg-primary/10 blur-2xl" />
 						</div>
-						<div className="relative flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/20">
+						<div className="relative flex items-center justify-center w-32 h-32 rounded-full bg-linear-to-br from-primary/20 to-primary/5 border-2 border-primary/20">
 							<Database className="w-16 h-16 text-primary/70" strokeWidth={1.5} />
 						</div>
 					</div>
@@ -110,7 +110,7 @@ export const RepositorySnapshotsTabContent = ({ repository }: Props) => {
 					</div>
 					<div className="flex gap-2 items-center">
 						<Input
-							className="w-full lg:w-[240px]"
+							className="w-full lg:w-60"
 							placeholder="Search snapshots..."
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}

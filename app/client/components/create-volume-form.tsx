@@ -4,7 +4,6 @@ import { type } from "arktype";
 import { CheckCircle, Loader2, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { testConnectionMutation } from "~/api-client/@tanstack/react-query.gen";
 import { cn, slugify } from "~/client/lib/utils";
 import { deepClean } from "~/utils/object";
 import { DirectoryBrowser } from "./directory-browser";
@@ -13,6 +12,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { volumeConfigSchema } from "~/schemas/volumes";
+import { testConnectionMutation } from "../api-client/@tanstack/react-query.gen";
 
 export const formSchema = type({
 	name: "2<=string<=32",

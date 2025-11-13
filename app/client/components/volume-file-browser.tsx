@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FolderOpen } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
-import { listFilesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { FileTree } from "~/client/components/file-tree";
+import { listFilesOptions } from "../api-client/@tanstack/react-query.gen";
 
 interface FileEntry {
 	name: string;

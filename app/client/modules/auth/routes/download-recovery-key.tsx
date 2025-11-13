@@ -3,7 +3,6 @@ import { AlertTriangle, Download } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { downloadResticPasswordMutation } from "~/api-client/@tanstack/react-query.gen";
 import { AuthLayout } from "~/client/components/auth-layout";
 import { Alert, AlertDescription, AlertTitle } from "~/client/components/ui/alert";
 import { Button } from "~/client/components/ui/button";
@@ -11,6 +10,7 @@ import { Input } from "~/client/components/ui/input";
 import { Label } from "~/client/components/ui/label";
 import { authMiddleware } from "~/middleware/auth";
 import type { Route } from "./+types/download-recovery-key";
+import { downloadResticPasswordMutation } from "~/client/api-client/@tanstack/react-query.gen";
 
 export const clientMiddleware = [authMiddleware];
 

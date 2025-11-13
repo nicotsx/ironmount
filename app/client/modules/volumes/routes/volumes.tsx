@@ -2,8 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { HardDrive, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { listVolumes } from "~/api-client";
-import { listVolumesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { CreateVolumeDialog } from "~/client/components/create-volume-dialog";
 import { EmptyState } from "~/client/components/empty-state";
 import { StatusDot } from "~/client/components/status-dot";
@@ -14,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/client/components/ui/table";
 import { VolumeIcon } from "~/client/components/volume-icon";
 import type { Route } from "./+types/volumes";
+import { listVolumes } from "~/client/api-client";
+import { listVolumesOptions } from "~/client/api-client/@tanstack/react-query.gen";
 
 export function meta(_: Route.MetaArgs) {
 	return [
@@ -79,13 +79,13 @@ export default function Volumes({ loaderData }: Route.ComponentProps) {
 			<div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-2 md:justify-between p-4 bg-card-header py-4">
 				<span className="flex flex-col sm:flex-row items-stretch md:items-center gap-0 flex-wrap ">
 					<Input
-						className="w-full lg:w-[180px] min-w-[180px] mr-[-1px] mt-[-1px]"
+						className="w-full lg:w-[180px] min-w-[180px] -mr-px -mt-px"
 						placeholder="Search volumes…"
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 					/>
 					<Select value={statusFilter} onValueChange={setStatusFilter}>
-						<SelectTrigger className="w-full lg:w-[180px] min-w-[180px] mr-[-1px] mt-[-1px]">
+						<SelectTrigger className="w-full lg:w-[180px] min-w-[180px] -mr-px -mt-px">
 							<SelectValue placeholder="All status" />
 						</SelectTrigger>
 						<SelectContent>
@@ -95,7 +95,7 @@ export default function Volumes({ loaderData }: Route.ComponentProps) {
 						</SelectContent>
 					</Select>
 					<Select value={backendFilter} onValueChange={setBackendFilter}>
-						<SelectTrigger className="w-full lg:w-[180px] min-w-[180px] mt-[-1px]">
+						<SelectTrigger className="w-full lg:w-[180px] min-w-[180px] -mt-px">
 							<SelectValue placeholder="All backends" />
 						</SelectTrigger>
 						<SelectContent>

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getSystemInfoOptions } from "~/api-client/@tanstack/react-query.gen";
+import { getSystemInfoOptions } from "../api-client/@tanstack/react-query.gen";
 
 export function useSystemInfo() {
 	const { data, isLoading, error } = useQuery({

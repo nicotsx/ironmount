@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Unplug } from "lucide-react";
 import * as YML from "yaml";
-import { getContainersUsingVolumeOptions } from "~/api-client/@tanstack/react-query.gen";
+import { getContainersUsingVolumeOptions } from "~/client/api-client/@tanstack/react-query.gen";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/client/components/ui/card";
 import { CodeBlock } from "~/client/components/ui/code-block";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/client/components/ui/table";

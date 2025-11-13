@@ -1,5 +1,5 @@
 import { redirect, type MiddlewareFunction } from "react-router";
-import { getMe, getStatus } from "~/api-client";
+import { getMe, getStatus } from "~/client/api-client";
 import { appContext } from "~/context";
 
 export const authMiddleware: MiddlewareFunction = async ({ context, request }) => {

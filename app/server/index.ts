@@ -48,10 +48,10 @@ const app = new Hono()
 	.route("/api/v1/repositories", repositoriesController.use(requireAuth))
 	.route("/api/v1/backups", backupScheduleController.use(requireAuth))
 	.route("/api/v1/system", systemController.use(requireAuth))
-	.route("/api/v1/events", eventsController.use(requireAuth))
-	.get("/assets/*", serveStatic({ root: "./assets/frontend" }))
-	.get("/images/*", serveStatic({ root: "./assets/frontend" }))
-	.get("*", serveStatic({ path: "./assets/frontend/index.html" }));
+	.route("/api/v1/events", eventsController.use(requireAuth));
+// .get("/assets/*", serveStatic({ root: "./assets/frontend" }))
+// .get("/images/*", serveStatic({ root: "./assets/frontend" }))
+// .get("*", serveStatic({ path: "./assets/frontend/index.html" }));
 
 app.get("/api/v1/openapi.json", generalDescriptor(app));
 app.get("/api/v1/docs", scalarDescriptor);

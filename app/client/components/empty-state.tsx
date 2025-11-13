@@ -17,7 +17,7 @@ export function EmptyState(props: EmptyStateProps) {
 					<div className="absolute inset-0 animate-pulse">
 						<div className="w-32 h-32 rounded-full bg-primary/10 blur-2xl" />
 					</div>
-					<div className="relative flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/20">
+					<div className="relative flex items-center justify-center w-32 h-32 rounded-full bg-linear-to-br from-primary/20 to-primary/5 border-2 border-primary/20">
 						<Cicon className="w-16 h-16 text-primary/70" strokeWidth={1.5} />
 					</div>
 				</div>

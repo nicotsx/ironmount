@@ -7,7 +7,7 @@ import {
 	doctorRepositoryMutation,
 	getRepositoryOptions,
 	listSnapshotsOptions,
-} from "~/api-client/@tanstack/react-query.gen";
+} from "~/client/api-client/@tanstack/react-query.gen";
 import { Button } from "~/client/components/ui/button";
 import {
 	AlertDialog,
@@ -19,7 +19,7 @@ import {
 	AlertDialogTitle,
 } from "~/client/components/ui/alert-dialog";
 import { parseError } from "~/client/lib/errors";
-import { getRepository } from "~/api-client/sdk.gen";
+import { getRepository } from "~/client/api-client/sdk.gen";
 import type { Route } from "./+types/repository-details";
 import { cn } from "~/client/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/client/components/ui/tabs";

@@ -8,13 +8,13 @@ import { Button } from "./ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { listRcloneRemotesOptions } from "~/api-client/@tanstack/react-query.gen";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "./ui/alert";
 import { ExternalLink } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { useSystemInfo } from "~/client/hooks/use-system-info";
 import { COMPRESSION_MODES, repositoryConfigSchema } from "~/schemas/restic";
+import { listRcloneRemotesOptions } from "../api-client/@tanstack/react-query.gen";
 
 export const formSchema = type({
 	name: "2<=string<=32",

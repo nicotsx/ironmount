@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { HeartIcon } from "lucide-react";
 import { toast } from "sonner";
-import { healthCheckVolumeMutation, updateVolumeMutation } from "~/api-client/@tanstack/react-query.gen";
+import { healthCheckVolumeMutation, updateVolumeMutation } from "~/client/api-client/@tanstack/react-query.gen";
 import { OnOff } from "~/client/components/onoff";
 import { Button } from "~/client/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/client/components/ui/card";
@@ -54,7 +54,7 @@ export const HealthchecksCard = ({ volume }: Props) => {
 			</CardHeader>
 			<CardContent>
 				<div className="flex flex-col flex-1 justify-start">
-					{volume.lastError && <span className="text-sm text-red-500 break-words">{volume.lastError}</span>}
+					{volume.lastError && <span className="text-sm text-red-500 wrap-break-word">{volume.lastError}</span>}
 					{volume.status === "mounted" && <span className="text-md text-emerald-500">Healthy</span>}
 					{volume.status !== "unmounted" && (
 						<span className="text-xs text-muted-foreground mb-4">Checked {timeAgo || "never"}</span>

@@ -2,8 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Database, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { listRepositories } from "~/api-client/sdk.gen";
-import { listRepositoriesOptions } from "~/api-client/@tanstack/react-query.gen";
+import { listRepositories } from "~/client/api-client/sdk.gen";
+import { listRepositoriesOptions } from "~/client/api-client/@tanstack/react-query.gen";
 import { CreateRepositoryDialog } from "~/client/components/create-repository-dialog";
 import { RepositoryIcon } from "~/client/components/repository-icon";
 import { Button } from "~/client/components/ui/button";
@@ -79,13 +79,13 @@ export default function Repositories({ loaderData }: Route.ComponentProps) {
 			<div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-2 md:justify-between p-4 bg-card-header py-4">
 				<span className="flex flex-col sm:flex-row items-stretch md:items-center gap-0 flex-wrap ">
 					<Input
-						className="w-full lg:w-[180px] min-w-[180px] mr-[-1px] mt-[-1px]"
+						className="w-full lg:w-[180px] min-w-[180px] -mr-px -mt-px"
 						placeholder="Search repositories…"
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 					/>
 					<Select value={statusFilter} onValueChange={setStatusFilter}>
-						<SelectTrigger className="w-full lg:w-[180px] min-w-[180px] mr-[-1px] mt-[-1px]">
+						<SelectTrigger className="w-full lg:w-[180px] min-w-[180px] -mr-px -mt-px">
 							<SelectValue placeholder="All status" />
 						</SelectTrigger>
 						<SelectContent>
@@ -95,7 +95,7 @@ export default function Repositories({ loaderData }: Route.ComponentProps) {
 						</SelectContent>
 					</Select>
 					<Select value={backendFilter} onValueChange={setBackendFilter}>
-						<SelectTrigger className="w-full lg:w-[180px] min-w-[180px] mt-[-1px]">
+						<SelectTrigger className="w-full lg:w-[180px] min-w-[180px] -mt-px">
 							<SelectValue placeholder="All backends" />
 						</SelectTrigger>
 						<SelectContent>

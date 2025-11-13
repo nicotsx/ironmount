@@ -3,11 +3,6 @@ import { Download, KeyRound, User } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import {
-	changePasswordMutation,
-	downloadResticPasswordMutation,
-	logoutMutation,
-} from "~/api-client/@tanstack/react-query.gen";
 import { Button } from "~/client/components/ui/button";
 import { Card, CardContent, CardDescription, CardTitle } from "~/client/components/ui/card";
 import {
@@ -23,6 +18,11 @@ import { Input } from "~/client/components/ui/input";
 import { Label } from "~/client/components/ui/label";
 import { appContext } from "~/context";
 import type { Route } from "./+types/settings";
+import {
+	changePasswordMutation,
+	downloadResticPasswordMutation,
+	logoutMutation,
+} from "~/client/api-client/@tanstack/react-query.gen";
 
 export function meta(_: Route.MetaArgs) {
 	return [

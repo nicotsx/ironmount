@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { RotateCcw } from "lucide-react";
 import { useId, useState } from "react";
 import { toast } from "sonner";
-import { restoreSnapshotMutation } from "~/api-client/@tanstack/react-query.gen";
+import { restoreSnapshotMutation } from "~/client/api-client/@tanstack/react-query.gen";
 import { parseError } from "~/client/lib/errors";
 import { Button } from "~/client/components/ui/button";
 import {

@@ -4,7 +4,7 @@ import type {
 	GetRepositoryResponse,
 	GetVolumeResponse,
 	ListSnapshotsResponse,
-} from "~/api-client";
+} from "../api-client";
 
 export type Volume = GetVolumeResponse["volume"];
 export type StatFs = GetVolumeResponse["statfs"];

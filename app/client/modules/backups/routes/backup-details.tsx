@@ -10,15 +10,15 @@ import {
 	listSnapshotsOptions,
 	updateBackupScheduleMutation,
 	stopBackupMutation,
-} from "~/api-client/@tanstack/react-query.gen";
+} from "~/client/api-client/@tanstack/react-query.gen";
 import { parseError } from "~/client/lib/errors";
 import { getCronExpression } from "~/utils/utils";
 import { CreateScheduleForm, type BackupScheduleFormValues } from "../components/create-schedule-form";
 import { ScheduleSummary } from "../components/schedule-summary";
-import { getBackupSchedule } from "~/api-client";
 import type { Route } from "./+types/backup-details";
 import { SnapshotFileBrowser } from "../components/snapshot-file-browser";
 import { SnapshotTimeline } from "../components/snapshot-timeline";
+import { getBackupSchedule } from "~/client/api-client";
 
 export function meta(_: Route.MetaArgs) {
 	return [

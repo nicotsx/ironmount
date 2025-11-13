@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileIcon } from "lucide-react";
-import { listSnapshotFilesOptions, restoreSnapshotMutation } from "~/api-client/@tanstack/react-query.gen";
 import { FileTree, type FileEntry } from "~/client/components/file-tree";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/client/components/ui/card";
 import { Button } from "~/client/components/ui/button";
@@ -20,6 +19,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/client/components/ui/tooltip";
 import type { Snapshot, Volume } from "~/client/lib/types";
 import { toast } from "sonner";
+import { listSnapshotFilesOptions, restoreSnapshotMutation } from "~/client/api-client/@tanstack/react-query.gen";
 
 interface Props {
 	snapshot: Snapshot;

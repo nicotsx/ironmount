@@ -1,8 +1,8 @@
-import type { ListSnapshotsResponse } from "~/api-client/types.gen";
 import { cn } from "~/client/lib/utils";
 import { Card } from "~/client/components/ui/card";
 import { ByteSize } from "~/client/components/bytes-size";
 import { useEffect } from "react";
+import type { ListSnapshotsResponse } from "~/client/api-client";
 
 interface Props {
 	snapshots: ListSnapshotsResponse;
@@ -56,7 +56,7 @@ export const SnapshotTimeline = (props: Props) => {
 			<div className="w-full bg-card">
 				<div className="relative flex items-center">
 					<div className="flex-1 overflow-hidden">
-						<div className="flex gap-4 overflow-x-auto pb-2 [&>:first-child]:ml-2 [&>:last-child]:mr-2">
+						<div className="flex gap-4 overflow-x-auto pb-2 *:first:ml-2 *:last:mr-2">
 							{snapshots.map((snapshot, index) => {
 								const date = new Date(snapshot.time);
 								const isSelected = snapshotId === snapshot.short_id;

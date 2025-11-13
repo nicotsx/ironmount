@@ -2,12 +2,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import { useState } from "react";
-import {
-	deleteVolumeMutation,
-	getVolumeOptions,
-	mountVolumeMutation,
-	unmountVolumeMutation,
-} from "~/api-client/@tanstack/react-query.gen";
 import { StatusDot } from "~/client/components/status-dot";
 import { Button } from "~/client/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/client/components/ui/tabs";
@@ -24,12 +18,18 @@ import { VolumeIcon } from "~/client/components/volume-icon";
 import { parseError } from "~/client/lib/errors";
 import { cn } from "~/client/lib/utils";
 import type { Route } from "./+types/volume-details";
-import { getVolume } from "~/api-client";
 import { VolumeInfoTabContent } from "../tabs/info";
 import { FilesTabContent } from "../tabs/files";
 import { DockerTabContent } from "../tabs/docker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/client/components/ui/tooltip";
 import { useSystemInfo } from "~/client/hooks/use-system-info";
+import { getVolume } from "~/client/api-client";
+import {
+	deleteVolumeMutation,
+	getVolumeOptions,
+	mountVolumeMutation,
+	unmountVolumeMutation,
+} from "~/client/api-client/@tanstack/react-query.gen";
 
 export function meta({ params }: Route.MetaArgs) {
 	return [

@@ -7,7 +7,7 @@ import {
 	createBackupScheduleMutation,
 	listRepositoriesOptions,
 	listVolumesOptions,
-} from "~/api-client/@tanstack/react-query.gen";
+} from "~/client/api-client/@tanstack/react-query.gen";
 import { Button } from "~/client/components/ui/button";
 import { Card, CardContent } from "~/client/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/client/components/ui/select";
@@ -16,7 +16,7 @@ import { EmptyState } from "~/client/components/empty-state";
 import { getCronExpression } from "~/utils/utils";
 import { CreateScheduleForm, type BackupScheduleFormValues } from "../components/create-schedule-form";
 import type { Route } from "./+types/create-backup";
-import { listRepositories, listVolumes } from "~/api-client";
+import { listRepositories, listVolumes } from "~/client/api-client";
 
 export function meta(_: Route.MetaArgs) {
 	return [
@@ -168,7 +168,7 @@ export default function CreateBackup({ loaderData }: Route.ComponentProps) {
 								<div className="absolute inset-0 animate-pulse">
 									<div className="w-24 h-24 rounded-full bg-primary/10 blur-2xl" />
 								</div>
-								<div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/20">
+								<div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-linear-to-br from-primary/20 to-primary/5 border-2 border-primary/20">
 									<Database className="w-12 h-12 text-primary/70" strokeWidth={1.5} />
 								</div>
 							</div>
