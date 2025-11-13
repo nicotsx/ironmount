@@ -61,17 +61,17 @@ export const CreateRepositoryForm = ({
 	const { watch } = form;
 
 	const watchedBackend = watch("backend");
-	const watchedName = watch("name");
 
 	const { data: rcloneRemotes, isLoading: isLoadingRemotes } = useQuery({
 		...listRcloneRemotesOptions(),
 	});
 
 	useEffect(() => {
-		if (watchedBackend && watchedBackend in defaultValuesForType) {
-			form.reset({ name: watchedName, ...defaultValuesForType[watchedBackend as keyof typeof defaultValuesForType] });
-		}
-	}, [watchedBackend, watchedName, form]);
+		form.reset({
+			name: form.getValues().name,
+			...defaultValuesForType[watchedBackend as keyof typeof defaultValuesForType],
+		});
+	}, [watchedBackend, form]);
 
 	const { capabilities } = useSystemInfo();
 

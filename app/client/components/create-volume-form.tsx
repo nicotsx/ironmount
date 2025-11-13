@@ -50,13 +50,15 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 	const { watch, getValues } = form;
 
 	const watchedBackend = watch("backend");
-	const watchedName = watch("name");
 
 	useEffect(() => {
 		if (mode === "create") {
-			form.reset({ name: watchedName, ...defaultValuesForType[watchedBackend as keyof typeof defaultValuesForType] });
+			form.reset({
+				name: form.getValues().name,
+				...defaultValuesForType[watchedBackend as keyof typeof defaultValuesForType],
+			});
 		}
-	}, [watchedBackend, watchedName, form.reset, mode]);
+	}, [watchedBackend, form, mode]);
 
 	const [testMessage, setTestMessage] = useState<{ success: boolean; message: string } | null>(null);
 
