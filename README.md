@@ -39,7 +39,8 @@ services:
     image: ghcr.io/nicotsx/ironmount:v0.7
     container_name: ironmount
     restart: unless-stopped
-    privileged: true
+    cap_add:
+      - SYS_ADMIN
     ports:
       - "4096:4096"
     devices:
@@ -135,7 +136,8 @@ Ironmount can use [rclone](https://rclone.org/) to support 40+ cloud storage pro
        image: ghcr.io/nicotsx/ironmount:v0.7
        container_name: ironmount
        restart: unless-stopped
-       privileged: true
+       cap_add:
+         - SYS_ADMIN
        ports:
          - "4096:4096"
        devices:
