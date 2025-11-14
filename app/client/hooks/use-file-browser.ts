@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { FileEntry } from "../components/file-tree";
 
 type FetchFolderFn = (
@@ -19,14 +19,8 @@ type UseFileBrowserOptions = {
 	rootPath?: string;
 };
 
-export const useFileBrowser = ({
-	initialData,
-	isLoading = false,
-	fetchFolder,
-	prefetchFolder,
-	pathTransform,
-	rootPath = "/",
-}: UseFileBrowserOptions) => {
+export const useFileBrowser = (props: UseFileBrowserOptions) => {
+	const { initialData, isLoading, fetchFolder, prefetchFolder, pathTransform, rootPath = "/" } = props;
 	const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
 	const [fetchedFolders, setFetchedFolders] = useState<Set<string>>(new Set([rootPath]));
 	const [loadingFolders, setLoadingFolders] = useState<Set<string>>(new Set());
