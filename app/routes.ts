@@ -7,6 +7,7 @@ export default [
 	layout("./client/components/layout.tsx", [
 		route("/", "./client/routes/root.tsx"),
 		route("volumes", "./client/modules/volumes/routes/volumes.tsx"),
+		route("volumes/create", "./client/modules/volumes/routes/create-volume.tsx"),
 		route("volumes/:name", "./client/modules/volumes/routes/volume-details.tsx"),
 		route("backups", "./client/modules/backups/routes/backups.tsx"),
 		route("backups/create", "./client/modules/backups/routes/create-backup.tsx"),

@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { HardDrive, RotateCcw } from "lucide-react";
+import { HardDrive, Plus, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { CreateVolumeDialog } from "~/client/components/create-volume-dialog";
 import { EmptyState } from "~/client/components/empty-state";
 import { StatusDot } from "~/client/components/status-dot";
 import { Button } from "~/client/components/ui/button";
@@ -36,7 +35,6 @@ export const clientLoader = async () => {
 };
 
 export default function Volumes({ loaderData }: Route.ComponentProps) {
-	const [createVolumeOpen, setCreateVolumeOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [statusFilter, setStatusFilter] = useState("");
 	const [backendFilter, setBackendFilter] = useState("");
@@ -73,7 +71,12 @@ export default function Volumes({ loaderData }: Route.ComponentProps) {
 				icon={HardDrive}
 				title="No volume"
 				description="Manage and monitor all your storage backends in one place with advanced features like automatic mounting and health checks."
-				button={<CreateVolumeDialog open={createVolumeOpen} setOpen={setCreateVolumeOpen} />}
+				button={
+					<Button onClick={() => navigate("/volumes/create")}>
+						<Plus size={16} className="mr-2" />
+						Create Volume
+					</Button>
+				}
 			/>
 		);
 	}
@@ -115,7 +118,10 @@ export default function Volumes({ loaderData }: Route.ComponentProps) {
 						</Button>
 					)}
 				</span>
-				<CreateVolumeDialog open={createVolumeOpen} setOpen={setCreateVolumeOpen} />
+				<Button onClick={() => navigate("/volumes/create")}>
+					<Plus size={16} className="mr-2" />
+					Create Volume
+				</Button>
 			</div>
 			<div className="overflow-x-auto">
 				<Table className="border-t">
