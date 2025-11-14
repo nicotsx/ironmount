@@ -18,7 +18,7 @@ services:
       - /var/lib/ironmount:/var/lib/ironmount
 
       - ./app:/app/app
-      # - ~/.config/rclone:/root/.config/rclone
+      - ~/.config/rclone:/root/.config/rclone
 
   ironmount-prod:
     build:

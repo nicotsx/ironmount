@@ -1,7 +1,7 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileIcon } from "lucide-react";
-import { FileTree, type FileEntry } from "~/client/components/file-tree";
+import { FileTree } from "~/client/components/file-tree";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/client/components/ui/card";
 import { Button } from "~/client/components/ui/button";
 import { Checkbox } from "~/client/components/ui/checkbox";
@@ -20,6 +20,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "~/client/components/ui/
 import type { Snapshot, Volume } from "~/client/lib/types";
 import { toast } from "sonner";
 import { listSnapshotFilesOptions, restoreSnapshotMutation } from "~/client/api-client/@tanstack/react-query.gen";
+import { useFileBrowser } from "~/client/hooks/use-file-browser";
 
 interface Props {
 	snapshot: Snapshot;
@@ -33,10 +34,6 @@ export const SnapshotFileBrowser = (props: Props) => {
 	const isReadOnly = volume?.config && "readOnly" in volume.config && volume.config.readOnly === true;
 
 	const queryClient = useQueryClient();
-	const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
-	const [fetchedFolders, setFetchedFolders] = useState<Set<string>>(new Set());
-	const [loadingFolders, setLoadingFolders] = useState<Set<string>>(new Set());
-	const [allFiles, setAllFiles] = useState<Map<string, FileEntry>>(new Map());
 	const [selectedPaths, setSelectedPaths] = useState<Set<string>>(new Set());
 	const [showRestoreDialog, setShowRestoreDialog] = useState(false);
 	const [deleteExtraFiles, setDeleteExtraFiles] = useState(false);
@@ -72,89 +69,30 @@ export const SnapshotFileBrowser = (props: Props) => {
 		[volumeBasePath],
 	);
 
-	useMemo(() => {
-		if (filesData?.files) {
-			setAllFiles((prev) => {
-				const next = new Map(prev);
-				for (const file of filesData.files) {
-					const strippedPath = stripBasePath(file.path);
-					if (strippedPath !== "/") {
-						next.set(strippedPath, { ...file, path: strippedPath });
-					}
-				}
-				return next;
-			});
-			setFetchedFolders((prev) => new Set(prev).add("/"));
-		}
-	}, [filesData, stripBasePath]);
-
-	const fileArray = useMemo(() => Array.from(allFiles.values()), [allFiles]);
-
-	const handleFolderExpand = useCallback(
-		async (folderPath: string) => {
-			setExpandedFolders((prev) => {
-				const next = new Set(prev);
-				next.add(folderPath);
-				return next;
-			});
-
-			if (!fetchedFolders.has(folderPath)) {
-				setLoadingFolders((prev) => new Set(prev).add(folderPath));
-
-				try {
-					const fullPath = addBasePath(folderPath);
-
-					const result = await queryClient.ensureQueryData(
-						listSnapshotFilesOptions({
-							path: { name: repositoryName, snapshotId: snapshot.short_id },
-							query: { path: fullPath },
-						}),
-					);
-
-					if (result.files) {
-						setAllFiles((prev) => {
-							const next = new Map(prev);
-							for (const file of result.files) {
-								const strippedPath = stripBasePath(file.path);
-								// Skip the directory itself
-								if (strippedPath !== folderPath) {
-									next.set(strippedPath, { ...file, path: strippedPath });
-								}
-							}
-							return next;
-						});
-
-						setFetchedFolders((prev) => new Set(prev).add(folderPath));
-					}
-				} catch (error) {
-					console.error("Failed to fetch folder contents:", error);
-				} finally {
-					setLoadingFolders((prev) => {
-						const next = new Set(prev);
-						next.delete(folderPath);
-						return next;
-					});
-				}
-			}
+	const fileBrowser = useFileBrowser({
+		initialData: filesData,
+		isLoading: filesLoading,
+		fetchFolder: async (path) => {
+			return await queryClient.ensureQueryData(
+				listSnapshotFilesOptions({
+					path: { name: repositoryName, snapshotId: snapshot.short_id },
+					query: { path },
+				}),
+			);
 		},
-		[repositoryName, snapshot, fetchedFolders, queryClient, stripBasePath, addBasePath],
-	);
-
-	const handleFolderHover = useCallback(
-		(folderPath: string) => {
-			if (!fetchedFolders.has(folderPath) && !loadingFolders.has(folderPath)) {
-				const fullPath = addBasePath(folderPath);
-
-				queryClient.prefetchQuery({
-					...listSnapshotFilesOptions({
-						path: { name: repositoryName, snapshotId: snapshot.short_id },
-						query: { path: fullPath },
-					}),
-				});
-			}
+		prefetchFolder: (path) => {
+			queryClient.prefetchQuery(
+				listSnapshotFilesOptions({
+					path: { name: repositoryName, snapshotId: snapshot.short_id },
+					query: { path },
+				}),
+			);
 		},
-		[repositoryName, snapshot, fetchedFolders, loadingFolders, queryClient, addBasePath],
-	);
+		pathTransform: {
+			strip: stripBasePath,
+			add: addBasePath,
+		},
+	});
 
 	const { mutate: restoreSnapshot, isPending: isRestoring } = useMutation({
 		...restoreSnapshotMutation(),
@@ -225,27 +163,27 @@ export const SnapshotFileBrowser = (props: Props) => {
 					</div>
 				</CardHeader>
 				<CardContent className="flex-1 overflow-hidden flex flex-col p-0">
-					{filesLoading && fileArray.length === 0 && (
+					{fileBrowser.isLoading && (
 						<div className="flex items-center justify-center flex-1">
 							<p className="text-muted-foreground">Loading files...</p>
 						</div>
 					)}
 
-					{fileArray.length === 0 && !filesLoading && (
+					{fileBrowser.isEmpty && (
 						<div className="flex flex-col items-center justify-center flex-1 text-center p-8">
 							<FileIcon className="w-12 h-12 text-muted-foreground/50 mb-4" />
 							<p className="text-muted-foreground">No files in this snapshot</p>
 						</div>
 					)}
 
-					{fileArray.length > 0 && (
+					{!fileBrowser.isLoading && !fileBrowser.isEmpty && (
 						<div className="overflow-auto flex-1 border border-border rounded-md bg-card m-4">
 							<FileTree
-								files={fileArray}
-								onFolderExpand={handleFolderExpand}
-								onFolderHover={handleFolderHover}
-								expandedFolders={expandedFolders}
-								loadingFolders={loadingFolders}
+								files={fileBrowser.fileArray}
+								onFolderExpand={fileBrowser.handleFolderExpand}
+								onFolderHover={fileBrowser.handleFolderHover}
+								expandedFolders={fileBrowser.expandedFolders}
+								loadingFolders={fileBrowser.loadingFolders}
 								className="px-2 py-2"
 								withCheckboxes={true}
 								selectedPaths={selectedPaths}

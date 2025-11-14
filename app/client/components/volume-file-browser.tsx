@@ -1,16 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FolderOpen } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
 import { FileTree } from "~/client/components/file-tree";
 import { listFilesOptions } from "../api-client/@tanstack/react-query.gen";
-
-interface FileEntry {
-	name: string;
-	path: string;
-	type: "file" | "directory";
-	size?: number;
-	modifiedAt?: number;
-}
+import { useFileBrowser } from "../hooks/use-file-browser";
 
 type VolumeFileBrowserProps = {
 	volumeName: string;
@@ -36,89 +28,34 @@ export const VolumeFileBrowser = ({
 	emptyDescription,
 }: VolumeFileBrowserProps) => {
 	const queryClient = useQueryClient();
-	const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
-	const [fetchedFolders, setFetchedFolders] = useState<Set<string>>(new Set(["/"]));
-	const [loadingFolders, setLoadingFolders] = useState<Set<string>>(new Set());
-	const [allFiles, setAllFiles] = useState<Map<string, FileEntry>>(new Map());
 
 	const { data, isLoading, error } = useQuery({
 		...listFilesOptions({ path: { name: volumeName } }),
 		enabled,
 	});
 
-	useMemo(() => {
-		if (data?.files) {
-			setAllFiles((prev) => {
-				const next = new Map(prev);
-				for (const file of data.files) {
-					next.set(file.path, file);
-				}
-				return next;
-			});
-		}
-	}, [data]);
-
-	const fileArray = useMemo(() => Array.from(allFiles.values()), [allFiles]);
-
-	const handleFolderExpand = useCallback(
-		async (folderPath: string) => {
-			setExpandedFolders((prev) => {
-				const next = new Set(prev);
-				next.add(folderPath);
-				return next;
-			});
-
-			if (!fetchedFolders.has(folderPath)) {
-				setLoadingFolders((prev) => new Set(prev).add(folderPath));
-
-				try {
-					const result = await queryClient.ensureQueryData(
-						listFilesOptions({
-							path: { name: volumeName },
-							query: { path: folderPath },
-						}),
-					);
-
-					if (result.files) {
-						setAllFiles((prev) => {
-							const next = new Map(prev);
-							for (const file of result.files) {
-								next.set(file.path, file);
-							}
-							return next;
-						});
-
-						setFetchedFolders((prev) => new Set(prev).add(folderPath));
-					}
-				} catch (error) {
-					console.error("Failed to fetch folder contents:", error);
-				} finally {
-					setLoadingFolders((prev) => {
-						const next = new Set(prev);
-						next.delete(folderPath);
-						return next;
-					});
-				}
-			}
+	const fileBrowser = useFileBrowser({
+		initialData: data,
+		isLoading,
+		fetchFolder: async (path) => {
+			return await queryClient.ensureQueryData(
+				listFilesOptions({
+					path: { name: volumeName },
+					query: { path },
+				}),
+			);
 		},
-		[volumeName, fetchedFolders, queryClient.ensureQueryData],
-	);
-
-	const handleFolderHover = useCallback(
-		(folderPath: string) => {
-			if (!fetchedFolders.has(folderPath) && !loadingFolders.has(folderPath)) {
-				queryClient.prefetchQuery(
-					listFilesOptions({
-						path: { name: volumeName },
-						query: { path: folderPath },
-					}),
-				);
-			}
+		prefetchFolder: (path) => {
+			queryClient.prefetchQuery(
+				listFilesOptions({
+					path: { name: volumeName },
+					query: { path },
+				}),
+			);
 		},
-		[volumeName, fetchedFolders, loadingFolders, queryClient],
-	);
+	});
 
-	if (isLoading && fileArray.length === 0) {
+	if (fileBrowser.isLoading) {
 		return (
 			<div className="flex items-center justify-center h-full min-h-[200px]">
 				<p className="text-muted-foreground">Loading files...</p>
@@ -134,7 +71,7 @@ export const VolumeFileBrowser = ({
 		);
 	}
 
-	if (fileArray.length === 0) {
+	if (fileBrowser.isEmpty) {
 		return (
 			<div className="flex flex-col items-center justify-center h-full text-center p-8 min-h-[200px]">
 				<FolderOpen className="mb-4 h-12 w-12 text-muted-foreground" />
@@ -147,11 +84,11 @@ export const VolumeFileBrowser = ({
 	return (
 		<div className={className}>
 			<FileTree
-				files={fileArray}
-				onFolderExpand={handleFolderExpand}
-				onFolderHover={handleFolderHover}
-				expandedFolders={expandedFolders}
-				loadingFolders={loadingFolders}
+				files={fileBrowser.fileArray}
+				onFolderExpand={fileBrowser.handleFolderExpand}
+				onFolderHover={fileBrowser.handleFolderHover}
+				expandedFolders={fileBrowser.expandedFolders}
+				loadingFolders={fileBrowser.loadingFolders}
 				withCheckboxes={withCheckboxes}
 				selectedPaths={selectedPaths}
 				onSelectionChange={onSelectionChange}

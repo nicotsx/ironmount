@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useMemo, useState } from "react";
-import { FileTree, type FileEntry } from "./file-tree";
+import { FileTree } from "./file-tree";
 import { ScrollArea } from "./ui/scroll-area";
 import { browseFilesystemOptions } from "../api-client/@tanstack/react-query.gen";
+import { useFileBrowser } from "../hooks/use-file-browser";
 
 type Props = {
 	onSelectPath: (path: string) => void;
@@ -11,82 +11,23 @@ type Props = {
 
 export const DirectoryBrowser = ({ onSelectPath, selectedPath }: Props) => {
 	const queryClient = useQueryClient();
-	const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
-	const [fetchedFolders, setFetchedFolders] = useState<Set<string>>(new Set(["/"]));
-	const [loadingFolders, setLoadingFolders] = useState<Set<string>>(new Set());
-	const [allFiles, setAllFiles] = useState<Map<string, FileEntry>>(new Map());
 
 	const { data, isLoading } = useQuery({
 		...browseFilesystemOptions({ query: { path: "/" } }),
 	});
 
-	useMemo(() => {
-		if (data?.directories) {
-			setAllFiles((prev) => {
-				const next = new Map(prev);
-				for (const dir of data.directories) {
-					next.set(dir.path, { name: dir.name, path: dir.path, type: "folder" });
-				}
-				return next;
-			});
-		}
-	}, [data]);
-
-	const fileArray = useMemo(() => Array.from(allFiles.values()), [allFiles]);
-
-	const handleFolderExpand = useCallback(
-		async (folderPath: string) => {
-			setExpandedFolders((prev) => {
-				const next = new Set(prev);
-				next.add(folderPath);
-				return next;
-			});
-
-			if (!fetchedFolders.has(folderPath)) {
-				setLoadingFolders((prev) => new Set(prev).add(folderPath));
-
-				try {
-					const result = await queryClient.ensureQueryData(
-						browseFilesystemOptions({
-							query: { path: folderPath },
-						}),
-					);
-
-					if (result.directories) {
-						setAllFiles((prev) => {
-							const next = new Map(prev);
-							for (const dir of result.directories) {
-								next.set(dir.path, { name: dir.name, path: dir.path, type: "folder" });
-							}
-							return next;
-						});
-
-						setFetchedFolders((prev) => new Set(prev).add(folderPath));
-					}
-				} catch (error) {
-					console.error("Failed to fetch folder contents:", error);
-				} finally {
-					setLoadingFolders((prev) => {
-						const next = new Set(prev);
-						next.delete(folderPath);
-						return next;
-					});
-				}
-			}
+	const fileBrowser = useFileBrowser({
+		initialData: data,
+		isLoading,
+		fetchFolder: async (path) => {
+			return await queryClient.ensureQueryData(browseFilesystemOptions({ query: { path } }));
 		},
-		[fetchedFolders, queryClient],
-	);
-
-	const handleFolderHover = useCallback(
-		(folderPath: string) => {
-			if (!fetchedFolders.has(folderPath) && !loadingFolders.has(folderPath)) {
-				queryClient.prefetchQuery(browseFilesystemOptions({ query: { path: folderPath } }));
-			}
+		prefetchFolder: (path) => {
+			queryClient.prefetchQuery(browseFilesystemOptions({ query: { path } }));
 		},
-		[fetchedFolders, loadingFolders, queryClient],
-	);
+	});
 
-	if (isLoading && fileArray.length === 0) {
+	if (fileBrowser.isLoading) {
 		return (
 			<div className="border rounded-lg overflow-hidden">
 				<ScrollArea className="h-64">
@@ -96,7 +37,7 @@ export const DirectoryBrowser = ({ onSelectPath, selectedPath }: Props) => {
 		);
 	}
 
-	if (fileArray.length === 0) {
+	if (fileBrowser.isEmpty) {
 		return (
 			<div className="border rounded-lg overflow-hidden">
 				<ScrollArea className="h-64">
@@ -110,11 +51,11 @@ export const DirectoryBrowser = ({ onSelectPath, selectedPath }: Props) => {
 		<div className="border rounded-lg overflow-hidden">
 			<ScrollArea className="h-64">
 				<FileTree
-					files={fileArray}
-					onFolderExpand={handleFolderExpand}
-					onFolderHover={handleFolderHover}
-					expandedFolders={expandedFolders}
-					loadingFolders={loadingFolders}
+					files={fileBrowser.fileArray}
+					onFolderExpand={fileBrowser.handleFolderExpand}
+					onFolderHover={fileBrowser.handleFolderHover}
+					expandedFolders={fileBrowser.expandedFolders}
+					loadingFolders={fileBrowser.loadingFolders}
 					foldersOnly
 					selectableFolders
 					selectedFolder={selectedPath}
