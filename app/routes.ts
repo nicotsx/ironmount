@@ -12,6 +12,7 @@ export default [
 		route("backups/create", "./client/modules/backups/routes/create-backup.tsx"),
 		route("backups/:id", "./client/modules/backups/routes/backup-details.tsx"),
 		route("repositories", "./client/modules/repositories/routes/repositories.tsx"),
+		route("repositories/create", "./client/modules/repositories/routes/create-repository.tsx"),
 		route("repositories/:name", "./client/modules/repositories/routes/repository-details.tsx"),
 		route("repositories/:name/:snapshotId", "./client/modules/repositories/routes/snapshot-details.tsx"),
 		route("settings", "./client/modules/settings/routes/settings.tsx"),

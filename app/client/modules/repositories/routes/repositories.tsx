@@ -1,10 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { Database, RotateCcw } from "lucide-react";
+import { Database, Plus, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { listRepositories } from "~/client/api-client/sdk.gen";
 import { listRepositoriesOptions } from "~/client/api-client/@tanstack/react-query.gen";
-import { CreateRepositoryDialog } from "~/client/components/create-repository-dialog";
 import { RepositoryIcon } from "~/client/components/repository-icon";
 import { Button } from "~/client/components/ui/button";
 import { Card } from "~/client/components/ui/card";
@@ -39,7 +38,6 @@ export default function Repositories({ loaderData }: Route.ComponentProps) {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [statusFilter, setStatusFilter] = useState("");
 	const [backendFilter, setBackendFilter] = useState("");
-	const [createRepositoryOpen, setCreateRepositoryOpen] = useState(false);
 
 	const clearFilters = () => {
 		setSearchQuery("");
@@ -73,7 +71,12 @@ export default function Repositories({ loaderData }: Route.ComponentProps) {
 				icon={Database}
 				title="No repository"
 				description="Repositories are remote storage locations where you can backup your volumes securely. Encrypted and optimized for storage efficiency."
-				button={<CreateRepositoryDialog open={createRepositoryOpen} setOpen={setCreateRepositoryOpen} />}
+				button={
+					<Button onClick={() => navigate("/repositories/create")}>
+						<Plus size={16} className="mr-2" />
+						Create Repository
+					</Button>
+				}
 			/>
 		);
 	}
@@ -116,7 +119,10 @@ export default function Repositories({ loaderData }: Route.ComponentProps) {
 						</Button>
 					)}
 				</span>
-				<CreateRepositoryDialog open={createRepositoryOpen} setOpen={setCreateRepositoryOpen} />
+				<Button onClick={() => navigate("/repositories/create")}>
+					<Plus size={16} className="mr-2" />
+					Create Repository
+				</Button>
 			</div>
 			<div className="overflow-x-auto">
 				<Table className="border-t">
