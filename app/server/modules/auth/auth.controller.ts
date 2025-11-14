@@ -25,7 +25,7 @@ import { toMessage } from "../../utils/errors";
 const COOKIE_NAME = "session_id";
 const COOKIE_OPTIONS = {
 	httpOnly: true,
-	secure: process.env.NODE_ENV === "production",
+	secure: false,
 	sameSite: "lax" as const,
 	path: "/",
 };
