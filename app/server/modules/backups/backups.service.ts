@@ -342,6 +342,32 @@ const stopBackup = async (scheduleId: number) => {
 	abortController.abort();
 };
 
+const runForget = async (scheduleId: number) => {
+	const schedule = await db.query.backupSchedulesTable.findFirst({
+		where: eq(backupSchedulesTable.id, scheduleId),
+	});
+
+	if (!schedule) {
+		throw new NotFoundError("Backup schedule not found");
+	}
+
+	if (!schedule.retentionPolicy) {
+		throw new BadRequestError("No retention policy configured for this schedule");
+	}
+
+	const repository = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.id, schedule.repositoryId),
+	});
+
+	if (!repository) {
+		throw new NotFoundError("Repository not found");
+	}
+
+	logger.info(`Manually running retention policy (forget) for schedule ${scheduleId}`);
+	await restic.forget(repository.config, schedule.retentionPolicy, { tag: schedule.id.toString() });
+	logger.info(`Retention policy applied successfully for schedule ${scheduleId}`);
+};
+
 export const backupsService = {
 	listSchedules,
 	getSchedule,
@@ -352,4 +378,5 @@ export const backupsService = {
 	getSchedulesToExecute,
 	getScheduleForVolume,
 	stopBackup,
+	runForget,
 };

@@ -251,3 +251,28 @@ export const stopBackupDto = describeRoute({
 		},
 	},
 });
+
+/**
+ * Run retention policy (forget) manually
+ */
+export const runForgetResponse = type({
+	success: "boolean",
+});
+
+export type RunForgetDto = typeof runForgetResponse.infer;
+
+export const runForgetDto = describeRoute({
+	description: "Manually apply retention policy to clean up old snapshots",
+	operationId: "runForget",
+	tags: ["Backups"],
+	responses: {
+		200: {
+			description: "Retention policy applied successfully",
+			content: {
+				"application/json": {
+					schema: resolver(runForgetResponse),
+				},
+			},
+		},
+	},
+});

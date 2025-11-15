@@ -1,4 +1,4 @@
-import { Pencil, Play, Square, Trash2 } from "lucide-react";
+import { Eraser, Pencil, Play, Square, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { OnOff } from "~/client/components/onoff";
 import { Button } from "~/client/components/ui/button";
@@ -14,6 +14,10 @@ import {
 } from "~/client/components/ui/alert-dialog";
 import type { BackupSchedule } from "~/client/lib/types";
 import { BackupProgressCard } from "./backup-progress-card";
+import { runForgetMutation } from "~/client/api-client/@tanstack/react-query.gen";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { parseError } from "~/client/lib/errors";
 
 type Props = {
 	schedule: BackupSchedule;
@@ -28,6 +32,17 @@ export const ScheduleSummary = (props: Props) => {
 	const { schedule, handleToggleEnabled, handleRunBackupNow, handleStopBackup, handleDeleteSchedule, setIsEditMode } =
 		props;
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+	const [showForgetConfirm, setShowForgetConfirm] = useState(false);
+
+	const runForget = useMutation({
+		...runForgetMutation(),
+		onSuccess: () => {
+			toast.success("Retention policy applied successfully");
+		},
+		onError: (error) => {
+			toast.error("Failed to apply retention policy", { description: parseError(error)?.message });
+		},
+	});
 
 	const summary = useMemo(() => {
 		const scheduleLabel = schedule ? schedule.cronExpression : "-";
@@ -54,6 +69,11 @@ export const ScheduleSummary = (props: Props) => {
 	const handleConfirmDelete = () => {
 		setShowDeleteConfirm(false);
 		handleDeleteSchedule();
+	};
+
+	const handleConfirmForget = () => {
+		setShowForgetConfirm(false);
+		runForget.mutate({ path: { scheduleId: schedule.id.toString() } });
 	};
 
 	return (
@@ -87,6 +107,18 @@ export const ScheduleSummary = (props: Props) => {
 							<Button variant="default" size="sm" onClick={handleRunBackupNow} className="w-full sm:w-auto">
 								<Play className="h-4 w-4 mr-2" />
 								<span className="sm:inline">Backup now</span>
+							</Button>
+						)}
+						{schedule.retentionPolicy && (
+							<Button
+								variant="outline"
+								size="sm"
+								loading={runForget.isPending}
+								onClick={() => setShowForgetConfirm(true)}
+								className="w-full sm:w-auto"
+							>
+								<Eraser className="h-4 w-4 mr-2" />
+								<span className="sm:inline">Run cleanup</span>
 							</Button>
 						)}
 						<Button variant="outline" size="sm" onClick={() => setIsEditMode(true)} className="w-full sm:w-auto">
@@ -164,6 +196,22 @@ export const ScheduleSummary = (props: Props) => {
 						>
 							Delete schedule
 						</AlertDialogAction>
+					</div>
+				</AlertDialogContent>
+			</AlertDialog>
+
+			<AlertDialog open={showForgetConfirm} onOpenChange={setShowForgetConfirm}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Run retention policy cleanup?</AlertDialogTitle>
+						<AlertDialogDescription>
+							This will apply the retention policy and permanently delete old snapshots according to the configured
+							rules ({summary.retentionLabel}). This action cannot be undone.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<div className="flex gap-3 justify-end">
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction onClick={handleConfirmForget}>Run cleanup</AlertDialogAction>
 					</div>
 				</AlertDialogContent>
 			</AlertDialog>
