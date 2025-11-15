@@ -7,7 +7,6 @@ import { repositoriesTable } from "../../db/schema";
 import { toMessage } from "../../utils/errors";
 import { restic } from "../../utils/restic";
 import { cryptoUtils } from "../../utils/crypto";
-import { logger } from "../../utils/logger";
 import type { CompressionMode, RepositoryConfig } from "~/schemas/restic";
 
 const listRepositories = async () => {

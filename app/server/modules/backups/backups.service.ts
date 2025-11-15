@@ -195,9 +195,11 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 		repositoryName: repository.name,
 	});
 
+	const nextBackupAt = calculateNextRun(schedule.cronExpression);
+
 	await db
 		.update(backupSchedulesTable)
-		.set({ lastBackupStatus: "in_progress", updatedAt: Date.now(), lastBackupError: null })
+		.set({ lastBackupStatus: "in_progress", updatedAt: Date.now(), lastBackupError: null, nextBackupAt })
 		.where(eq(backupSchedulesTable.id, scheduleId));
 
 	const abortController = new AbortController();
