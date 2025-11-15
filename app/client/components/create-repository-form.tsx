@@ -67,8 +67,11 @@ export const CreateRepositoryForm = ({
 
 	const [passwordMode, setPasswordMode] = useState<"default" | "custom">("default");
 
+	const { capabilities } = useSystemInfo();
+
 	const { data: rcloneRemotes, isLoading: isLoadingRemotes } = useQuery({
 		...listRcloneRemotesOptions(),
+		enabled: capabilities.rclone,
 	});
 
 	useEffect(() => {
@@ -79,8 +82,6 @@ export const CreateRepositoryForm = ({
 			...defaultValuesForType[watchedBackend as keyof typeof defaultValuesForType],
 		});
 	}, [watchedBackend, form]);
-
-	const { capabilities } = useSystemInfo();
 
 	return (
 		<Form {...form}>
