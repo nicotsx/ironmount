@@ -9,3 +9,6 @@
 .env
 .turbo
 CLAUDE.md
+
+mutagen.yml.lock
+notes.md
