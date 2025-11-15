@@ -7,6 +7,7 @@ import { repositoriesTable } from "../../db/schema";
 import { toMessage } from "../../utils/errors";
 import { restic } from "../../utils/restic";
 import { cryptoUtils } from "../../utils/crypto";
+import { logger } from "../../utils/logger";
 import type { CompressionMode, RepositoryConfig } from "~/schemas/restic";
 
 const listRepositories = async () => {
@@ -19,6 +20,7 @@ const encryptConfig = async (config: RepositoryConfig): Promise<RepositoryConfig
 
 	switch (config.backend) {
 		case "s3":
+		case "r2":
 			encryptedConfig.accessKeyId = await cryptoUtils.encrypt(config.accessKeyId);
 			encryptedConfig.secretAccessKey = await cryptoUtils.encrypt(config.secretAccessKey);
 			break;
@@ -80,6 +82,7 @@ const createRepository = async (name: string, config: RepositoryConfig, compress
 	}
 
 	const errorMessage = toMessage(error);
+
 	await db.delete(repositoriesTable).where(eq(repositoriesTable.id, id));
 
 	throw new InternalServerError(`Failed to initialize repository: ${errorMessage}`);

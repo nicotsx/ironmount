@@ -36,6 +36,7 @@ type Props = {
 const defaultValuesForType = {
 	local: { backend: "local" as const, compressionMode: "auto" as const },
 	s3: { backend: "s3" as const, compressionMode: "auto" as const },
+	r2: { backend: "r2" as const, compressionMode: "auto" as const },
 	gcs: { backend: "gcs" as const, compressionMode: "auto" as const },
 	azure: { backend: "azure" as const, compressionMode: "auto" as const },
 	rclone: { backend: "rclone" as const, compressionMode: "auto" as const },
@@ -115,6 +116,7 @@ export const CreateRepositoryForm = ({
 								<SelectContent>
 									<SelectItem value="local">Local</SelectItem>
 									<SelectItem value="s3">S3</SelectItem>
+									<SelectItem value="r2">Cloudflare R2</SelectItem>
 									<SelectItem value="gcs">Google Cloud Storage</SelectItem>
 									<SelectItem value="azure">Azure Blob Storage</SelectItem>
 									<Tooltip>
@@ -215,6 +217,67 @@ export const CreateRepositoryForm = ({
 										<Input type="password" placeholder="••••••••" {...field} />
 									</FormControl>
 									<FormDescription>S3 secret access key for authentication.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
+
+				{watchedBackend === "r2" && (
+					<>
+						<FormField
+							control={form.control}
+							name="endpoint"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Endpoint</FormLabel>
+									<FormControl>
+										<Input placeholder="<account-id>.r2.cloudflarestorage.com" {...field} />
+									</FormControl>
+									<FormDescription>R2 endpoint (without https://). Find in R2 dashboard under bucket settings.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="bucket"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Bucket</FormLabel>
+									<FormControl>
+										<Input placeholder="my-backup-bucket" {...field} />
+									</FormControl>
+									<FormDescription>R2 bucket name for storing backups.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="accessKeyId"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Access Key ID</FormLabel>
+									<FormControl>
+										<Input placeholder="Access Key ID from R2 API tokens" {...field} />
+									</FormControl>
+									<FormDescription>R2 API token Access Key ID (create in Cloudflare R2 dashboard).</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="secretAccessKey"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Secret Access Key</FormLabel>
+									<FormControl>
+										<Input type="password" placeholder="••••••••" {...field} />
+									</FormControl>
+									<FormDescription>R2 API token Secret Access Key (shown once when creating token).</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}

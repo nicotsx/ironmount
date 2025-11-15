@@ -3,6 +3,7 @@ import { type } from "arktype";
 export const REPOSITORY_BACKENDS = {
 	local: "local",
 	s3: "s3",
+	r2: "r2",
 	gcs: "gcs",
 	azure: "azure",
 	rclone: "rclone",
@@ -12,6 +13,14 @@ export type RepositoryBackend = keyof typeof REPOSITORY_BACKENDS;
 
 export const s3RepositoryConfigSchema = type({
 	backend: "'s3'",
+	endpoint: "string",
+	bucket: "string",
+	accessKeyId: "string",
+	secretAccessKey: "string",
+});
+
+export const r2RepositoryConfigSchema = type({
+	backend: "'r2'",
 	endpoint: "string",
 	bucket: "string",
 	accessKeyId: "string",
@@ -45,6 +54,7 @@ export const rcloneRepositoryConfigSchema = type({
 });
 
 export const repositoryConfigSchema = s3RepositoryConfigSchema
+	.or(r2RepositoryConfigSchema)
 	.or(localRepositoryConfigSchema)
 	.or(gcsRepositoryConfigSchema)
 	.or(azureRepositoryConfigSchema)
