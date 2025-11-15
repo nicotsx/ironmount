@@ -15,7 +15,11 @@ const listRepositories = async () => {
 };
 
 const encryptConfig = async (config: RepositoryConfig): Promise<RepositoryConfig> => {
-	const encryptedConfig: Record<string, string> = { ...config };
+	const encryptedConfig: Record<string, string | boolean> = { ...config };
+
+	if (config.customPassword) {
+		encryptedConfig.customPassword = await cryptoUtils.encrypt(config.customPassword);
+	}
 
 	switch (config.backend) {
 		case "s3":
@@ -65,23 +69,30 @@ const createRepository = async (name: string, config: RepositoryConfig, compress
 		throw new InternalServerError("Failed to create repository");
 	}
 
-	const { success, error } = await restic.init(encryptedConfig);
+	let error: string | null = null;
 
-	if (success) {
+	if (config.isExistingRepository) {
+		const result = await restic
+			.snapshots(encryptedConfig)
+			.then(() => ({ error: null }))
+			.catch((error) => ({ error }));
+
+		error = result.error;
+	} else {
+		const initResult = await restic.init(encryptedConfig);
+		error = initResult.error;
+	}
+
+	if (!error) {
 		await db
 			.update(repositoriesTable)
-			.set({
-				status: "healthy",
-				lastChecked: Date.now(),
-				lastError: null,
-			})
+			.set({ status: "healthy", lastChecked: Date.now(), lastError: null })
 			.where(eq(repositoriesTable.id, id));
 
 		return { repository: created, status: 201 };
 	}
 
 	const errorMessage = toMessage(error);
-
 	await db.delete(repositoriesTable).where(eq(repositoriesTable.id, id));
 
 	throw new InternalServerError(`Failed to initialize repository: ${errorMessage}`);

@@ -1,6 +1,6 @@
 import { arktypeResolver } from "@hookform/resolvers/arktype";
 import { type } from "arktype";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { cn, slugify } from "~/client/lib/utils";
 import { deepClean } from "~/utils/object";
@@ -15,6 +15,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { useSystemInfo } from "~/client/hooks/use-system-info";
 import { COMPRESSION_MODES, repositoryConfigSchema } from "~/schemas/restic";
 import { listRcloneRemotesOptions } from "../api-client/@tanstack/react-query.gen";
+import { Checkbox } from "./ui/checkbox";
 
 export const formSchema = type({
 	name: "2<=string<=32",
@@ -59,9 +60,12 @@ export const CreateRepositoryForm = ({
 		},
 	});
 
-	const { watch } = form;
+	const { watch, setValue } = form;
 
 	const watchedBackend = watch("backend");
+	const watchedIsExistingRepository = watch("isExistingRepository");
+
+	const [passwordMode, setPasswordMode] = useState<"default" | "custom">("default");
 
 	const { data: rcloneRemotes, isLoading: isLoadingRemotes } = useQuery({
 		...listRcloneRemotesOptions(),
@@ -70,6 +74,8 @@ export const CreateRepositoryForm = ({
 	useEffect(() => {
 		form.reset({
 			name: form.getValues().name,
+			isExistingRepository: form.getValues().isExistingRepository,
+			customPassword: form.getValues().customPassword,
 			...defaultValuesForType[watchedBackend as keyof typeof defaultValuesForType],
 		});
 	}, [watchedBackend, form]);
@@ -163,6 +169,81 @@ export const CreateRepositoryForm = ({
 					)}
 				/>
 
+				<FormField
+					control={form.control}
+					name="isExistingRepository"
+					render={({ field }) => (
+						<FormItem className="flex flex-row items-center space-x-3">
+							<FormControl>
+								<Checkbox
+									checked={field.value}
+									onCheckedChange={(checked) => {
+										field.onChange(checked);
+										if (!checked) {
+											setPasswordMode("default");
+											setValue("customPassword", undefined);
+										}
+									}}
+								/>
+							</FormControl>
+							<div className="space-y-1">
+								<FormLabel>Import existing repository</FormLabel>
+								<FormDescription>Check this if the repository already exists at the specified location</FormDescription>
+							</div>
+						</FormItem>
+					)}
+				/>
+				{watchedIsExistingRepository && (
+					<>
+						<FormItem>
+							<FormLabel>Repository Password</FormLabel>
+							<Select
+								onValueChange={(value) => {
+									setPasswordMode(value as "default" | "custom");
+									if (value === "default") {
+										setValue("customPassword", undefined);
+									}
+								}}
+								defaultValue={passwordMode}
+								value={passwordMode}
+							>
+								<FormControl>
+									<SelectTrigger>
+										<SelectValue placeholder="Select password option" />
+									</SelectTrigger>
+								</FormControl>
+								<SelectContent>
+									<SelectItem value="default">Use Ironmount's password</SelectItem>
+									<SelectItem value="custom">Enter password manually</SelectItem>
+								</SelectContent>
+							</Select>
+							<FormDescription>
+								Choose whether to use Ironmount's master password or enter a custom password for the existing
+								repository.
+							</FormDescription>
+						</FormItem>
+
+						{passwordMode === "custom" && (
+							<FormField
+								control={form.control}
+								name="customPassword"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Repository Password</FormLabel>
+										<FormControl>
+											<Input type="password" placeholder="Enter repository password" {...field} />
+										</FormControl>
+										<FormDescription>
+											The password used to encrypt this repository. It will be stored securely.
+										</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						)}
+					</>
+				)}
+
 				{watchedBackend === "s3" && (
 					<>
 						<FormField
@@ -235,7 +316,9 @@ export const CreateRepositoryForm = ({
 									<FormControl>
 										<Input placeholder="<account-id>.r2.cloudflarestorage.com" {...field} />
 									</FormControl>
-									<FormDescription>R2 endpoint (without https://). Find in R2 dashboard under bucket settings.</FormDescription>
+									<FormDescription>
+										R2 endpoint (without https://). Find in R2 dashboard under bucket settings.
+									</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}

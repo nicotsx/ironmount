@@ -11,13 +11,19 @@ export const REPOSITORY_BACKENDS = {
 
 export type RepositoryBackend = keyof typeof REPOSITORY_BACKENDS;
 
+// Common fields for all repository configs
+const baseRepositoryConfigSchema = type({
+	isExistingRepository: "boolean?",
+	customPassword: "string?",
+});
+
 export const s3RepositoryConfigSchema = type({
 	backend: "'s3'",
 	endpoint: "string",
 	bucket: "string",
 	accessKeyId: "string",
 	secretAccessKey: "string",
-});
+}).and(baseRepositoryConfigSchema);
 
 export const r2RepositoryConfigSchema = type({
 	backend: "'r2'",
@@ -25,19 +31,19 @@ export const r2RepositoryConfigSchema = type({
 	bucket: "string",
 	accessKeyId: "string",
 	secretAccessKey: "string",
-});
+}).and(baseRepositoryConfigSchema);
 
 export const localRepositoryConfigSchema = type({
 	backend: "'local'",
 	name: "string",
-});
+}).and(baseRepositoryConfigSchema);
 
 export const gcsRepositoryConfigSchema = type({
 	backend: "'gcs'",
 	bucket: "string",
 	projectId: "string",
 	credentialsJson: "string",
-});
+}).and(baseRepositoryConfigSchema);
 
 export const azureRepositoryConfigSchema = type({
 	backend: "'azure'",
@@ -45,13 +51,13 @@ export const azureRepositoryConfigSchema = type({
 	accountName: "string",
 	accountKey: "string",
 	endpointSuffix: "string?",
-});
+}).and(baseRepositoryConfigSchema);
 
 export const rcloneRepositoryConfigSchema = type({
 	backend: "'rclone'",
 	remote: "string",
 	path: "string",
-});
+}).and(baseRepositoryConfigSchema);
 
 export const repositoryConfigSchema = s3RepositoryConfigSchema
 	.or(r2RepositoryConfigSchema)
