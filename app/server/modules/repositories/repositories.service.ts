@@ -82,21 +82,6 @@ const createRepository = async (name: string, config: RepositoryConfig, compress
 	}
 
 	const errorMessage = toMessage(error);
-	
-	if (errorMessage.includes("already initialized") || errorMessage.includes("config file already exists")) {
-		logger.info(`Repository already exists on backend, connecting to existing repository: ${slug}`);
-		
-		await db
-			.update(repositoriesTable)
-			.set({
-				status: "healthy",
-				lastChecked: Date.now(),
-				lastError: null,
-			})
-			.where(eq(repositoriesTable.id, id));
-
-		return { repository: created, status: 201 };
-	}
 
 	await db.delete(repositoriesTable).where(eq(repositoriesTable.id, id));
 
