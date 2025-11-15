@@ -36,7 +36,7 @@ In order to run Ironmount, you need to have Docker and Docker Compose installed 
 ```yaml
 services:
   ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.8
+    image: ghcr.io/nicotsx/ironmount:v0.9
     container_name: ironmount
     restart: unless-stopped
     cap_add:
@@ -68,7 +68,7 @@ If you want to track a local directory on the same server where Ironmount is run
 ```diff
 services:
   ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.8
+    image: ghcr.io/nicotsx/ironmount:v0.9
     container_name: ironmount
     restart: unless-stopped
     cap_add:
@@ -133,7 +133,7 @@ Ironmount can use [rclone](https://rclone.org/) to support 40+ cloud storage pro
    ```diff
    services:
      ironmount:
-       image: ghcr.io/nicotsx/ironmount:v0.8
+       image: ghcr.io/nicotsx/ironmount:v0.9
        container_name: ironmount
        restart: unless-stopped
        cap_add:
@@ -189,7 +189,7 @@ In order to enable this feature, you need to change your bind mount `/var/lib/ir
 ```diff
 services:
   ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.8
+    image: ghcr.io/nicotsx/ironmount:v0.9
     container_name: ironmount
     restart: unless-stopped
     ports:
@@ -217,7 +217,7 @@ In order to enable this feature, you need to run Ironmount with several items sh
 ```diff
 services:
   ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.8
+    image: ghcr.io/nicotsx/ironmount:v0.9
     container_name: ironmount
     restart: unless-stopped
     cap_add:
