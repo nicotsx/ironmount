@@ -19,7 +19,9 @@ export class CleanupDanglingMountsJob extends Job {
 				const matchingVolume = allVolumes.find((v) => getVolumePath(v) === mount.mountPoint);
 				if (!matchingVolume) {
 					logger.info(`Found dangling mount at ${mount.mountPoint}, attempting to unmount...`);
-					await executeUnmount(mount.mountPoint);
+					await executeUnmount(mount.mountPoint).catch((err) => {
+						logger.warn(`Failed to unmount dangling mount ${mount.mountPoint}: ${toMessage(err)}`);
+					});
 
 					await fs.rmdir(path.dirname(mount.mountPoint)).catch((err) => {
 						logger.warn(

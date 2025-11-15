@@ -13,6 +13,10 @@ export const executeMount = async (args: string[]): Promise<void> => {
 	if (stderr?.trim()) {
 		logger.warn(stderr.trim());
 	}
+
+	if (result.exitCode !== 0) {
+		throw new Error(`Mount command failed with exit code ${result.exitCode}: ${stderr?.trim()}`);
+	}
 };
 
 export const executeUnmount = async (path: string): Promise<void> => {
@@ -23,6 +27,10 @@ export const executeUnmount = async (path: string): Promise<void> => {
 
 	if (stderr?.trim()) {
 		logger.warn(stderr.trim());
+	}
+
+	if (result.exitCode !== 0) {
+		throw new Error(`Mount command failed with exit code ${result.exitCode}: ${stderr?.trim()}`);
 	}
 };
 
