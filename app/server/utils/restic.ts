@@ -74,6 +74,10 @@ const buildRepoUrl = (config: RepositoryConfig): string => {
 			return `${REPOSITORY_BASE}/${config.name}`;
 		case "s3":
 			return `s3:${config.endpoint}/${config.bucket}`;
+		case "r2": {
+			const endpoint = config.endpoint.replace(/^https?:\/\//, '');
+			return `s3:${endpoint}/${config.bucket}`;
+		}
 		case "gcs":
 			return `gs:${config.bucket}:/`;
 		case "azure":
@@ -97,6 +101,12 @@ const buildEnv = async (config: RepositoryConfig) => {
 		case "s3":
 			env.AWS_ACCESS_KEY_ID = await cryptoUtils.decrypt(config.accessKeyId);
 			env.AWS_SECRET_ACCESS_KEY = await cryptoUtils.decrypt(config.secretAccessKey);
+			break;
+		case "r2":
+			env.AWS_ACCESS_KEY_ID = await cryptoUtils.decrypt(config.accessKeyId);
+			env.AWS_SECRET_ACCESS_KEY = await cryptoUtils.decrypt(config.secretAccessKey);
+			env.AWS_REGION = "auto";
+			env.AWS_S3_FORCE_PATH_STYLE = "true";
 			break;
 		case "gcs": {
 			const decryptedCredentials = await cryptoUtils.decrypt(config.credentialsJson);
