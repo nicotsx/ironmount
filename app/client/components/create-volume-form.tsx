@@ -536,42 +536,44 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 					</>
 				)}
 
-				<div className="space-y-3">
-					<div className="flex items-center gap-2">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={handleTestConnection}
-							disabled={testBackendConnection.isPending}
-							className="flex-1"
-						>
-							{testBackendConnection.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-							{!testBackendConnection.isPending && testMessage?.success && (
-								<CheckCircle className="mr-2 h-4 w-4 text-green-500" />
-							)}
-							{!testBackendConnection.isPending && testMessage && !testMessage.success && (
-								<XCircle className="mr-2 h-4 w-4 text-red-500" />
-							)}
-							{testBackendConnection.isPending
-								? "Testing..."
-								: testMessage
-									? testMessage.success
-										? "Connection Successful"
-										: "Test Failed"
-									: "Test Connection"}
-						</Button>
-					</div>
-					{testMessage && (
-						<div
-							className={cn("text-xs p-2 rounded-md text-wrap wrap-anywhere", {
-								"bg-green-50 text-green-700 border border-green-200": testMessage.success,
-								"bg-red-50 text-red-700 border border-red-200": !testMessage.success,
-							})}
-						>
-							{testMessage.message}
+				{watchedBackend !== "directory" && (
+					<div className="space-y-3">
+						<div className="flex items-center gap-2">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={handleTestConnection}
+								disabled={testBackendConnection.isPending}
+								className="flex-1"
+							>
+								{testBackendConnection.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+								{!testBackendConnection.isPending && testMessage?.success && (
+									<CheckCircle className="mr-2 h-4 w-4 text-green-500" />
+								)}
+								{!testBackendConnection.isPending && testMessage && !testMessage.success && (
+									<XCircle className="mr-2 h-4 w-4 text-red-500" />
+								)}
+								{testBackendConnection.isPending
+									? "Testing..."
+									: testMessage
+										? testMessage.success
+											? "Connection Successful"
+											: "Test Failed"
+										: "Test Connection"}
+							</Button>
 						</div>
-					)}
-				</div>
+						{testMessage && (
+							<div
+								className={cn("text-xs p-2 rounded-md text-wrap wrap-anywhere", {
+									"bg-green-50 text-green-700 border border-green-200": testMessage.success,
+									"bg-red-50 text-red-700 border border-red-200": !testMessage.success,
+								})}
+							>
+								{testMessage.message}
+							</div>
+						)}
+					</div>
+				)}
 				{mode === "update" && (
 					<Button type="submit" className="w-full" loading={loading}>
 						Save Changes
