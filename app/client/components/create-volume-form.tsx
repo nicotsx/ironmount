@@ -14,6 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { volumeConfigSchema } from "~/schemas/volumes";
 import { testConnectionMutation } from "../api-client/@tanstack/react-query.gen";
 
+const SUPPORTS_CONNECTION_TEST = ["nfs", "smb", "webdav", "mariadb", "mysql", "postgres"] as const;
+
 export const formSchema = type({
 	name: "2<=string<=32",
 }).and(volumeConfigSchema);
@@ -85,14 +87,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 	const handleTestConnection = async () => {
 		const formValues = getValues();
 
-		if (
-			formValues.backend === "nfs" ||
-			formValues.backend === "smb" ||
-			formValues.backend === "webdav" ||
-			formValues.backend === "mariadb" ||
-			formValues.backend === "mysql" ||
-			formValues.backend === "postgres"
-		) {
+		if (SUPPORTS_CONNECTION_TEST.includes(formValues.backend)) {
 			testBackendConnection.mutate({
 				body: { config: formValues },
 			});
