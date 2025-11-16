@@ -84,6 +84,10 @@ const buildRepoUrl = (config: RepositoryConfig): string => {
 			return `azure:${config.container}:/`;
 		case "rclone":
 			return `rclone:${config.remote}:${config.path}`;
+		case "rest": {
+			const path = config.path ? `/${config.path}` : "";
+			return `rest:${config.url}${path}`;
+		}
 		default: {
 			throw new Error(`Unsupported repository backend: ${JSON.stringify(config)}`);
 		}
@@ -130,6 +134,15 @@ const buildEnv = async (config: RepositoryConfig) => {
 			env.AZURE_ACCOUNT_KEY = await cryptoUtils.decrypt(config.accountKey);
 			if (config.endpointSuffix) {
 				env.AZURE_ENDPOINT_SUFFIX = config.endpointSuffix;
+			}
+			break;
+		}
+		case "rest": {
+			if (config.username) {
+				env.RESTIC_REST_USERNAME = await cryptoUtils.decrypt(config.username);
+			}
+			if (config.password) {
+				env.RESTIC_REST_PASSWORD = await cryptoUtils.decrypt(config.password);
 			}
 			break;
 		}

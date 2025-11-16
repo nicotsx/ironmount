@@ -7,6 +7,7 @@ export const REPOSITORY_BACKENDS = {
 	gcs: "gcs",
 	azure: "azure",
 	rclone: "rclone",
+	rest: "rest",
 } as const;
 
 export type RepositoryBackend = keyof typeof REPOSITORY_BACKENDS;
@@ -59,12 +60,21 @@ export const rcloneRepositoryConfigSchema = type({
 	path: "string",
 }).and(baseRepositoryConfigSchema);
 
+export const restRepositoryConfigSchema = type({
+	backend: "'rest'",
+	url: "string",
+	username: "string?",
+	password: "string?",
+	path: "string?",
+}).and(baseRepositoryConfigSchema);
+
 export const repositoryConfigSchema = s3RepositoryConfigSchema
 	.or(r2RepositoryConfigSchema)
 	.or(localRepositoryConfigSchema)
 	.or(gcsRepositoryConfigSchema)
 	.or(azureRepositoryConfigSchema)
-	.or(rcloneRepositoryConfigSchema);
+	.or(rcloneRepositoryConfigSchema)
+	.or(restRepositoryConfigSchema);
 
 export type RepositoryConfig = typeof repositoryConfigSchema.infer;
 

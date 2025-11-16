@@ -33,6 +33,14 @@ const encryptConfig = async (config: RepositoryConfig): Promise<RepositoryConfig
 		case "azure":
 			encryptedConfig.accountKey = await cryptoUtils.encrypt(config.accountKey);
 			break;
+		case "rest":
+			if (config.username) {
+				encryptedConfig.username = await cryptoUtils.encrypt(config.username);
+			}
+			if (config.password) {
+				encryptedConfig.password = await cryptoUtils.encrypt(config.password);
+			}
+			break;
 	}
 
 	return encryptedConfig as RepositoryConfig;
