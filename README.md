@@ -46,6 +46,7 @@ services:
     devices:
       - /dev/fuse:/dev/fuse
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - /var/lib/ironmount:/var/lib/ironmount
 ```
 
@@ -78,6 +79,7 @@ services:
     devices:
       - /dev/fuse:/dev/fuse
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - /var/lib/ironmount:/var/lib/ironmount
 +     - /path/to/your/directory:/mydata
 ```
@@ -143,6 +145,7 @@ Ironmount can use [rclone](https://rclone.org/) to support 40+ cloud storage pro
        devices:
          - /dev/fuse:/dev/fuse
        volumes:
+         - /etc/localtime:/etc/localtime:ro
          - /var/lib/ironmount:/var/lib/ironmount
    +     - ~/.config/rclone:/root/.config/rclone
    ```
@@ -197,6 +200,7 @@ services:
     devices:
       - /dev/fuse:/dev/fuse
     volumes:
+      - /etc/localtime:/etc/localtime:ro
 -     - /var/lib/ironmount:/var/lib/ironmount
 +     - /var/lib/ironmount:/var/lib/ironmount:rshared
 ```
@@ -227,6 +231,7 @@ services:
     devices:
       - /dev/fuse:/dev/fuse
     volumes:
+      - /etc/localtime:/etc/localtime:ro
 -     - /var/lib/ironmount:/var/lib/ironmount
 +     - /var/lib/ironmount:/var/lib/ironmount:rshared
 +     - /run/docker/plugins:/run/docker/plugins
