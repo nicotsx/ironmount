@@ -59,6 +59,9 @@ CMD ["bun", "run", "dev"]
 # ------------------------------
 FROM oven/bun:${BUN_VERSION} AS builder
 
+ARG APP_VERSION=dev
+ENV VITE_APP_VERSION=${APP_VERSION}
+
 WORKDIR /app
 
 COPY ./package.json ./bun.lock ./
