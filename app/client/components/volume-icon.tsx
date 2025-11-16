@@ -1,4 +1,4 @@
-import { Cloud, Folder, Server, Share2 } from "lucide-react";
+import { Cloud, Database, Folder, Server, Share2 } from "lucide-react";
 import type { BackendType } from "~/schemas/volumes";
 
 type VolumeIconProps = {
@@ -31,6 +31,30 @@ const getIconAndColor = (backend: BackendType) => {
 				icon: Cloud,
 				color: "text-green-600 dark:text-green-400",
 				label: "WebDAV",
+			};
+		case "mariadb":
+			return {
+				icon: Database,
+				color: "text-teal-600 dark:text-teal-400",
+				label: "MariaDB",
+			};
+		case "mysql":
+			return {
+				icon: Database,
+				color: "text-cyan-600 dark:text-cyan-400",
+				label: "MySQL",
+			};
+		case "postgres":
+			return {
+				icon: Database,
+				color: "text-indigo-600 dark:text-indigo-400",
+				label: "PostgreSQL",
+			};
+		case "sqlite":
+			return {
+				icon: Database,
+				color: "text-slate-600 dark:text-slate-400",
+				label: "SQLite",
 			};
 		default:
 			return {
