@@ -3,6 +3,7 @@ import { Link, NavLink } from "react-router";
 import {
 	Sidebar,
 	SidebarContent,
+	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupContent,
 	SidebarHeader,
@@ -13,6 +14,7 @@ import {
 } from "~/client/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/client/components/ui/tooltip";
 import { cn } from "~/client/lib/utils";
+import { APP_VERSION } from "~/client/lib/version";
 
 const items = [
 	{
@@ -85,6 +87,15 @@ export function AppSidebar() {
 					</SidebarGroupContent>
 				</SidebarGroup>
 			</SidebarContent>
+			<SidebarFooter className="p-4 border-r border-t border-border/50">
+				<div
+					className={cn("text-xs text-muted-foreground transition-all duration-200", {
+						"opacity-0 w-0 overflow-hidden": state === "collapsed",
+					})}
+				>
+					Version {APP_VERSION}
+				</div>
+			</SidebarFooter>
 		</Sidebar>
 	);
 }
