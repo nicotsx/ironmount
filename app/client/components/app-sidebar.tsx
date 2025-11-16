@@ -93,7 +93,7 @@ export function AppSidebar() {
 						"opacity-0 w-0 overflow-hidden": state === "collapsed",
 					})}
 				>
-					Version {APP_VERSION}
+					{APP_VERSION}
 				</div>
 			</SidebarFooter>
 		</Sidebar>
