@@ -66,7 +66,11 @@ export const safeSpawn = (params: Params) => {
 				await callbacks.finally();
 			}
 
-			reject(error);
+			resolve({
+				exitCode: -1,
+				stdout: stdoutData,
+				stderr: stderrData,
+			});
 		});
 
 		child.on("close", async (code) => {
