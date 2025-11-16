@@ -52,8 +52,12 @@ const checkHealth = async (config: BackendConfig) => {
 	}
 };
 
-export const makeDirectoryBackend = (config: BackendConfig, volumePath: string): VolumeBackend => ({
+export const makeDirectoryBackend = (config: BackendConfig, volumeName: string, volumePath: string): VolumeBackend => ({
 	mount: () => mount(config, volumePath),
 	unmount,
 	checkHealth: () => checkHealth(config),
+	getVolumePath: () => config.backend === "directory" ? config.path : volumePath,
+	isDatabaseBackend: () => false,
+	getDumpPath: () => null,
+	getDumpFilePath: () => null,
 });

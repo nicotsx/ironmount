@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { volumeService } from "../volumes/volume.service";
-import { getVolumePath } from "../volumes/helpers";
+import { createVolumeBackend } from "../backends/backend";
+import { VOLUME_MOUNT_BASE } from "../../core/constants";
 
 export const driverController = new Hono()
 	.post("/VolumeDriver.Capabilities", (c) => {
@@ -31,9 +32,11 @@ export const driverController = new Hono()
 		}
 
 		const volumeName = body.Name.replace(/^im-/, "");
+		const { volume } = await volumeService.getVolume(volumeName);
+		const backend = createVolumeBackend(volume);
 
 		return c.json({
-			Mountpoint: getVolumePath(volumeName),
+			Mountpoint: backend.getVolumePath(),
 		});
 	})
 	.post("/VolumeDriver.Unmount", (c) => {
@@ -49,9 +52,10 @@ export const driverController = new Hono()
 		}
 
 		const { volume } = await volumeService.getVolume(body.Name.replace(/^im-/, ""));
+		const backend = createVolumeBackend(volume);
 
 		return c.json({
-			Mountpoint: getVolumePath(volume),
+			Mountpoint: backend.getVolumePath(),
 		});
 	})
 	.post("/VolumeDriver.Get", async (c) => {
@@ -62,11 +66,12 @@ export const driverController = new Hono()
 		}
 
 		const { volume } = await volumeService.getVolume(body.Name.replace(/^im-/, ""));
+		const backend = createVolumeBackend(volume);
 
 		return c.json({
 			Volume: {
 				Name: `im-${volume.name}`,
-				Mountpoint: getVolumePath(volume),
+				Mountpoint: backend.getVolumePath(),
 				Status: {},
 			},
 			Err: "",
@@ -75,11 +80,14 @@ export const driverController = new Hono()
 	.post("/VolumeDriver.List", async (c) => {
 		const volumes = await volumeService.listVolumes();
 
-		const res = volumes.map((volume) => ({
-			Name: `im-${volume.name}`,
-			Mountpoint: getVolumePath(volume),
-			Status: {},
-		}));
+		const res = volumes.map((volume) => {
+			const backend = createVolumeBackend(volume);
+			return {
+				Name: `im-${volume.name}`,
+				Mountpoint: backend.getVolumePath(),
+				Status: {},
+			};
+		});
 
 		return c.json({
 			Volumes: res,

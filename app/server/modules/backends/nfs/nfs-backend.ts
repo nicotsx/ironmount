@@ -114,8 +114,12 @@ const checkHealth = async (path: string, readOnly: boolean) => {
 	}
 };
 
-export const makeNfsBackend = (config: BackendConfig, path: string): VolumeBackend => ({
+export const makeNfsBackend = (config: BackendConfig, volumeName: string, path: string): VolumeBackend => ({
 	mount: () => mount(config, path),
 	unmount: () => unmount(path),
 	checkHealth: () => checkHealth(path, config.readOnly ?? false),
+	getVolumePath: () => path,
+	isDatabaseBackend: () => false,
+	getDumpPath: () => null,
+	getDumpFilePath: () => null,
 });

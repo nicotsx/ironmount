@@ -4,6 +4,7 @@ import { logger } from "../../../utils/logger";
 import { testPostgresConnection } from "../../../utils/database-dump";
 import type { VolumeBackend } from "../backend";
 import { BACKEND_STATUS, type BackendConfig } from "~/schemas/volumes";
+import { VOLUME_MOUNT_BASE } from "../../../core/constants";
 
 const mount = async (config: BackendConfig, volumePath: string) => {
 	if (config.backend !== "postgres") {
@@ -50,8 +51,19 @@ const checkHealth = async (config: BackendConfig) => {
 	}
 };
 
-export const makePostgresBackend = (config: BackendConfig, volumePath: string): VolumeBackend => ({
+export const makePostgresBackend = (config: BackendConfig, volumeName: string, volumePath: string): VolumeBackend => ({
 	mount: () => mount(config, volumePath),
 	unmount: () => unmount(volumePath),
 	checkHealth: () => checkHealth(config),
+	getVolumePath: () => volumePath,
+	isDatabaseBackend: () => true,
+	getDumpPath: () => `${VOLUME_MOUNT_BASE}/${volumeName}/dumps`,
+	getDumpFilePath: (timestamp: number) => {
+		const dumpDir = `${VOLUME_MOUNT_BASE}/${volumeName}/dumps`;
+		const extension = config.backend === "postgres" &&
+			(config as Extract<BackendConfig, { backend: "postgres" }>).dumpFormat !== "plain"
+			? "dump"
+			: "sql";
+		return `${dumpDir}/${volumeName}-${timestamp}.${extension}`;
+	},
 });

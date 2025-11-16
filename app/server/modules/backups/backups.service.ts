@@ -7,7 +7,7 @@ import { db } from "../../db/db";
 import { backupSchedulesTable, repositoriesTable, volumesTable } from "../../db/schema";
 import { restic } from "../../utils/restic";
 import { logger } from "../../utils/logger";
-import { getVolumePath, isDatabaseVolume, getDumpFilePath } from "../volumes/helpers";
+import { createVolumeBackend } from "../backends/backend";
 import type { CreateBackupScheduleBody, UpdateBackupScheduleBody } from "./backups.dto";
 import { toMessage } from "../../utils/errors";
 import { serverEvents } from "../../core/events";
@@ -208,15 +208,20 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 	runningBackups.set(scheduleId, abortController);
 
 	try {
+		const backend = createVolumeBackend(volume);
 		let backupPath: string;
 		let dumpFilePath: string | null = null;
-		const isDatabase = isDatabaseVolume(volume);
+		const isDatabase = backend.isDatabaseBackend();
 
 		if (isDatabase) {
 			logger.info(`Creating database dump for volume ${volume.name}`);
 			
 			const timestamp = Date.now();
-			dumpFilePath = getDumpFilePath(volume, timestamp);
+			dumpFilePath = backend.getDumpFilePath(timestamp);
+			
+			if (!dumpFilePath) {
+				throw new Error("Failed to get dump file path for database volume");
+			}
 			
 			try {
 				await executeDatabaseDump(volume.config as DatabaseConfig, dumpFilePath);
@@ -228,7 +233,7 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 			
 			backupPath = dumpFilePath;
 		} else {
-			backupPath = getVolumePath(volume);
+			backupPath = backend.getVolumePath();
 		}
 
 		const backupOptions: {
