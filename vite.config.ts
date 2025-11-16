@@ -3,9 +3,21 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { reactRouterHonoServer } from "react-router-hono-server/dev";
+import { execSync } from "node:child_process";
+
+const getVersion = () => {
+	try {
+		return execSync("git describe --tags --always").toString().trim();
+	} catch {
+		return "dev";
+	}
+};
 
 export default defineConfig({
 	plugins: [reactRouterHonoServer({ runtime: "bun" }), reactRouter(), tailwindcss(), tsconfigPaths()],
+	define: {
+		"import.meta.env.VITE_APP_VERSION": JSON.stringify(getVersion()),
+	},
 	build: {
 		outDir: "dist",
 		sourcemap: true,

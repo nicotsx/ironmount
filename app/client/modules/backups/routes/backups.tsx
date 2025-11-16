@@ -15,7 +15,7 @@ export const handle = {
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Backup Jobs" },
+		{ title: "Ironmount - Backup Jobs" },
 		{
 			name: "description",
 			content: "Automate volume backups with scheduled jobs and retention policies.",

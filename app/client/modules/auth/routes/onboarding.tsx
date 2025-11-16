@@ -24,7 +24,7 @@ export const clientMiddleware = [authMiddleware];
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Onboarding" },
+		{ title: "Ironmount - Onboarding" },
 		{
 			name: "description",
 			content: "Welcome to Ironmount. Create your admin account to get started.",

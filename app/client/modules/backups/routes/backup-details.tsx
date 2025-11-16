@@ -40,7 +40,7 @@ export const handle = {
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Backup Job Details" },
+		{ title: "Ironmount - Backup Job Details" },
 		{
 			name: "description",
 			content: "View and manage backup job configuration, schedule, and snapshots.",

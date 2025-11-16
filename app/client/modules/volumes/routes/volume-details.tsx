@@ -37,7 +37,7 @@ export const handle = {
 
 export function meta({ params }: Route.MetaArgs) {
 	return [
-		{ title: params.name },
+		{ title: `Ironmount - ${params.name}` },
 		{
 			name: "description",
 			content: "View and manage volume details, configuration, and files.",
