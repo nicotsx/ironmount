@@ -711,30 +711,42 @@ export type ListRepositoriesResponses = {
             bucket: string;
             endpoint: string;
             secretAccessKey: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             accessKeyId: string;
             backend: 's3';
             bucket: string;
             endpoint: string;
             secretAccessKey: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             accountKey: string;
             accountName: string;
             backend: 'azure';
             container: string;
+            customPassword?: string;
             endpointSuffix?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'gcs';
             bucket: string;
             credentialsJson: string;
             projectId: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'local';
             name: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'rclone';
             path: string;
             remote: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         };
         createdAt: number;
         id: string;
@@ -757,30 +769,42 @@ export type CreateRepositoryData = {
             bucket: string;
             endpoint: string;
             secretAccessKey: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             accessKeyId: string;
             backend: 's3';
             bucket: string;
             endpoint: string;
             secretAccessKey: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             accountKey: string;
             accountName: string;
             backend: 'azure';
             container: string;
+            customPassword?: string;
             endpointSuffix?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'gcs';
             bucket: string;
             credentialsJson: string;
             projectId: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'local';
             name: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'rclone';
             path: string;
             remote: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         };
         name: string;
         compressionMode?: 'auto' | 'better' | 'fastest' | 'max' | 'off';
@@ -865,30 +889,42 @@ export type GetRepositoryResponses = {
             bucket: string;
             endpoint: string;
             secretAccessKey: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             accessKeyId: string;
             backend: 's3';
             bucket: string;
             endpoint: string;
             secretAccessKey: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             accountKey: string;
             accountName: string;
             backend: 'azure';
             container: string;
+            customPassword?: string;
             endpointSuffix?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'gcs';
             bucket: string;
             credentialsJson: string;
             projectId: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'local';
             name: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'rclone';
             path: string;
             remote: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         };
         createdAt: number;
         id: string;
@@ -928,6 +964,27 @@ export type ListSnapshotsResponses = {
 };
 
 export type ListSnapshotsResponse = ListSnapshotsResponses[keyof ListSnapshotsResponses];
+
+export type DeleteSnapshotData = {
+    body?: never;
+    path: {
+        name: string;
+        snapshotId: string;
+    };
+    query?: never;
+    url: '/api/v1/repositories/{name}/snapshots/{snapshotId}';
+};
+
+export type DeleteSnapshotResponses = {
+    /**
+     * Snapshot deleted successfully
+     */
+    200: {
+        message: string;
+    };
+};
+
+export type DeleteSnapshotResponse = DeleteSnapshotResponses[keyof DeleteSnapshotResponses];
 
 export type GetSnapshotDetailsData = {
     body?: never;
@@ -1079,30 +1136,42 @@ export type ListBackupSchedulesResponses = {
                 bucket: string;
                 endpoint: string;
                 secretAccessKey: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 accessKeyId: string;
                 backend: 's3';
                 bucket: string;
                 endpoint: string;
                 secretAccessKey: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 accountKey: string;
                 accountName: string;
                 backend: 'azure';
                 container: string;
+                customPassword?: string;
                 endpointSuffix?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'gcs';
                 bucket: string;
                 credentialsJson: string;
                 projectId: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'local';
                 name: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'rclone';
                 path: string;
                 remote: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             };
             createdAt: number;
             id: string;
@@ -1280,30 +1349,42 @@ export type GetBackupScheduleResponses = {
                 bucket: string;
                 endpoint: string;
                 secretAccessKey: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 accessKeyId: string;
                 backend: 's3';
                 bucket: string;
                 endpoint: string;
                 secretAccessKey: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 accountKey: string;
                 accountName: string;
                 backend: 'azure';
                 container: string;
+                customPassword?: string;
                 endpointSuffix?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'gcs';
                 bucket: string;
                 credentialsJson: string;
                 projectId: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'local';
                 name: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'rclone';
                 path: string;
                 remote: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             };
             createdAt: number;
             id: string;
@@ -1462,30 +1543,42 @@ export type GetBackupScheduleForVolumeResponses = {
                 bucket: string;
                 endpoint: string;
                 secretAccessKey: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 accessKeyId: string;
                 backend: 's3';
                 bucket: string;
                 endpoint: string;
                 secretAccessKey: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 accountKey: string;
                 accountName: string;
                 backend: 'azure';
                 container: string;
+                customPassword?: string;
                 endpointSuffix?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'gcs';
                 bucket: string;
                 credentialsJson: string;
                 projectId: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'local';
                 name: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'rclone';
                 path: string;
                 remote: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             };
             createdAt: number;
             id: string;
@@ -1609,13 +1702,6 @@ export type RunForgetData = {
     };
     query?: never;
     url: '/api/v1/backups/{scheduleId}/forget';
-};
-
-export type RunForgetErrors = {
-    /**
-     * No retention policy configured for this schedule
-     */
-    400: unknown;
 };
 
 export type RunForgetResponses = {

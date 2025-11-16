@@ -327,6 +327,18 @@ const doctorRepository = async (name: string) => {
 	};
 };
 
+const deleteSnapshot = async (name: string, snapshotId: string) => {
+	const repository = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.name, name),
+	});
+
+	if (!repository) {
+		throw new NotFoundError("Repository not found");
+	}
+
+	await restic.deleteSnapshot(repository.config, snapshotId);
+};
+
 export const repositoriesService = {
 	listRepositories,
 	createRepository,
@@ -338,4 +350,5 @@ export const repositoriesService = {
 	getSnapshotDetails,
 	checkHealth,
 	doctorRepository,
+	deleteSnapshot,
 };
