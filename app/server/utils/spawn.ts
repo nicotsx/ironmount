@@ -41,12 +41,6 @@ export const safeSpawn = (params: Params) => {
 			}, timeout);
 		}
 
-		// Write stdin if provided
-		if (stdin && child.stdin) {
-			child.stdin.write(stdin);
-			child.stdin.end();
-		}
-
 		child.stdout.on("data", (data) => {
 			if (callbacks.onStdout) {
 				callbacks.onStdout(data.toString());
