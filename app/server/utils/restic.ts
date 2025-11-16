@@ -441,6 +441,22 @@ const forget = async (config: RepositoryConfig, options: RetentionPolicy, extra:
 	return { success: true };
 };
 
+const deleteSnapshot = async (config: RepositoryConfig, snapshotId: string) => {
+	const repoUrl = buildRepoUrl(config);
+	const env = await buildEnv(config);
+
+	const args: string[] = ["--repo", repoUrl, "forget", snapshotId, "--prune"];
+
+	const res = await $`restic ${args}`.env(env).nothrow();
+
+	if (res.exitCode !== 0) {
+		logger.error(`Restic snapshot deletion failed: ${res.stderr}`);
+		throw new Error(`Failed to delete snapshot: ${res.stderr}`);
+	}
+
+	return { success: true };
+};
+
 const lsNodeSchema = type({
 	name: "string",
 	type: "string",
@@ -601,6 +617,7 @@ export const restic = {
 	restore,
 	snapshots,
 	forget,
+	deleteSnapshot,
 	unlock,
 	ls,
 	check,

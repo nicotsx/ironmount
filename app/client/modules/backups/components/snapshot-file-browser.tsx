@@ -26,10 +26,12 @@ interface Props {
 	snapshot: Snapshot;
 	repositoryName: string;
 	volume?: Volume;
+	onDeleteSnapshot?: (snapshotId: string) => void;
+	isDeletingSnapshot?: boolean;
 }
 
 export const SnapshotFileBrowser = (props: Props) => {
-	const { snapshot, repositoryName, volume } = props;
+	const { snapshot, repositoryName, volume, onDeleteSnapshot, isDeletingSnapshot } = props;
 
 	const isReadOnly = volume?.config && "readOnly" in volume.config && volume.config.readOnly === true;
 
@@ -136,30 +138,43 @@ export const SnapshotFileBrowser = (props: Props) => {
 							<CardTitle>File Browser</CardTitle>
 							<CardDescription>{`Viewing snapshot from ${new Date(snapshot?.time ?? 0).toLocaleString()}`}</CardDescription>
 						</div>
-						{selectedPaths.size > 0 && (
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<span tabIndex={isReadOnly ? 0 : undefined}>
-										<Button
-											onClick={handleRestoreClick}
-											variant="primary"
-											size="sm"
-											disabled={isRestoring || isReadOnly}
-										>
-											{isRestoring
-												? "Restoring..."
-												: `Restore ${selectedPaths.size} selected ${selectedPaths.size === 1 ? "item" : "items"}`}
-										</Button>
-									</span>
-								</TooltipTrigger>
-								{isReadOnly && (
-									<TooltipContent className="text-center">
-										<p>Volume is mounted as read-only.</p>
-										<p>Please remount with read-only disabled to restore files.</p>
-									</TooltipContent>
-								)}
-							</Tooltip>
-						)}
+						<div className="flex gap-2">
+							{selectedPaths.size > 0 && (
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<span tabIndex={isReadOnly ? 0 : undefined}>
+											<Button
+												onClick={handleRestoreClick}
+												variant="primary"
+												size="sm"
+												disabled={isRestoring || isReadOnly}
+											>
+												{isRestoring
+													? "Restoring..."
+													: `Restore ${selectedPaths.size} selected ${selectedPaths.size === 1 ? "item" : "items"}`}
+											</Button>
+										</span>
+									</TooltipTrigger>
+									{isReadOnly && (
+										<TooltipContent className="text-center">
+											<p>Volume is mounted as read-only.</p>
+											<p>Please remount with read-only disabled to restore files.</p>
+										</TooltipContent>
+									)}
+								</Tooltip>
+							)}
+							{onDeleteSnapshot && (
+								<Button
+									variant="destructive"
+									size="sm"
+									onClick={() => onDeleteSnapshot(snapshot.short_id)}
+									disabled={isDeletingSnapshot}
+									loading={isDeletingSnapshot}
+								>
+									{isDeletingSnapshot ? "Deleting..." : "Delete Snapshot"}
+								</Button>
+							)}
+						</div>
 					</div>
 				</CardHeader>
 				<CardContent className="flex-1 overflow-hidden flex flex-col p-0">
