@@ -41,6 +41,9 @@ const encryptConfig = async (config: RepositoryConfig): Promise<RepositoryConfig
 				encryptedConfig.password = await cryptoUtils.encrypt(config.password);
 			}
 			break;
+		case "sftp":
+			encryptedConfig.privateKey = await cryptoUtils.encrypt(config.privateKey);
+			break;
 	}
 
 	return encryptedConfig as RepositoryConfig;

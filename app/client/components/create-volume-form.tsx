@@ -546,7 +546,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 					</>
 				)}
 
-				{watchedBackend !== "directory" && (
+				{watchedBackend && watchedBackend !== "directory" && (
 					<div className="space-y-3">
 						<div className="flex items-center gap-2">
 							<Button
