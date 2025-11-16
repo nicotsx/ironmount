@@ -40,7 +40,6 @@ const defaultValuesForType = {
 	mariadb: { backend: "mariadb" as const, port: 3306 },
 	mysql: { backend: "mysql" as const, port: 3306 },
 	postgres: { backend: "postgres" as const, port: 5432, dumpFormat: "custom" as const },
-	sqlite: { backend: "sqlite" as const, path: "/" },
 };
 
 export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, formId, loading, className }: Props) => {
@@ -139,7 +138,6 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 									<SelectItem value="mariadb">MariaDB</SelectItem>
 									<SelectItem value="mysql">MySQL</SelectItem>
 									<SelectItem value="postgres">PostgreSQL</SelectItem>
-									<SelectItem value="sqlite">SQLite</SelectItem>
 								</SelectContent>
 							</Select>
 							<FormDescription>Choose the storage backend for this volume.</FormDescription>
@@ -798,38 +796,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 					</>
 				)}
 
-				{watchedBackend === "sqlite" && (
-					<FormField
-						control={form.control}
-						name="path"
-						render={({ field }) => {
-							return (
-								<FormItem>
-									<FormLabel>Database File Path</FormLabel>
-									<FormControl>
-										{field.value ? (
-											<div className="flex items-center gap-2">
-												<div className="flex-1 border rounded-md p-3 bg-muted/50">
-													<div className="text-xs font-medium text-muted-foreground mb-1">Selected database:</div>
-													<div className="text-sm font-mono break-all">{field.value}</div>
-												</div>
-												<Button type="button" variant="outline" size="sm" onClick={() => field.onChange("")}>
-													Change
-												</Button>
-											</div>
-										) : (
-											<DirectoryBrowser onSelectPath={(path) => field.onChange(path)} selectedPath={field.value} />
-										)}
-									</FormControl>
-									<FormDescription>Path to the SQLite database file (.db, .sqlite, .sqlite3).</FormDescription>
-									<FormMessage />
-								</FormItem>
-							);
-						}}
-					/>
-				)}
-
-				{watchedBackend !== "directory" && watchedBackend !== "sqlite" && (
+				{watchedBackend !== "directory" && (
 					<div className="space-y-3">
 						<div className="flex items-center gap-2">
 							<Button

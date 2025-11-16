@@ -8,7 +8,6 @@ export const BACKEND_TYPES = {
 	mariadb: "mariadb",
 	mysql: "mysql",
 	postgres: "postgres",
-	sqlite: "sqlite",
 } as const;
 
 export type BackendType = keyof typeof BACKEND_TYPES;
@@ -82,19 +81,13 @@ export const postgresConfigSchema = type({
 	dumpOptions: "string[]?",
 });
 
-export const sqliteConfigSchema = type({
-	backend: "'sqlite'",
-	path: "string",
-});
-
 export const volumeConfigSchema = nfsConfigSchema
 	.or(smbConfigSchema)
 	.or(webdavConfigSchema)
 	.or(directoryConfigSchema)
 	.or(mariadbConfigSchema)
 	.or(mysqlConfigSchema)
-	.or(postgresConfigSchema)
-	.or(sqliteConfigSchema);
+	.or(postgresConfigSchema);
 
 export type BackendConfig = typeof volumeConfigSchema.infer;
 
