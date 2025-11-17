@@ -741,12 +741,21 @@ export type ListRepositoriesResponses = {
             name: string;
             customPassword?: string;
             isExistingRepository?: boolean;
+            path?: string;
         } | {
             backend: 'rclone';
             path: string;
             remote: string;
             customPassword?: string;
             isExistingRepository?: boolean;
+        } | {
+            backend: 'rest';
+            url: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
+            password?: string;
+            path?: string;
+            username?: string;
         };
         createdAt: number;
         id: string;
@@ -754,7 +763,7 @@ export type ListRepositoriesResponses = {
         lastError: string | null;
         name: string;
         status: 'error' | 'healthy' | 'unknown' | null;
-        type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 's3';
+        type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 'rest' | 's3';
         updatedAt: number;
     }>;
 };
@@ -799,12 +808,21 @@ export type CreateRepositoryData = {
             name: string;
             customPassword?: string;
             isExistingRepository?: boolean;
+            path?: string;
         } | {
             backend: 'rclone';
             path: string;
             remote: string;
             customPassword?: string;
             isExistingRepository?: boolean;
+        } | {
+            backend: 'rest';
+            url: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
+            password?: string;
+            path?: string;
+            username?: string;
         };
         name: string;
         compressionMode?: 'auto' | 'better' | 'fastest' | 'max' | 'off';
@@ -919,12 +937,21 @@ export type GetRepositoryResponses = {
             name: string;
             customPassword?: string;
             isExistingRepository?: boolean;
+            path?: string;
         } | {
             backend: 'rclone';
             path: string;
             remote: string;
             customPassword?: string;
             isExistingRepository?: boolean;
+        } | {
+            backend: 'rest';
+            url: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
+            password?: string;
+            path?: string;
+            username?: string;
         };
         createdAt: number;
         id: string;
@@ -932,7 +959,7 @@ export type GetRepositoryResponses = {
         lastError: string | null;
         name: string;
         status: 'error' | 'healthy' | 'unknown' | null;
-        type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 's3';
+        type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 'rest' | 's3';
         updatedAt: number;
     };
 };
@@ -1166,12 +1193,21 @@ export type ListBackupSchedulesResponses = {
                 name: string;
                 customPassword?: string;
                 isExistingRepository?: boolean;
+                path?: string;
             } | {
                 backend: 'rclone';
                 path: string;
                 remote: string;
                 customPassword?: string;
                 isExistingRepository?: boolean;
+            } | {
+                backend: 'rest';
+                url: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
+                password?: string;
+                path?: string;
+                username?: string;
             };
             createdAt: number;
             id: string;
@@ -1179,7 +1215,7 @@ export type ListBackupSchedulesResponses = {
             lastError: string | null;
             name: string;
             status: 'error' | 'healthy' | 'unknown' | null;
-            type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 's3';
+            type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 'rest' | 's3';
             updatedAt: number;
         };
         repositoryId: string;
@@ -1379,12 +1415,21 @@ export type GetBackupScheduleResponses = {
                 name: string;
                 customPassword?: string;
                 isExistingRepository?: boolean;
+                path?: string;
             } | {
                 backend: 'rclone';
                 path: string;
                 remote: string;
                 customPassword?: string;
                 isExistingRepository?: boolean;
+            } | {
+                backend: 'rest';
+                url: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
+                password?: string;
+                path?: string;
+                username?: string;
             };
             createdAt: number;
             id: string;
@@ -1392,7 +1437,7 @@ export type GetBackupScheduleResponses = {
             lastError: string | null;
             name: string;
             status: 'error' | 'healthy' | 'unknown' | null;
-            type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 's3';
+            type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 'rest' | 's3';
             updatedAt: number;
         };
         repositoryId: string;
@@ -1573,12 +1618,21 @@ export type GetBackupScheduleForVolumeResponses = {
                 name: string;
                 customPassword?: string;
                 isExistingRepository?: boolean;
+                path?: string;
             } | {
                 backend: 'rclone';
                 path: string;
                 remote: string;
                 customPassword?: string;
                 isExistingRepository?: boolean;
+            } | {
+                backend: 'rest';
+                url: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
+                password?: string;
+                path?: string;
+                username?: string;
             };
             createdAt: number;
             id: string;
@@ -1586,7 +1640,7 @@ export type GetBackupScheduleForVolumeResponses = {
             lastError: string | null;
             name: string;
             status: 'error' | 'healthy' | 'unknown' | null;
-            type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 's3';
+            type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 'rest' | 's3';
             updatedAt: number;
         };
         repositoryId: string;

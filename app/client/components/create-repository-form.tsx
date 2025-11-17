@@ -10,12 +10,23 @@ import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "./ui/alert";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, AlertTriangle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { useSystemInfo } from "~/client/hooks/use-system-info";
 import { COMPRESSION_MODES, repositoryConfigSchema } from "~/schemas/restic";
 import { listRcloneRemotesOptions } from "../api-client/@tanstack/react-query.gen";
 import { Checkbox } from "./ui/checkbox";
+import { DirectoryBrowser } from "./directory-browser";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "./ui/alert-dialog";
 
 export const formSchema = type({
 	name: "2<=string<=32",
@@ -67,6 +78,8 @@ export const CreateRepositoryForm = ({
 	const watchedIsExistingRepository = watch("isExistingRepository");
 
 	const [passwordMode, setPasswordMode] = useState<"default" | "custom">("default");
+	const [showPathBrowser, setShowPathBrowser] = useState(false);
+	const [showPathWarning, setShowPathWarning] = useState(false);
 
 	const { capabilities } = useSystemInfo();
 
@@ -244,6 +257,87 @@ export const CreateRepositoryForm = ({
 								)}
 							/>
 						)}
+					</>
+				)}
+
+				{watchedBackend === "local" && (
+					<>
+						<FormItem>
+							<FormLabel>Repository Directory</FormLabel>
+							<div className="flex items-center gap-2">
+								<div className="flex-1 text-sm font-mono bg-muted px-3 py-2 rounded-md border">
+									{form.watch("path") || "/var/lib/ironmount/repositories"}
+								</div>
+								<Button
+									type="button"
+									variant="outline"
+									onClick={() => setShowPathWarning(true)}
+									size="sm"
+								>
+									Change
+								</Button>
+							</div>
+							<FormDescription>
+								The directory where the repository will be stored.
+							</FormDescription>
+						</FormItem>
+
+						<AlertDialog open={showPathWarning} onOpenChange={setShowPathWarning}>
+							<AlertDialogContent>
+								<AlertDialogHeader>
+									<AlertDialogTitle className="flex items-center gap-2">
+										<AlertTriangle className="h-5 w-5 text-yellow-500" />
+										Important: Host Mount Required
+									</AlertDialogTitle>
+									<AlertDialogDescription className="space-y-3">
+										<p>
+											When selecting a custom path, ensure it is mounted from the host machine into the
+											container.
+										</p>
+										<p className="font-medium">
+											If the path is not a host mount, you will lose your repository data when the container
+											restarts.
+										</p>
+										<p className="text-sm text-muted-foreground">
+											The default path <code className="bg-muted px-1 rounded">/var/lib/ironmount/repositories</code> is
+											already mounted from the host and is safe to use.
+										</p>
+									</AlertDialogDescription>
+								</AlertDialogHeader>
+								<AlertDialogFooter>
+									<AlertDialogCancel>Cancel</AlertDialogCancel>
+									<AlertDialogAction
+										onClick={() => {
+											setShowPathBrowser(true);
+											setShowPathWarning(false);
+										}}
+									>
+										I Understand, Continue
+									</AlertDialogAction>
+								</AlertDialogFooter>
+							</AlertDialogContent>
+						</AlertDialog>
+
+						<AlertDialog open={showPathBrowser} onOpenChange={setShowPathBrowser}>
+							<AlertDialogContent className="max-w-2xl">
+								<AlertDialogHeader>
+									<AlertDialogTitle>Select Repository Directory</AlertDialogTitle>
+									<AlertDialogDescription>
+										Choose a directory from the filesystem to store the repository.
+									</AlertDialogDescription>
+								</AlertDialogHeader>
+								<div className="py-4">
+									<DirectoryBrowser
+										onSelectPath={(path) => form.setValue("path", path)}
+										selectedPath={form.watch("path") || "/var/lib/ironmount/repositories"}
+									/>
+								</div>
+								<AlertDialogFooter>
+									<AlertDialogCancel>Cancel</AlertDialogCancel>
+									<AlertDialogAction onClick={() => setShowPathBrowser(false)}>Done</AlertDialogAction>
+								</AlertDialogFooter>
+							</AlertDialogContent>
+						</AlertDialog>
 					</>
 				)}
 

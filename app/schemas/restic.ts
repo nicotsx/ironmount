@@ -37,6 +37,7 @@ export const r2RepositoryConfigSchema = type({
 export const localRepositoryConfigSchema = type({
 	backend: "'local'",
 	name: "string",
+	path: "string?",
 }).and(baseRepositoryConfigSchema);
 
 export const gcsRepositoryConfigSchema = type({
