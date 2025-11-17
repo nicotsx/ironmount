@@ -68,13 +68,23 @@ export const restRepositoryConfigSchema = type({
 	path: "string?",
 }).and(baseRepositoryConfigSchema);
 
+export const sftpRepositoryConfigSchema = type({
+	backend: "'sftp'",
+	server: "string",
+	port: type("string.integer").or(type("number")).to("1 <= number <= 65536").default(22),
+	username: "string",
+	password: "string",
+	path: "string",
+}).and(baseRepositoryConfigSchema);
+
 export const repositoryConfigSchema = s3RepositoryConfigSchema
 	.or(r2RepositoryConfigSchema)
 	.or(localRepositoryConfigSchema)
 	.or(gcsRepositoryConfigSchema)
 	.or(azureRepositoryConfigSchema)
 	.or(rcloneRepositoryConfigSchema)
-	.or(restRepositoryConfigSchema);
+	.or(restRepositoryConfigSchema)
+	.or(sftpRepositoryConfigSchema);
 
 export type RepositoryConfig = typeof repositoryConfigSchema.infer;
 

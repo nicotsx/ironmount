@@ -103,9 +103,10 @@ Now, when adding a new volume in the Ironmount web interface, you can select "Di
 A repository is where your backups will be securely stored encrypted. Ironmount supports multiple storage backends for your backup repositories:
 
 - **Local directories** - Store backups on local disk at `/var/lib/ironmount/repositories/<repository-name>`
-- **S3-compatible storage** - Amazon S3, MinIO, Wasabi, DigitalOcean Spaces, etc.
+- **S3-compatible storage** - Amazon S3, MinIO, Wasabi, DigitalOcean Spaces, Cloudflare R2, etc.
 - **Google Cloud Storage** - Google's cloud storage service
 - **Azure Blob Storage** - Microsoft Azure storage
+- **SFTP** - Secure File Transfer Protocol 
 - **rclone remotes** - 40+ cloud storage providers via rclone (see below)
 
 Repositories are optimized for storage efficiency and data integrity, leveraging Restic's deduplication and encryption features.
