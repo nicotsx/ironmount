@@ -139,11 +139,6 @@ const buildEnv = async (config: RepositoryConfig) => {
 			}
 			break;
 		}
-		case "sftp": {
-			const decryptedPassword = await cryptoUtils.decrypt(config.password);
-			const passwordFilePath = path.join("/tmp", `ironmount-sftp-pass-${crypto.randomBytes(8).toString("hex")}.txt`);
-			await fs.writeFile(passwordFilePath, decryptedPassword, { mode: 0o600 });
-			env.RESTIC_SFTP_PASSWORD_FILE = passwordFilePath;
 		case "rest": {
 			if (config.username) {
 				env.RESTIC_REST_USERNAME = await cryptoUtils.decrypt(config.username);
@@ -151,6 +146,12 @@ const buildEnv = async (config: RepositoryConfig) => {
 			if (config.password) {
 				env.RESTIC_REST_PASSWORD = await cryptoUtils.decrypt(config.password);
 			}
+		}
+		case "sftp": {
+			const decryptedPassword = await cryptoUtils.decrypt(config.password);
+			const passwordFilePath = path.join("/tmp", `ironmount-sftp-pass-${crypto.randomBytes(8).toString("hex")}.txt`);
+			await fs.writeFile(passwordFilePath, decryptedPassword, { mode: 0o600 });
+			env.RESTIC_SFTP_PASSWORD_FILE = passwordFilePath;
 			break;
 		}
 	}
