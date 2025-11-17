@@ -84,6 +84,8 @@ const buildRepoUrl = (config: RepositoryConfig): string => {
 			return `azure:${config.container}:/`;
 		case "rclone":
 			return `rclone:${config.remote}:${config.path}`;
+		case "sftp":
+			return `sftp:${config.username}@${config.server}:${config.port}${config.path}`;
 		default: {
 			throw new Error(`Unsupported repository backend: ${JSON.stringify(config)}`);
 		}
@@ -131,6 +133,13 @@ const buildEnv = async (config: RepositoryConfig) => {
 			if (config.endpointSuffix) {
 				env.AZURE_ENDPOINT_SUFFIX = config.endpointSuffix;
 			}
+			break;
+		}
+		case "sftp": {
+			const decryptedPassword = await cryptoUtils.decrypt(config.password);
+			const passwordFilePath = path.join("/tmp", `ironmount-sftp-pass-${crypto.randomBytes(8).toString("hex")}.txt`);
+			await fs.writeFile(passwordFilePath, decryptedPassword, { mode: 0o600 });
+			env.RESTIC_SFTP_PASSWORD_FILE = passwordFilePath;
 			break;
 		}
 	}

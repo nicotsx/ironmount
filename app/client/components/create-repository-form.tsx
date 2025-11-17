@@ -41,6 +41,7 @@ const defaultValuesForType = {
 	gcs: { backend: "gcs" as const, compressionMode: "auto" as const },
 	azure: { backend: "azure" as const, compressionMode: "auto" as const },
 	rclone: { backend: "rclone" as const, compressionMode: "auto" as const },
+	sftp: { backend: "sftp" as const, compressionMode: "auto" as const, port: 22 },
 };
 
 export const CreateRepositoryForm = ({
@@ -126,6 +127,7 @@ export const CreateRepositoryForm = ({
 									<SelectItem value="r2">Cloudflare R2</SelectItem>
 									<SelectItem value="gcs">Google Cloud Storage</SelectItem>
 									<SelectItem value="azure">Azure Blob Storage</SelectItem>
+									<SelectItem value="sftp">SFTP</SelectItem>
 									<Tooltip>
 										<TooltipTrigger>
 											<SelectItem disabled={!capabilities.rclone} value="rclone">
@@ -545,6 +547,81 @@ export const CreateRepositoryForm = ({
 							/>
 						</>
 					))}
+
+				{watchedBackend === "sftp" && (
+					<>
+						<FormField
+							control={form.control}
+							name="server"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Server</FormLabel>
+									<FormControl>
+										<Input placeholder="sftp.example.com" {...field} />
+									</FormControl>
+									<FormDescription>SFTP/SSH server hostname or IP address.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="port"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Port</FormLabel>
+									<FormControl>
+										<Input type="number" placeholder="22" {...field} />
+									</FormControl>
+									<FormDescription>SSH server port (default: 22).</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="username"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Username</FormLabel>
+									<FormControl>
+										<Input placeholder="sftpuser" {...field} />
+									</FormControl>
+									<FormDescription>SSH account username.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="password"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Password</FormLabel>
+									<FormControl>
+										<Input type="password" placeholder="••••••••" {...field} />
+									</FormControl>
+									<FormDescription>SSH account password.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="path"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Path</FormLabel>
+									<FormControl>
+										<Input placeholder="/home/user/backups/repository" {...field} />
+									</FormControl>
+									<FormDescription>Remote path on the SFTP server where backups will be stored.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
 
 				{mode === "update" && (
 					<Button type="submit" className="w-full" loading={loading}>

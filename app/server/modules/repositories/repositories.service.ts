@@ -15,7 +15,7 @@ const listRepositories = async () => {
 };
 
 const encryptConfig = async (config: RepositoryConfig): Promise<RepositoryConfig> => {
-	const encryptedConfig: Record<string, string | boolean> = { ...config };
+	const encryptedConfig: Record<string, string | boolean | number> = { ...config };
 
 	if (config.customPassword) {
 		encryptedConfig.customPassword = await cryptoUtils.encrypt(config.customPassword);
@@ -32,6 +32,9 @@ const encryptConfig = async (config: RepositoryConfig): Promise<RepositoryConfig
 			break;
 		case "azure":
 			encryptedConfig.accountKey = await cryptoUtils.encrypt(config.accountKey);
+			break;
+		case "sftp":
+			encryptedConfig.password = await cryptoUtils.encrypt(config.password);
 			break;
 	}
 
