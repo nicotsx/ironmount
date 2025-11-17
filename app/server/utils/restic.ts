@@ -71,7 +71,7 @@ const ensurePassfile = async () => {
 const buildRepoUrl = (config: RepositoryConfig): string => {
 	switch (config.backend) {
 		case "local":
-			return `${config.path}/${config.name}` || `${REPOSITORY_BASE}/${config.name}`;
+			return config.path ? `${config.path}/${config.name}` : `${REPOSITORY_BASE}/${config.name}`;
 		case "s3":
 			return `s3:${config.endpoint}/${config.bucket}`;
 		case "r2": {
@@ -155,6 +155,9 @@ const init = async (config: RepositoryConfig) => {
 	await ensurePassfile();
 
 	const repoUrl = buildRepoUrl(config);
+
+	logger.info(`Initializing restic repository at ${repoUrl}...`);
+
 	const env = await buildEnv(config);
 
 	const res = await $`restic init --repo ${repoUrl} --json`.env(env).nothrow();
