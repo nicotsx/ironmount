@@ -16,7 +16,7 @@ export const clientMiddleware = [authMiddleware];
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Login" },
+		{ title: "Ironmount - Login" },
 		{
 			name: "description",
 			content: "Sign in to your Ironmount account.",

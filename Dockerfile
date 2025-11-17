@@ -59,12 +59,17 @@ CMD ["bun", "run", "dev"]
 # ------------------------------
 FROM oven/bun:${BUN_VERSION} AS builder
 
+ARG APP_VERSION=dev
+
 WORKDIR /app
 
 COPY ./package.json ./bun.lock ./
 RUN bun install --frozen-lockfile
 
 COPY . .
+
+RUN touch .env
+RUN echo "VITE_APP_VERSION=${APP_VERSION}" >> .env
 
 RUN bun run build
 

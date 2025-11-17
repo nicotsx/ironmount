@@ -4,12 +4,23 @@ import { redirect, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { Button } from "~/client/components/ui/button";
 import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "~/client/components/ui/alert-dialog";
+import {
 	getBackupScheduleOptions,
 	runBackupNowMutation,
 	deleteBackupScheduleMutation,
 	listSnapshotsOptions,
 	updateBackupScheduleMutation,
 	stopBackupMutation,
+	deleteSnapshotMutation,
 } from "~/client/api-client/@tanstack/react-query.gen";
 import { parseError } from "~/client/lib/errors";
 import { getCronExpression } from "~/utils/utils";
@@ -29,7 +40,7 @@ export const handle = {
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Backup Job Details" },
+		{ title: "Ironmount - Backup Job Details" },
 		{
 			name: "description",
 			content: "View and manage backup job configuration, schedule, and snapshots.",
@@ -50,6 +61,8 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 	const [isEditMode, setIsEditMode] = useState(false);
 	const formId = useId();
 	const [selectedSnapshotId, setSelectedSnapshotId] = useState<string>();
+	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+	const [snapshotToDelete, setSnapshotToDelete] = useState<string | null>(null);
 
 	const { data: schedule } = useQuery({
 		...getBackupScheduleOptions({ path: { scheduleId: params.id } }),
@@ -110,6 +123,17 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 		},
 	});
 
+	const deleteSnapshot = useMutation({
+		...deleteSnapshotMutation(),
+		onSuccess: () => {
+			setShowDeleteConfirm(false);
+			setSnapshotToDelete(null);
+			if (selectedSnapshotId === snapshotToDelete) {
+				setSelectedSnapshotId(undefined);
+			}
+		},
+	});
+
 	const handleSubmit = (formValues: BackupScheduleFormValues) => {
 		if (!schedule) return;
 
@@ -148,6 +172,26 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 				excludePatterns: schedule.excludePatterns || undefined,
 			},
 		});
+	};
+
+	const handleDeleteSnapshot = (snapshotId: string) => {
+		setSnapshotToDelete(snapshotId);
+		setShowDeleteConfirm(true);
+	};
+
+	const handleConfirmDelete = () => {
+		if (snapshotToDelete) {
+			toast.promise(
+				deleteSnapshot.mutateAsync({
+					path: { name: schedule.repository.name, snapshotId: snapshotToDelete },
+				}),
+				{
+					loading: "Deleting snapshot...",
+					success: "Snapshot deleted successfully",
+					error: (error) => parseError(error)?.message || "Failed to delete snapshot",
+				},
+			);
+		}
 	};
 
 	if (isEditMode) {
@@ -191,8 +235,32 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 					snapshot={selectedSnapshot}
 					repositoryName={schedule.repository.name}
 					volume={schedule.volume}
+					onDeleteSnapshot={handleDeleteSnapshot}
+					isDeletingSnapshot={deleteSnapshot.isPending}
 				/>
 			)}
+
+			<AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Delete snapshot?</AlertDialogTitle>
+						<AlertDialogDescription>
+							This action cannot be undone. This will permanently delete the snapshot and all its data from the
+							repository.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={handleConfirmDelete}
+							disabled={deleteSnapshot.isPending}
+							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+						>
+							Delete snapshot
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 }

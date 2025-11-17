@@ -36,7 +36,7 @@ export const handle = {
 
 export function meta({ params }: Route.MetaArgs) {
 	return [
-		{ title: params.name },
+		{ title: `Ironmount - ${params.name}` },
 		{
 			name: "description",
 			content: "View repository configuration, status, and snapshots.",

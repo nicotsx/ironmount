@@ -86,6 +86,10 @@ const buildRepoUrl = (config: RepositoryConfig): string => {
 			return `rclone:${config.remote}:${config.path}`;
 		case "sftp":
 			return `sftp:${config.username}@${config.server}:${config.port}${config.path}`;
+		case "rest": {
+			const path = config.path ? `/${config.path}` : "";
+			return `rest:${config.url}${path}`;
+		}
 		default: {
 			throw new Error(`Unsupported repository backend: ${JSON.stringify(config)}`);
 		}
@@ -140,6 +144,13 @@ const buildEnv = async (config: RepositoryConfig) => {
 			const passwordFilePath = path.join("/tmp", `ironmount-sftp-pass-${crypto.randomBytes(8).toString("hex")}.txt`);
 			await fs.writeFile(passwordFilePath, decryptedPassword, { mode: 0o600 });
 			env.RESTIC_SFTP_PASSWORD_FILE = passwordFilePath;
+		case "rest": {
+			if (config.username) {
+				env.RESTIC_REST_USERNAME = await cryptoUtils.decrypt(config.username);
+			}
+			if (config.password) {
+				env.RESTIC_REST_PASSWORD = await cryptoUtils.decrypt(config.password);
+			}
 			break;
 		}
 	}
@@ -450,6 +461,22 @@ const forget = async (config: RepositoryConfig, options: RetentionPolicy, extra:
 	return { success: true };
 };
 
+const deleteSnapshot = async (config: RepositoryConfig, snapshotId: string) => {
+	const repoUrl = buildRepoUrl(config);
+	const env = await buildEnv(config);
+
+	const args: string[] = ["--repo", repoUrl, "forget", snapshotId, "--prune"];
+
+	const res = await $`restic ${args}`.env(env).nothrow();
+
+	if (res.exitCode !== 0) {
+		logger.error(`Restic snapshot deletion failed: ${res.stderr}`);
+		throw new Error(`Failed to delete snapshot: ${res.stderr}`);
+	}
+
+	return { success: true };
+};
+
 const lsNodeSchema = type({
 	name: "string",
 	type: "string",
@@ -610,6 +637,7 @@ export const restic = {
 	restore,
 	snapshots,
 	forget,
+	deleteSnapshot,
 	unlock,
 	ls,
 	check,

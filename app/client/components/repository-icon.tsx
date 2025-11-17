@@ -1,4 +1,4 @@
-import { Database, HardDrive, Cloud } from "lucide-react";
+import { Database, HardDrive, Cloud, Server } from "lucide-react";
 import type { RepositoryBackend } from "~/schemas/restic";
 
 type Props = {
@@ -14,6 +14,8 @@ export const RepositoryIcon = ({ backend, className = "h-4 w-4" }: Props) => {
 			return <Cloud className={className} />;
 		case "gcs":
 			return <Cloud className={className} />;
+		case "rest":
+			return <Server className={className} />;
 		default:
 			return <Database className={className} />;
 	}

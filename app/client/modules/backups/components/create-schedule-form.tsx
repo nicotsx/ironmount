@@ -254,8 +254,8 @@ export const CreateScheduleForm = ({ initialValues, formId, onSubmit, volume }: 
 						<CardHeader>
 							<CardTitle>Backup paths</CardTitle>
 							<CardDescription>
-								Select which folders or files to include in the backup. If no paths are selected, the entire volume will be
-								backed up.
+								Select which folders or files to include in the backup. If no paths are selected, the entire volume will
+								be backed up.
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
