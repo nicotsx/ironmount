@@ -287,3 +287,7 @@ Ironmount includes [Restic](https://github.com/restic/restic) for backup functio
 - **License Text**: See [LICENSES/BSD-2-Clause-Restic.txt](LICENSES/BSD-2-Clause-Restic.txt)
 
 For a complete list of third-party software licenses and attributions, please refer to the [NOTICES.md](NOTICES.md) file.
+
+## Contributing
+
+Contributions by anyone are welcome! If you find a bug or have a feature request, please open an issue on GitHub. If you want to contribute code, feel free to fork the repository and submit a pull request. We require that all contributors sign a Contributor License Agreement (CLA) before we can accept your contributions. This is to protect both you and the project. Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for more details.
