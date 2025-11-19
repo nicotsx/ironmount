@@ -6,15 +6,31 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { cn, slugify } from "~/client/lib/utils";
 import { deepClean } from "~/utils/object";
-import { DirectoryBrowser } from "./directory-browser";
-import { Button } from "./ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
-import { Input } from "./ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { volumeConfigSchema } from "~/schemas/volumes";
-import { testConnectionMutation } from "../api-client/@tanstack/react-query.gen";
+import { testConnectionMutation } from "~/client/api-client/@tanstack/react-query.gen";
+import {
+	Form,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "~/client/components/ui/form";
+import { Input } from "~/client/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectLabel,
+	SelectTrigger,
+	SelectValue,
+} from "~/client/components/ui/select";
+import { Button } from "~/client/components/ui/button";
+import { DirectoryBrowser } from "~/client/components/directory-browser";
 
-const SUPPORTS_CONNECTION_TEST = ["nfs", "smb", "webdav", "mariadb", "mysql", "postgres"] as const;
+const SUPPORTS_CONNECTION_TEST = ["nfs", "smb", "webdav", "mariadb", "mysql", "postgres"];
 
 export const formSchema = type({
 	name: "2<=string<=32",
@@ -126,18 +142,26 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 							<FormLabel>Backend</FormLabel>
 							<Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
 								<FormControl>
-									<SelectTrigger>
+									<SelectTrigger className="w-[280px]">
 										<SelectValue placeholder="Select a backend" />
 									</SelectTrigger>
 								</FormControl>
 								<SelectContent>
-									<SelectItem value="directory">Directory</SelectItem>
-									<SelectItem value="nfs">NFS</SelectItem>
-									<SelectItem value="smb">SMB</SelectItem>
-									<SelectItem value="webdav">WebDAV</SelectItem>
-									<SelectItem value="mariadb">MariaDB</SelectItem>
-									<SelectItem value="mysql">MySQL</SelectItem>
-									<SelectItem value="postgres">PostgreSQL</SelectItem>
+									<SelectGroup>
+										<SelectItem value="directory">Directory</SelectItem>
+									</SelectGroup>
+									<SelectGroup>
+										<SelectLabel>Network Storage</SelectLabel>
+										<SelectItem value="nfs">NFS</SelectItem>
+										<SelectItem value="smb">SMB</SelectItem>
+										<SelectItem value="webdav">WebDAV</SelectItem>
+									</SelectGroup>
+									<SelectGroup>
+										<SelectLabel>Databases</SelectLabel>
+										<SelectItem value="mariadb">MariaDB</SelectItem>
+										<SelectItem value="mysql">MySQL</SelectItem>
+										<SelectItem value="postgres">PostgreSQL</SelectItem>
+									</SelectGroup>
 								</SelectContent>
 							</Select>
 							<FormDescription>Choose the storage backend for this volume.</FormDescription>

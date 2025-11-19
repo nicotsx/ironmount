@@ -158,12 +158,37 @@ export type ListVolumesResponses = {
             path: string;
             readOnly?: false;
         } | {
+            backend: 'mariadb';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            port?: number;
+            dumpOptions?: Array<string>;
+        } | {
+            backend: 'mysql';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            port?: number;
+            dumpOptions?: Array<string>;
+        } | {
             backend: 'nfs';
             exportPath: string;
             server: string;
             version: '3' | '4' | '4.1';
             port?: number;
             readOnly?: boolean;
+        } | {
+            backend: 'postgres';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            dumpFormat?: 'custom' | 'directory' | 'plain';
+            port?: number;
+            dumpOptions?: Array<string>;
         } | {
             backend: 'smb';
             password: string;
@@ -190,7 +215,7 @@ export type ListVolumesResponses = {
         lastHealthCheck: number;
         name: string;
         status: 'error' | 'mounted' | 'unmounted';
-        type: 'directory' | 'nfs' | 'smb' | 'webdav';
+        type: 'directory' | 'mariadb' | 'mysql' | 'nfs' | 'postgres' | 'smb' | 'webdav';
         updatedAt: number;
     }>;
 };
@@ -204,12 +229,37 @@ export type CreateVolumeData = {
             path: string;
             readOnly?: false;
         } | {
+            backend: 'mariadb';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            port?: number;
+            dumpOptions?: Array<string>;
+        } | {
+            backend: 'mysql';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            port?: number;
+            dumpOptions?: Array<string>;
+        } | {
             backend: 'nfs';
             exportPath: string;
             server: string;
             version: '3' | '4' | '4.1';
             port?: number;
             readOnly?: boolean;
+        } | {
+            backend: 'postgres';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            dumpFormat?: 'custom' | 'directory' | 'plain';
+            port?: number;
+            dumpOptions?: Array<string>;
         } | {
             backend: 'smb';
             password: string;
@@ -248,12 +298,37 @@ export type CreateVolumeResponses = {
             path: string;
             readOnly?: false;
         } | {
+            backend: 'mariadb';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            port?: number;
+            dumpOptions?: Array<string>;
+        } | {
+            backend: 'mysql';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            port?: number;
+            dumpOptions?: Array<string>;
+        } | {
             backend: 'nfs';
             exportPath: string;
             server: string;
             version: '3' | '4' | '4.1';
             port?: number;
             readOnly?: boolean;
+        } | {
+            backend: 'postgres';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            dumpFormat?: 'custom' | 'directory' | 'plain';
+            port?: number;
+            dumpOptions?: Array<string>;
         } | {
             backend: 'smb';
             password: string;
@@ -280,7 +355,7 @@ export type CreateVolumeResponses = {
         lastHealthCheck: number;
         name: string;
         status: 'error' | 'mounted' | 'unmounted';
-        type: 'directory' | 'nfs' | 'smb' | 'webdav';
+        type: 'directory' | 'mariadb' | 'mysql' | 'nfs' | 'postgres' | 'smb' | 'webdav';
         updatedAt: number;
     };
 };
@@ -294,12 +369,37 @@ export type TestConnectionData = {
             path: string;
             readOnly?: false;
         } | {
+            backend: 'mariadb';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            port?: number;
+            dumpOptions?: Array<string>;
+        } | {
+            backend: 'mysql';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            port?: number;
+            dumpOptions?: Array<string>;
+        } | {
             backend: 'nfs';
             exportPath: string;
             server: string;
             version: '3' | '4' | '4.1';
             port?: number;
             readOnly?: boolean;
+        } | {
+            backend: 'postgres';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            dumpFormat?: 'custom' | 'directory' | 'plain';
+            port?: number;
+            dumpOptions?: Array<string>;
         } | {
             backend: 'smb';
             password: string;
@@ -391,12 +491,37 @@ export type GetVolumeResponses = {
                 path: string;
                 readOnly?: false;
             } | {
+                backend: 'mariadb';
+                database: string;
+                host: string;
+                password: string;
+                username: string;
+                port?: number;
+                dumpOptions?: Array<string>;
+            } | {
+                backend: 'mysql';
+                database: string;
+                host: string;
+                password: string;
+                username: string;
+                port?: number;
+                dumpOptions?: Array<string>;
+            } | {
                 backend: 'nfs';
                 exportPath: string;
                 server: string;
                 version: '3' | '4' | '4.1';
                 port?: number;
                 readOnly?: boolean;
+            } | {
+                backend: 'postgres';
+                database: string;
+                host: string;
+                password: string;
+                username: string;
+                dumpFormat?: 'custom' | 'directory' | 'plain';
+                port?: number;
+                dumpOptions?: Array<string>;
             } | {
                 backend: 'smb';
                 password: string;
@@ -423,7 +548,7 @@ export type GetVolumeResponses = {
             lastHealthCheck: number;
             name: string;
             status: 'error' | 'mounted' | 'unmounted';
-            type: 'directory' | 'nfs' | 'smb' | 'webdav';
+            type: 'directory' | 'mariadb' | 'mysql' | 'nfs' | 'postgres' | 'smb' | 'webdav';
             updatedAt: number;
         };
     };
@@ -439,12 +564,37 @@ export type UpdateVolumeData = {
             path: string;
             readOnly?: false;
         } | {
+            backend: 'mariadb';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            port?: number;
+            dumpOptions?: Array<string>;
+        } | {
+            backend: 'mysql';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            port?: number;
+            dumpOptions?: Array<string>;
+        } | {
             backend: 'nfs';
             exportPath: string;
             server: string;
             version: '3' | '4' | '4.1';
             port?: number;
             readOnly?: boolean;
+        } | {
+            backend: 'postgres';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            dumpFormat?: 'custom' | 'directory' | 'plain';
+            port?: number;
+            dumpOptions?: Array<string>;
         } | {
             backend: 'smb';
             password: string;
@@ -491,12 +641,37 @@ export type UpdateVolumeResponses = {
             path: string;
             readOnly?: false;
         } | {
+            backend: 'mariadb';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            port?: number;
+            dumpOptions?: Array<string>;
+        } | {
+            backend: 'mysql';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            port?: number;
+            dumpOptions?: Array<string>;
+        } | {
             backend: 'nfs';
             exportPath: string;
             server: string;
             version: '3' | '4' | '4.1';
             port?: number;
             readOnly?: boolean;
+        } | {
+            backend: 'postgres';
+            database: string;
+            host: string;
+            password: string;
+            username: string;
+            dumpFormat?: 'custom' | 'directory' | 'plain';
+            port?: number;
+            dumpOptions?: Array<string>;
         } | {
             backend: 'smb';
             password: string;
@@ -523,7 +698,7 @@ export type UpdateVolumeResponses = {
         lastHealthCheck: number;
         name: string;
         status: 'error' | 'mounted' | 'unmounted';
-        type: 'directory' | 'nfs' | 'smb' | 'webdav';
+        type: 'directory' | 'mariadb' | 'mysql' | 'nfs' | 'postgres' | 'smb' | 'webdav';
         updatedAt: number;
     };
 };
@@ -711,30 +886,42 @@ export type ListRepositoriesResponses = {
             bucket: string;
             endpoint: string;
             secretAccessKey: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             accessKeyId: string;
             backend: 's3';
             bucket: string;
             endpoint: string;
             secretAccessKey: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             accountKey: string;
             accountName: string;
             backend: 'azure';
             container: string;
+            customPassword?: string;
             endpointSuffix?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'gcs';
             bucket: string;
             credentialsJson: string;
             projectId: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'local';
             name: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'rclone';
             path: string;
             remote: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         };
         createdAt: number;
         id: string;
@@ -757,30 +944,42 @@ export type CreateRepositoryData = {
             bucket: string;
             endpoint: string;
             secretAccessKey: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             accessKeyId: string;
             backend: 's3';
             bucket: string;
             endpoint: string;
             secretAccessKey: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             accountKey: string;
             accountName: string;
             backend: 'azure';
             container: string;
+            customPassword?: string;
             endpointSuffix?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'gcs';
             bucket: string;
             credentialsJson: string;
             projectId: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'local';
             name: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'rclone';
             path: string;
             remote: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         };
         name: string;
         compressionMode?: 'auto' | 'better' | 'fastest' | 'max' | 'off';
@@ -865,30 +1064,42 @@ export type GetRepositoryResponses = {
             bucket: string;
             endpoint: string;
             secretAccessKey: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             accessKeyId: string;
             backend: 's3';
             bucket: string;
             endpoint: string;
             secretAccessKey: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             accountKey: string;
             accountName: string;
             backend: 'azure';
             container: string;
+            customPassword?: string;
             endpointSuffix?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'gcs';
             bucket: string;
             credentialsJson: string;
             projectId: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'local';
             name: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         } | {
             backend: 'rclone';
             path: string;
             remote: string;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         };
         createdAt: number;
         id: string;
@@ -1079,30 +1290,42 @@ export type ListBackupSchedulesResponses = {
                 bucket: string;
                 endpoint: string;
                 secretAccessKey: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 accessKeyId: string;
                 backend: 's3';
                 bucket: string;
                 endpoint: string;
                 secretAccessKey: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 accountKey: string;
                 accountName: string;
                 backend: 'azure';
                 container: string;
+                customPassword?: string;
                 endpointSuffix?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'gcs';
                 bucket: string;
                 credentialsJson: string;
                 projectId: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'local';
                 name: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'rclone';
                 path: string;
                 remote: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             };
             createdAt: number;
             id: string;
@@ -1131,12 +1354,37 @@ export type ListBackupSchedulesResponses = {
                 path: string;
                 readOnly?: false;
             } | {
+                backend: 'mariadb';
+                database: string;
+                host: string;
+                password: string;
+                username: string;
+                port?: number;
+                dumpOptions?: Array<string>;
+            } | {
+                backend: 'mysql';
+                database: string;
+                host: string;
+                password: string;
+                username: string;
+                port?: number;
+                dumpOptions?: Array<string>;
+            } | {
                 backend: 'nfs';
                 exportPath: string;
                 server: string;
                 version: '3' | '4' | '4.1';
                 port?: number;
                 readOnly?: boolean;
+            } | {
+                backend: 'postgres';
+                database: string;
+                host: string;
+                password: string;
+                username: string;
+                dumpFormat?: 'custom' | 'directory' | 'plain';
+                port?: number;
+                dumpOptions?: Array<string>;
             } | {
                 backend: 'smb';
                 password: string;
@@ -1163,7 +1411,7 @@ export type ListBackupSchedulesResponses = {
             lastHealthCheck: number;
             name: string;
             status: 'error' | 'mounted' | 'unmounted';
-            type: 'directory' | 'nfs' | 'smb' | 'webdav';
+            type: 'directory' | 'mariadb' | 'mysql' | 'nfs' | 'postgres' | 'smb' | 'webdav';
             updatedAt: number;
         };
         volumeId: number;
@@ -1280,30 +1528,42 @@ export type GetBackupScheduleResponses = {
                 bucket: string;
                 endpoint: string;
                 secretAccessKey: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 accessKeyId: string;
                 backend: 's3';
                 bucket: string;
                 endpoint: string;
                 secretAccessKey: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 accountKey: string;
                 accountName: string;
                 backend: 'azure';
                 container: string;
+                customPassword?: string;
                 endpointSuffix?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'gcs';
                 bucket: string;
                 credentialsJson: string;
                 projectId: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'local';
                 name: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'rclone';
                 path: string;
                 remote: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             };
             createdAt: number;
             id: string;
@@ -1332,12 +1592,37 @@ export type GetBackupScheduleResponses = {
                 path: string;
                 readOnly?: false;
             } | {
+                backend: 'mariadb';
+                database: string;
+                host: string;
+                password: string;
+                username: string;
+                port?: number;
+                dumpOptions?: Array<string>;
+            } | {
+                backend: 'mysql';
+                database: string;
+                host: string;
+                password: string;
+                username: string;
+                port?: number;
+                dumpOptions?: Array<string>;
+            } | {
                 backend: 'nfs';
                 exportPath: string;
                 server: string;
                 version: '3' | '4' | '4.1';
                 port?: number;
                 readOnly?: boolean;
+            } | {
+                backend: 'postgres';
+                database: string;
+                host: string;
+                password: string;
+                username: string;
+                dumpFormat?: 'custom' | 'directory' | 'plain';
+                port?: number;
+                dumpOptions?: Array<string>;
             } | {
                 backend: 'smb';
                 password: string;
@@ -1364,7 +1649,7 @@ export type GetBackupScheduleResponses = {
             lastHealthCheck: number;
             name: string;
             status: 'error' | 'mounted' | 'unmounted';
-            type: 'directory' | 'nfs' | 'smb' | 'webdav';
+            type: 'directory' | 'mariadb' | 'mysql' | 'nfs' | 'postgres' | 'smb' | 'webdav';
             updatedAt: number;
         };
         volumeId: number;
@@ -1462,30 +1747,42 @@ export type GetBackupScheduleForVolumeResponses = {
                 bucket: string;
                 endpoint: string;
                 secretAccessKey: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 accessKeyId: string;
                 backend: 's3';
                 bucket: string;
                 endpoint: string;
                 secretAccessKey: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 accountKey: string;
                 accountName: string;
                 backend: 'azure';
                 container: string;
+                customPassword?: string;
                 endpointSuffix?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'gcs';
                 bucket: string;
                 credentialsJson: string;
                 projectId: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'local';
                 name: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             } | {
                 backend: 'rclone';
                 path: string;
                 remote: string;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             };
             createdAt: number;
             id: string;
@@ -1514,12 +1811,37 @@ export type GetBackupScheduleForVolumeResponses = {
                 path: string;
                 readOnly?: false;
             } | {
+                backend: 'mariadb';
+                database: string;
+                host: string;
+                password: string;
+                username: string;
+                port?: number;
+                dumpOptions?: Array<string>;
+            } | {
+                backend: 'mysql';
+                database: string;
+                host: string;
+                password: string;
+                username: string;
+                port?: number;
+                dumpOptions?: Array<string>;
+            } | {
                 backend: 'nfs';
                 exportPath: string;
                 server: string;
                 version: '3' | '4' | '4.1';
                 port?: number;
                 readOnly?: boolean;
+            } | {
+                backend: 'postgres';
+                database: string;
+                host: string;
+                password: string;
+                username: string;
+                dumpFormat?: 'custom' | 'directory' | 'plain';
+                port?: number;
+                dumpOptions?: Array<string>;
             } | {
                 backend: 'smb';
                 password: string;
@@ -1546,7 +1868,7 @@ export type GetBackupScheduleForVolumeResponses = {
             lastHealthCheck: number;
             name: string;
             status: 'error' | 'mounted' | 'unmounted';
-            type: 'directory' | 'nfs' | 'smb' | 'webdav';
+            type: 'directory' | 'mariadb' | 'mysql' | 'nfs' | 'postgres' | 'smb' | 'webdav';
             updatedAt: number;
         };
         volumeId: number;
@@ -1609,13 +1931,6 @@ export type RunForgetData = {
     };
     query?: never;
     url: '/api/v1/backups/{scheduleId}/forget';
-};
-
-export type RunForgetErrors = {
-    /**
-     * No retention policy configured for this schedule
-     */
-    400: unknown;
 };
 
 export type RunForgetResponses = {

@@ -1,7 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CreateVolumeForm, type FormValues } from "~/client/components/create-volume-form";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -17,6 +16,7 @@ import type { StatFs, Volume } from "~/client/lib/types";
 import { HealthchecksCard } from "../components/healthchecks-card";
 import { StorageChart } from "../components/storage-chart";
 import { updateVolumeMutation } from "~/client/api-client/@tanstack/react-query.gen";
+import { CreateVolumeForm, type FormValues } from "../components/create-volume-form";
 
 type Props = {
 	volume: Volume;

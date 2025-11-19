@@ -4,12 +4,12 @@ import { useId } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { createVolumeMutation } from "~/client/api-client/@tanstack/react-query.gen";
-import { CreateVolumeForm, type FormValues } from "~/client/components/create-volume-form";
 import { Button } from "~/client/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/client/components/ui/card";
 import { parseError } from "~/client/lib/errors";
 import type { Route } from "./+types/create-volume";
 import { Alert, AlertDescription } from "~/client/components/ui/alert";
+import { CreateVolumeForm, type FormValues } from "../components/create-volume-form";
 
 export const handle = {
 	breadcrumb: () => [{ label: "Volumes", href: "/volumes" }, { label: "Create" }],
