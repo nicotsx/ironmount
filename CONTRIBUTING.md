@@ -1,6 +1,6 @@
-# Contributing to Ironmount
+# Contributing to Zerobyte
 
-Thank you for your interest in contributing to Ironmount! We welcome contributions from the community and are grateful for your support in making this project better.
+Thank you for your interest in contributing to Zerobyte! We welcome contributions from the community and are grateful for your support in making this project better.
 
 ## Table of Contents
 
@@ -16,7 +16,7 @@ Thank you for your interest in contributing to Ironmount! We welcome contributio
 
 Before you begin:
 
-1. Check the [issues](https://github.com/nicotsx/ironmount/issues) to see if someone is already working on what you have in mind
+1. Check the [issues](https://github.com/nicotsx/zerobyte/issues) to see if someone is already working on what you have in mind
 2. For major changes, please open an issue first to discuss what you would like to change
 3. Make sure you have read and agreed to our Contributor License Agreement (CLA)
 
@@ -30,7 +30,7 @@ A Contributor License Agreement (CLA) is a legal document in which you state you
 
 We require a CLA for several important reasons:
 
-1. **License Flexibility**: It allows the project to evolve its licensing model if needed in the future without requiring re-approval from all past contributors, ensuring Ironmount can continue to operate and adapt to changing needs of the community.
+1. **License Flexibility**: It allows the project to evolve its licensing model if needed in the future without requiring re-approval from all past contributors, ensuring Zerobyte can continue to operate and adapt to changing needs of the community.
 
 2. **Patent Protection**: The CLA includes a patent license grant, which protects the project and its users from potential patent claims related to your contributions.
 
@@ -45,7 +45,7 @@ When you submit your first pull request, our CLA Assistant will automatically pr
 3. Follow the link provided to review and sign the CLA electronically
 4. Once signed, the bot will update your PR status
 
-You only need to sign the CLA once, and it will cover all your future contributions to Ironmount.
+You only need to sign the CLA once, and it will cover all your future contributions to Zerobyte.
 
 ### Key Points of Our CLA
 
@@ -55,11 +55,11 @@ You only need to sign the CLA once, and it will cover all your future contributi
 - You're not required to provide support for your contributions
 - The CLA does not guarantee that your contribution will be accepted or kept into the project
 
-For the complete CLA text, please see the [CLA document](https://cla-assistant.io/nicotsx/ironmount).
+For the complete CLA text, please see the [CLA document](https://cla-assistant.io/nicotsx/zerobyte).
 
 ## How to Contribute
 
-There are many ways to contribute to Ironmount:
+There are many ways to contribute to Zerobyte:
 
 ### Reporting Bugs
 
@@ -67,7 +67,7 @@ If you find a bug, please open an issue with:
 - A clear, descriptive title
 - Steps to reproduce the issue
 - Expected vs. actual behavior
-- Your environment (OS, Docker version, Ironmount version)
+- Your environment (OS, Docker version, Zerobyte version)
 - Any relevant logs or screenshots
 
 ### Suggesting Features
@@ -97,14 +97,14 @@ Documentation improvements are always welcome! This includes:
 
 ### Translations
 
-We welcome translations to make Ironmount accessible to more users worldwide. Please open an issue to discuss translation efforts before starting.
+We welcome translations to make Zerobyte accessible to more users worldwide. Please open an issue to discuss translation efforts before starting.
 
 ## Development Setup
 
 1. **Clone your fork**:
    ```bash
-   git clone https://github.com/your-username/ironmount.git
-   cd ironmount
+   git clone https://github.com/your-username/zerobyte.git
+   cd zerobyte
    ```
 
 2. **Set up your development environment**:
@@ -164,4 +164,4 @@ If you have questions about contributing, feel free to:
 
 ---
 
-Thank you for contributing to Ironmount!
+Thank you for contributing to Zerobyte!

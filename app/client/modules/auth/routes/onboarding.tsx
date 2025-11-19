@@ -24,10 +24,10 @@ export const clientMiddleware = [authMiddleware];
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Ironmount - Onboarding" },
+		{ title: "Zerobyte - Onboarding" },
 		{
 			name: "description",
-			content: "Welcome to Ironmount. Create your admin account to get started.",
+			content: "Welcome to Zerobyte. Create your admin account to get started.",
 		},
 	];
 }
@@ -82,7 +82,7 @@ export default function OnboardingPage() {
 	};
 
 	return (
-		<AuthLayout title="Welcome to Ironmount" description="Create the admin user to get started">
+		<AuthLayout title="Welcome to Zerobyte" description="Create the admin user to get started">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 					<FormField

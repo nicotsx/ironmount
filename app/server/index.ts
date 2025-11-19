@@ -24,7 +24,7 @@ export const generalDescriptor = (app: Hono) =>
 	openAPIRouteHandler(app, {
 		documentation: {
 			info: {
-				title: "Ironmount API",
+				title: "Zerobyte API",
 				version: "1.0.0",
 				description: "API for managing volumes",
 			},
@@ -33,8 +33,8 @@ export const generalDescriptor = (app: Hono) =>
 	});
 
 export const scalarDescriptor = Scalar({
-	title: "Ironmount API Docs",
-	pageTitle: "Ironmount API Docs",
+	title: "Zerobyte API Docs",
+	pageTitle: "Zerobyte API Docs",
 	url: "/api/v1/openapi.json",
 });
 

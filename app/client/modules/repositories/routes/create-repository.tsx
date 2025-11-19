@@ -17,7 +17,7 @@ export const handle = {
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Ironmount - Create Repository" },
+		{ title: "Zerobyte - Create Repository" },
 		{
 			name: "description",
 			content: "Create a new backup repository with encryption and compression.",

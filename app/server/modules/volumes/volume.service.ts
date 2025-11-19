@@ -186,7 +186,7 @@ const updateVolume = async (name: string, volumeData: UpdateVolumeBody) => {
 };
 
 const testConnection = async (backendConfig: BackendConfig) => {
-	const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "ironmount-test-"));
+	const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "zerobyte-test-"));
 
 	const mockVolume = {
 		id: 0,

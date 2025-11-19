@@ -54,7 +54,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/ironmount
+          images: ghcr.io/${{ github.repository_owner }}/zerobyte
           tags: |
             type=semver,pattern={{version}},prefix=v
             type=semver,pattern={{major}},prefix=v,enable=${{ needs.determine-release-type.outputs.release_type == 'release' }}
@@ -62,8 +62,8 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}.{{patch}},prefix=v,enable=${{ needs.determine-release-type.outputs.release_type == 'release' }}
           flavor: |
             latest=${{ needs.determine-release-type.outputs.release_type == 'release' }}
-          cache-from: type=registry,ref=ghcr.io/nicotsx/ironmount:buildcache
-          cache-to: type=registry,ref=ghcr.io/nicotsx/ironmount:buildcache,mode=max
+          cache-from: type=registry,ref=ghcr.io/nicotsx/zerobyte:buildcache
+          cache-to: type=registry,ref=ghcr.io/nicotsx/zerobyte:buildcache,mode=max
 
       - name: Build and push images
         uses: docker/build-push-action@v6
