@@ -1,41 +1,9 @@
 import * as fs from "node:fs/promises";
 import { toMessage } from "../../../utils/errors";
 import { logger } from "../../../utils/logger";
-import { testMariaDBConnection } from "../../../utils/database-dump";
 import type { VolumeBackend } from "../backend";
 import { BACKEND_STATUS, type BackendConfig } from "~/schemas/volumes";
-import { VOLUME_MOUNT_BASE } from "../../../core/constants";
-
-const mount = async (config: BackendConfig, volumePath: string) => {
-	if (config.backend !== "mariadb") {
-		return { status: BACKEND_STATUS.error, error: "Invalid backend type" };
-	}
-
-	logger.info(`Testing MariaDB connection to: ${config.host}:${config.port}`);
-
-	try {
-		await testMariaDBConnection(config);
-		await fs.mkdir(volumePath, { recursive: true });
-
-		logger.info("MariaDB connection successful");
-		return { status: BACKEND_STATUS.mounted };
-	} catch (error) {
-		logger.error("Failed to connect to MariaDB:", error);
-		return { status: BACKEND_STATUS.error, error: toMessage(error) };
-	}
-};
-
-const unmount = async (volumePath: string) => {
-	logger.info("Cleaning up MariaDB dump directory");
-	
-	try {
-		await fs.rm(volumePath, { recursive: true, force: true });
-		return { status: BACKEND_STATUS.unmounted };
-	} catch (error) {
-		logger.warn(`Failed to clean up MariaDB dump directory: ${toMessage(error)}`);
-		return { status: BACKEND_STATUS.unmounted };
-	}
-};
+import { $ } from "bun";
 
 const checkHealth = async (config: BackendConfig) => {
 	if (config.backend !== "mariadb") {
@@ -43,7 +11,23 @@ const checkHealth = async (config: BackendConfig) => {
 	}
 
 	try {
-		await testMariaDBConnection(config);
+		logger.debug(`Testing MariaDB connection to: ${config.host}:${config.port}`);
+
+		const args = [
+			`--host=${config.host}`,
+			`--port=${config.port}`,
+			`--user=${config.username}`,
+			`--database=${config.database}`,
+			"--skip-ssl",
+			"--execute=SELECT 1",
+		];
+
+		const env = {
+			MYSQL_PWD: config.password,
+		};
+
+		await $`mariadb ${args.join(" ")}`.env(env);
+
 		return { status: BACKEND_STATUS.mounted };
 	} catch (error) {
 		logger.error("MariaDB health check failed:", error);
@@ -51,15 +35,47 @@ const checkHealth = async (config: BackendConfig) => {
 	}
 };
 
-export const makeMariaDBBackend = (config: BackendConfig, volumeName: string, volumePath: string): VolumeBackend => ({
-	mount: () => mount(config, volumePath),
-	unmount: () => unmount(volumePath),
+const getBackupPath = async (config: BackendConfig) => {
+	const dumpDir = await fs.mkdtemp(`/tmp/ironmount-mariadb-`);
+
+	if (config.backend !== "mariadb") {
+		throw new Error("Invalid backend type for MariaDB dump");
+	}
+
+	logger.info(`Starting MariaDB dump for database: ${config.database}`);
+
+	const args = [
+		`--host=${config.host}`,
+		`--port=${config.port}`,
+		`--user=${config.username}`,
+		`--skip-ssl`,
+		`--single-transaction`,
+		`--quick`,
+		`--lock-tables=false`,
+		...(config.dumpOptions || []),
+		config.database,
+	];
+
+	const env = {
+		MYSQL_PWD: config.password,
+	};
+
+	const result = await $`mariadb-dump ${args}`.env(env).nothrow();
+
+	if (result.exitCode !== 0) {
+		throw new Error(`mariadb-dump failed with exit code ${result.exitCode}: ${result.stderr}`);
+	}
+
+	await fs.writeFile(`${dumpDir}/dump.sql`, result.stdout);
+	logger.info(`MariaDB dump completed: ${dumpDir}/dump.sql`);
+
+	return `${dumpDir}/dump.sql`;
+};
+
+export const makeMariaDBBackend = (config: BackendConfig): VolumeBackend => ({
+	mount: () => Promise.resolve({ status: BACKEND_STATUS.mounted }),
+	unmount: () => Promise.resolve({ status: BACKEND_STATUS.unmounted }),
 	checkHealth: () => checkHealth(config),
-	getVolumePath: () => volumePath,
-	isDatabaseBackend: () => true,
-	getDumpPath: () => `${VOLUME_MOUNT_BASE}/${volumeName}/dumps`,
-	getDumpFilePath: (timestamp: number) => {
-		const dumpDir = `${VOLUME_MOUNT_BASE}/${volumeName}/dumps`;
-		return `${dumpDir}/${volumeName}-${timestamp}.sql`;
-	},
+	getVolumePath: () => "/tmp",
+	getBackupPath: () => getBackupPath(config),
 });

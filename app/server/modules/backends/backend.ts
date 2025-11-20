@@ -1,6 +1,5 @@
 import type { BackendStatus } from "~/schemas/volumes";
 import type { Volume } from "../../db/schema";
-import { VOLUME_MOUNT_BASE } from "../../core/constants";
 import { makeDirectoryBackend } from "./directory/directory-backend";
 import { makeNfsBackend } from "./nfs/nfs-backend";
 import { makeSmbBackend } from "./smb/smb-backend";
@@ -19,37 +18,31 @@ export type VolumeBackend = {
 	unmount: () => Promise<OperationResult>;
 	checkHealth: () => Promise<OperationResult>;
 	getVolumePath: () => string;
-	isDatabaseBackend: () => boolean;
-	getDumpPath: () => string | null;
-	getDumpFilePath: (timestamp: number) => string | null;
+	getBackupPath: () => Promise<string>;
 };
 
 export const createVolumeBackend = (volume: Volume): VolumeBackend => {
-	const path = volume.config.backend === "directory"
-		? volume.config.path
-		: `${VOLUME_MOUNT_BASE}/${volume.name}/_data`;
-
 	switch (volume.config.backend) {
 		case "nfs": {
-			return makeNfsBackend(volume.config, volume.name, path);
+			return makeNfsBackend(volume.config, volume.name);
 		}
 		case "smb": {
-			return makeSmbBackend(volume.config, volume.name, path);
+			return makeSmbBackend(volume.config, volume.name);
 		}
 		case "directory": {
-			return makeDirectoryBackend(volume.config, volume.name, path);
+			return makeDirectoryBackend(volume.config, volume.name);
 		}
 		case "webdav": {
-			return makeWebdavBackend(volume.config, volume.name, path);
+			return makeWebdavBackend(volume.config, volume.name);
 		}
 		case "mariadb": {
-			return makeMariaDBBackend(volume.config, volume.name, path);
+			return makeMariaDBBackend(volume.config);
 		}
 		case "mysql": {
-			return makeMySQLBackend(volume.config, volume.name, path);
+			return makeMySQLBackend(volume.config);
 		}
 		case "postgres": {
-			return makePostgresBackend(volume.config, volume.name, path);
+			return makePostgresBackend(volume.config);
 		}
 		default: {
 			throw new Error(`Unsupported backend type: ${(volume.config as any).backend}`);

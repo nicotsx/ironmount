@@ -58,6 +58,7 @@ export const mariadbConfigSchema = type({
 	password: "string",
 	database: "string",
 	dumpOptions: "string[]?",
+	readOnly: "false?",
 });
 
 export const mysqlConfigSchema = type({
@@ -68,6 +69,7 @@ export const mysqlConfigSchema = type({
 	password: "string",
 	database: "string",
 	dumpOptions: "string[]?",
+	readOnly: "false?",
 });
 
 export const postgresConfigSchema = type({
@@ -79,6 +81,7 @@ export const postgresConfigSchema = type({
 	database: "string",
 	dumpFormat: type("'plain' | 'custom' | 'directory'").default("custom"),
 	dumpOptions: "string[]?",
+	readOnly: "false?",
 });
 
 export const volumeConfigSchema = nfsConfigSchema

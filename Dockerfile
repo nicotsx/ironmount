@@ -6,8 +6,7 @@ RUN apk add --no-cache \
     davfs2=1.6.1-r2 \
     mariadb-client \
     mysql-client \
-    postgresql-client \
-    sqlite
+    postgresql-client
 
 # ------------------------------
 # DEPENDENCIES

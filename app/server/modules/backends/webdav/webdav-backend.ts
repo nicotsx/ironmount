@@ -2,7 +2,7 @@ import { execFile as execFileCb } from "node:child_process";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import { promisify } from "node:util";
-import { OPERATION_TIMEOUT } from "../../../core/constants";
+import { OPERATION_TIMEOUT, VOLUME_MOUNT_BASE } from "../../../core/constants";
 import { toMessage } from "../../../utils/errors";
 import { logger } from "../../../utils/logger";
 import { getMountForPath } from "../../../utils/mountinfo";
@@ -13,7 +13,8 @@ import { BACKEND_STATUS, type BackendConfig } from "~/schemas/volumes";
 
 const execFile = promisify(execFileCb);
 
-const mount = async (config: BackendConfig, path: string) => {
+const mount = async (config: BackendConfig, name: string) => {
+	const path = getVolumePath(name);
 	logger.debug(`Mounting WebDAV volume ${path}...`);
 
 	if (config.backend !== "webdav") {
@@ -104,7 +105,8 @@ const mount = async (config: BackendConfig, path: string) => {
 	}
 };
 
-const unmount = async (path: string) => {
+const unmount = async (name: string) => {
+	const path = getVolumePath(name);
 	if (os.platform() !== "linux") {
 		logger.error("WebDAV unmounting is only supported on Linux hosts.");
 		return { status: BACKEND_STATUS.error, error: "WebDAV unmounting is only supported on Linux hosts." };
@@ -134,7 +136,9 @@ const unmount = async (path: string) => {
 	}
 };
 
-const checkHealth = async (path: string, readOnly: boolean) => {
+const checkHealth = async (name: string, readOnly: boolean) => {
+	const path = getVolumePath(name);
+
 	const run = async () => {
 		logger.debug(`Checking health of WebDAV volume at ${path}...`);
 		await fs.access(path);
@@ -161,12 +165,14 @@ const checkHealth = async (path: string, readOnly: boolean) => {
 	}
 };
 
-export const makeWebdavBackend = (config: BackendConfig, volumeName: string, path: string): VolumeBackend => ({
-	mount: () => mount(config, path),
-	unmount: () => unmount(path),
-	checkHealth: () => checkHealth(path, config.readOnly ?? false),
-	getVolumePath: () => path,
-	isDatabaseBackend: () => false,
-	getDumpPath: () => null,
-	getDumpFilePath: () => null,
+const getVolumePath = (name: string) => {
+	return `${VOLUME_MOUNT_BASE}/${name}/_data`;
+};
+
+export const makeWebdavBackend = (config: BackendConfig, name: string): VolumeBackend => ({
+	mount: () => mount(config, name),
+	unmount: () => unmount(name),
+	checkHealth: () => checkHealth(name, config.readOnly ?? false),
+	getVolumePath: () => getVolumePath(name),
+	getBackupPath: async () => getVolumePath(name),
 });

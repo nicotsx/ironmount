@@ -52,12 +52,18 @@ const checkHealth = async (config: BackendConfig) => {
 	}
 };
 
-export const makeDirectoryBackend = (config: BackendConfig, volumeName: string, volumePath: string): VolumeBackend => ({
+const getVolumePath = (config: BackendConfig): string => {
+	if (config.backend !== "directory") {
+		throw new Error("Invalid backend type");
+	}
+
+	return config.path;
+};
+
+export const makeDirectoryBackend = (config: BackendConfig, volumePath: string): VolumeBackend => ({
 	mount: () => mount(config, volumePath),
 	unmount,
 	checkHealth: () => checkHealth(config),
-	getVolumePath: () => config.backend === "directory" ? config.path : volumePath,
-	isDatabaseBackend: () => false,
-	getDumpPath: () => null,
-	getDumpFilePath: () => null,
+	getVolumePath: () => getVolumePath(config),
+	getBackupPath: async () => getVolumePath(config),
 });

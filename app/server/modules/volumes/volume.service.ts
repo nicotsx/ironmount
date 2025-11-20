@@ -129,7 +129,8 @@ const getVolume = async (name: string) => {
 	let statfs: Partial<StatFs> = {};
 	if (volume.status === "mounted") {
 		const backend = createVolumeBackend(volume);
-		statfs = await withTimeout(getStatFs(backend.getVolumePath()), 1000, "getStatFs").catch((error) => {
+		const volumePath = backend.getVolumePath();
+		statfs = await withTimeout(getStatFs(volumePath), 1000, "getStatFs").catch((error) => {
 			logger.warn(`Failed to get statfs for volume ${name}: ${toMessage(error)}`);
 			return {};
 		});
@@ -203,7 +204,16 @@ const testConnection = async (backendConfig: BackendConfig) => {
 	};
 
 	const backend = createVolumeBackend(mockVolume);
-	const { error } = await backend.mount();
+	let error: string | null = null;
+	const mount = await backend.mount();
+	if (mount.error) {
+		error = mount.error;
+	} else {
+		const health = await backend.checkHealth();
+		if (health.error) {
+			error = health.error;
+		}
+	}
 
 	await backend.unmount();
 
@@ -295,7 +305,6 @@ const listFiles = async (name: string, subPath?: string) => {
 		throw new InternalServerError("Volume is not mounted");
 	}
 
-	// For directory volumes, use the configured path directly
 	const backend = createVolumeBackend(volume);
 	const volumePath = backend.getVolumePath();
 

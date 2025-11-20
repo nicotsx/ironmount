@@ -50,12 +50,6 @@ const getIconAndColor = (backend: BackendType) => {
 				color: "text-indigo-600 dark:text-indigo-400",
 				label: "PostgreSQL",
 			};
-		case "sqlite":
-			return {
-				icon: Database,
-				color: "text-slate-600 dark:text-slate-400",
-				label: "SQLite",
-			};
 		default:
 			return {
 				icon: Folder,

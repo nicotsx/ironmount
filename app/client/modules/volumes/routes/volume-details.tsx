@@ -118,7 +118,8 @@ export default function VolumeDetails({ loaderData }: Route.ComponentProps) {
 
 	const { volume, statfs } = data;
 	const dockerAvailable = capabilities.docker;
-	const isDatabaseVolume = ["mariadb", "mysql", "postgres", "sqlite"].includes(volume.config.backend);
+
+	const isDatabaseVolume = ["mariadb", "mysql", "postgres"].includes(volume.config.backend);
 
 	return (
 		<>
@@ -153,7 +154,9 @@ export default function VolumeDetails({ loaderData }: Route.ComponentProps) {
 			<Tabs value={activeTab} onValueChange={(value) => setSearchParams({ tab: value })} className="mt-4">
 				<TabsList className="mb-2">
 					<TabsTrigger value="info">Configuration</TabsTrigger>
-					{!isDatabaseVolume && <TabsTrigger value="files">Files</TabsTrigger>}
+					<TabsTrigger disabled={isDatabaseVolume} value="files">
+						Files
+					</TabsTrigger>
 					<Tooltip>
 						<TooltipTrigger>
 							<TabsTrigger disabled={!dockerAvailable} value="docker">

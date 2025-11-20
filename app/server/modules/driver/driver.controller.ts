@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 import { volumeService } from "../volumes/volume.service";
 import { createVolumeBackend } from "../backends/backend";
-import { VOLUME_MOUNT_BASE } from "../../core/constants";
 
 export const driverController = new Hono()
 	.post("/VolumeDriver.Capabilities", (c) => {
@@ -80,14 +79,16 @@ export const driverController = new Hono()
 	.post("/VolumeDriver.List", async (c) => {
 		const volumes = await volumeService.listVolumes();
 
-		const res = volumes.map((volume) => {
+		let res = [];
+		for (const volume of volumes) {
 			const backend = createVolumeBackend(volume);
-			return {
+
+			res.push({
 				Name: `im-${volume.name}`,
 				Mountpoint: backend.getVolumePath(),
 				Status: {},
-			};
-		});
+			});
+		}
 
 		return c.json({
 			Volumes: res,

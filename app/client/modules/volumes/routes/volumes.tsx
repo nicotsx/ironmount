@@ -113,7 +113,6 @@ export default function Volumes({ loaderData }: Route.ComponentProps) {
 							<SelectItem value="mariadb">MariaDB</SelectItem>
 							<SelectItem value="mysql">MySQL</SelectItem>
 							<SelectItem value="postgres">PostgreSQL</SelectItem>
-							<SelectItem value="sqlite">SQLite</SelectItem>
 						</SelectContent>
 					</Select>
 					{(searchQuery || statusFilter || backendFilter) && (

@@ -20,6 +20,7 @@ export class CleanupDanglingMountsJob extends Job {
 					const backend = createVolumeBackend(v);
 					return backend.getVolumePath() === mount.mountPoint;
 				});
+
 				if (!matchingVolume) {
 					logger.info(`Found dangling mount at ${mount.mountPoint}, attempting to unmount...`);
 					await executeUnmount(mount.mountPoint).catch((err) => {

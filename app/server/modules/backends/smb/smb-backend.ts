@@ -1,6 +1,6 @@
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
-import { OPERATION_TIMEOUT } from "../../../core/constants";
+import { OPERATION_TIMEOUT, VOLUME_MOUNT_BASE } from "../../../core/constants";
 import { toMessage } from "../../../utils/errors";
 import { logger } from "../../../utils/logger";
 import { getMountForPath } from "../../../utils/mountinfo";
@@ -9,7 +9,8 @@ import type { VolumeBackend } from "../backend";
 import { createTestFile, executeMount, executeUnmount } from "../utils/backend-utils";
 import { BACKEND_STATUS, type BackendConfig } from "~/schemas/volumes";
 
-const mount = async (config: BackendConfig, path: string) => {
+const mount = async (config: BackendConfig, name: string) => {
+	const path = getVolumePath(name);
 	logger.debug(`Mounting SMB volume ${path}...`);
 
 	if (config.backend !== "smb") {
@@ -22,13 +23,13 @@ const mount = async (config: BackendConfig, path: string) => {
 		return { status: BACKEND_STATUS.error, error: "SMB mounting is only supported on Linux hosts." };
 	}
 
-	const { status } = await checkHealth(path, config.readOnly ?? false);
+	const { status } = await checkHealth(name, config.readOnly ?? false);
 	if (status === "mounted") {
 		return { status: BACKEND_STATUS.mounted };
 	}
 
 	logger.debug(`Trying to unmount any existing mounts at ${path} before mounting...`);
-	await unmount(path);
+	await unmount(name);
 
 	const run = async () => {
 		await fs.mkdir(path, { recursive: true });
@@ -70,7 +71,9 @@ const mount = async (config: BackendConfig, path: string) => {
 	}
 };
 
-const unmount = async (path: string) => {
+const unmount = async (name: string) => {
+	const path = getVolumePath(name);
+
 	if (os.platform() !== "linux") {
 		logger.error("SMB unmounting is only supported on Linux hosts.");
 		return { status: BACKEND_STATUS.error, error: "SMB unmounting is only supported on Linux hosts." };
@@ -100,7 +103,9 @@ const unmount = async (path: string) => {
 	}
 };
 
-const checkHealth = async (path: string, readOnly: boolean) => {
+const checkHealth = async (name: string, readOnly: boolean) => {
+	const path = getVolumePath(name);
+
 	const run = async () => {
 		logger.debug(`Checking health of SMB volume at ${path}...`);
 		await fs.access(path);
@@ -127,12 +132,14 @@ const checkHealth = async (path: string, readOnly: boolean) => {
 	}
 };
 
-export const makeSmbBackend = (config: BackendConfig, volumeName: string, path: string): VolumeBackend => ({
-	mount: () => mount(config, path),
-	unmount: () => unmount(path),
-	checkHealth: () => checkHealth(path, config.readOnly ?? false),
-	getVolumePath: () => path,
-	isDatabaseBackend: () => false,
-	getDumpPath: () => null,
-	getDumpFilePath: () => null,
+const getVolumePath = (name: string) => {
+	return `${VOLUME_MOUNT_BASE}/${name}/_data`;
+};
+
+export const makeSmbBackend = (config: BackendConfig, name: string): VolumeBackend => ({
+	mount: () => mount(config, name),
+	unmount: () => unmount(name),
+	checkHealth: () => checkHealth(name, config.readOnly ?? false),
+	getVolumePath: () => getVolumePath(name),
+	getBackupPath: async () => getVolumePath(name),
 });
