@@ -229,12 +229,12 @@ export const CreateRepositoryForm = ({
 									</SelectTrigger>
 								</FormControl>
 								<SelectContent>
-									<SelectItem value="default">Use Ironmount's password</SelectItem>
+									<SelectItem value="default">Use Zerobyte's password</SelectItem>
 									<SelectItem value="custom">Enter password manually</SelectItem>
 								</SelectContent>
 							</Select>
 							<FormDescription>
-								Choose whether to use Ironmount's master password or enter a custom password for the existing
+								Choose whether to use Zerobyte's master password or enter a custom password for the existing
 								repository.
 							</FormDescription>
 						</FormItem>
@@ -266,7 +266,7 @@ export const CreateRepositoryForm = ({
 							<FormLabel>Repository Directory</FormLabel>
 							<div className="flex items-center gap-2">
 								<div className="flex-1 text-sm font-mono bg-muted px-3 py-2 rounded-md border">
-									{form.watch("path") || "/var/lib/ironmount/repositories"}
+									{form.watch("path") || "/var/lib/zerobyte/repositories"}
 								</div>
 								<Button
 									type="button"
@@ -299,7 +299,7 @@ export const CreateRepositoryForm = ({
 											restarts.
 										</p>
 										<p className="text-sm text-muted-foreground">
-											The default path <code className="bg-muted px-1 rounded">/var/lib/ironmount/repositories</code> is
+											The default path <code className="bg-muted px-1 rounded">/var/lib/zerobyte/repositories</code> is
 											already mounted from the host and is safe to use.
 										</p>
 									</AlertDialogDescription>
@@ -329,7 +329,7 @@ export const CreateRepositoryForm = ({
 								<div className="py-4">
 									<DirectoryBrowser
 										onSelectPath={(path) => form.setValue("path", path)}
-										selectedPath={form.watch("path") || "/var/lib/ironmount/repositories"}
+										selectedPath={form.watch("path") || "/var/lib/zerobyte/repositories"}
 									/>
 								</div>
 								<AlertDialogFooter>
@@ -632,7 +632,7 @@ export const CreateRepositoryForm = ({
 									<FormItem>
 										<FormLabel>Path</FormLabel>
 										<FormControl>
-											<Input placeholder="backups/ironmount" {...field} />
+											<Input placeholder="backups/zerobyte" {...field} />
 										</FormControl>
 										<FormDescription>Path within the remote where backups will be stored.</FormDescription>
 										<FormMessage />

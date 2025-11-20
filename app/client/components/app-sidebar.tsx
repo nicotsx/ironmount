@@ -1,4 +1,4 @@
-import { CalendarClock, Database, HardDrive, Mountain, Settings } from "lucide-react";
+import { CalendarClock, Database, HardDrive, Settings } from "lucide-react";
 import { Link, NavLink } from "react-router";
 import {
 	Sidebar,
@@ -46,13 +46,17 @@ export function AppSidebar() {
 		<Sidebar variant="inset" collapsible="icon" className="p-0">
 			<SidebarHeader className="bg-card-header border-b border-border/50 hidden md:flex h-[65px] flex-row items-center p-4">
 				<Link to="/volumes" className="flex items-center gap-3 font-semibold pl-2">
-					<Mountain className="size-5 text-strong-accent" />
+					<img
+						src="/images/zerobyte.png"
+						alt="Zerobyte Logo"
+						className={cn("h-8 w-8 flex-shrink-0 object-contain -ml-2")}
+					/>
 					<span
-						className={cn("text-base transition-all duration-200", {
+						className={cn("text-base transition-all duration-200 -ml-1", {
 							"opacity-0 w-0 overflow-hidden ": state === "collapsed",
 						})}
 					>
-						Ironmount
+						Zerobyte
 					</span>
 				</Link>
 			</SidebarHeader>

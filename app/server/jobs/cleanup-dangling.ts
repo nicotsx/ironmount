@@ -15,7 +15,7 @@ export class CleanupDanglingMountsJob extends Job {
 		const allSystemMounts = await readMountInfo();
 
 		for (const mount of allSystemMounts) {
-			if (mount.mountPoint.includes("ironmount") && mount.mountPoint.endsWith("_data")) {
+			if (mount.mountPoint.includes("zerobyte") && mount.mountPoint.endsWith("_data")) {
 				const matchingVolume = allVolumes.find((v) => getVolumePath(v) === mount.mountPoint);
 				if (!matchingVolume) {
 					logger.info(`Found dangling mount at ${mount.mountPoint}, attempting to unmount...`);
@@ -32,9 +32,9 @@ export class CleanupDanglingMountsJob extends Job {
 			}
 		}
 
-		const allIronmountDirs = await fs.readdir(VOLUME_MOUNT_BASE).catch(() => []);
+		const allZerobyteDirs = await fs.readdir(VOLUME_MOUNT_BASE).catch(() => []);
 
-		for (const dir of allIronmountDirs) {
+		for (const dir of allZerobyteDirs) {
 			const volumePath = `${VOLUME_MOUNT_BASE}/${dir}/_data`;
 			const matchingVolume = allVolumes.find((v) => getVolumePath(v) === volumePath);
 			if (!matchingVolume) {

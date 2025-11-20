@@ -30,7 +30,7 @@ export const driverController = new Hono()
 			return c.json({ Err: "Volume name is required" }, 400);
 		}
 
-		const volumeName = body.Name.replace(/^im-/, "");
+		const volumeName = body.Name.replace(/^zb-/, "");
 
 		return c.json({
 			Mountpoint: getVolumePath(volumeName),
@@ -48,7 +48,7 @@ export const driverController = new Hono()
 			return c.json({ Err: "Volume name is required" }, 400);
 		}
 
-		const { volume } = await volumeService.getVolume(body.Name.replace(/^im-/, ""));
+		const { volume } = await volumeService.getVolume(body.Name.replace(/^zb-/, ""));
 
 		return c.json({
 			Mountpoint: getVolumePath(volume),
@@ -61,11 +61,11 @@ export const driverController = new Hono()
 			return c.json({ Err: "Volume name is required" }, 400);
 		}
 
-		const { volume } = await volumeService.getVolume(body.Name.replace(/^im-/, ""));
+		const { volume } = await volumeService.getVolume(body.Name.replace(/^zb-/, ""));
 
 		return c.json({
 			Volume: {
-				Name: `im-${volume.name}`,
+				Name: `zb-${volume.name}`,
 				Mountpoint: getVolumePath(volume),
 				Status: {},
 			},
@@ -76,7 +76,7 @@ export const driverController = new Hono()
 		const volumes = await volumeService.listVolumes();
 
 		const res = volumes.map((volume) => ({
-			Name: `im-${volume.name}`,
+			Name: `zb-${volume.name}`,
 			Mountpoint: getVolumePath(volume),
 			Status: {},
 		}));

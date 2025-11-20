@@ -96,13 +96,13 @@ const buildRepoUrl = (config: RepositoryConfig): string => {
 
 const buildEnv = async (config: RepositoryConfig) => {
 	const env: Record<string, string> = {
-		RESTIC_CACHE_DIR: "/var/lib/ironmount/restic/cache",
+		RESTIC_CACHE_DIR: "/var/lib/zerobyte/restic/cache",
 		PATH: process.env.PATH || "/usr/local/bin:/usr/bin:/bin",
 	};
 
 	if (config.isExistingRepository && config.customPassword) {
 		const decryptedPassword = await cryptoUtils.decrypt(config.customPassword);
-		const passwordFilePath = path.join("/tmp", `ironmount-pass-${crypto.randomBytes(8).toString("hex")}.txt`);
+		const passwordFilePath = path.join("/tmp", `zerobyte-pass-${crypto.randomBytes(8).toString("hex")}.txt`);
 
 		await fs.writeFile(passwordFilePath, decryptedPassword, { mode: 0o600 });
 		env.RESTIC_PASSWORD_FILE = passwordFilePath;
@@ -123,7 +123,7 @@ const buildEnv = async (config: RepositoryConfig) => {
 			break;
 		case "gcs": {
 			const decryptedCredentials = await cryptoUtils.decrypt(config.credentialsJson);
-			const credentialsPath = path.join("/tmp", `ironmount-gcs-${crypto.randomBytes(8).toString("hex")}.json`);
+			const credentialsPath = path.join("/tmp", `zerobyte-gcs-${crypto.randomBytes(8).toString("hex")}.json`);
 			await fs.writeFile(credentialsPath, decryptedCredentials, { mode: 0o600 });
 			env.GOOGLE_PROJECT_ID = config.projectId;
 			env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath;

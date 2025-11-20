@@ -1,10 +1,10 @@
 services:
-  ironmount-dev:
+  zerobyte-dev:
     build:
       context: .
       dockerfile: Dockerfile
       target: development
-    container_name: ironmount
+    container_name: zerobyte
     restart: unless-stopped
     devices:
       - /dev/fuse:/dev/fuse
@@ -16,20 +16,20 @@ services:
       - "4096:4096"
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /var/lib/ironmount:/var/lib/ironmount
+      - /var/lib/zerobyte:/var/lib/zerobyte
 
       - ./app:/app/app
       - ~/.config/rclone:/root/.config/rclone
-      - /var/lib/ironmount:/var/lib/ironmount:rshared
+      - /var/lib/zerobyte:/var/lib/zerobyte:rshared
       - /run/docker/plugins:/run/docker/plugins
       - /var/run/docker.sock:/var/run/docker.sock
 
-  ironmount-prod:
+  zerobyte-prod:
     build:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: ironmount
+    container_name: zerobyte
     restart: unless-stopped
     devices:
       - /dev/fuse:/dev/fuse
@@ -39,6 +39,6 @@ services:
       - "4096:4096"
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /var/lib/ironmount:/var/lib/ironmount:rshared
+      - /var/lib/zerobyte:/var/lib/zerobyte:rshared
       - /run/docker/plugins:/run/docker/plugins
       - /var/run/docker.sock:/var/run/docker.sock
