@@ -20,7 +20,7 @@ export const handle = {
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Ironmount - Volumes" },
+		{ title: "Zerobyte - Volumes" },
 		{
 			name: "description",
 			content: "Create, manage, monitor, and automate your Docker volumes with ease.",

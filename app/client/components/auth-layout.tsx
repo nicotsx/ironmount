@@ -1,4 +1,3 @@
-import { Mountain } from "lucide-react";
 import type { ReactNode } from "react";
 
 type AuthLayoutProps = {
@@ -13,8 +12,8 @@ export function AuthLayout({ title, description, children }: AuthLayoutProps) {
 			<div className="flex flex-1 items-center justify-center bg-background p-8">
 				<div className="w-full max-w-md space-y-8">
 					<div className="flex items-center gap-3">
-						<Mountain className="size-5 text-strong-accent" />
-						<span className="text-lg font-semibold">Ironmount</span>
+						<img src="/images/zerobyte.png" alt="Zerobyte Logo" className="h-5 w-5 object-contain" />
+						<span className="text-lg font-semibold">Zerobyte</span>
 					</div>
 
 					<div className="space-y-2">

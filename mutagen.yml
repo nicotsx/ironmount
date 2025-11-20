@@ -10,9 +10,9 @@ sync:
         - "logs"
         - "mutagen.yml.lock"
         - "data"
-  ironmount:
+  zerobyte:
     alpha: "."
-    beta: "nicolas@192.168.2.42:/home/nicolas/ironmount"
+    beta: "nicolas@192.168.2.42:/home/nicolas/zerobyte"
     mode: "one-way-replica"
     flushOnCreate: true
     ignore:

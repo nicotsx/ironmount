@@ -8,6 +8,7 @@ export const REPOSITORY_BACKENDS = {
 	azure: "azure",
 	rclone: "rclone",
 	rest: "rest",
+	sftp: "sftp",
 } as const;
 
 export type RepositoryBackend = keyof typeof REPOSITORY_BACKENDS;
@@ -37,6 +38,7 @@ export const r2RepositoryConfigSchema = type({
 export const localRepositoryConfigSchema = type({
 	backend: "'local'",
 	name: "string",
+	path: "string?",
 }).and(baseRepositoryConfigSchema);
 
 export const gcsRepositoryConfigSchema = type({
@@ -68,13 +70,23 @@ export const restRepositoryConfigSchema = type({
 	path: "string?",
 }).and(baseRepositoryConfigSchema);
 
+export const sftpRepositoryConfigSchema = type({
+	backend: "'sftp'",
+	host: "string",
+	port: type("string.integer").or(type("number")).to("1 <= number <= 65535").default(22),
+	user: "string",
+	path: "string",
+	privateKey: "string",
+}).and(baseRepositoryConfigSchema);
+
 export const repositoryConfigSchema = s3RepositoryConfigSchema
 	.or(r2RepositoryConfigSchema)
 	.or(localRepositoryConfigSchema)
 	.or(gcsRepositoryConfigSchema)
 	.or(azureRepositoryConfigSchema)
 	.or(rcloneRepositoryConfigSchema)
-	.or(restRepositoryConfigSchema);
+	.or(restRepositoryConfigSchema)
+	.or(sftpRepositoryConfigSchema);
 
 export type RepositoryConfig = typeof repositoryConfigSchema.infer;
 

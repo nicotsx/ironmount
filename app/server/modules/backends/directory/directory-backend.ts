@@ -1,5 +1,4 @@
 import * as fs from "node:fs/promises";
-import * as npath from "node:path";
 import { toMessage } from "../../../utils/errors";
 import { logger } from "../../../utils/logger";
 import type { VolumeBackend } from "../backend";
@@ -39,11 +38,6 @@ const checkHealth = async (config: BackendConfig) => {
 
 	try {
 		await fs.access(config.path);
-
-		// Try to create a temporary file to ensure write access
-		const tempFilePath = npath.join(config.path, `.healthcheck-${Date.now()}`);
-		await fs.writeFile(tempFilePath, "healthcheck");
-		await fs.unlink(tempFilePath);
 
 		return { status: BACKEND_STATUS.mounted };
 	} catch (error) {

@@ -1,12 +1,12 @@
 <div align="center">
-  <h1>Ironmount</h1>
+  <h1>Zerobyte</h1>
   <h3>Powerful backup automation for your remote storage<br />Encrypt, compress, and protect your data with ease</h3>
-  <a href="https://github.com/nicotsx/ironmount/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/nicotsx/ironmount" />
+  <a href="https://github.com/nicotsx/zerobyte/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/nicotsx/zerobyte" />
   </a>
   <br />
   <figure>
-    <img src="https://github.com/nicotsx/ironmount/blob/main/screenshots/backup-details.png?raw=true" alt="Demo" />
+    <img src="https://github.com/nicotsx/zerobyte/blob/main/screenshots/backup-details.png?raw=true" alt="Demo" />
     <figcaption>
       <p align="center">
         Backup management with scheduling and monitoring
@@ -16,11 +16,11 @@
 </div>
 
 > [!WARNING]
-> Ironmount is still in version 0.x.x and is subject to major changes from version to version. I am developing the core features and collecting feedbacks. Expect bugs! Please open issues or feature requests
+> Zerobyte is still in version 0.x.x and is subject to major changes from version to version. I am developing the core features and collecting feedbacks. Expect bugs! Please open issues or feature requests
 
 ## Intro
 
-Ironmount is a backup automation tool that helps you save your data across multiple storage backends. Built on top of Restic, it provides an modern web interface to schedule, manage, and monitor encrypted backups of your remote storage.
+Zerobyte is a backup automation tool that helps you save your data across multiple storage backends. Built on top of Restic, it provides an modern web interface to schedule, manage, and monitor encrypted backups of your remote storage.
 
 ### Features
 
@@ -31,13 +31,13 @@ Ironmount is a backup automation tool that helps you save your data across multi
 
 ## Installation
 
-In order to run Ironmount, you need to have Docker and Docker Compose installed on your server. Then, you can use the provided `docker-compose.yml` file to start the application.
+In order to run Zerobyte, you need to have Docker and Docker Compose installed on your server. Then, you can use the provided `docker-compose.yml` file to start the application.
 
 ```yaml
 services:
-  ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.10
-    container_name: ironmount
+  zerobyte:
+    image: ghcr.io/nicotsx/zerobyte:v0.12
+    container_name: zerobyte
     restart: unless-stopped
     cap_add:
       - SYS_ADMIN
@@ -47,13 +47,13 @@ services:
       - /dev/fuse:/dev/fuse
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /var/lib/ironmount:/var/lib/ironmount
+      - /var/lib/zerobyte:/var/lib/zerobyte
 ```
 
 > [!WARNING]
-> Do not try to change the location of the bind mount `/var/lib/ironmount` on your host or store it on a network share. You will likely face permission issues and strong performance degradation.
+> Do not try to change the location of the bind mount `/var/lib/zerobyte` on your host or store it on a network share. You will likely face permission issues and strong performance degradation.
 
-Then, run the following command to start Ironmount:
+Then, run the following command to start Zerobyte:
 
 ```bash
 docker compose up -d
@@ -63,17 +63,17 @@ Once the container is running, you can access the web interface at `http://<your
 
 ## Adding your first volume
 
-Ironmount supports multiple volume backends including NFS, SMB, WebDAV, and local directories. A volume represents the source data you want to back up and monitor.
+Zerobyte supports multiple volume backends including NFS, SMB, WebDAV, and local directories. A volume represents the source data you want to back up and monitor.
 
 To add your first volume, navigate to the "Volumes" section in the web interface and click on "Create volume". Fill in the required details such as volume name, type, and connection settings.
 
-If you want to track a local directory on the same server where Ironmount is running, you'll first need to mount that directory into the Ironmount container. You can do this by adding a volume mapping in your `docker-compose.yml` file. For example, to mount `/path/to/your/directory` from the host to `/mydata` in the container, you would add the following line under the `volumes` section:
+If you want to track a local directory on the same server where Zerobyte is running, you'll first need to mount that directory into the Zerobyte container. You can do this by adding a volume mapping in your `docker-compose.yml` file. For example, to mount `/path/to/your/directory` from the host to `/mydata` in the container, you would add the following line under the `volumes` section:
 
 ```diff
 services:
-  ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.10
-    container_name: ironmount
+  zerobyte:
+    image: ghcr.io/nicotsx/zerobyte:v0.12
+    container_name: zerobyte
     restart: unless-stopped
     cap_add:
       - SYS_ADMIN
@@ -83,26 +83,26 @@ services:
       - /dev/fuse:/dev/fuse
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /var/lib/ironmount:/var/lib/ironmount
+      - /var/lib/zerobyte:/var/lib/zerobyte
 +     - /path/to/your/directory:/mydata
 ```
 
-After updating the `docker-compose.yml` file, restart the Ironmount container to apply the changes:
+After updating the `docker-compose.yml` file, restart the Zerobyte container to apply the changes:
 
 ```bash
 docker compose down
 docker compose up -d
 ```
 
-Now, when adding a new volume in the Ironmount web interface, you can select "Directory" as the volume type and search for your mounted path (e.g., `/mydata`) as the source path.
+Now, when adding a new volume in the Zerobyte web interface, you can select "Directory" as the volume type and search for your mounted path (e.g., `/mydata`) as the source path.
 
-![Preview](https://github.com/nicotsx/ironmount/blob/main/screenshots/add-volume.png?raw=true)
+![Preview](https://github.com/nicotsx/zerobyte/blob/main/screenshots/add-volume.png?raw=true)
 
 ## Creating a repository
 
-A repository is where your backups will be securely stored encrypted. Ironmount supports multiple storage backends for your backup repositories:
+A repository is where your backups will be securely stored encrypted. Zerobyte supports multiple storage backends for your backup repositories:
 
-- **Local directories** - Store backups on local disk at `/var/lib/ironmount/repositories/<repository-name>`
+- **Local directories** - Store backups on local disk at `/var/lib/zerobyte/repositories/<repository-name>`
 - **S3-compatible storage** - Amazon S3, MinIO, Wasabi, DigitalOcean Spaces, etc.
 - **Google Cloud Storage** - Google's cloud storage service
 - **Azure Blob Storage** - Microsoft Azure storage
@@ -114,7 +114,7 @@ To create a repository, navigate to the "Repositories" section in the web interf
 
 ### Using rclone for cloud storage
 
-Ironmount can use [rclone](https://rclone.org/) to support 40+ cloud storage providers including Google Drive, Dropbox, OneDrive, Box, pCloud, Mega, and many more. This gives you the flexibility to store your backups on virtually any cloud storage service.
+Zerobyte can use [rclone](https://rclone.org/) to support 40+ cloud storage providers including Google Drive, Dropbox, OneDrive, Box, pCloud, Mega, and many more. This gives you the flexibility to store your backups on virtually any cloud storage service.
 
 **Setup instructions:**
 
@@ -134,12 +134,12 @@ Ironmount can use [rclone](https://rclone.org/) to support 40+ cloud storage pro
    rclone listremotes
    ```
 
-4. **Mount the rclone config into the Ironmount container** by updating your `docker-compose.yml`:
+4. **Mount the rclone config into the Zerobyte container** by updating your `docker-compose.yml`:
    ```diff
    services:
-     ironmount:
-       image: ghcr.io/nicotsx/ironmount:v0.10
-       container_name: ironmount
+     zerobyte:
+       image: ghcr.io/nicotsx/zerobyte:v0.12
+       container_name: zerobyte
        restart: unless-stopped
        cap_add:
          - SYS_ADMIN
@@ -149,20 +149,20 @@ Ironmount can use [rclone](https://rclone.org/) to support 40+ cloud storage pro
          - /dev/fuse:/dev/fuse
        volumes:
          - /etc/localtime:/etc/localtime:ro
-         - /var/lib/ironmount:/var/lib/ironmount
+         - /var/lib/zerobyte:/var/lib/zerobyte
    +     - ~/.config/rclone:/root/.config/rclone
    ```
 
-5. **Restart the Ironmount container**:
+5. **Restart the Zerobyte container**:
    ```bash
    docker compose down
    docker compose up -d
    ```
 
-6. **Create a repository** in Ironmount:
+6. **Create a repository** in Zerobyte:
    - Select "rclone" as the repository type
    - Choose your configured remote from the dropdown
-   - Specify the path within your remote (e.g., `backups/ironmount`)
+   - Specify the path within your remote (e.g., `backups/zerobyte`)
 
 For a complete list of supported providers, see the [rclone documentation](https://rclone.org/).
 
@@ -175,28 +175,28 @@ When creating a backup job, you can specify the following settings:
 - **Retention Policy**: Set rules for how long backups should be retained (e.g., keep daily backups for 7 days, weekly backups for 4 weeks)
 - **Paths**: Specify which files or directories to include in the backup
 
-After configuring the backup job, save it and Ironmount will automatically execute the backup according to the defined schedule.
+After configuring the backup job, save it and Zerobyte will automatically execute the backup according to the defined schedule.
 You can monitor the progress and status of your backup jobs in the "Backups" section of the web interface.
 
-![Preview](https://github.com/nicotsx/ironmount/blob/main/screenshots/backups-list.png?raw=true)
+![Preview](https://github.com/nicotsx/zerobyte/blob/main/screenshots/backups-list.png?raw=true)
 
 ## Restoring data
 
-Ironmount allows you to easily restore your data from backups. To restore data, navigate to the "Backups" section and select the backup job from which you want to restore data. You can then choose a specific backup snapshot and select the files or directories you wish to restore. The data you select will be restored to their original location.
+Zerobyte allows you to easily restore your data from backups. To restore data, navigate to the "Backups" section and select the backup job from which you want to restore data. You can then choose a specific backup snapshot and select the files or directories you wish to restore. The data you select will be restored to their original location.
 
-![Preview](https://github.com/nicotsx/ironmount/blob/main/screenshots/restoring.png?raw=true)
+![Preview](https://github.com/nicotsx/zerobyte/blob/main/screenshots/restoring.png?raw=true)
 
 ## Propagating mounts to host
 
-Ironmount is capable of propagating mounted volumes from within the container to the host system. This is particularly useful when you want to access the mounted data directly from the host to use it with other applications or services.
+Zerobyte is capable of propagating mounted volumes from within the container to the host system. This is particularly useful when you want to access the mounted data directly from the host to use it with other applications or services.
 
-In order to enable this feature, you need to change your bind mount `/var/lib/ironmount` to use the `:rshared` flag. Here is an example of how to set this up in your `docker-compose.yml` file:
+In order to enable this feature, you need to change your bind mount `/var/lib/zerobyte` to use the `:rshared` flag. Here is an example of how to set this up in your `docker-compose.yml` file:
 
 ```diff
 services:
-  ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.10
-    container_name: ironmount
+  zerobyte:
+    image: ghcr.io/nicotsx/zerobyte:v0.12
+    container_name: zerobyte
     restart: unless-stopped
     ports:
       - "4096:4096"
@@ -204,11 +204,11 @@ services:
       - /dev/fuse:/dev/fuse
     volumes:
       - /etc/localtime:/etc/localtime:ro
--     - /var/lib/ironmount:/var/lib/ironmount
-+     - /var/lib/ironmount:/var/lib/ironmount:rshared
+-     - /var/lib/zerobyte:/var/lib/zerobyte
++     - /var/lib/zerobyte:/var/lib/zerobyte:rshared
 ```
 
-Restart the Ironmount container to apply the changes:
+Restart the Zerobyte container to apply the changes:
 
 ```bash
 docker compose down
@@ -217,15 +217,15 @@ docker compose up -d
 
 ## Docker plugin
 
-Ironmount can also be used as a Docker volume plugin, allowing you to mount your volumes directly into other Docker containers. This enables seamless integration with your containerized applications.
+Zerobyte can also be used as a Docker volume plugin, allowing you to mount your volumes directly into other Docker containers. This enables seamless integration with your containerized applications.
 
-In order to enable this feature, you need to run Ironmount with several items shared from the host. Here is an example of how to set this up in your `docker-compose.yml` file:
+In order to enable this feature, you need to run Zerobyte with several items shared from the host. Here is an example of how to set this up in your `docker-compose.yml` file:
 
 ```diff
 services:
-  ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.10
-    container_name: ironmount
+  zerobyte:
+    image: ghcr.io/nicotsx/zerobyte:v0.12
+    container_name: zerobyte
     restart: unless-stopped
     cap_add:
       - SYS_ADMIN
@@ -235,20 +235,20 @@ services:
       - /dev/fuse:/dev/fuse
     volumes:
       - /etc/localtime:/etc/localtime:ro
--     - /var/lib/ironmount:/var/lib/ironmount
-+     - /var/lib/ironmount:/var/lib/ironmount:rshared
+-     - /var/lib/zerobyte:/var/lib/zerobyte
++     - /var/lib/zerobyte:/var/lib/zerobyte:rshared
 +     - /run/docker/plugins:/run/docker/plugins
 +     - /var/run/docker.sock:/var/run/docker.sock
 ```
 
-Restart the Ironmount container to apply the changes:
+Restart the Zerobyte container to apply the changes:
 
 ```bash
 docker compose down
 docker compose up -d
 ```
 
-Your Ironmount volumes will now be available as Docker volumes that you can mount into other containers using the `--volume` flag:
+Your Zerobyte volumes will now be available as Docker volumes that you can mount into other containers using the `--volume` flag:
 
 ```bash
 docker run -v im-nfs:/path/in/container nginx:latest
@@ -267,7 +267,7 @@ volumes:
     external: true
 ```
 
-The volume name format is `im-<volume-name>` where `<volume-name>` is the name you assigned to the volume in Ironmount. You can verify that the volume is available by running:
+The volume name format is `im-<volume-name>` where `<volume-name>` is the name you assigned to the volume in Zerobyte. You can verify that the volume is available by running:
 
 ```bash
 docker volume ls
@@ -279,7 +279,7 @@ This project includes the following third-party software components:
 
 ### Restic
 
-Ironmount includes [Restic](https://github.com/restic/restic) for backup functionality.
+Zerobyte includes [Restic](https://github.com/restic/restic) for backup functionality.
 
 - **License**: BSD 2-Clause License
 - **Copyright**: Copyright (c) 2014, Alexander Neumann <alexander@bumpern.de>
@@ -287,3 +287,7 @@ Ironmount includes [Restic](https://github.com/restic/restic) for backup functio
 - **License Text**: See [LICENSES/BSD-2-Clause-Restic.txt](LICENSES/BSD-2-Clause-Restic.txt)
 
 For a complete list of third-party software licenses and attributions, please refer to the [NOTICES.md](NOTICES.md) file.
+
+## Contributing
+
+Contributions by anyone are welcome! If you find a bug or have a feature request, please open an issue on GitHub. If you want to contribute code, feel free to fork the repository and submit a pull request. We require that all contributors sign a Contributor License Agreement (CLA) before we can accept your contributions. This is to protect both you and the project. Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for more details.

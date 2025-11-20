@@ -16,10 +16,10 @@ export const clientMiddleware = [authMiddleware];
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Ironmount - Login" },
+		{ title: "Zerobyte - Login" },
 		{
 			name: "description",
-			content: "Sign in to your Ironmount account.",
+			content: "Sign in to your Zerobyte account.",
 		},
 	];
 }

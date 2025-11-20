@@ -36,7 +36,7 @@ export const handle = {
 
 export function meta({ params }: Route.MetaArgs) {
 	return [
-		{ title: `Ironmount - ${params.name}` },
+		{ title: `Zerobyte - ${params.name}` },
 		{
 			name: "description",
 			content: "View repository configuration, status, and snapshots.",
@@ -181,8 +181,8 @@ export default function RepositoryDetailsPage({ loaderData }: Route.ComponentPro
 					<AlertDialogHeader>
 						<AlertDialogTitle>Delete repository?</AlertDialogTitle>
 						<AlertDialogDescription>
-							Are you sure you want to delete the repository <strong>{data.name}</strong>? This action cannot be undone
-							and will remove all backup data.
+							Are you sure you want to delete the repository <strong>{data.name}</strong>? This will not remove the
+							actual data from the backend storage, only the repository configuration will be deleted.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<div className="flex gap-3 justify-end">

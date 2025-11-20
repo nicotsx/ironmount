@@ -6,6 +6,6 @@ export default defineConfig({
 	schema: "./app/server/db/schema.ts",
 	dialect: "sqlite",
 	dbCredentials: {
-		url: "./data/ironmount.db",
+		url: "./data/zerobyte.db",
 	},
 });

@@ -16,7 +16,7 @@ export const clientMiddleware = [authMiddleware];
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Ironmount - Download Recovery Key" },
+		{ title: "Zerobyte - Download Recovery Key" },
 		{
 			name: "description",
 			content: "Download your backup recovery key to ensure you can restore your data.",

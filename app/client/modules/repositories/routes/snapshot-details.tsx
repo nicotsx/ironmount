@@ -17,7 +17,7 @@ export const handle = {
 
 export function meta({ params }: Route.MetaArgs) {
 	return [
-		{ title: `Ironmount - Snapshot ${params.snapshotId}` },
+		{ title: `Zerobyte - Snapshot ${params.snapshotId}` },
 		{
 			name: "description",
 			content: "Browse and restore files from a backup snapshot.",
