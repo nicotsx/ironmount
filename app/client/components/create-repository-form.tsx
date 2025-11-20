@@ -27,6 +27,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "./ui/alert-dialog";
+import { Textarea } from "./ui/textarea";
 
 export const formSchema = type({
 	name: "2<=string<=32",
@@ -53,6 +54,7 @@ const defaultValuesForType = {
 	azure: { backend: "azure" as const, compressionMode: "auto" as const },
 	rclone: { backend: "rclone" as const, compressionMode: "auto" as const },
 	rest: { backend: "rest" as const, compressionMode: "auto" as const },
+	sftp: { backend: "sftp" as const, compressionMode: "auto" as const, port: 22 },
 };
 
 export const CreateRepositoryForm = ({
@@ -141,6 +143,7 @@ export const CreateRepositoryForm = ({
 									<SelectItem value="gcs">Google Cloud Storage</SelectItem>
 									<SelectItem value="azure">Azure Blob Storage</SelectItem>
 									<SelectItem value="rest">REST Server</SelectItem>
+									<SelectItem value="sftp">SFTP</SelectItem>
 									<Tooltip>
 										<TooltipTrigger>
 											<SelectItem disabled={!capabilities.rclone} value="rclone">
@@ -268,18 +271,11 @@ export const CreateRepositoryForm = ({
 								<div className="flex-1 text-sm font-mono bg-muted px-3 py-2 rounded-md border">
 									{form.watch("path") || "/var/lib/zerobyte/repositories"}
 								</div>
-								<Button
-									type="button"
-									variant="outline"
-									onClick={() => setShowPathWarning(true)}
-									size="sm"
-								>
+								<Button type="button" variant="outline" onClick={() => setShowPathWarning(true)} size="sm">
 									Change
 								</Button>
 							</div>
-							<FormDescription>
-								The directory where the repository will be stored.
-							</FormDescription>
+							<FormDescription>The directory where the repository will be stored.</FormDescription>
 						</FormItem>
 
 						<AlertDialog open={showPathWarning} onOpenChange={setShowPathWarning}>
@@ -290,13 +286,9 @@ export const CreateRepositoryForm = ({
 										Important: Host Mount Required
 									</AlertDialogTitle>
 									<AlertDialogDescription className="space-y-3">
-										<p>
-											When selecting a custom path, ensure it is mounted from the host machine into the
-											container.
-										</p>
+										<p>When selecting a custom path, ensure it is mounted from the host machine into the container.</p>
 										<p className="font-medium">
-											If the path is not a host mount, you will lose your repository data when the container
-											restarts.
+											If the path is not a host mount, you will lose your repository data when the container restarts.
 										</p>
 										<p className="text-sm text-muted-foreground">
 											The default path <code className="bg-muted px-1 rounded">/var/lib/zerobyte/repositories</code> is
@@ -696,6 +688,89 @@ export const CreateRepositoryForm = ({
 										<Input type="password" placeholder="••••••••" {...field} />
 									</FormControl>
 									<FormDescription>Password for REST server authentication.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
+
+				{watchedBackend === "sftp" && (
+					<>
+						<FormField
+							control={form.control}
+							name="host"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Host</FormLabel>
+									<FormControl>
+										<Input placeholder="192.168.1.100" {...field} />
+									</FormControl>
+									<FormDescription>SFTP server hostname or IP address.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="port"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Port</FormLabel>
+									<FormControl>
+										<Input
+											type="number"
+											placeholder="22"
+											{...field}
+											onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
+										/>
+									</FormControl>
+									<FormDescription>SSH port (default: 22).</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="user"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>User</FormLabel>
+									<FormControl>
+										<Input placeholder="backup-user" {...field} />
+									</FormControl>
+									<FormDescription>SSH username for authentication.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="path"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Path</FormLabel>
+									<FormControl>
+										<Input placeholder="backups/ironmount" {...field} />
+									</FormControl>
+									<FormDescription>Repository path on the SFTP server. </FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="privateKey"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>SSH Private Key</FormLabel>
+									<FormControl>
+										<Textarea
+											{...field}
+											placeholder="-----BEGIN OPENSSH PRIVATE KEY-----&#10;...&#10;-----END OPENSSH PRIVATE KEY-----"
+										/>
+									</FormControl>
+									<FormDescription>Paste the contents of your SSH private key.</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}

@@ -15,6 +15,7 @@ export const RepositoryIcon = ({ backend, className = "h-4 w-4" }: Props) => {
 		case "gcs":
 			return <Cloud className={className} />;
 		case "rest":
+		case "sftp":
 			return <Server className={className} />;
 		default:
 			return <Database className={className} />;

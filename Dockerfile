@@ -2,7 +2,7 @@ ARG BUN_VERSION="1.3.1"
 
 FROM oven/bun:${BUN_VERSION}-alpine AS base
 
-RUN apk add --no-cache davfs2=1.6.1-r2
+RUN apk add --no-cache davfs2=1.6.1-r2 openssh-client
 
 
 # ------------------------------
