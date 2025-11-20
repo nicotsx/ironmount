@@ -19,7 +19,7 @@ const calculateNextRun = (cronExpression: string): number => {
 	try {
 		const interval = CronExpressionParser.parse(cronExpression, {
 			currentDate: new Date(),
-			tz: "UTC",
+			tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
 		});
 
 		return interval.next().getTime();

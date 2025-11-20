@@ -15,6 +15,7 @@ services:
     ports:
       - "4096:4096"
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - /var/lib/ironmount:/var/lib/ironmount
 
       - ./app:/app/app
@@ -37,6 +38,7 @@ services:
     ports:
       - "4096:4096"
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - /var/lib/ironmount:/var/lib/ironmount:rshared
       - /run/docker/plugins:/run/docker/plugins
       - /var/run/docker.sock:/var/run/docker.sock

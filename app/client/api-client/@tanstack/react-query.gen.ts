@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { browseFilesystem, changePassword, createBackupSchedule, createRepository, createVolume, deleteBackupSchedule, deleteRepository, deleteVolume, doctorRepository, downloadResticPassword, getBackupSchedule, getBackupScheduleForVolume, getContainersUsingVolume, getMe, getRepository, getSnapshotDetails, getStatus, getSystemInfo, getVolume, healthCheckVolume, listBackupSchedules, listFiles, listRcloneRemotes, listRepositories, listSnapshotFiles, listSnapshots, listVolumes, login, logout, mountVolume, type Options, register, restoreSnapshot, runBackupNow, runForget, stopBackup, testConnection, unmountVolume, updateBackupSchedule, updateVolume } from '../sdk.gen';
-import type { BrowseFilesystemData, BrowseFilesystemResponse, ChangePasswordData, ChangePasswordResponse, CreateBackupScheduleData, CreateBackupScheduleResponse, CreateRepositoryData, CreateRepositoryResponse, CreateVolumeData, CreateVolumeResponse, DeleteBackupScheduleData, DeleteBackupScheduleResponse, DeleteRepositoryData, DeleteRepositoryResponse, DeleteVolumeData, DeleteVolumeResponse, DoctorRepositoryData, DoctorRepositoryResponse, DownloadResticPasswordData, DownloadResticPasswordResponse, GetBackupScheduleData, GetBackupScheduleForVolumeData, GetBackupScheduleForVolumeResponse, GetBackupScheduleResponse, GetContainersUsingVolumeData, GetContainersUsingVolumeResponse, GetMeData, GetMeResponse, GetRepositoryData, GetRepositoryResponse, GetSnapshotDetailsData, GetSnapshotDetailsResponse, GetStatusData, GetStatusResponse, GetSystemInfoData, GetSystemInfoResponse, GetVolumeData, GetVolumeResponse, HealthCheckVolumeData, HealthCheckVolumeResponse, ListBackupSchedulesData, ListBackupSchedulesResponse, ListFilesData, ListFilesResponse, ListRcloneRemotesData, ListRcloneRemotesResponse, ListRepositoriesData, ListRepositoriesResponse, ListSnapshotFilesData, ListSnapshotFilesResponse, ListSnapshotsData, ListSnapshotsResponse, ListVolumesData, ListVolumesResponse, LoginData, LoginResponse, LogoutData, LogoutResponse, MountVolumeData, MountVolumeResponse, RegisterData, RegisterResponse, RestoreSnapshotData, RestoreSnapshotResponse, RunBackupNowData, RunBackupNowResponse, RunForgetData, RunForgetResponse, StopBackupData, StopBackupResponse, TestConnectionData, TestConnectionResponse, UnmountVolumeData, UnmountVolumeResponse, UpdateBackupScheduleData, UpdateBackupScheduleResponse, UpdateVolumeData, UpdateVolumeResponse } from '../types.gen';
+import { browseFilesystem, changePassword, createBackupSchedule, createRepository, createVolume, deleteBackupSchedule, deleteRepository, deleteSnapshot, deleteVolume, doctorRepository, downloadResticPassword, getBackupSchedule, getBackupScheduleForVolume, getContainersUsingVolume, getMe, getRepository, getSnapshotDetails, getStatus, getSystemInfo, getVolume, healthCheckVolume, listBackupSchedules, listFiles, listRcloneRemotes, listRepositories, listSnapshotFiles, listSnapshots, listVolumes, login, logout, mountVolume, type Options, register, restoreSnapshot, runBackupNow, runForget, stopBackup, testConnection, unmountVolume, updateBackupSchedule, updateVolume } from '../sdk.gen';
+import type { BrowseFilesystemData, BrowseFilesystemResponse, ChangePasswordData, ChangePasswordResponse, CreateBackupScheduleData, CreateBackupScheduleResponse, CreateRepositoryData, CreateRepositoryResponse, CreateVolumeData, CreateVolumeResponse, DeleteBackupScheduleData, DeleteBackupScheduleResponse, DeleteRepositoryData, DeleteRepositoryResponse, DeleteSnapshotData, DeleteSnapshotResponse, DeleteVolumeData, DeleteVolumeResponse, DoctorRepositoryData, DoctorRepositoryResponse, DownloadResticPasswordData, DownloadResticPasswordResponse, GetBackupScheduleData, GetBackupScheduleForVolumeData, GetBackupScheduleForVolumeResponse, GetBackupScheduleResponse, GetContainersUsingVolumeData, GetContainersUsingVolumeResponse, GetMeData, GetMeResponse, GetRepositoryData, GetRepositoryResponse, GetSnapshotDetailsData, GetSnapshotDetailsResponse, GetStatusData, GetStatusResponse, GetSystemInfoData, GetSystemInfoResponse, GetVolumeData, GetVolumeResponse, HealthCheckVolumeData, HealthCheckVolumeResponse, ListBackupSchedulesData, ListBackupSchedulesResponse, ListFilesData, ListFilesResponse, ListRcloneRemotesData, ListRcloneRemotesResponse, ListRepositoriesData, ListRepositoriesResponse, ListSnapshotFilesData, ListSnapshotFilesResponse, ListSnapshotsData, ListSnapshotsResponse, ListVolumesData, ListVolumesResponse, LoginData, LoginResponse, LogoutData, LogoutResponse, MountVolumeData, MountVolumeResponse, RegisterData, RegisterResponse, RestoreSnapshotData, RestoreSnapshotResponse, RunBackupNowData, RunBackupNowResponse, RunForgetData, RunForgetResponse, StopBackupData, StopBackupResponse, TestConnectionData, TestConnectionResponse, UnmountVolumeData, UnmountVolumeResponse, UpdateBackupScheduleData, UpdateBackupScheduleResponse, UpdateVolumeData, UpdateVolumeResponse } from '../types.gen';
 
 /**
  * Register a new user
@@ -459,6 +459,23 @@ export const listSnapshotsOptions = (options: Options<ListSnapshotsData>) => que
     },
     queryKey: listSnapshotsQueryKey(options)
 });
+
+/**
+ * Delete a specific snapshot from a repository
+ */
+export const deleteSnapshotMutation = (options?: Partial<Options<DeleteSnapshotData>>): UseMutationOptions<DeleteSnapshotResponse, DefaultError, Options<DeleteSnapshotData>> => {
+    const mutationOptions: UseMutationOptions<DeleteSnapshotResponse, DefaultError, Options<DeleteSnapshotData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteSnapshot({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 export const getSnapshotDetailsQueryKey = (options: Options<GetSnapshotDetailsData>) => createQueryKey("getSnapshotDetails", options);
 

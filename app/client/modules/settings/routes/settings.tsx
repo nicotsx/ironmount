@@ -30,7 +30,7 @@ export const handle = {
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Settings" },
+		{ title: "Ironmount - Settings" },
 		{
 			name: "description",
 			content: "Manage your account settings and preferences.",

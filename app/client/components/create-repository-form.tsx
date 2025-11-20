@@ -41,6 +41,7 @@ const defaultValuesForType = {
 	gcs: { backend: "gcs" as const, compressionMode: "auto" as const },
 	azure: { backend: "azure" as const, compressionMode: "auto" as const },
 	rclone: { backend: "rclone" as const, compressionMode: "auto" as const },
+	rest: { backend: "rest" as const, compressionMode: "auto" as const },
 };
 
 export const CreateRepositoryForm = ({
@@ -126,6 +127,7 @@ export const CreateRepositoryForm = ({
 									<SelectItem value="r2">Cloudflare R2</SelectItem>
 									<SelectItem value="gcs">Google Cloud Storage</SelectItem>
 									<SelectItem value="azure">Azure Blob Storage</SelectItem>
+									<SelectItem value="rest">REST Server</SelectItem>
 									<Tooltip>
 										<TooltipTrigger>
 											<SelectItem disabled={!capabilities.rclone} value="rclone">
@@ -545,6 +547,67 @@ export const CreateRepositoryForm = ({
 							/>
 						</>
 					))}
+
+				{watchedBackend === "rest" && (
+					<>
+						<FormField
+							control={form.control}
+							name="url"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>REST Server URL</FormLabel>
+									<FormControl>
+										<Input placeholder="http://192.168.1.30:8000" {...field} />
+									</FormControl>
+									<FormDescription>URL of the REST server.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="path"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Repository Path (Optional)</FormLabel>
+									<FormControl>
+										<Input placeholder="my-backup-repo" {...field} />
+									</FormControl>
+									<FormDescription>Path to the repository on the REST server (leave empty for root).</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="username"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Username (Optional)</FormLabel>
+									<FormControl>
+										<Input placeholder="username" {...field} />
+									</FormControl>
+									<FormDescription>Username for REST server authentication.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="password"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Password (Optional)</FormLabel>
+									<FormControl>
+										<Input type="password" placeholder="••••••••" {...field} />
+									</FormControl>
+									<FormDescription>Password for REST server authentication.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
 
 				{mode === "update" && (
 					<Button type="submit" className="w-full" loading={loading}>

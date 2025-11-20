@@ -33,6 +33,14 @@ const encryptConfig = async (config: RepositoryConfig): Promise<RepositoryConfig
 		case "azure":
 			encryptedConfig.accountKey = await cryptoUtils.encrypt(config.accountKey);
 			break;
+		case "rest":
+			if (config.username) {
+				encryptedConfig.username = await cryptoUtils.encrypt(config.username);
+			}
+			if (config.password) {
+				encryptedConfig.password = await cryptoUtils.encrypt(config.password);
+			}
+			break;
 	}
 
 	return encryptedConfig as RepositoryConfig;
@@ -327,6 +335,18 @@ const doctorRepository = async (name: string) => {
 	};
 };
 
+const deleteSnapshot = async (name: string, snapshotId: string) => {
+	const repository = await db.query.repositoriesTable.findFirst({
+		where: eq(repositoriesTable.name, name),
+	});
+
+	if (!repository) {
+		throw new NotFoundError("Repository not found");
+	}
+
+	await restic.deleteSnapshot(repository.config, snapshotId);
+};
+
 export const repositoriesService = {
 	listRepositories,
 	createRepository,
@@ -338,4 +358,5 @@ export const repositoriesService = {
 	getSnapshotDetails,
 	checkHealth,
 	doctorRepository,
+	deleteSnapshot,
 };

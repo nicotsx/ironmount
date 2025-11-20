@@ -215,7 +215,12 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 								<FormItem>
 									<FormLabel>Port</FormLabel>
 									<FormControl>
-										<Input type="number" placeholder="2049" {...field} />
+										<Input
+											type="number"
+											placeholder="2049"
+											{...field}
+											onChange={(e) => field.onChange(parseInt(e.target.value, 10) || undefined)}
+										/>
 									</FormControl>
 									<FormDescription>NFS server port (default: 2049).</FormDescription>
 									<FormMessage />
@@ -340,7 +345,12 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 								<FormItem>
 									<FormLabel>Port</FormLabel>
 									<FormControl>
-										<Input type="number" placeholder="80" {...field} />
+										<Input
+											type="number"
+											placeholder="80"
+											{...field}
+											onChange={(e) => field.onChange(parseInt(e.target.value, 10) || undefined)}
+										/>
 									</FormControl>
 									<FormDescription>WebDAV server port (default: 80 for HTTP, 443 for HTTPS).</FormDescription>
 									<FormMessage />

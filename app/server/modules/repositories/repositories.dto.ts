@@ -326,3 +326,28 @@ export const listRcloneRemotesDto = describeRoute({
 		},
 	},
 });
+
+/**
+ * Delete a snapshot
+ */
+export const deleteSnapshotResponse = type({
+	message: "string",
+});
+
+export type DeleteSnapshotDto = typeof deleteSnapshotResponse.infer;
+
+export const deleteSnapshotDto = describeRoute({
+	description: "Delete a specific snapshot from a repository",
+	tags: ["Repositories"],
+	operationId: "deleteSnapshot",
+	responses: {
+		200: {
+			description: "Snapshot deleted successfully",
+			content: {
+				"application/json": {
+					schema: resolver(deleteSnapshotResponse),
+				},
+			},
+		},
+	},
+});

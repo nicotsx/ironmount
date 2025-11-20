@@ -36,7 +36,7 @@ In order to run Ironmount, you need to have Docker and Docker Compose installed 
 ```yaml
 services:
   ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.9
+    image: ghcr.io/nicotsx/ironmount:v0.10
     container_name: ironmount
     restart: unless-stopped
     cap_add:
@@ -46,8 +46,12 @@ services:
     devices:
       - /dev/fuse:/dev/fuse
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - /var/lib/ironmount:/var/lib/ironmount
 ```
+
+> [!WARNING]
+> Do not try to change the location of the bind mount `/var/lib/ironmount` on your host or store it on a network share. You will likely face permission issues and strong performance degradation.
 
 Then, run the following command to start Ironmount:
 
@@ -68,7 +72,7 @@ If you want to track a local directory on the same server where Ironmount is run
 ```diff
 services:
   ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.9
+    image: ghcr.io/nicotsx/ironmount:v0.10
     container_name: ironmount
     restart: unless-stopped
     cap_add:
@@ -78,6 +82,7 @@ services:
     devices:
       - /dev/fuse:/dev/fuse
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - /var/lib/ironmount:/var/lib/ironmount
 +     - /path/to/your/directory:/mydata
 ```
@@ -133,7 +138,7 @@ Ironmount can use [rclone](https://rclone.org/) to support 40+ cloud storage pro
    ```diff
    services:
      ironmount:
-       image: ghcr.io/nicotsx/ironmount:v0.9
+       image: ghcr.io/nicotsx/ironmount:v0.10
        container_name: ironmount
        restart: unless-stopped
        cap_add:
@@ -143,6 +148,7 @@ Ironmount can use [rclone](https://rclone.org/) to support 40+ cloud storage pro
        devices:
          - /dev/fuse:/dev/fuse
        volumes:
+         - /etc/localtime:/etc/localtime:ro
          - /var/lib/ironmount:/var/lib/ironmount
    +     - ~/.config/rclone:/root/.config/rclone
    ```
@@ -189,7 +195,7 @@ In order to enable this feature, you need to change your bind mount `/var/lib/ir
 ```diff
 services:
   ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.9
+    image: ghcr.io/nicotsx/ironmount:v0.10
     container_name: ironmount
     restart: unless-stopped
     ports:
@@ -197,6 +203,7 @@ services:
     devices:
       - /dev/fuse:/dev/fuse
     volumes:
+      - /etc/localtime:/etc/localtime:ro
 -     - /var/lib/ironmount:/var/lib/ironmount
 +     - /var/lib/ironmount:/var/lib/ironmount:rshared
 ```
@@ -217,7 +224,7 @@ In order to enable this feature, you need to run Ironmount with several items sh
 ```diff
 services:
   ironmount:
-    image: ghcr.io/nicotsx/ironmount:v0.9
+    image: ghcr.io/nicotsx/ironmount:v0.10
     container_name: ironmount
     restart: unless-stopped
     cap_add:
@@ -227,6 +234,7 @@ services:
     devices:
       - /dev/fuse:/dev/fuse
     volumes:
+      - /etc/localtime:/etc/localtime:ro
 -     - /var/lib/ironmount:/var/lib/ironmount
 +     - /var/lib/ironmount:/var/lib/ironmount:rshared
 +     - /run/docker/plugins:/run/docker/plugins

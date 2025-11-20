@@ -17,7 +17,7 @@ export const handle = {
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Create Volume" },
+		{ title: "Ironmount - Create Volume" },
 		{
 			name: "description",
 			content: "Create a new storage volume with automatic mounting and health checks.",
