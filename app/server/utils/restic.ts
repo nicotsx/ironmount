@@ -565,7 +565,7 @@ const ls = async (config: RepositoryConfig, snapshotId: string, path?: string) =
 
 	addRepoSpecificArgs(args, config, env);
 
-	const res = await $`restic ${args}`.env(env).nothrow().quiet();
+	const res = await safeSpawn({ command: "restic", args, env });
 	await cleanupTemporaryKeys(config, env);
 
 	if (res.exitCode !== 0) {
@@ -574,7 +574,7 @@ const ls = async (config: RepositoryConfig, snapshotId: string, path?: string) =
 	}
 
 	// The output is a stream of JSON objects, first is snapshot info, rest are file/dir nodes
-	const stdout = res.text();
+	const stdout = res.stdout;
 	const lines = stdout
 		.trim()
 		.split("\n")

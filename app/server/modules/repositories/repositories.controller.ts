@@ -123,7 +123,8 @@ export const repositoriesController = new Hono()
 			const { name, snapshotId } = c.req.param();
 			const { path } = c.req.valid("query");
 
-			const result = await repositoriesService.listSnapshotFiles(name, snapshotId, path);
+			const decodedPath = path ? decodeURIComponent(path) : undefined;
+			const result = await repositoriesService.listSnapshotFiles(name, snapshotId, decodedPath);
 
 			c.header("Cache-Control", "max-age=300, stale-while-revalidate=600");
 
