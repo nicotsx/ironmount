@@ -109,6 +109,11 @@ export default function Volumes({ loaderData }: Route.ComponentProps) {
 							<SelectItem value="directory">Directory</SelectItem>
 							<SelectItem value="nfs">NFS</SelectItem>
 							<SelectItem value="smb">SMB</SelectItem>
+							<SelectItem value="webdav">WebDAV</SelectItem>
+							<SelectItem value="mariadb">MariaDB</SelectItem>
+							<SelectItem value="mysql">MySQL</SelectItem>
+							<SelectItem value="postgres">PostgreSQL</SelectItem>
+							<SelectItem value="sqlite">SQLite</SelectItem>
 						</SelectContent>
 					</Select>
 					{(searchQuery || statusFilter || backendFilter) && (

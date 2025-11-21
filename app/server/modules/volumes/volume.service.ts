@@ -13,7 +13,6 @@ import { getStatFs, type StatFs } from "../../utils/mountinfo";
 import { withTimeout } from "../../utils/timeout";
 import { createVolumeBackend } from "../backends/backend";
 import type { UpdateVolumeBody } from "./volume.dto";
-import { getVolumePath } from "./helpers";
 import { logger } from "../../utils/logger";
 import { serverEvents } from "../../core/events";
 import type { BackendConfig } from "~/schemas/volumes";
@@ -129,7 +128,8 @@ const getVolume = async (name: string) => {
 
 	let statfs: Partial<StatFs> = {};
 	if (volume.status === "mounted") {
-		statfs = await withTimeout(getStatFs(getVolumePath(volume)), 1000, "getStatFs").catch((error) => {
+		const backend = createVolumeBackend(volume);
+		statfs = await withTimeout(getStatFs(backend.getVolumePath()), 1000, "getStatFs").catch((error) => {
 			logger.warn(`Failed to get statfs for volume ${name}: ${toMessage(error)}`);
 			return {};
 		});
@@ -296,7 +296,8 @@ const listFiles = async (name: string, subPath?: string) => {
 	}
 
 	// For directory volumes, use the configured path directly
-	const volumePath = getVolumePath(volume);
+	const backend = createVolumeBackend(volume);
+	const volumePath = backend.getVolumePath();
 
 	const requestedPath = subPath ? path.join(volumePath, subPath) : volumePath;
 

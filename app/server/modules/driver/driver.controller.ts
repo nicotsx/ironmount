@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { volumeService } from "../volumes/volume.service";
-import { getVolumePath } from "../volumes/helpers";
+import { createVolumeBackend } from "../backends/backend";
+import { VOLUME_MOUNT_BASE } from "../../core/constants";
 
 export const driverController = new Hono()
 	.post("/VolumeDriver.Capabilities", (c) => {
@@ -30,10 +31,13 @@ export const driverController = new Hono()
 			return c.json({ Err: "Volume name is required" }, 400);
 		}
 
+		const volumeName = body.Name.replace(/^im-/, "");
+		const { volume } = await volumeService.getVolume(volumeName);
+		const backend = createVolumeBackend(volume);
 		const volumeName = body.Name.replace(/^zb-/, "");
 
 		return c.json({
-			Mountpoint: getVolumePath(volumeName),
+			Mountpoint: backend.getVolumePath(),
 		});
 	})
 	.post("/VolumeDriver.Unmount", (c) => {
@@ -48,10 +52,12 @@ export const driverController = new Hono()
 			return c.json({ Err: "Volume name is required" }, 400);
 		}
 
+		const { volume } = await volumeService.getVolume(body.Name.replace(/^im-/, ""));
+		const backend = createVolumeBackend(volume);
 		const { volume } = await volumeService.getVolume(body.Name.replace(/^zb-/, ""));
 
 		return c.json({
-			Mountpoint: getVolumePath(volume),
+			Mountpoint: backend.getVolumePath(),
 		});
 	})
 	.post("/VolumeDriver.Get", async (c) => {
@@ -61,6 +67,13 @@ export const driverController = new Hono()
 			return c.json({ Err: "Volume name is required" }, 400);
 		}
 
+		const { volume } = await volumeService.getVolume(body.Name.replace(/^im-/, ""));
+		const backend = createVolumeBackend(volume);
+
+		return c.json({
+			Volume: {
+				Name: `im-${volume.name}`,
+				Mountpoint: backend.getVolumePath(),
 		const { volume } = await volumeService.getVolume(body.Name.replace(/^zb-/, ""));
 
 		return c.json({
@@ -75,6 +88,14 @@ export const driverController = new Hono()
 	.post("/VolumeDriver.List", async (c) => {
 		const volumes = await volumeService.listVolumes();
 
+		const res = volumes.map((volume) => {
+			const backend = createVolumeBackend(volume);
+			return {
+				Name: `im-${volume.name}`,
+				Mountpoint: backend.getVolumePath(),
+				Status: {},
+			};
+		});
 		const res = volumes.map((volume) => ({
 			Name: `zb-${volume.name}`,
 			Mountpoint: getVolumePath(volume),

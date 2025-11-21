@@ -25,7 +25,7 @@ import {
 	type BrowseFilesystemDto,
 } from "./volume.dto";
 import { volumeService } from "./volume.service";
-import { getVolumePath } from "./helpers";
+import { createVolumeBackend } from "../backends/backend";
 
 export const volumeController = new Hono()
 	.get("/", listVolumesDto, async (c) => {
@@ -37,9 +37,10 @@ export const volumeController = new Hono()
 		const body = c.req.valid("json");
 		const res = await volumeService.createVolume(body.name, body.config);
 
+		const backend = createVolumeBackend(res.volume);
 		const response = {
 			...res.volume,
-			path: getVolumePath(res.volume),
+			path: backend.getVolumePath(),
 		};
 
 		return c.json<CreateVolumeDto>(response, 201);
@@ -60,10 +61,11 @@ export const volumeController = new Hono()
 		const { name } = c.req.param();
 		const res = await volumeService.getVolume(name);
 
+		const backend = createVolumeBackend(res.volume);
 		const response = {
 			volume: {
 				...res.volume,
-				path: getVolumePath(res.volume),
+				path: backend.getVolumePath(),
 			},
 			statfs: {
 				total: res.statfs.total ?? 0,
@@ -85,9 +87,10 @@ export const volumeController = new Hono()
 		const body = c.req.valid("json");
 		const res = await volumeService.updateVolume(name, body);
 
+		const backend = createVolumeBackend(res.volume);
 		const response = {
 			...res.volume,
-			path: getVolumePath(res.volume),
+			path: backend.getVolumePath(),
 		};
 
 		return c.json<UpdateVolumeDto>(response, 200);

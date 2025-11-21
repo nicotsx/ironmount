@@ -2,14 +2,16 @@ import { eq } from "drizzle-orm";
 import cron from "node-cron";
 import { CronExpressionParser } from "cron-parser";
 import { NotFoundError, BadRequestError, ConflictError } from "http-errors-enhanced";
+import * as fs from "node:fs/promises";
 import { db } from "../../db/db";
 import { backupSchedulesTable, repositoriesTable, volumesTable } from "../../db/schema";
 import { restic } from "../../utils/restic";
 import { logger } from "../../utils/logger";
-import { getVolumePath } from "../volumes/helpers";
+import { createVolumeBackend } from "../backends/backend";
 import type { CreateBackupScheduleBody, UpdateBackupScheduleBody } from "./backups.dto";
 import { toMessage } from "../../utils/errors";
 import { serverEvents } from "../../core/events";
+import { executeDatabaseDump, type DatabaseConfig } from "../../utils/database-dump";
 
 const runningBackups = new Map<number, AbortController>();
 
@@ -206,7 +208,33 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 	runningBackups.set(scheduleId, abortController);
 
 	try {
-		const volumePath = getVolumePath(volume);
+		const backend = createVolumeBackend(volume);
+		let backupPath: string;
+		let dumpFilePath: string | null = null;
+		const isDatabase = backend.isDatabaseBackend();
+
+		if (isDatabase) {
+			logger.info(`Creating database dump for volume ${volume.name}`);
+			
+			const timestamp = Date.now();
+			dumpFilePath = backend.getDumpFilePath(timestamp);
+			
+			if (!dumpFilePath) {
+				throw new Error("Failed to get dump file path for database volume");
+			}
+			
+			try {
+				await executeDatabaseDump(volume.config as DatabaseConfig, dumpFilePath);
+				logger.info(`Database dump created at: ${dumpFilePath}`);
+			} catch (error) {
+				logger.error(`Failed to create database dump: ${toMessage(error)}`);
+				throw error;
+			}
+			
+			backupPath = dumpFilePath;
+		} else {
+			backupPath = backend.getVolumePath();
+		}
 
 		const backupOptions: {
 			exclude?: string[];
@@ -226,7 +254,7 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 			backupOptions.include = schedule.includePatterns;
 		}
 
-		await restic.backup(repository.config, volumePath, {
+		await restic.backup(repository.config, backupPath, {
 			...backupOptions,
 			onProgress: (progress) => {
 				serverEvents.emit("backup:progress", {
@@ -240,6 +268,16 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 
 		if (schedule.retentionPolicy) {
 			await restic.forget(repository.config, schedule.retentionPolicy, { tag: schedule.id.toString() });
+		}
+
+		// Clean up dump file if it was created
+		if (dumpFilePath) {
+			try {
+				await fs.unlink(dumpFilePath);
+				logger.info(`Cleaned up dump file: ${dumpFilePath}`);
+			} catch (error) {
+				logger.warn(`Failed to clean up dump file: ${toMessage(error)}`);
+			}
 		}
 
 		const nextBackupAt = calculateNextRun(schedule.cronExpression);

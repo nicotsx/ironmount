@@ -14,6 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { volumeConfigSchema } from "~/schemas/volumes";
 import { testConnectionMutation } from "../api-client/@tanstack/react-query.gen";
 
+const SUPPORTS_CONNECTION_TEST = ["nfs", "smb", "webdav", "mariadb", "mysql", "postgres"] as const;
+
 export const formSchema = type({
 	name: "2<=string<=32",
 }).and(volumeConfigSchema);
@@ -35,6 +37,9 @@ const defaultValuesForType = {
 	nfs: { backend: "nfs" as const, port: 2049, version: "4.1" as const },
 	smb: { backend: "smb" as const, port: 445, vers: "3.0" as const },
 	webdav: { backend: "webdav" as const, port: 80, ssl: false },
+	mariadb: { backend: "mariadb" as const, port: 3306 },
+	mysql: { backend: "mysql" as const, port: 3306 },
+	postgres: { backend: "postgres" as const, port: 5432, dumpFormat: "custom" as const },
 };
 
 export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, formId, loading, className }: Props) => {
@@ -81,7 +86,7 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 	const handleTestConnection = async () => {
 		const formValues = getValues();
 
-		if (formValues.backend === "nfs" || formValues.backend === "smb" || formValues.backend === "webdav") {
+		if (SUPPORTS_CONNECTION_TEST.includes(formValues.backend)) {
 			testBackendConnection.mutate({
 				body: { config: formValues },
 			});
@@ -130,6 +135,9 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 									<SelectItem value="nfs">NFS</SelectItem>
 									<SelectItem value="smb">SMB</SelectItem>
 									<SelectItem value="webdav">WebDAV</SelectItem>
+									<SelectItem value="mariadb">MariaDB</SelectItem>
+									<SelectItem value="mysql">MySQL</SelectItem>
+									<SelectItem value="postgres">PostgreSQL</SelectItem>
 								</SelectContent>
 							</Select>
 							<FormDescription>Choose the storage backend for this volume.</FormDescription>
@@ -539,6 +547,258 @@ export const CreateVolumeForm = ({ onSubmit, mode = "create", initialValues, for
 									<FormDescription>
 										Prevent any modifications to the volume. Recommended for backup sources and sensitive data.
 									</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
+
+				{watchedBackend === "mariadb" && (
+					<>
+						<FormField
+							control={form.control}
+							name="host"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Host</FormLabel>
+									<FormControl>
+										<Input placeholder="localhost" {...field} />
+									</FormControl>
+									<FormDescription>MariaDB server hostname or IP address.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="port"
+							defaultValue={3306}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Port</FormLabel>
+									<FormControl>
+										<Input type="number" placeholder="3306" {...field} />
+									</FormControl>
+									<FormDescription>MariaDB server port (default: 3306).</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="username"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Username</FormLabel>
+									<FormControl>
+										<Input placeholder="root" {...field} />
+									</FormControl>
+									<FormDescription>Database user with backup privileges.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="password"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Password</FormLabel>
+									<FormControl>
+										<Input type="password" placeholder="••••••••" {...field} />
+									</FormControl>
+									<FormDescription>Password for database authentication.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="database"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Database</FormLabel>
+									<FormControl>
+										<Input placeholder="myapp_production" {...field} />
+									</FormControl>
+									<FormDescription>Name of the database to backup.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
+
+				{watchedBackend === "mysql" && (
+					<>
+						<FormField
+							control={form.control}
+							name="host"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Host</FormLabel>
+									<FormControl>
+										<Input placeholder="localhost" {...field} />
+									</FormControl>
+									<FormDescription>MySQL server hostname or IP address.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="port"
+							defaultValue={3306}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Port</FormLabel>
+									<FormControl>
+										<Input type="number" placeholder="3306" {...field} />
+									</FormControl>
+									<FormDescription>MySQL server port (default: 3306).</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="username"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Username</FormLabel>
+									<FormControl>
+										<Input placeholder="root" {...field} />
+									</FormControl>
+									<FormDescription>Database user with backup privileges.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="password"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Password</FormLabel>
+									<FormControl>
+										<Input type="password" placeholder="••••••••" {...field} />
+									</FormControl>
+									<FormDescription>Password for database authentication.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="database"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Database</FormLabel>
+									<FormControl>
+										<Input placeholder="myapp_production" {...field} />
+									</FormControl>
+									<FormDescription>Name of the database to backup.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
+
+				{watchedBackend === "postgres" && (
+					<>
+						<FormField
+							control={form.control}
+							name="host"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Host</FormLabel>
+									<FormControl>
+										<Input placeholder="localhost" {...field} />
+									</FormControl>
+									<FormDescription>PostgreSQL server hostname or IP address.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="port"
+							defaultValue={5432}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Port</FormLabel>
+									<FormControl>
+										<Input type="number" placeholder="5432" {...field} />
+									</FormControl>
+									<FormDescription>PostgreSQL server port (default: 5432).</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="username"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Username</FormLabel>
+									<FormControl>
+										<Input placeholder="postgres" {...field} />
+									</FormControl>
+									<FormDescription>Database user with backup privileges.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="password"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Password</FormLabel>
+									<FormControl>
+										<Input type="password" placeholder="••••••••" {...field} />
+									</FormControl>
+									<FormDescription>Password for database authentication.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="database"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Database</FormLabel>
+									<FormControl>
+										<Input placeholder="myapp_production" {...field} />
+									</FormControl>
+									<FormDescription>Name of the database to backup.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="dumpFormat"
+							defaultValue="custom"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Dump Format</FormLabel>
+									<Select onValueChange={field.onChange} defaultValue={field.value || "custom"}>
+										<FormControl>
+											<SelectTrigger>
+												<SelectValue placeholder="Select dump format" />
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent>
+											<SelectItem value="custom">Custom (Compressed)</SelectItem>
+											<SelectItem value="plain">Plain SQL</SelectItem>
+											<SelectItem value="directory">Directory</SelectItem>
+										</SelectContent>
+									</Select>
+									<FormDescription>Format for database dumps (custom recommended).</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}

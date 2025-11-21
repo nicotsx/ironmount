@@ -3,7 +3,7 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import { volumeService } from "../modules/volumes/volume.service";
 import { readMountInfo } from "../utils/mountinfo";
-import { getVolumePath } from "../modules/volumes/helpers";
+import { createVolumeBackend } from "../modules/backends/backend";
 import { logger } from "../utils/logger";
 import { executeUnmount } from "../modules/backends/utils/backend-utils";
 import { toMessage } from "../utils/errors";
@@ -36,7 +36,10 @@ export class CleanupDanglingMountsJob extends Job {
 
 		for (const dir of allZerobyteDirs) {
 			const volumePath = `${VOLUME_MOUNT_BASE}/${dir}/_data`;
-			const matchingVolume = allVolumes.find((v) => getVolumePath(v) === volumePath);
+			const matchingVolume = allVolumes.find((v) => {
+				const backend = createVolumeBackend(v);
+				return backend.getVolumePath() === volumePath;
+			});
 			if (!matchingVolume) {
 				const fullPath = path.join(VOLUME_MOUNT_BASE, dir);
 				logger.info(`Found dangling mount directory at ${fullPath}, attempting to remove...`);
