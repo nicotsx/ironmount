@@ -67,9 +67,6 @@ export const backupSchedulesTable = sqliteTable("backup_schedules_table", {
 	volumeId: int("volume_id")
 		.notNull()
 		.references(() => volumesTable.id, { onDelete: "cascade" }),
-	repositoryId: text("repository_id")
-		.notNull()
-		.references(() => repositoriesTable.id, { onDelete: "cascade" }),
 	enabled: int("enabled", { mode: "boolean" }).notNull().default(true),
 	cronExpression: text("cron_expression").notNull(),
 	retentionPolicy: text("retention_policy", { mode: "json" }).$type<{
@@ -90,14 +87,43 @@ export const backupSchedulesTable = sqliteTable("backup_schedules_table", {
 	createdAt: int("created_at", { mode: "number" }).notNull().default(sql`(unixepoch())`),
 	updatedAt: int("updated_at", { mode: "number" }).notNull().default(sql`(unixepoch())`),
 });
-export const backupScheduleRelations = relations(backupSchedulesTable, ({ one }) => ({
+
+/**
+ * Junction Table: Backup Schedules <-> Repositories (Many-to-Many)
+ */
+export const backupScheduleRepositoriesTable = sqliteTable(
+	"backup_schedule_repositories_table",
+	{
+		scheduleId: int("schedule_id")
+			.notNull()
+			.references(() => backupSchedulesTable.id, { onDelete: "cascade" }),
+		repositoryId: text("repository_id")
+			.notNull()
+			.references(() => repositoriesTable.id, { onDelete: "cascade" }),
+	},
+	(table) => ({
+		pk: { name: "pk_schedule_repository", columns: [table.scheduleId, table.repositoryId] },
+	}),
+);
+
+export const backupScheduleRelations = relations(backupSchedulesTable, ({ one, many }) => ({
 	volume: one(volumesTable, {
 		fields: [backupSchedulesTable.volumeId],
 		references: [volumesTable.id],
 	}),
+	repositories: many(backupScheduleRepositoriesTable),
+}));
+
+export const backupScheduleRepositoryRelations = relations(backupScheduleRepositoriesTable, ({ one }) => ({
+	schedule: one(backupSchedulesTable, {
+		fields: [backupScheduleRepositoriesTable.scheduleId],
+		references: [backupSchedulesTable.id],
+	}),
 	repository: one(repositoriesTable, {
-		fields: [backupSchedulesTable.repositoryId],
+		fields: [backupScheduleRepositoriesTable.repositoryId],
 		references: [repositoriesTable.id],
 	}),
 }));
+
 export type BackupSchedule = typeof backupSchedulesTable.$inferSelect;
+export type BackupScheduleRepository = typeof backupScheduleRepositoriesTable.$inferSelect;
