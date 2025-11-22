@@ -60,8 +60,6 @@ export default function NotificationDetailsPage({ loaderData }: Route.ComponentP
 	const { data } = useQuery({
 		...getNotificationDestinationOptions({ path: { id: String(loaderData.id) } }),
 		initialData: loaderData,
-		refetchInterval: 10000,
-		refetchOnWindowFocus: true,
 	});
 
 	const deleteDestination = useMutation({
