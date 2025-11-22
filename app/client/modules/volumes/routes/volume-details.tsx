@@ -24,12 +24,23 @@ import { DockerTabContent } from "../tabs/docker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/client/components/ui/tooltip";
 import { useSystemInfo } from "~/client/hooks/use-system-info";
 import { getVolume } from "~/client/api-client";
+import type { VolumeStatus } from "~/client/lib/types";
 import {
 	deleteVolumeMutation,
 	getVolumeOptions,
 	mountVolumeMutation,
 	unmountVolumeMutation,
 } from "~/client/api-client/@tanstack/react-query.gen";
+
+const getVolumeStatusVariant = (status: VolumeStatus): "success" | "neutral" | "error" | "warning" => {
+	const statusMap = {
+		mounted: "success" as const,
+		unmounted: "neutral" as const,
+		error: "error" as const,
+		unknown: "warning" as const,
+	};
+	return statusMap[status];
+};
 
 export const handle = {
 	breadcrumb: (match: Route.MetaArgs) => [{ label: "Volumes", href: "/volumes" }, { label: match.params.name }],
@@ -124,7 +135,12 @@ export default function VolumeDetails({ loaderData }: Route.ComponentProps) {
 			<div className="flex flex-col items-start xs:items-center xs:flex-row xs:justify-between">
 				<div className="text-sm font-semibold mb-2 xs:mb-0 text-muted-foreground flex items-center gap-2">
 					<span className="flex items-center gap-2">
-						<StatusDot status={volume.status} /> {volume.status[0].toUpperCase() + volume.status.slice(1)}
+						<StatusDot
+							variant={getVolumeStatusVariant(volume.status)}
+							label={volume.status[0].toUpperCase() + volume.status.slice(1)}
+						/>
+						&nbsp;
+						{volume.status[0].toUpperCase() + volume.status.slice(1)}
 					</span>
 					<VolumeIcon size={14} backend={volume?.config.backend} />
 				</div>

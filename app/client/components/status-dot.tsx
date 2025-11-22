@@ -1,30 +1,42 @@
-import type { VolumeStatus } from "~/client/lib/types";
 import { cn } from "~/client/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
-export const StatusDot = ({ status }: { status: VolumeStatus }) => {
+type StatusVariant = "success" | "neutral" | "error" | "warning" | "info";
+
+interface StatusDotProps {
+	variant: StatusVariant;
+	label: string;
+	animated?: boolean;
+}
+
+export const StatusDot = ({ variant, label, animated }: StatusDotProps) => {
 	const statusMapping = {
-		mounted: {
+		success: {
 			color: "bg-green-500",
 			colorLight: "bg-emerald-400",
-			animated: true,
+			animated: animated ?? true,
 		},
-		unmounted: {
+		neutral: {
 			color: "bg-gray-500",
 			colorLight: "bg-gray-400",
-			animated: false,
+			animated: animated ?? false,
 		},
 		error: {
 			color: "bg-red-500",
-			colorLight: "bg-amber-700",
-			animated: true,
+			colorLight: "bg-red-400",
+			animated: animated ?? true,
 		},
-		unknown: {
+		warning: {
 			color: "bg-yellow-500",
 			colorLight: "bg-yellow-400",
-			animated: true,
+			animated: animated ?? true,
 		},
-	}[status];
+		info: {
+			color: "bg-blue-500",
+			colorLight: "bg-blue-400",
+			animated: animated ?? true,
+		},
+	}[variant];
 
 	return (
 		<Tooltip>
@@ -42,7 +54,7 @@ export const StatusDot = ({ status }: { status: VolumeStatus }) => {
 				</span>
 			</TooltipTrigger>
 			<TooltipContent>
-				<p className="capitalize">{status}</p>
+				<p>{label}</p>
 			</TooltipContent>
 		</Tooltip>
 	);

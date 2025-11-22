@@ -13,6 +13,17 @@ import { VolumeIcon } from "~/client/components/volume-icon";
 import type { Route } from "./+types/volumes";
 import { listVolumes } from "~/client/api-client";
 import { listVolumesOptions } from "~/client/api-client/@tanstack/react-query.gen";
+import type { VolumeStatus } from "~/client/lib/types";
+
+const getVolumeStatusVariant = (status: VolumeStatus): "success" | "neutral" | "error" | "warning" => {
+	const statusMap = {
+		mounted: "success" as const,
+		unmounted: "neutral" as const,
+		error: "error" as const,
+		unknown: "warning" as const,
+	};
+	return statusMap[status];
+};
 
 export const handle = {
 	breadcrumb: () => [{ label: "Volumes" }],
@@ -157,7 +168,10 @@ export default function Volumes({ loaderData }: Route.ComponentProps) {
 										<VolumeIcon backend={volume.type} />
 									</TableCell>
 									<TableCell className="text-center">
-										<StatusDot status={volume.status} />
+										<StatusDot
+											variant={getVolumeStatusVariant(volume.status)}
+											label={volume.status[0].toUpperCase() + volume.status.slice(1)}
+										/>
 									</TableCell>
 								</TableRow>
 							))

@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { BrowseFilesystemData, BrowseFilesystemResponses, ChangePasswordData, ChangePasswordResponses, CreateBackupScheduleData, CreateBackupScheduleResponses, CreateRepositoryData, CreateRepositoryResponses, CreateVolumeData, CreateVolumeResponses, DeleteBackupScheduleData, DeleteBackupScheduleResponses, DeleteRepositoryData, DeleteRepositoryResponses, DeleteSnapshotData, DeleteSnapshotResponses, DeleteVolumeData, DeleteVolumeResponses, DoctorRepositoryData, DoctorRepositoryResponses, DownloadResticPasswordData, DownloadResticPasswordResponses, GetBackupScheduleData, GetBackupScheduleForVolumeData, GetBackupScheduleForVolumeResponses, GetBackupScheduleResponses, GetContainersUsingVolumeData, GetContainersUsingVolumeErrors, GetContainersUsingVolumeResponses, GetMeData, GetMeResponses, GetRepositoryData, GetRepositoryResponses, GetSnapshotDetailsData, GetSnapshotDetailsResponses, GetStatusData, GetStatusResponses, GetSystemInfoData, GetSystemInfoResponses, GetVolumeData, GetVolumeErrors, GetVolumeResponses, HealthCheckVolumeData, HealthCheckVolumeErrors, HealthCheckVolumeResponses, ListBackupSchedulesData, ListBackupSchedulesResponses, ListFilesData, ListFilesResponses, ListRcloneRemotesData, ListRcloneRemotesResponses, ListRepositoriesData, ListRepositoriesResponses, ListSnapshotFilesData, ListSnapshotFilesResponses, ListSnapshotsData, ListSnapshotsResponses, ListVolumesData, ListVolumesResponses, LoginData, LoginResponses, LogoutData, LogoutResponses, MountVolumeData, MountVolumeResponses, RegisterData, RegisterResponses, RestoreSnapshotData, RestoreSnapshotResponses, RunBackupNowData, RunBackupNowResponses, RunForgetData, RunForgetResponses, StopBackupData, StopBackupErrors, StopBackupResponses, TestConnectionData, TestConnectionResponses, UnmountVolumeData, UnmountVolumeResponses, UpdateBackupScheduleData, UpdateBackupScheduleResponses, UpdateVolumeData, UpdateVolumeErrors, UpdateVolumeResponses } from './types.gen';
+import type { BrowseFilesystemData, BrowseFilesystemResponses, ChangePasswordData, ChangePasswordResponses, CreateBackupScheduleData, CreateBackupScheduleResponses, CreateNotificationDestinationData, CreateNotificationDestinationResponses, CreateRepositoryData, CreateRepositoryResponses, CreateVolumeData, CreateVolumeResponses, DeleteBackupScheduleData, DeleteBackupScheduleResponses, DeleteNotificationDestinationData, DeleteNotificationDestinationErrors, DeleteNotificationDestinationResponses, DeleteRepositoryData, DeleteRepositoryResponses, DeleteSnapshotData, DeleteSnapshotResponses, DeleteVolumeData, DeleteVolumeResponses, DoctorRepositoryData, DoctorRepositoryResponses, DownloadResticPasswordData, DownloadResticPasswordResponses, GetBackupScheduleData, GetBackupScheduleForVolumeData, GetBackupScheduleForVolumeResponses, GetBackupScheduleResponses, GetContainersUsingVolumeData, GetContainersUsingVolumeErrors, GetContainersUsingVolumeResponses, GetMeData, GetMeResponses, GetNotificationDestinationData, GetNotificationDestinationErrors, GetNotificationDestinationResponses, GetRepositoryData, GetRepositoryResponses, GetScheduleNotificationsData, GetScheduleNotificationsResponses, GetSnapshotDetailsData, GetSnapshotDetailsResponses, GetStatusData, GetStatusResponses, GetSystemInfoData, GetSystemInfoResponses, GetVolumeData, GetVolumeErrors, GetVolumeResponses, HealthCheckVolumeData, HealthCheckVolumeErrors, HealthCheckVolumeResponses, ListBackupSchedulesData, ListBackupSchedulesResponses, ListFilesData, ListFilesResponses, ListNotificationDestinationsData, ListNotificationDestinationsResponses, ListRcloneRemotesData, ListRcloneRemotesResponses, ListRepositoriesData, ListRepositoriesResponses, ListSnapshotFilesData, ListSnapshotFilesResponses, ListSnapshotsData, ListSnapshotsResponses, ListVolumesData, ListVolumesResponses, LoginData, LoginResponses, LogoutData, LogoutResponses, MountVolumeData, MountVolumeResponses, RegisterData, RegisterResponses, RestoreSnapshotData, RestoreSnapshotResponses, RunBackupNowData, RunBackupNowResponses, RunForgetData, RunForgetResponses, StopBackupData, StopBackupErrors, StopBackupResponses, TestConnectionData, TestConnectionResponses, TestNotificationDestinationData, TestNotificationDestinationErrors, TestNotificationDestinationResponses, UnmountVolumeData, UnmountVolumeResponses, UpdateBackupScheduleData, UpdateBackupScheduleResponses, UpdateNotificationDestinationData, UpdateNotificationDestinationErrors, UpdateNotificationDestinationResponses, UpdateScheduleNotificationsData, UpdateScheduleNotificationsResponses, UpdateVolumeData, UpdateVolumeErrors, UpdateVolumeResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -434,6 +434,98 @@ export const stopBackup = <ThrowOnError extends boolean = false>(options: Option
 export const runForget = <ThrowOnError extends boolean = false>(options: Options<RunForgetData, ThrowOnError>) => {
     return (options.client ?? client).post<RunForgetResponses, unknown, ThrowOnError>({
         url: '/api/v1/backups/{scheduleId}/forget',
+        ...options
+    });
+};
+
+/**
+ * Get notification assignments for a backup schedule
+ */
+export const getScheduleNotifications = <ThrowOnError extends boolean = false>(options: Options<GetScheduleNotificationsData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetScheduleNotificationsResponses, unknown, ThrowOnError>({
+        url: '/api/v1/backups/{scheduleId}/notifications',
+        ...options
+    });
+};
+
+/**
+ * Update notification assignments for a backup schedule
+ */
+export const updateScheduleNotifications = <ThrowOnError extends boolean = false>(options: Options<UpdateScheduleNotificationsData, ThrowOnError>) => {
+    return (options.client ?? client).put<UpdateScheduleNotificationsResponses, unknown, ThrowOnError>({
+        url: '/api/v1/backups/{scheduleId}/notifications',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * List all notification destinations
+ */
+export const listNotificationDestinations = <ThrowOnError extends boolean = false>(options?: Options<ListNotificationDestinationsData, ThrowOnError>) => {
+    return (options?.client ?? client).get<ListNotificationDestinationsResponses, unknown, ThrowOnError>({
+        url: '/api/v1/notifications/destinations',
+        ...options
+    });
+};
+
+/**
+ * Create a new notification destination
+ */
+export const createNotificationDestination = <ThrowOnError extends boolean = false>(options?: Options<CreateNotificationDestinationData, ThrowOnError>) => {
+    return (options?.client ?? client).post<CreateNotificationDestinationResponses, unknown, ThrowOnError>({
+        url: '/api/v1/notifications/destinations',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options?.headers
+        }
+    });
+};
+
+/**
+ * Delete a notification destination
+ */
+export const deleteNotificationDestination = <ThrowOnError extends boolean = false>(options: Options<DeleteNotificationDestinationData, ThrowOnError>) => {
+    return (options.client ?? client).delete<DeleteNotificationDestinationResponses, DeleteNotificationDestinationErrors, ThrowOnError>({
+        url: '/api/v1/notifications/destinations/{id}',
+        ...options
+    });
+};
+
+/**
+ * Get a notification destination by ID
+ */
+export const getNotificationDestination = <ThrowOnError extends boolean = false>(options: Options<GetNotificationDestinationData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetNotificationDestinationResponses, GetNotificationDestinationErrors, ThrowOnError>({
+        url: '/api/v1/notifications/destinations/{id}',
+        ...options
+    });
+};
+
+/**
+ * Update a notification destination
+ */
+export const updateNotificationDestination = <ThrowOnError extends boolean = false>(options: Options<UpdateNotificationDestinationData, ThrowOnError>) => {
+    return (options.client ?? client).patch<UpdateNotificationDestinationResponses, UpdateNotificationDestinationErrors, ThrowOnError>({
+        url: '/api/v1/notifications/destinations/{id}',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * Test a notification destination by sending a test message
+ */
+export const testNotificationDestination = <ThrowOnError extends boolean = false>(options: Options<TestNotificationDestinationData, ThrowOnError>) => {
+    return (options.client ?? client).post<TestNotificationDestinationResponses, TestNotificationDestinationErrors, ThrowOnError>({
+        url: '/api/v1/notifications/destinations/{id}/test',
         ...options
     });
 };
