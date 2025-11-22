@@ -756,6 +756,15 @@ export type ListRepositoriesResponses = {
             password?: string;
             path?: string;
             username?: string;
+        } | {
+            backend: 'sftp';
+            host: string;
+            path: string;
+            privateKey: string;
+            user: string;
+            port?: number;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         };
         createdAt: number;
         id: string;
@@ -763,7 +772,7 @@ export type ListRepositoriesResponses = {
         lastError: string | null;
         name: string;
         status: 'error' | 'healthy' | 'unknown' | null;
-        type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 'rest' | 's3';
+        type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 'rest' | 's3' | 'sftp';
         updatedAt: number;
     }>;
 };
@@ -823,6 +832,15 @@ export type CreateRepositoryData = {
             password?: string;
             path?: string;
             username?: string;
+        } | {
+            backend: 'sftp';
+            host: string;
+            path: string;
+            privateKey: string;
+            user: string;
+            port?: number;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         };
         name: string;
         compressionMode?: 'auto' | 'better' | 'fastest' | 'max' | 'off';
@@ -952,6 +970,15 @@ export type GetRepositoryResponses = {
             password?: string;
             path?: string;
             username?: string;
+        } | {
+            backend: 'sftp';
+            host: string;
+            path: string;
+            privateKey: string;
+            user: string;
+            port?: number;
+            customPassword?: string;
+            isExistingRepository?: boolean;
         };
         createdAt: number;
         id: string;
@@ -959,7 +986,7 @@ export type GetRepositoryResponses = {
         lastError: string | null;
         name: string;
         status: 'error' | 'healthy' | 'unknown' | null;
-        type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 'rest' | 's3';
+        type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 'rest' | 's3' | 'sftp';
         updatedAt: number;
     };
 };
@@ -1084,6 +1111,7 @@ export type RestoreSnapshotData = {
         snapshotId: string;
         delete?: boolean;
         exclude?: Array<string>;
+        excludeXattr?: Array<string>;
         include?: Array<string>;
     };
     path: {
@@ -1208,6 +1236,15 @@ export type ListBackupSchedulesResponses = {
                 password?: string;
                 path?: string;
                 username?: string;
+            } | {
+                backend: 'sftp';
+                host: string;
+                path: string;
+                privateKey: string;
+                user: string;
+                port?: number;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             };
             createdAt: number;
             id: string;
@@ -1215,7 +1252,7 @@ export type ListBackupSchedulesResponses = {
             lastError: string | null;
             name: string;
             status: 'error' | 'healthy' | 'unknown' | null;
-            type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 'rest' | 's3';
+            type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 'rest' | 's3' | 'sftp';
             updatedAt: number;
         };
         repositoryId: string;
@@ -1430,6 +1467,15 @@ export type GetBackupScheduleResponses = {
                 password?: string;
                 path?: string;
                 username?: string;
+            } | {
+                backend: 'sftp';
+                host: string;
+                path: string;
+                privateKey: string;
+                user: string;
+                port?: number;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             };
             createdAt: number;
             id: string;
@@ -1437,7 +1483,7 @@ export type GetBackupScheduleResponses = {
             lastError: string | null;
             name: string;
             status: 'error' | 'healthy' | 'unknown' | null;
-            type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 'rest' | 's3';
+            type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 'rest' | 's3' | 'sftp';
             updatedAt: number;
         };
         repositoryId: string;
@@ -1633,6 +1679,15 @@ export type GetBackupScheduleForVolumeResponses = {
                 password?: string;
                 path?: string;
                 username?: string;
+            } | {
+                backend: 'sftp';
+                host: string;
+                path: string;
+                privateKey: string;
+                user: string;
+                port?: number;
+                customPassword?: string;
+                isExistingRepository?: boolean;
             };
             createdAt: number;
             id: string;
@@ -1640,7 +1695,7 @@ export type GetBackupScheduleForVolumeResponses = {
             lastError: string | null;
             name: string;
             status: 'error' | 'healthy' | 'unknown' | null;
-            type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 'rest' | 's3';
+            type: 'azure' | 'gcs' | 'local' | 'r2' | 'rclone' | 'rest' | 's3' | 'sftp';
             updatedAt: number;
         };
         repositoryId: string;

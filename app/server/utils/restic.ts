@@ -351,6 +351,7 @@ const restore = async (
 	options?: {
 		include?: string[];
 		exclude?: string[];
+		excludeXattr?: string[];
 		path?: string;
 		delete?: boolean;
 	},
@@ -380,10 +381,14 @@ const restore = async (
 		}
 	}
 
+	if (options?.excludeXattr && options.excludeXattr.length > 0) {
+		for (const xattr of options.excludeXattr) {
+			args.push("--exclude-xattr", xattr);
+		}
+	}
+
 	addRepoSpecificArgs(args, config, env);
 	args.push("--json");
-
-	console.log("Restic restore command:", ["restic", ...args].join(" "));
 
 	const res = await $`restic ${args}`.env(env).nothrow();
 	await cleanupTemporaryKeys(config, env);
@@ -408,6 +413,7 @@ const restore = async (
 		};
 	}
 
+	logger.debug(`Restic restore output last line: ${lastLine}`);
 	const resSummary = JSON.parse(lastLine);
 	const result = restoreOutputSchema(resSummary);
 

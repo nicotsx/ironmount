@@ -237,6 +237,7 @@ export const restoreSnapshotBody = type({
 	snapshotId: "string",
 	include: "string[]?",
 	exclude: "string[]?",
+	excludeXattr: "string[]?",
 	delete: "boolean?",
 });
 

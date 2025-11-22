@@ -15,7 +15,7 @@ const listRepositories = async () => {
 };
 
 const encryptConfig = async (config: RepositoryConfig): Promise<RepositoryConfig> => {
-	const encryptedConfig: Record<string, string | boolean> = { ...config };
+	const encryptedConfig: Record<string, string | boolean | number> = { ...config };
 
 	if (config.customPassword) {
 		encryptedConfig.customPassword = await cryptoUtils.encrypt(config.customPassword);
@@ -193,7 +193,7 @@ const listSnapshotFiles = async (name: string, snapshotId: string, path?: string
 const restoreSnapshot = async (
 	name: string,
 	snapshotId: string,
-	options?: { include?: string[]; exclude?: string[]; delete?: boolean },
+	options?: { include?: string[]; exclude?: string[]; excludeXattr?: string[]; delete?: boolean },
 ) => {
 	const repository = await db.query.repositoriesTable.findFirst({
 		where: eq(repositoriesTable.name, name),

@@ -1,11 +1,12 @@
 import { useCallback, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FileIcon } from "lucide-react";
+import { ChevronDown, FileIcon } from "lucide-react";
 import { FileTree } from "~/client/components/file-tree";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/client/components/ui/card";
 import { Button } from "~/client/components/ui/button";
 import { Checkbox } from "~/client/components/ui/checkbox";
 import { Label } from "~/client/components/ui/label";
+import { Input } from "~/client/components/ui/input";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -39,6 +40,8 @@ export const SnapshotFileBrowser = (props: Props) => {
 	const [selectedPaths, setSelectedPaths] = useState<Set<string>>(new Set());
 	const [showRestoreDialog, setShowRestoreDialog] = useState(false);
 	const [deleteExtraFiles, setDeleteExtraFiles] = useState(false);
+	const [showAdvanced, setShowAdvanced] = useState(false);
+	const [excludeXattr, setExcludeXattr] = useState("");
 
 	const volumeBasePath = snapshot.paths[0]?.match(/^(.*?_data)(\/|$)/)?.[1] || "/";
 
@@ -64,9 +67,11 @@ export const SnapshotFileBrowser = (props: Props) => {
 
 	const addBasePath = useCallback(
 		(displayPath: string): string => {
-			if (!volumeBasePath) return displayPath;
-			if (displayPath === "/") return volumeBasePath;
-			return `${volumeBasePath}${displayPath}`;
+			let vbp = volumeBasePath === "/" ? "" : volumeBasePath;
+
+			if (!vbp) return displayPath;
+			if (displayPath === "/") return vbp;
+			return `${vbp}${displayPath}`;
 		},
 		[volumeBasePath],
 	);
@@ -117,17 +122,23 @@ export const SnapshotFileBrowser = (props: Props) => {
 		const pathsArray = Array.from(selectedPaths);
 		const includePaths = pathsArray.map((path) => addBasePath(path));
 
+		const excludeXattrArray = excludeXattr
+			?.split(",")
+			.map((s) => s.trim())
+			.filter(Boolean);
+
 		restoreSnapshot({
 			path: { name: repositoryName },
 			body: {
 				snapshotId: snapshot.short_id,
 				include: includePaths,
 				delete: deleteExtraFiles,
+				excludeXattr: excludeXattrArray && excludeXattrArray.length > 0 ? excludeXattrArray : undefined,
 			},
 		});
 
 		setShowRestoreDialog(false);
-	}, [selectedPaths, addBasePath, repositoryName, snapshot.short_id, restoreSnapshot, deleteExtraFiles]);
+	}, [selectedPaths, addBasePath, repositoryName, snapshot.short_id, restoreSnapshot, deleteExtraFiles, excludeXattr]);
 
 	return (
 		<div className="space-y-4">
@@ -220,15 +231,46 @@ export const SnapshotFileBrowser = (props: Props) => {
 							Existing files will be overwritten by what's in the snapshot. This action cannot be undone.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
-					<div className="flex items-center space-x-2 py-4">
-						<Checkbox
-							id="delete-extra"
-							checked={deleteExtraFiles}
-							onCheckedChange={(checked) => setDeleteExtraFiles(checked === true)}
-						/>
-						<Label htmlFor="delete-extra" className="text-sm font-normal cursor-pointer">
-							Delete files not present in the snapshot?
-						</Label>
+					<div className="space-y-4">
+						<div>
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								onClick={() => setShowAdvanced(!showAdvanced)}
+								className="h-auto p-0 text-sm font-normal"
+							>
+								Advanced
+								<ChevronDown size={16} className={`ml-1 transition-transform ${showAdvanced ? "rotate-180" : ""}`} />
+							</Button>
+
+							{showAdvanced && (
+								<div className="mt-4 space-y-2">
+									<Label htmlFor="exclude-xattr" className="text-sm">
+										Exclude Extended Attributes (Optional)
+									</Label>
+									<Input
+										id="exclude-xattr"
+										placeholder="com.apple.metadata,user.*,nfs4.*"
+										value={excludeXattr}
+										onChange={(e) => setExcludeXattr(e.target.value)}
+									/>
+									<p className="text-xs text-muted-foreground">
+										Exclude specific extended attributes during restore (comma-separated)
+									</p>
+									<div className="flex items-center space-x-2 mt-2">
+										<Checkbox
+											id="delete-extra"
+											checked={deleteExtraFiles}
+											onCheckedChange={(checked) => setDeleteExtraFiles(checked === true)}
+										/>
+										<Label htmlFor="delete-extra" className="text-sm font-normal cursor-pointer">
+											Delete files not present in the snapshot?
+										</Label>
+									</div>
+								</div>
+							)}
+						</div>
 					</div>
 					<AlertDialogFooter>
 						<AlertDialogCancel>Cancel</AlertDialogCancel>

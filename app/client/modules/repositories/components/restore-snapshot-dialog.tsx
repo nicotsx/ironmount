@@ -52,12 +52,18 @@ export const RestoreSnapshotDialog = ({ name, snapshotId }: Props) => {
 			.map((s) => s.trim())
 			.filter(Boolean);
 
+		const excludeXattr = values.excludeXattr
+			?.split(",")
+			.map((s) => s.trim())
+			.filter(Boolean);
+
 		restore.mutate({
 			path: { name },
 			body: {
 				snapshotId,
 				include: include && include.length > 0 ? include : undefined,
 				exclude: exclude && exclude.length > 0 ? exclude : undefined,
+				excludeXattr: excludeXattr && excludeXattr.length > 0 ? excludeXattr : undefined,
 			},
 		});
 	};

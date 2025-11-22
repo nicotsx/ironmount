@@ -42,7 +42,7 @@ export const StatusDot = ({ variant, label, animated }: StatusDotProps) => {
 		<Tooltip>
 			<TooltipTrigger>
 				<span className="relative flex size-3 mx-auto">
-					{statusMapping.animated && (
+					{statusMapping?.animated && (
 						<span
 							className={cn(
 								"absolute inline-flex h-full w-full animate-ping rounded-full opacity-75",
@@ -50,7 +50,7 @@ export const StatusDot = ({ variant, label, animated }: StatusDotProps) => {
 							)}
 						/>
 					)}
-					<span className={cn("relative inline-flex size-3 rounded-full", `${statusMapping.color}`)} />
+					<span className={cn("relative inline-flex size-3 rounded-full", `${statusMapping?.color}`)} />
 				</span>
 			</TooltipTrigger>
 			<TooltipContent>

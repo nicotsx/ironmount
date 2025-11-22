@@ -1,5 +1,7 @@
 import { arktypeResolver } from "@hookform/resolvers/arktype";
 import { type } from "arktype";
+import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
 	Form,
@@ -11,11 +13,13 @@ import {
 	FormMessage,
 } from "~/client/components/ui/form";
 import { Input } from "~/client/components/ui/input";
+import { Button } from "~/client/components/ui/button";
 
 const restoreSnapshotFormSchema = type({
 	path: "string?",
 	include: "string?",
 	exclude: "string?",
+	excludeXattr: "string?",
 });
 
 export type RestoreSnapshotFormValues = typeof restoreSnapshotFormSchema.inferIn;
@@ -27,12 +31,15 @@ type Props = {
 };
 
 export const RestoreSnapshotForm = ({ formId, onSubmit, className }: Props) => {
+	const [showAdvanced, setShowAdvanced] = useState(false);
+
 	const form = useForm<RestoreSnapshotFormValues>({
 		resolver: arktypeResolver(restoreSnapshotFormSchema),
 		defaultValues: {
 			path: "",
 			include: "",
 			exclude: "",
+			excludeXattr: "",
 		},
 	});
 
@@ -90,6 +97,43 @@ export const RestoreSnapshotForm = ({ formId, onSubmit, className }: Props) => {
 							</FormItem>
 						)}
 					/>
+
+					<div>
+						<Button
+							type="button"
+							variant="ghost"
+							size="sm"
+							onClick={() => setShowAdvanced(!showAdvanced)}
+							className="h-auto p-0 text-sm font-normal"
+						>
+							Advanced
+							<ChevronDown
+								size={16}
+								className={`ml-1 transition-transform ${showAdvanced ? "rotate-180" : ""}`}
+							/>
+						</Button>
+
+						{showAdvanced && (
+							<div className="mt-4">
+								<FormField
+									control={form.control}
+									name="excludeXattr"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Exclude Extended Attributes (Optional)</FormLabel>
+											<FormControl>
+												<Input placeholder="com.apple.metadata,user.custom" {...field} />
+											</FormControl>
+											<FormDescription>
+												Exclude specific extended attributes during restore (comma-separated)
+											</FormDescription>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</div>
+						)}
+					</div>
 				</div>
 			</form>
 		</Form>
