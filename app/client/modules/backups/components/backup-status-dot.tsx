@@ -1,7 +1,4 @@
-import { cn } from "~/client/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "~/client/components/ui/tooltip";
-
-type BackupStatus = "active" | "paused" | "error" | "in_progress";
+import { StatusDot } from "~/client/components/status-dot";
 
 export const BackupStatusDot = ({
 	enabled,
@@ -12,60 +9,22 @@ export const BackupStatusDot = ({
 	hasError?: boolean;
 	isInProgress?: boolean;
 }) => {
-	let status: BackupStatus = "paused";
+	let variant: "success" | "neutral" | "error" | "info";
+	let label: string;
+
 	if (isInProgress) {
-		status = "in_progress";
+		variant = "info";
+		label = "Backup in progress";
 	} else if (hasError) {
-		status = "error";
+		variant = "error";
+		label = "Error";
 	} else if (enabled) {
-		status = "active";
+		variant = "success";
+		label = "Active";
+	} else {
+		variant = "neutral";
+		label = "Paused";
 	}
 
-	const statusMapping = {
-		active: {
-			color: "bg-green-500",
-			colorLight: "bg-emerald-400",
-			animated: true,
-			label: "Active",
-		},
-		paused: {
-			color: "bg-gray-500",
-			colorLight: "bg-gray-400",
-			animated: false,
-			label: "Paused",
-		},
-		error: {
-			color: "bg-red-500",
-			colorLight: "bg-red-400",
-			animated: true,
-			label: "Error",
-		},
-		in_progress: {
-			color: "bg-blue-500",
-			colorLight: "bg-blue-400",
-			animated: true,
-			label: "Backup in progress",
-		},
-	}[status];
-
-	return (
-		<Tooltip>
-			<TooltipTrigger>
-				<span className="relative flex size-3 mx-auto">
-					{statusMapping.animated && (
-						<span
-							className={cn(
-								"absolute inline-flex h-full w-full animate-ping rounded-full opacity-75",
-								`${statusMapping.colorLight}`,
-							)}
-						/>
-					)}
-					<span className={cn("relative inline-flex size-3 rounded-full", `${statusMapping.color}`)} />
-				</span>
-			</TooltipTrigger>
-			<TooltipContent>
-				<p>{statusMapping.label}</p>
-			</TooltipContent>
-		</Tooltip>
-	);
+	return <StatusDot variant={variant} label={label} />;
 };

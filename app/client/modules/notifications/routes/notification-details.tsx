@@ -56,7 +56,6 @@ export default function NotificationDetailsPage({ loaderData }: Route.ComponentP
 	const navigate = useNavigate();
 	const formId = useId();
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-	const [isEditing, setIsEditing] = useState(false);
 
 	const { data } = useQuery({
 		...getNotificationDestinationOptions({ path: { id: String(loaderData.id) } }),
@@ -82,7 +81,6 @@ export default function NotificationDetailsPage({ loaderData }: Route.ComponentP
 		...updateNotificationDestinationMutation(),
 		onSuccess: () => {
 			toast.success("Notification destination updated successfully");
-			setIsEditing(false);
 		},
 		onError: (error) => {
 			toast.error("Failed to update notification destination", {
@@ -146,11 +144,6 @@ export default function NotificationDetailsPage({ loaderData }: Route.ComponentP
 						<TestTube2 className="h-4 w-4 mr-2" />
 						Test
 					</Button>
-					{!isEditing && (
-						<Button onClick={() => setIsEditing(true)} variant="outline">
-							Edit
-						</Button>
-					)}
 					<Button
 						onClick={() => setShowDeleteConfirm(true)}
 						variant="destructive"
@@ -180,46 +173,20 @@ export default function NotificationDetailsPage({ loaderData }: Route.ComponentP
 							</AlertDescription>
 						</Alert>
 					)}
-
-					{isEditing ? (
-						<>
-							<CreateNotificationForm
-								mode="update"
-								formId={formId}
-								onSubmit={handleSubmit}
-								initialValues={data.config}
-								loading={updateDestination.isPending}
-							/>
-							<div className="flex justify-end gap-2 pt-4 border-t">
-								<Button
-									type="button"
-									variant="secondary"
-									onClick={() => setIsEditing(false)}
-									disabled={updateDestination.isPending}
-								>
-									Cancel
-								</Button>
-								<Button type="submit" form={formId} loading={updateDestination.isPending}>
-									Save Changes
-								</Button>
-							</div>
-						</>
-					) : (
-						<div className="space-y-4">
-							<div>
-								<div className="text-sm font-medium text-muted-foreground">Type</div>
-								<div className="mt-1 capitalize">{data.type}</div>
-							</div>
-							<div>
-								<div className="text-sm font-medium text-muted-foreground">Created</div>
-								<div className="mt-1">{new Date(data.createdAt * 1000).toLocaleString()}</div>
-							</div>
-							<div>
-								<div className="text-sm font-medium text-muted-foreground">Last Updated</div>
-								<div className="mt-1">{new Date(data.updatedAt * 1000).toLocaleString()}</div>
-							</div>
+					<>
+						<CreateNotificationForm
+							mode="update"
+							formId={formId}
+							onSubmit={handleSubmit}
+							initialValues={data.config}
+							loading={updateDestination.isPending}
+						/>
+						<div className="flex justify-end gap-2 pt-4 border-t">
+							<Button type="submit" form={formId} loading={updateDestination.isPending}>
+								Save Changes
+							</Button>
 						</div>
-					)}
+					</>
 				</CardContent>
 			</Card>
 

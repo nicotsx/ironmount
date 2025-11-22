@@ -31,9 +31,9 @@ export default function CreateNotification() {
 
 	const createNotification = useMutation({
 		...createNotificationDestinationMutation(),
-		onSuccess: (data) => {
+		onSuccess: () => {
 			toast.success("Notification destination created successfully");
-			navigate(`/notifications/${data.id}`);
+			navigate(`/notifications`);
 		},
 	});
 
