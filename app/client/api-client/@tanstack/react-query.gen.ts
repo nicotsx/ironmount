@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { browseFilesystem, changePassword, createBackupSchedule, createRepository, createVolume, deleteBackupSchedule, deleteRepository, deleteSnapshot, deleteVolume, doctorRepository, downloadResticPassword, getBackupSchedule, getBackupScheduleForVolume, getContainersUsingVolume, getMe, getRepository, getSnapshotDetails, getStatus, getSystemInfo, getVolume, healthCheckVolume, listBackupSchedules, listFiles, listRcloneRemotes, listRepositories, listSnapshotFiles, listSnapshots, listVolumes, login, logout, mountVolume, type Options, register, restoreSnapshot, runBackupNow, runForget, stopBackup, testConnection, unmountVolume, updateBackupSchedule, updateVolume } from '../sdk.gen';
-import type { BrowseFilesystemData, BrowseFilesystemResponse, ChangePasswordData, ChangePasswordResponse, CreateBackupScheduleData, CreateBackupScheduleResponse, CreateRepositoryData, CreateRepositoryResponse, CreateVolumeData, CreateVolumeResponse, DeleteBackupScheduleData, DeleteBackupScheduleResponse, DeleteRepositoryData, DeleteRepositoryResponse, DeleteSnapshotData, DeleteSnapshotResponse, DeleteVolumeData, DeleteVolumeResponse, DoctorRepositoryData, DoctorRepositoryResponse, DownloadResticPasswordData, DownloadResticPasswordResponse, GetBackupScheduleData, GetBackupScheduleForVolumeData, GetBackupScheduleForVolumeResponse, GetBackupScheduleResponse, GetContainersUsingVolumeData, GetContainersUsingVolumeResponse, GetMeData, GetMeResponse, GetRepositoryData, GetRepositoryResponse, GetSnapshotDetailsData, GetSnapshotDetailsResponse, GetStatusData, GetStatusResponse, GetSystemInfoData, GetSystemInfoResponse, GetVolumeData, GetVolumeResponse, HealthCheckVolumeData, HealthCheckVolumeResponse, ListBackupSchedulesData, ListBackupSchedulesResponse, ListFilesData, ListFilesResponse, ListRcloneRemotesData, ListRcloneRemotesResponse, ListRepositoriesData, ListRepositoriesResponse, ListSnapshotFilesData, ListSnapshotFilesResponse, ListSnapshotsData, ListSnapshotsResponse, ListVolumesData, ListVolumesResponse, LoginData, LoginResponse, LogoutData, LogoutResponse, MountVolumeData, MountVolumeResponse, RegisterData, RegisterResponse, RestoreSnapshotData, RestoreSnapshotResponse, RunBackupNowData, RunBackupNowResponse, RunForgetData, RunForgetResponse, StopBackupData, StopBackupResponse, TestConnectionData, TestConnectionResponse, UnmountVolumeData, UnmountVolumeResponse, UpdateBackupScheduleData, UpdateBackupScheduleResponse, UpdateVolumeData, UpdateVolumeResponse } from '../types.gen';
+import { browseFilesystem, changePassword, createBackupSchedule, createNotificationDestination, createRepository, createVolume, deleteBackupSchedule, deleteNotificationDestination, deleteRepository, deleteSnapshot, deleteVolume, doctorRepository, downloadResticPassword, getBackupSchedule, getBackupScheduleForVolume, getContainersUsingVolume, getMe, getNotificationDestination, getRepository, getScheduleNotifications, getSnapshotDetails, getStatus, getSystemInfo, getVolume, healthCheckVolume, listBackupSchedules, listFiles, listNotificationDestinations, listRcloneRemotes, listRepositories, listSnapshotFiles, listSnapshots, listVolumes, login, logout, mountVolume, type Options, register, restoreSnapshot, runBackupNow, runForget, stopBackup, testConnection, testNotificationDestination, unmountVolume, updateBackupSchedule, updateNotificationDestination, updateScheduleNotifications, updateVolume } from '../sdk.gen';
+import type { BrowseFilesystemData, BrowseFilesystemResponse, ChangePasswordData, ChangePasswordResponse, CreateBackupScheduleData, CreateBackupScheduleResponse, CreateNotificationDestinationData, CreateNotificationDestinationResponse, CreateRepositoryData, CreateRepositoryResponse, CreateVolumeData, CreateVolumeResponse, DeleteBackupScheduleData, DeleteBackupScheduleResponse, DeleteNotificationDestinationData, DeleteNotificationDestinationResponse, DeleteRepositoryData, DeleteRepositoryResponse, DeleteSnapshotData, DeleteSnapshotResponse, DeleteVolumeData, DeleteVolumeResponse, DoctorRepositoryData, DoctorRepositoryResponse, DownloadResticPasswordData, DownloadResticPasswordResponse, GetBackupScheduleData, GetBackupScheduleForVolumeData, GetBackupScheduleForVolumeResponse, GetBackupScheduleResponse, GetContainersUsingVolumeData, GetContainersUsingVolumeResponse, GetMeData, GetMeResponse, GetNotificationDestinationData, GetNotificationDestinationResponse, GetRepositoryData, GetRepositoryResponse, GetScheduleNotificationsData, GetScheduleNotificationsResponse, GetSnapshotDetailsData, GetSnapshotDetailsResponse, GetStatusData, GetStatusResponse, GetSystemInfoData, GetSystemInfoResponse, GetVolumeData, GetVolumeResponse, HealthCheckVolumeData, HealthCheckVolumeResponse, ListBackupSchedulesData, ListBackupSchedulesResponse, ListFilesData, ListFilesResponse, ListNotificationDestinationsData, ListNotificationDestinationsResponse, ListRcloneRemotesData, ListRcloneRemotesResponse, ListRepositoriesData, ListRepositoriesResponse, ListSnapshotFilesData, ListSnapshotFilesResponse, ListSnapshotsData, ListSnapshotsResponse, ListVolumesData, ListVolumesResponse, LoginData, LoginResponse, LogoutData, LogoutResponse, MountVolumeData, MountVolumeResponse, RegisterData, RegisterResponse, RestoreSnapshotData, RestoreSnapshotResponse, RunBackupNowData, RunBackupNowResponse, RunForgetData, RunForgetResponse, StopBackupData, StopBackupResponse, TestConnectionData, TestConnectionResponse, TestNotificationDestinationData, TestNotificationDestinationResponse, UnmountVolumeData, UnmountVolumeResponse, UpdateBackupScheduleData, UpdateBackupScheduleResponse, UpdateNotificationDestinationData, UpdateNotificationDestinationResponse, UpdateScheduleNotificationsData, UpdateScheduleNotificationsResponse, UpdateVolumeData, UpdateVolumeResponse } from '../types.gen';
 
 /**
  * Register a new user
@@ -693,6 +693,145 @@ export const runForgetMutation = (options?: Partial<Options<RunForgetData>>): Us
     const mutationOptions: UseMutationOptions<RunForgetResponse, DefaultError, Options<RunForgetData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await runForget({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getScheduleNotificationsQueryKey = (options: Options<GetScheduleNotificationsData>) => createQueryKey("getScheduleNotifications", options);
+
+/**
+ * Get notification assignments for a backup schedule
+ */
+export const getScheduleNotificationsOptions = (options: Options<GetScheduleNotificationsData>) => queryOptions<GetScheduleNotificationsResponse, DefaultError, GetScheduleNotificationsResponse, ReturnType<typeof getScheduleNotificationsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getScheduleNotifications({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getScheduleNotificationsQueryKey(options)
+});
+
+/**
+ * Update notification assignments for a backup schedule
+ */
+export const updateScheduleNotificationsMutation = (options?: Partial<Options<UpdateScheduleNotificationsData>>): UseMutationOptions<UpdateScheduleNotificationsResponse, DefaultError, Options<UpdateScheduleNotificationsData>> => {
+    const mutationOptions: UseMutationOptions<UpdateScheduleNotificationsResponse, DefaultError, Options<UpdateScheduleNotificationsData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateScheduleNotifications({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listNotificationDestinationsQueryKey = (options?: Options<ListNotificationDestinationsData>) => createQueryKey("listNotificationDestinations", options);
+
+/**
+ * List all notification destinations
+ */
+export const listNotificationDestinationsOptions = (options?: Options<ListNotificationDestinationsData>) => queryOptions<ListNotificationDestinationsResponse, DefaultError, ListNotificationDestinationsResponse, ReturnType<typeof listNotificationDestinationsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listNotificationDestinations({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listNotificationDestinationsQueryKey(options)
+});
+
+/**
+ * Create a new notification destination
+ */
+export const createNotificationDestinationMutation = (options?: Partial<Options<CreateNotificationDestinationData>>): UseMutationOptions<CreateNotificationDestinationResponse, DefaultError, Options<CreateNotificationDestinationData>> => {
+    const mutationOptions: UseMutationOptions<CreateNotificationDestinationResponse, DefaultError, Options<CreateNotificationDestinationData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createNotificationDestination({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Delete a notification destination
+ */
+export const deleteNotificationDestinationMutation = (options?: Partial<Options<DeleteNotificationDestinationData>>): UseMutationOptions<DeleteNotificationDestinationResponse, DefaultError, Options<DeleteNotificationDestinationData>> => {
+    const mutationOptions: UseMutationOptions<DeleteNotificationDestinationResponse, DefaultError, Options<DeleteNotificationDestinationData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteNotificationDestination({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getNotificationDestinationQueryKey = (options: Options<GetNotificationDestinationData>) => createQueryKey("getNotificationDestination", options);
+
+/**
+ * Get a notification destination by ID
+ */
+export const getNotificationDestinationOptions = (options: Options<GetNotificationDestinationData>) => queryOptions<GetNotificationDestinationResponse, DefaultError, GetNotificationDestinationResponse, ReturnType<typeof getNotificationDestinationQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getNotificationDestination({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getNotificationDestinationQueryKey(options)
+});
+
+/**
+ * Update a notification destination
+ */
+export const updateNotificationDestinationMutation = (options?: Partial<Options<UpdateNotificationDestinationData>>): UseMutationOptions<UpdateNotificationDestinationResponse, DefaultError, Options<UpdateNotificationDestinationData>> => {
+    const mutationOptions: UseMutationOptions<UpdateNotificationDestinationResponse, DefaultError, Options<UpdateNotificationDestinationData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateNotificationDestination({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Test a notification destination by sending a test message
+ */
+export const testNotificationDestinationMutation = (options?: Partial<Options<TestNotificationDestinationData>>): UseMutationOptions<TestNotificationDestinationResponse, DefaultError, Options<TestNotificationDestinationData>> => {
+    const mutationOptions: UseMutationOptions<TestNotificationDestinationResponse, DefaultError, Options<TestNotificationDestinationData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await testNotificationDestination({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

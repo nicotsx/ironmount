@@ -16,6 +16,9 @@ export default [
 		route("repositories/create", "./client/modules/repositories/routes/create-repository.tsx"),
 		route("repositories/:name", "./client/modules/repositories/routes/repository-details.tsx"),
 		route("repositories/:name/:snapshotId", "./client/modules/repositories/routes/snapshot-details.tsx"),
+		route("notifications", "./client/modules/notifications/routes/notifications.tsx"),
+		route("notifications/create", "./client/modules/notifications/routes/create-notification.tsx"),
+		route("notifications/:id", "./client/modules/notifications/routes/notification-details.tsx"),
 		route("settings", "./client/modules/settings/routes/settings.tsx"),
 	]),
 ] satisfies RouteConfig;

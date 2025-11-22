@@ -2,7 +2,6 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "@ironmount/client",
       "dependencies": {
         "@hono/standard-validator": "^0.1.5",
         "@hookform/resolvers": "^5.2.2",

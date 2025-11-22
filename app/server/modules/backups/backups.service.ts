@@ -10,6 +10,7 @@ import { getVolumePath } from "../volumes/helpers";
 import type { CreateBackupScheduleBody, UpdateBackupScheduleBody } from "./backups.dto";
 import { toMessage } from "../../utils/errors";
 import { serverEvents } from "../../core/events";
+import { notificationsService } from "../notifications/notifications.service";
 
 const runningBackups = new Map<number, AbortController>();
 
@@ -195,6 +196,15 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 		repositoryName: repository.name,
 	});
 
+	notificationsService
+		.sendBackupNotification(scheduleId, "start", {
+			volumeName: volume.name,
+			repositoryName: repository.name,
+		})
+		.catch((error) => {
+			logger.error(`Failed to send backup start notification: ${toMessage(error)}`);
+		});
+
 	const nextBackupAt = calculateNextRun(schedule.cronExpression);
 
 	await db
@@ -262,6 +272,15 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 			repositoryName: repository.name,
 			status: "success",
 		});
+
+		notificationsService
+			.sendBackupNotification(scheduleId, "success", {
+				volumeName: volume.name,
+				repositoryName: repository.name,
+			})
+			.catch((error) => {
+				logger.error(`Failed to send backup success notification: ${toMessage(error)}`);
+			});
 	} catch (error) {
 		logger.error(`Backup failed for volume ${volume.name} to repository ${repository.name}: ${toMessage(error)}`);
 
@@ -281,6 +300,16 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 			repositoryName: repository.name,
 			status: "error",
 		});
+
+		notificationsService
+			.sendBackupNotification(scheduleId, "failure", {
+				volumeName: volume.name,
+				repositoryName: repository.name,
+				error: toMessage(error),
+			})
+			.catch((notifError) => {
+				logger.error(`Failed to send backup failure notification: ${toMessage(notifError)}`);
+			});
 
 		throw error;
 	} finally {

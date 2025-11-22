@@ -15,6 +15,7 @@ import { systemController } from "./modules/system/system.controller";
 import { volumeController } from "./modules/volumes/volume.controller";
 import { backupScheduleController } from "./modules/backups/backups.controller";
 import { eventsController } from "./modules/events/events.controller";
+import { notificationsController } from "./modules/notifications/notifications.controller";
 import { handleServiceError } from "./utils/errors";
 import { logger } from "./utils/logger";
 import { shutdown } from "./modules/lifecycle/shutdown";
@@ -46,6 +47,7 @@ const app = new Hono()
 	.route("/api/v1/volumes", volumeController.use(requireAuth))
 	.route("/api/v1/repositories", repositoriesController.use(requireAuth))
 	.route("/api/v1/backups", backupScheduleController.use(requireAuth))
+	.route("/api/v1/notifications", notificationsController.use(requireAuth))
 	.route("/api/v1/system", systemController.use(requireAuth))
 	.route("/api/v1/events", eventsController.use(requireAuth));
 

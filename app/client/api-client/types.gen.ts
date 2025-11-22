@@ -1769,6 +1769,536 @@ export type RunForgetResponses = {
 
 export type RunForgetResponse = RunForgetResponses[keyof RunForgetResponses];
 
+export type GetScheduleNotificationsData = {
+    body?: never;
+    path: {
+        scheduleId: string;
+    };
+    query?: never;
+    url: '/api/v1/backups/{scheduleId}/notifications';
+};
+
+export type GetScheduleNotificationsResponses = {
+    /**
+     * List of notification assignments for the schedule
+     */
+    200: Array<{
+        createdAt: number;
+        destination: {
+            config: {
+                from: string;
+                password: string;
+                smtpHost: string;
+                smtpPort: number;
+                to: Array<string>;
+                type: 'email';
+                useTLS: boolean;
+                username: string;
+            } | {
+                priority: 'default' | 'high' | 'low' | 'max' | 'min';
+                topic: string;
+                type: 'ntfy';
+                serverUrl?: string;
+                token?: string;
+            } | {
+                priority: number;
+                serverUrl: string;
+                token: string;
+                type: 'gotify';
+            } | {
+                shoutrrrUrl: string;
+                type: 'custom';
+            } | {
+                type: 'discord';
+                webhookUrl: string;
+                avatarUrl?: string;
+                username?: string;
+            } | {
+                type: 'slack';
+                webhookUrl: string;
+                channel?: string;
+                iconEmoji?: string;
+                username?: string;
+            };
+            createdAt: number;
+            enabled: boolean;
+            id: number;
+            name: string;
+            type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'slack';
+            updatedAt: number;
+        };
+        destinationId: number;
+        notifyOnFailure: boolean;
+        notifyOnStart: boolean;
+        notifyOnSuccess: boolean;
+        scheduleId: number;
+    }>;
+};
+
+export type GetScheduleNotificationsResponse = GetScheduleNotificationsResponses[keyof GetScheduleNotificationsResponses];
+
+export type UpdateScheduleNotificationsData = {
+    body?: {
+        assignments: Array<{
+            destinationId: number;
+            notifyOnFailure: boolean;
+            notifyOnStart: boolean;
+            notifyOnSuccess: boolean;
+        }>;
+    };
+    path: {
+        scheduleId: string;
+    };
+    query?: never;
+    url: '/api/v1/backups/{scheduleId}/notifications';
+};
+
+export type UpdateScheduleNotificationsResponses = {
+    /**
+     * Notification assignments updated successfully
+     */
+    200: Array<{
+        createdAt: number;
+        destination: {
+            config: {
+                from: string;
+                password: string;
+                smtpHost: string;
+                smtpPort: number;
+                to: Array<string>;
+                type: 'email';
+                useTLS: boolean;
+                username: string;
+            } | {
+                priority: 'default' | 'high' | 'low' | 'max' | 'min';
+                topic: string;
+                type: 'ntfy';
+                serverUrl?: string;
+                token?: string;
+            } | {
+                priority: number;
+                serverUrl: string;
+                token: string;
+                type: 'gotify';
+            } | {
+                shoutrrrUrl: string;
+                type: 'custom';
+            } | {
+                type: 'discord';
+                webhookUrl: string;
+                avatarUrl?: string;
+                username?: string;
+            } | {
+                type: 'slack';
+                webhookUrl: string;
+                channel?: string;
+                iconEmoji?: string;
+                username?: string;
+            };
+            createdAt: number;
+            enabled: boolean;
+            id: number;
+            name: string;
+            type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'slack';
+            updatedAt: number;
+        };
+        destinationId: number;
+        notifyOnFailure: boolean;
+        notifyOnStart: boolean;
+        notifyOnSuccess: boolean;
+        scheduleId: number;
+    }>;
+};
+
+export type UpdateScheduleNotificationsResponse = UpdateScheduleNotificationsResponses[keyof UpdateScheduleNotificationsResponses];
+
+export type ListNotificationDestinationsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/notifications/destinations';
+};
+
+export type ListNotificationDestinationsResponses = {
+    /**
+     * A list of notification destinations
+     */
+    200: Array<{
+        config: {
+            from: string;
+            password: string;
+            smtpHost: string;
+            smtpPort: number;
+            to: Array<string>;
+            type: 'email';
+            useTLS: boolean;
+            username: string;
+        } | {
+            priority: 'default' | 'high' | 'low' | 'max' | 'min';
+            topic: string;
+            type: 'ntfy';
+            serverUrl?: string;
+            token?: string;
+        } | {
+            priority: number;
+            serverUrl: string;
+            token: string;
+            type: 'gotify';
+        } | {
+            shoutrrrUrl: string;
+            type: 'custom';
+        } | {
+            type: 'discord';
+            webhookUrl: string;
+            avatarUrl?: string;
+            username?: string;
+        } | {
+            type: 'slack';
+            webhookUrl: string;
+            channel?: string;
+            iconEmoji?: string;
+            username?: string;
+        };
+        createdAt: number;
+        enabled: boolean;
+        id: number;
+        name: string;
+        type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'slack';
+        updatedAt: number;
+    }>;
+};
+
+export type ListNotificationDestinationsResponse = ListNotificationDestinationsResponses[keyof ListNotificationDestinationsResponses];
+
+export type CreateNotificationDestinationData = {
+    body?: {
+        config: {
+            from: string;
+            password: string;
+            smtpHost: string;
+            smtpPort: number;
+            to: Array<string>;
+            type: 'email';
+            useTLS: boolean;
+            username: string;
+        } | {
+            priority: 'default' | 'high' | 'low' | 'max' | 'min';
+            topic: string;
+            type: 'ntfy';
+            serverUrl?: string;
+            token?: string;
+        } | {
+            priority: number;
+            serverUrl: string;
+            token: string;
+            type: 'gotify';
+        } | {
+            shoutrrrUrl: string;
+            type: 'custom';
+        } | {
+            type: 'discord';
+            webhookUrl: string;
+            avatarUrl?: string;
+            username?: string;
+        } | {
+            type: 'slack';
+            webhookUrl: string;
+            channel?: string;
+            iconEmoji?: string;
+            username?: string;
+        };
+        name: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/notifications/destinations';
+};
+
+export type CreateNotificationDestinationResponses = {
+    /**
+     * Notification destination created successfully
+     */
+    201: {
+        config: {
+            from: string;
+            password: string;
+            smtpHost: string;
+            smtpPort: number;
+            to: Array<string>;
+            type: 'email';
+            useTLS: boolean;
+            username: string;
+        } | {
+            priority: 'default' | 'high' | 'low' | 'max' | 'min';
+            topic: string;
+            type: 'ntfy';
+            serverUrl?: string;
+            token?: string;
+        } | {
+            priority: number;
+            serverUrl: string;
+            token: string;
+            type: 'gotify';
+        } | {
+            shoutrrrUrl: string;
+            type: 'custom';
+        } | {
+            type: 'discord';
+            webhookUrl: string;
+            avatarUrl?: string;
+            username?: string;
+        } | {
+            type: 'slack';
+            webhookUrl: string;
+            channel?: string;
+            iconEmoji?: string;
+            username?: string;
+        };
+        createdAt: number;
+        enabled: boolean;
+        id: number;
+        name: string;
+        type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'slack';
+        updatedAt: number;
+    };
+};
+
+export type CreateNotificationDestinationResponse = CreateNotificationDestinationResponses[keyof CreateNotificationDestinationResponses];
+
+export type DeleteNotificationDestinationData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/notifications/destinations/{id}';
+};
+
+export type DeleteNotificationDestinationErrors = {
+    /**
+     * Notification destination not found
+     */
+    404: unknown;
+};
+
+export type DeleteNotificationDestinationResponses = {
+    /**
+     * Notification destination deleted successfully
+     */
+    200: {
+        message: string;
+    };
+};
+
+export type DeleteNotificationDestinationResponse = DeleteNotificationDestinationResponses[keyof DeleteNotificationDestinationResponses];
+
+export type GetNotificationDestinationData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/notifications/destinations/{id}';
+};
+
+export type GetNotificationDestinationErrors = {
+    /**
+     * Notification destination not found
+     */
+    404: unknown;
+};
+
+export type GetNotificationDestinationResponses = {
+    /**
+     * Notification destination details
+     */
+    200: {
+        config: {
+            from: string;
+            password: string;
+            smtpHost: string;
+            smtpPort: number;
+            to: Array<string>;
+            type: 'email';
+            useTLS: boolean;
+            username: string;
+        } | {
+            priority: 'default' | 'high' | 'low' | 'max' | 'min';
+            topic: string;
+            type: 'ntfy';
+            serverUrl?: string;
+            token?: string;
+        } | {
+            priority: number;
+            serverUrl: string;
+            token: string;
+            type: 'gotify';
+        } | {
+            shoutrrrUrl: string;
+            type: 'custom';
+        } | {
+            type: 'discord';
+            webhookUrl: string;
+            avatarUrl?: string;
+            username?: string;
+        } | {
+            type: 'slack';
+            webhookUrl: string;
+            channel?: string;
+            iconEmoji?: string;
+            username?: string;
+        };
+        createdAt: number;
+        enabled: boolean;
+        id: number;
+        name: string;
+        type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'slack';
+        updatedAt: number;
+    };
+};
+
+export type GetNotificationDestinationResponse = GetNotificationDestinationResponses[keyof GetNotificationDestinationResponses];
+
+export type UpdateNotificationDestinationData = {
+    body?: {
+        config?: {
+            from: string;
+            password: string;
+            smtpHost: string;
+            smtpPort: number;
+            to: Array<string>;
+            type: 'email';
+            useTLS: boolean;
+            username: string;
+        } | {
+            priority: 'default' | 'high' | 'low' | 'max' | 'min';
+            topic: string;
+            type: 'ntfy';
+            serverUrl?: string;
+            token?: string;
+        } | {
+            priority: number;
+            serverUrl: string;
+            token: string;
+            type: 'gotify';
+        } | {
+            shoutrrrUrl: string;
+            type: 'custom';
+        } | {
+            type: 'discord';
+            webhookUrl: string;
+            avatarUrl?: string;
+            username?: string;
+        } | {
+            type: 'slack';
+            webhookUrl: string;
+            channel?: string;
+            iconEmoji?: string;
+            username?: string;
+        };
+        enabled?: boolean;
+        name?: string;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/notifications/destinations/{id}';
+};
+
+export type UpdateNotificationDestinationErrors = {
+    /**
+     * Notification destination not found
+     */
+    404: unknown;
+};
+
+export type UpdateNotificationDestinationResponses = {
+    /**
+     * Notification destination updated successfully
+     */
+    200: {
+        config: {
+            from: string;
+            password: string;
+            smtpHost: string;
+            smtpPort: number;
+            to: Array<string>;
+            type: 'email';
+            useTLS: boolean;
+            username: string;
+        } | {
+            priority: 'default' | 'high' | 'low' | 'max' | 'min';
+            topic: string;
+            type: 'ntfy';
+            serverUrl?: string;
+            token?: string;
+        } | {
+            priority: number;
+            serverUrl: string;
+            token: string;
+            type: 'gotify';
+        } | {
+            shoutrrrUrl: string;
+            type: 'custom';
+        } | {
+            type: 'discord';
+            webhookUrl: string;
+            avatarUrl?: string;
+            username?: string;
+        } | {
+            type: 'slack';
+            webhookUrl: string;
+            channel?: string;
+            iconEmoji?: string;
+            username?: string;
+        };
+        createdAt: number;
+        enabled: boolean;
+        id: number;
+        name: string;
+        type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'slack';
+        updatedAt: number;
+    };
+};
+
+export type UpdateNotificationDestinationResponse = UpdateNotificationDestinationResponses[keyof UpdateNotificationDestinationResponses];
+
+export type TestNotificationDestinationData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/notifications/destinations/{id}/test';
+};
+
+export type TestNotificationDestinationErrors = {
+    /**
+     * Notification destination not found
+     */
+    404: unknown;
+    /**
+     * Cannot test disabled destination
+     */
+    409: unknown;
+    /**
+     * Failed to send test notification
+     */
+    500: unknown;
+};
+
+export type TestNotificationDestinationResponses = {
+    /**
+     * Test notification sent successfully
+     */
+    200: {
+        success: boolean;
+    };
+};
+
+export type TestNotificationDestinationResponse = TestNotificationDestinationResponses[keyof TestNotificationDestinationResponses];
+
 export type GetSystemInfoData = {
     body?: never;
     path?: never;

@@ -1,7 +1,8 @@
 import { relations, sql } from "drizzle-orm";
-import { int, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { int, integer, sqliteTable, text, primaryKey } from "drizzle-orm/sqlite-core";
 import type { CompressionMode, RepositoryBackend, repositoryConfigSchema, RepositoryStatus } from "~/schemas/restic";
 import type { BackendStatus, BackendType, volumeConfigSchema } from "~/schemas/volumes";
+import type { NotificationType, notificationConfigSchema } from "~/schemas/notifications";
 
 /**
  * Volumes Table
@@ -90,7 +91,7 @@ export const backupSchedulesTable = sqliteTable("backup_schedules_table", {
 	createdAt: int("created_at", { mode: "number" }).notNull().default(sql`(unixepoch())`),
 	updatedAt: int("updated_at", { mode: "number" }).notNull().default(sql`(unixepoch())`),
 });
-export const backupScheduleRelations = relations(backupSchedulesTable, ({ one }) => ({
+export const backupScheduleRelations = relations(backupSchedulesTable, ({ one, many }) => ({
 	volume: one(volumesTable, {
 		fields: [backupSchedulesTable.volumeId],
 		references: [volumesTable.id],
@@ -99,5 +100,54 @@ export const backupScheduleRelations = relations(backupSchedulesTable, ({ one })
 		fields: [backupSchedulesTable.repositoryId],
 		references: [repositoriesTable.id],
 	}),
+	notifications: many(backupScheduleNotificationsTable),
 }));
 export type BackupSchedule = typeof backupSchedulesTable.$inferSelect;
+
+/**
+ * Notification Destinations Table
+ */
+export const notificationDestinationsTable = sqliteTable("notification_destinations_table", {
+	id: int().primaryKey({ autoIncrement: true }),
+	name: text().notNull().unique(),
+	enabled: int("enabled", { mode: "boolean" }).notNull().default(true),
+	type: text().$type<NotificationType>().notNull(),
+	config: text("config", { mode: "json" }).$type<typeof notificationConfigSchema.inferOut>().notNull(),
+	createdAt: int("created_at", { mode: "number" }).notNull().default(sql`(unixepoch())`),
+	updatedAt: int("updated_at", { mode: "number" }).notNull().default(sql`(unixepoch())`),
+});
+export const notificationDestinationRelations = relations(notificationDestinationsTable, ({ many }) => ({
+	schedules: many(backupScheduleNotificationsTable),
+}));
+export type NotificationDestination = typeof notificationDestinationsTable.$inferSelect;
+
+/**
+ * Backup Schedule Notifications Junction Table (Many-to-Many)
+ */
+export const backupScheduleNotificationsTable = sqliteTable(
+	"backup_schedule_notifications_table",
+	{
+		scheduleId: int("schedule_id")
+			.notNull()
+			.references(() => backupSchedulesTable.id, { onDelete: "cascade" }),
+		destinationId: int("destination_id")
+			.notNull()
+			.references(() => notificationDestinationsTable.id, { onDelete: "cascade" }),
+		notifyOnStart: int("notify_on_start", { mode: "boolean" }).notNull().default(false),
+		notifyOnSuccess: int("notify_on_success", { mode: "boolean" }).notNull().default(false),
+		notifyOnFailure: int("notify_on_failure", { mode: "boolean" }).notNull().default(true),
+		createdAt: int("created_at", { mode: "number" }).notNull().default(sql`(unixepoch())`),
+	},
+	(table) => [primaryKey({ columns: [table.scheduleId, table.destinationId] })],
+);
+export const backupScheduleNotificationRelations = relations(backupScheduleNotificationsTable, ({ one }) => ({
+	schedule: one(backupSchedulesTable, {
+		fields: [backupScheduleNotificationsTable.scheduleId],
+		references: [backupSchedulesTable.id],
+	}),
+	destination: one(notificationDestinationsTable, {
+		fields: [backupScheduleNotificationsTable.destinationId],
+		references: [notificationDestinationsTable.id],
+	}),
+}));
+export type BackupScheduleNotification = typeof backupScheduleNotificationsTable.$inferSelect;

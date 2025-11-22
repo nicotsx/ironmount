@@ -23,6 +23,14 @@ import {
 	type UpdateBackupScheduleDto,
 } from "./backups.dto";
 import { backupsService } from "./backups.service";
+import {
+	getScheduleNotificationsDto,
+	updateScheduleNotificationsBody,
+	updateScheduleNotificationsDto,
+	type GetScheduleNotificationsDto,
+	type UpdateScheduleNotificationsDto,
+} from "../notifications/notifications.dto";
+import { notificationsService } from "../notifications/notifications.service";
 
 export const backupScheduleController = new Hono()
 	.get("/", listBackupSchedulesDto, async (c) => {
@@ -87,4 +95,22 @@ export const backupScheduleController = new Hono()
 		await backupsService.runForget(Number(scheduleId));
 
 		return c.json<RunForgetDto>({ success: true }, 200);
-	});
+	})
+	.get("/:scheduleId/notifications", getScheduleNotificationsDto, async (c) => {
+		const scheduleId = Number.parseInt(c.req.param("scheduleId"), 10);
+		const assignments = await notificationsService.getScheduleNotifications(scheduleId);
+
+		return c.json<GetScheduleNotificationsDto>(assignments, 200);
+	})
+	.put(
+		"/:scheduleId/notifications",
+		updateScheduleNotificationsDto,
+		validator("json", updateScheduleNotificationsBody),
+		async (c) => {
+			const scheduleId = Number.parseInt(c.req.param("scheduleId"), 10);
+			const body = c.req.valid("json");
+			const assignments = await notificationsService.updateScheduleNotifications(scheduleId, body.assignments);
+
+			return c.json<UpdateScheduleNotificationsDto>(assignments, 200);
+		},
+	);
