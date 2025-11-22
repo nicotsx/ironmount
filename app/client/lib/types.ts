@@ -3,6 +3,7 @@ import type {
 	GetMeResponse,
 	GetRepositoryResponse,
 	GetVolumeResponse,
+	ListNotificationDestinationsResponse,
 	ListSnapshotsResponse,
 } from "../api-client";
 
@@ -17,3 +18,5 @@ export type Repository = GetRepositoryResponse;
 export type BackupSchedule = GetBackupScheduleResponse;
 
 export type Snapshot = ListSnapshotsResponse[number];
+
+export type NotificationDestination = ListNotificationDestinationsResponse[number];

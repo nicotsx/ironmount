@@ -29,7 +29,9 @@ import { ScheduleSummary } from "../components/schedule-summary";
 import type { Route } from "./+types/backup-details";
 import { SnapshotFileBrowser } from "../components/snapshot-file-browser";
 import { SnapshotTimeline } from "../components/snapshot-timeline";
-import { getBackupSchedule } from "~/client/api-client";
+import { getBackupSchedule, listNotificationDestinations } from "~/client/api-client";
+import { ScheduleNotificationsConfig } from "../components/schedule-notifications-config";
+import { cn } from "~/client/lib/utils";
 
 export const handle = {
 	breadcrumb: (match: Route.MetaArgs) => [
@@ -49,11 +51,12 @@ export function meta(_: Route.MetaArgs) {
 }
 
 export const clientLoader = async ({ params }: Route.LoaderArgs) => {
-	const { data } = await getBackupSchedule({ path: { scheduleId: params.id } });
+	const schedule = await getBackupSchedule({ path: { scheduleId: params.id } });
+	const notifs = await listNotificationDestinations();
 
-	if (!data) return redirect("/backups");
+	if (!schedule.data) return redirect("/backups");
 
-	return data;
+	return { schedule: schedule.data, notifs: notifs.data };
 };
 
 export default function ScheduleDetailsPage({ params, loaderData }: Route.ComponentProps) {
@@ -66,7 +69,7 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 
 	const { data: schedule } = useQuery({
 		...getBackupScheduleOptions({ path: { scheduleId: params.id } }),
-		initialData: loaderData,
+		initialData: loaderData.schedule,
 		refetchInterval: 10000,
 		refetchOnWindowFocus: true,
 	});
@@ -222,6 +225,9 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 				setIsEditMode={setIsEditMode}
 				schedule={schedule}
 			/>
+			<div className={cn({ hidden: !loaderData.notifs?.length })}>
+				<ScheduleNotificationsConfig scheduleId={schedule.id} destinations={loaderData.notifs ?? []} />
+			</div>
 			<SnapshotTimeline
 				loading={isLoading}
 				snapshots={snapshots ?? []}

@@ -338,7 +338,8 @@ function buildNotificationMessage(
 		snapshotId?: string;
 	},
 ) {
-	const timestamp = new Date().toLocaleDateString();
+	const date = new Date().toLocaleDateString();
+	const time = new Date().toLocaleTimeString();
 
 	switch (event) {
 		case "start":
@@ -348,7 +349,7 @@ function buildNotificationMessage(
 					`Volume: ${context.volumeName}`,
 					`Repository: ${context.repositoryName}`,
 					context.scheduleName ? `Schedule: ${context.scheduleName}` : null,
-					`Time: ${timestamp}`,
+					`Time: ${date} - ${time}`,
 				]
 					.filter(Boolean)
 					.join("\n"),
@@ -364,7 +365,7 @@ function buildNotificationMessage(
 					context.filesProcessed !== undefined ? `Files: ${context.filesProcessed}` : null,
 					context.bytesProcessed ? `Size: ${context.bytesProcessed}` : null,
 					context.snapshotId ? `Snapshot: ${context.snapshotId}` : null,
-					`Time: ${timestamp}`,
+					`Time: ${date} - ${time}`,
 				]
 					.filter(Boolean)
 					.join("\n"),
@@ -377,7 +378,7 @@ function buildNotificationMessage(
 					`Volume: ${context.volumeName}`,
 					`Repository: ${context.repositoryName}`,
 					context.error ? `Error: ${context.error}` : null,
-					`Time: ${timestamp}`,
+					`Time: ${date} - ${time}`,
 				]
 					.filter(Boolean)
 					.join("\n"),
@@ -386,7 +387,7 @@ function buildNotificationMessage(
 		default:
 			return {
 				title: "Backup Notification",
-				body: `Volume: ${context.volumeName}\nRepository: ${context.repositoryName}\nTime: ${timestamp}`,
+				body: `Volume: ${context.volumeName}\nRepository: ${context.repositoryName}\nTime: ${date} - ${time}`,
 			};
 	}
 }
