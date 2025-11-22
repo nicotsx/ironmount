@@ -64,6 +64,12 @@ const defaultValuesForType = {
 		topic: "",
 		priority: "default" as const,
 	},
+	pushover: {
+		type: "pushover" as const,
+		userKey: "",
+		apiToken: "",
+		priority: 0,
+	},
 	custom: {
 		type: "custom" as const,
 		shoutrrrUrl: "",
@@ -141,6 +147,7 @@ export const CreateNotificationForm = ({ onSubmit, mode = "create", initialValue
 									<SelectItem value="discord">Discord</SelectItem>
 									<SelectItem value="gotify">Gotify</SelectItem>
 									<SelectItem value="ntfy">Ntfy</SelectItem>
+									<SelectItem value="pushover">Pushover</SelectItem>
 									<SelectItem value="custom">Custom (Shoutrrr URL)</SelectItem>
 								</SelectContent>
 							</Select>
@@ -490,6 +497,80 @@ export const CreateNotificationForm = ({ onSubmit, mode = "create", initialValue
 					</>
 				)}
 
+				{watchedType === "pushover" && (
+					<>
+						<FormField
+							control={form.control}
+							name="userKey"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>User Key</FormLabel>
+									<FormControl>
+										<Input {...field} placeholder="uQiRzpo4DXghDmr9QzzfQu27cmVRsG" />
+									</FormControl>
+									<FormDescription>Your Pushover user key from the dashboard.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="apiToken"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>API Token</FormLabel>
+									<FormControl>
+										<Input {...field} type="password" placeholder="••••••••" />
+									</FormControl>
+									<FormDescription>Application API token from your Pushover application.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="devices"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Devices (Optional)</FormLabel>
+									<FormControl>
+										<Input {...field} placeholder="iphone,android" />
+									</FormControl>
+									<FormDescription>Comma-separated list of device names. Leave empty for all devices.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="priority"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Priority</FormLabel>
+									<Select
+										onValueChange={(value) => field.onChange(Number(value))}
+										defaultValue={String(field.value)}
+										value={String(field.value)}
+									>
+										<FormControl>
+											<SelectTrigger>
+												<SelectValue placeholder="Select priority" />
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent>
+											<SelectItem value="-1">Low (-1)</SelectItem>
+											<SelectItem value="0">Normal (0)</SelectItem>
+											<SelectItem value="1">High (1)</SelectItem>
+										</SelectContent>
+									</Select>
+									<FormDescription>Message priority level.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
+
 				{watchedType === "custom" && (
 					<FormField
 						control={form.control}
@@ -513,7 +594,7 @@ export const CreateNotificationForm = ({ onSubmit, mode = "create", initialValue
 									>
 										Shoutrrr documentation
 									</a>
-									&nbsp; for supported services and URL formats.
+									&nbsp;for supported services and URL formats.
 								</FormDescription>
 								<FormMessage />
 							</FormItem>

@@ -101,6 +101,7 @@ export default function Notifications({ loaderData }: Route.ComponentProps) {
 							<SelectItem value="discord">Discord</SelectItem>
 							<SelectItem value="gotify">Gotify</SelectItem>
 							<SelectItem value="ntfy">Ntfy</SelectItem>
+							<SelectItem value="pushover">Pushover</SelectItem>
 							<SelectItem value="custom">Custom</SelectItem>
 						</SelectContent>
 					</Select>

@@ -6,6 +6,7 @@ export const NOTIFICATION_TYPES = {
 	discord: "discord",
 	gotify: "gotify",
 	ntfy: "ntfy",
+	pushover: "pushover",
 	custom: "custom",
 } as const;
 
@@ -52,6 +53,14 @@ export const ntfyNotificationConfigSchema = type({
 	priority: "'max' | 'high' | 'default' | 'low' | 'min'",
 });
 
+export const pushoverNotificationConfigSchema = type({
+	type: "'pushover'",
+	userKey: "string",
+	apiToken: "string",
+	devices: "string?",
+	priority: "-1 | 0 | 1",
+});
+
 export const customNotificationConfigSchema = type({
 	type: "'custom'",
 	shoutrrrUrl: "string",
@@ -62,6 +71,7 @@ export const notificationConfigSchema = emailNotificationConfigSchema
 	.or(discordNotificationConfigSchema)
 	.or(gotifyNotificationConfigSchema)
 	.or(ntfyNotificationConfigSchema)
+	.or(pushoverNotificationConfigSchema)
 	.or(customNotificationConfigSchema);
 
 export type NotificationConfig = typeof notificationConfigSchema.infer;
