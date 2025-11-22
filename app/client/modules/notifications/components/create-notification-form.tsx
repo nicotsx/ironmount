@@ -68,7 +68,7 @@ const defaultValuesForType = {
 		type: "pushover" as const,
 		userKey: "",
 		apiToken: "",
-		priority: 0,
+		priority: 0 as const,
 	},
 	custom: {
 		type: "custom" as const,

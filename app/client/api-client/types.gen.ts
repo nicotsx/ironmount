@@ -1841,6 +1841,12 @@ export type GetScheduleNotificationsResponses = {
         createdAt: number;
         destination: {
             config: {
+                apiToken: string;
+                priority: -1 | 0 | 1;
+                type: 'pushover';
+                userKey: string;
+                devices?: string;
+            } | {
                 from: string;
                 password: string;
                 smtpHost: string;
@@ -1879,7 +1885,7 @@ export type GetScheduleNotificationsResponses = {
             enabled: boolean;
             id: number;
             name: string;
-            type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'slack';
+            type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'pushover' | 'slack';
             updatedAt: number;
         };
         destinationId: number;
@@ -1916,6 +1922,12 @@ export type UpdateScheduleNotificationsResponses = {
         createdAt: number;
         destination: {
             config: {
+                apiToken: string;
+                priority: -1 | 0 | 1;
+                type: 'pushover';
+                userKey: string;
+                devices?: string;
+            } | {
                 from: string;
                 password: string;
                 smtpHost: string;
@@ -1954,7 +1966,7 @@ export type UpdateScheduleNotificationsResponses = {
             enabled: boolean;
             id: number;
             name: string;
-            type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'slack';
+            type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'pushover' | 'slack';
             updatedAt: number;
         };
         destinationId: number;
@@ -1980,6 +1992,12 @@ export type ListNotificationDestinationsResponses = {
      */
     200: Array<{
         config: {
+            apiToken: string;
+            priority: -1 | 0 | 1;
+            type: 'pushover';
+            userKey: string;
+            devices?: string;
+        } | {
             from: string;
             password: string;
             smtpHost: string;
@@ -2018,7 +2036,7 @@ export type ListNotificationDestinationsResponses = {
         enabled: boolean;
         id: number;
         name: string;
-        type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'slack';
+        type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'pushover' | 'slack';
         updatedAt: number;
     }>;
 };
@@ -2028,6 +2046,12 @@ export type ListNotificationDestinationsResponse = ListNotificationDestinationsR
 export type CreateNotificationDestinationData = {
     body?: {
         config: {
+            apiToken: string;
+            priority: -1 | 0 | 1;
+            type: 'pushover';
+            userKey: string;
+            devices?: string;
+        } | {
             from: string;
             password: string;
             smtpHost: string;
@@ -2075,6 +2099,12 @@ export type CreateNotificationDestinationResponses = {
      */
     201: {
         config: {
+            apiToken: string;
+            priority: -1 | 0 | 1;
+            type: 'pushover';
+            userKey: string;
+            devices?: string;
+        } | {
             from: string;
             password: string;
             smtpHost: string;
@@ -2113,7 +2143,7 @@ export type CreateNotificationDestinationResponses = {
         enabled: boolean;
         id: number;
         name: string;
-        type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'slack';
+        type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'pushover' | 'slack';
         updatedAt: number;
     };
 };
@@ -2169,6 +2199,12 @@ export type GetNotificationDestinationResponses = {
      */
     200: {
         config: {
+            apiToken: string;
+            priority: -1 | 0 | 1;
+            type: 'pushover';
+            userKey: string;
+            devices?: string;
+        } | {
             from: string;
             password: string;
             smtpHost: string;
@@ -2207,7 +2243,7 @@ export type GetNotificationDestinationResponses = {
         enabled: boolean;
         id: number;
         name: string;
-        type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'slack';
+        type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'pushover' | 'slack';
         updatedAt: number;
     };
 };
@@ -2217,6 +2253,12 @@ export type GetNotificationDestinationResponse = GetNotificationDestinationRespo
 export type UpdateNotificationDestinationData = {
     body?: {
         config?: {
+            apiToken: string;
+            priority: -1 | 0 | 1;
+            type: 'pushover';
+            userKey: string;
+            devices?: string;
+        } | {
             from: string;
             password: string;
             smtpHost: string;
@@ -2274,6 +2316,12 @@ export type UpdateNotificationDestinationResponses = {
      */
     200: {
         config: {
+            apiToken: string;
+            priority: -1 | 0 | 1;
+            type: 'pushover';
+            userKey: string;
+            devices?: string;
+        } | {
             from: string;
             password: string;
             smtpHost: string;
@@ -2312,7 +2360,7 @@ export type UpdateNotificationDestinationResponses = {
         enabled: boolean;
         id: number;
         name: string;
-        type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'slack';
+        type: 'custom' | 'discord' | 'email' | 'gotify' | 'ntfy' | 'pushover' | 'slack';
         updatedAt: number;
     };
 };
