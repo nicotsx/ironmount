@@ -29,6 +29,7 @@ const internalFormSchema = type({
 	frequency: "string",
 	dailyTime: "string?",
 	weeklyDay: "string?",
+	limitUploadKbps: "number?",
 	keepLast: "number?",
 	keepHourly: "number?",
 	keepDaily: "number?",
@@ -86,6 +87,7 @@ const backupScheduleToFormValues = (schedule?: BackupSchedule): InternalFormValu
 		weeklyDay,
 		includePatterns: schedule.includePatterns || undefined,
 		excludePatternsText: schedule.excludePatterns?.join("\n") || undefined,
+		limitUploadKbps: schedule.limitUploadKbps || undefined,
 		...schedule.retentionPolicy,
 	};
 };
@@ -247,6 +249,29 @@ export const CreateScheduleForm = ({ initialValues, formId, onSubmit, volume }: 
 									)}
 								/>
 							)}
+
+							<FormField
+								control={form.control}
+								name="limitUploadKbps"
+								render={({ field }) => (
+									<FormItem className="md:col-span-2">
+										<FormLabel>Upload speed limit (KB/s)</FormLabel>
+										<FormControl>
+											<Input
+												{...field}
+												type="number"
+												min={0}
+												placeholder="Unlimited"
+												onChange={(v) => field.onChange(v.target.value ? Number(v.target.value) : undefined)}
+											/>
+										</FormControl>
+										<FormDescription>
+											Limit upload bandwidth in kilobytes per second. Leave empty for unlimited speed.
+										</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 						</CardContent>
 					</Card>
 
@@ -482,6 +507,12 @@ export const CreateScheduleForm = ({ initialValues, formId, onSubmit, volume }: 
 									{repositoriesData?.find((r) => r.id === formValues.repositoryId)?.name || "—"}
 								</p>
 							</div>
+							{formValues.limitUploadKbps && (
+								<div>
+									<p className="text-xs uppercase text-muted-foreground">Upload speed limit</p>
+									<p className="font-medium">{formValues.limitUploadKbps} KB/s</p>
+								</div>
+							)}
 							{formValues.includePatterns && formValues.includePatterns.length > 0 && (
 								<div>
 									<p className="text-xs uppercase text-muted-foreground">Include paths</p>

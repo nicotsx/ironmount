@@ -88,6 +88,7 @@ const createSchedule = async (data: CreateBackupScheduleBody) => {
 			retentionPolicy: data.retentionPolicy ?? null,
 			excludePatterns: data.excludePatterns ?? [],
 			includePatterns: data.includePatterns ?? [],
+			limitUploadKbps: data.limitUploadKbps ?? null,
 			nextBackupAt: nextBackupAt,
 		})
 		.returning();
@@ -212,9 +213,11 @@ const executeBackup = async (scheduleId: number, manual = false) => {
 			exclude?: string[];
 			include?: string[];
 			tags?: string[];
+			limitUploadKbps?: number | null;
 			signal?: AbortSignal;
 		} = {
 			tags: [schedule.id.toString()],
+			limitUploadKbps: schedule.limitUploadKbps,
 			signal: abortController.signal,
 		};
 

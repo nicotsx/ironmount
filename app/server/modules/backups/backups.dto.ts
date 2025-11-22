@@ -24,6 +24,7 @@ const backupScheduleSchema = type({
 	retentionPolicy: retentionPolicySchema.or("null"),
 	excludePatterns: "string[] | null",
 	includePatterns: "string[] | null",
+	limitUploadKbps: "number | null",
 	lastBackupAt: "number | null",
 	lastBackupStatus: "'success' | 'error' | 'in_progress' | null",
 	lastBackupError: "string | null",
@@ -114,6 +115,7 @@ export const createBackupScheduleBody = type({
 	retentionPolicy: retentionPolicySchema.optional(),
 	excludePatterns: "string[]?",
 	includePatterns: "string[]?",
+	limitUploadKbps: "number?",
 	tags: "string[]?",
 });
 
@@ -149,6 +151,7 @@ export const updateBackupScheduleBody = type({
 	retentionPolicy: retentionPolicySchema.optional(),
 	excludePatterns: "string[]?",
 	includePatterns: "string[]?",
+	limitUploadKbps: "number?",
 	tags: "string[]?",
 });
 

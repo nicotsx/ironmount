@@ -156,6 +156,7 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 				retentionPolicy: Object.keys(retentionPolicy).length > 0 ? retentionPolicy : undefined,
 				includePatterns: formValues.includePatterns,
 				excludePatterns: formValues.excludePatterns,
+				limitUploadKbps: formValues.limitUploadKbps,
 			},
 		});
 	};
@@ -170,6 +171,7 @@ export default function ScheduleDetailsPage({ params, loaderData }: Route.Compon
 				retentionPolicy: schedule.retentionPolicy || undefined,
 				includePatterns: schedule.includePatterns || undefined,
 				excludePatterns: schedule.excludePatterns || undefined,
+				limitUploadKbps: schedule.limitUploadKbps || undefined,
 			},
 		});
 	};

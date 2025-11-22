@@ -234,6 +234,7 @@ const backup = async (
 		exclude?: string[];
 		include?: string[];
 		tags?: string[];
+		limitUploadKbps?: number | null;
 		signal?: AbortSignal;
 		onProgress?: (progress: BackupProgress) => void;
 	},
@@ -242,6 +243,10 @@ const backup = async (
 	const env = await buildEnv(config);
 
 	const args: string[] = ["--repo", repoUrl, "backup", "--one-file-system"];
+
+	if (options?.limitUploadKbps) {
+		args.push("--limit-upload", String(options.limitUploadKbps));
+	}
 
 	if (options?.tags && options.tags.length > 0) {
 		for (const tag of options.tags) {
